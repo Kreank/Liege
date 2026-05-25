@@ -1,0 +1,3988 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Liege</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🗡️%3C/text%3E%3C/svg%3E" />
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100vw; height: 100vh; }
+    body { background: #0a0a0f; overflow: hidden; font-family: monospace; }
+    canvas { display: block; }
+    #ui {
+      position: fixed; top: 12px; left: 12px; z-index: 10;
+      color: #c8b88a; font-size: 13px; text-shadow: 1px 1px 3px #000;
+      pointer-events: none;
+    }
+    #minimap {
+      position: fixed; bottom: 12px; right: 12px; z-index: 10;
+      border: 1px solid #444; image-rendering: pixelated;
+    }
+    #status {
+      position: fixed; top: 12px; right: 12px; z-index: 10;
+      color: #7aad6a; font-size: 12px; text-shadow: 1px 1px 3px #000;
+    }
+    #hp-bar {
+      position: fixed; top: 38px; left: 12px; z-index: 10;
+      width: 220px; height: 18px;
+      background: rgba(0,0,0,0.55); border: 1px solid #c8b88a;
+    }
+    #hp-fill {
+      height: 100%; width: 100%;
+      background: linear-gradient(to right, #a02820, #e85040);
+      transition: width 0.3s;
+    }
+    #hp-text {
+      position: absolute; inset: 0;
+      text-align: center; color: white;
+      font-size: 11px; line-height: 18px;
+      text-shadow: 1px 1px 2px #000;
+      font-family: monospace; font-weight: bold;
+    }
+    #mana-bar {
+      position: fixed; top: 60px; left: 12px; z-index: 10;
+      width: 220px; height: 14px;
+      background: rgba(0,0,0,0.55); border: 1px solid #5a7aa8;
+    }
+    #mana-fill {
+      height: 100%; width: 100%;
+      background: linear-gradient(to right, #2030a0, #4080e8);
+      transition: width 0.3s;
+    }
+    #mana-text {
+      position: absolute; inset: 0;
+      text-align: center; color: white;
+      font-size: 10px; line-height: 14px;
+      text-shadow: 1px 1px 2px #000;
+      font-family: monospace; font-weight: bold;
+    }
+    #hunger-bar {
+      position: fixed; top: 78px; left: 12px; z-index: 10;
+      width: 220px; height: 12px;
+      background: rgba(0,0,0,0.55); border: 1px solid #a08040;
+    }
+    #hunger-fill { height: 100%; width: 100%; background: linear-gradient(to right, #6a4020, #d08040); transition: width 0.3s; }
+    #hunger-text { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 9px; line-height: 12px; text-shadow: 1px 1px 2px #000; font-family: monospace; }
+    #stamina-bar {
+      position: fixed; top: 94px; left: 12px; z-index: 10;
+      width: 220px; height: 12px;
+      background: rgba(0,0,0,0.55); border: 1px solid #4a8a4a;
+    }
+    #stamina-fill { height: 100%; width: 100%; background: linear-gradient(to right, #205020, #50a050); transition: width 0.3s; }
+    #stamina-text { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 9px; line-height: 12px; text-shadow: 1px 1px 2px #000; font-family: monospace; }
+    /* Body-Parts (Welle 4) */
+    #body-parts {
+      position: fixed; top: 112px; left: 12px; z-index: 10;
+      width: 220px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .bp-row {
+      position: relative; height: 9px; background: rgba(0,0,0,0.55);
+      border: 1px solid #707080;
+    }
+    .bp-fill { height: 100%; background: linear-gradient(to right, #802020, #d04040); transition: width 0.3s; }
+    .bp-label { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 8px; line-height: 9px; text-shadow: 1px 1px 1px #000; font-family: monospace; }
+
+    /* Skills-Panel */
+    #skills-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #skills-overlay.active { display: flex; }
+    #skills-box {
+      width: 90%; max-width: 480px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+    }
+    #skills-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #skills-list { padding: 10px 14px; }
+    .skill-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .skill-icon { font-size: 18px; width: 28px; }
+    .skill-name { flex: 0 0 110px; color: #e8d870; }
+    .skill-level { flex: 0 0 60px; color: #fff; text-align: center; font-weight: bold; }
+    .skill-progress { flex: 1; height: 12px; background: rgba(0,0,0,0.5); border: 1px solid #555; position: relative; }
+    .skill-progress-fill { height: 100%; background: linear-gradient(to right, #4a5a8a, #6a8acf); }
+
+    /* Research-Panel (Welle 6) */
+    #research-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #research-overlay.active { display: flex; }
+    #research-box {
+      width: 92%; max-width: 620px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8a868;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column; max-height: 86vh;
+    }
+    #research-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8c870; font-weight: bold;
+    }
+    #research-list { padding: 8px 14px; overflow-y: auto; }
+    .research-row {
+      display: grid; grid-template-columns: 36px 1fr 90px 100px;
+      gap: 8px; padding: 8px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .research-row.locked { opacity: 0.4; }
+    .research-row.done { background: rgba(40,60,30,0.3); }
+    .research-icon { font-size: 22px; text-align: center; }
+    .research-name { color: #e8c870; }
+    .research-desc { font-size: 10px; color: #807060; }
+    .research-bar { height: 10px; background: rgba(0,0,0,0.5); border: 1px solid #555; position: relative; }
+    .research-bar-fill { height: 100%; background: linear-gradient(to right, #806020, #d0a040); }
+    .research-bar-text { position: absolute; inset: 0; text-align: center; font-size: 9px; color: #fff; line-height: 10px; text-shadow: 1px 1px 1px #000; }
+    .research-actions button {
+      background: #404020; border: 1px solid #a09060; color: #fff; cursor: pointer;
+      padding: 3px 7px; font-size: 10px; margin-left: 2px; border-radius: 3px;
+    }
+    .research-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Talent-Panel (Welle 18) */
+    #talents-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #talents-overlay.active { display: flex; }
+    #talents-box {
+      width: 92%; max-width: 720px;
+      background: rgba(20,18,14,0.97); border: 1px solid #b89858;
+      color: #c8b88a; font-size: 12px; max-height: 88vh;
+      display: flex; flex-direction: column;
+    }
+    #talents-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #ffd060; font-weight: bold;
+    }
+    #talents-points { color: #ffd060; font-size: 14px; }
+    #talents-tabs {
+      display: flex; gap: 2px; padding: 6px 10px; background: rgba(0,0,0,0.3);
+      flex-wrap: wrap;
+    }
+    .talents-tab {
+      background: rgba(60,50,30,0.7); border: 1px solid #806040; color: #c8b88a;
+      padding: 4px 10px; cursor: pointer; font-size: 11px; border-radius: 3px;
+    }
+    .talents-tab.active { background: rgba(120,90,40,0.9); color: #fff; }
+    #talents-list { padding: 8px 14px; overflow-y: auto; flex: 1; }
+    .talent-row {
+      display: grid; grid-template-columns: 32px 1fr 100px;
+      gap: 8px; padding: 6px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .talent-row.locked { opacity: 0.45; }
+    .talent-row.learned { background: rgba(40,60,30,0.3); }
+    .talent-row.available { background: rgba(60,50,20,0.3); }
+    .talent-icon { font-size: 22px; text-align: center; }
+    .talent-name { color: #e8c870; font-weight: bold; }
+    .talent-desc { font-size: 10px; color: #a09080; }
+    .talent-meta { font-size: 9px; color: #807060; }
+    .talent-action button {
+      background: #604020; border: 1px solid #a08040; color: #fff; cursor: pointer;
+      padding: 4px 8px; font-size: 11px; border-radius: 3px; width: 100%;
+    }
+    .talent-action button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .talent-status { font-size: 10px; padding: 2px 6px; border-radius: 3px; text-align: center; }
+    .talent-status.learned     { background: #305030; color: #80f080; }
+    .talent-status.needs_points{ background: #503020; color: #ff8060; }
+    .talent-status.locked      { background: #303030; color: #808080; }
+
+    /* Character-Panel (Attribute) */
+    #attributes-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #attributes-overlay.active { display: flex; }
+    #attributes-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8a888;
+      color: #c8b88a; font-size: 12px; max-height: 84vh;
+      display: flex; flex-direction: column;
+    }
+    #attributes-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8c870; font-weight: bold;
+    }
+    #attributes-list { padding: 10px 14px; overflow-y: auto; }
+    .attr-row {
+      display: grid; grid-template-columns: 110px 1fr 60px;
+      gap: 8px; padding: 5px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .attr-label { color: #e8c870; font-weight: bold; }
+    .attr-desc  { font-size: 10px; color: #a09060; }
+    .attr-value { font-size: 14px; font-weight: bold; color: #fff;
+                  text-align: right; font-family: monospace; }
+
+    /* Hotbar (Welle 34) */
+    #hotbar {
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 50; display: flex; gap: 4px;
+      padding: 4px; background: rgba(0,0,0,0.55); border: 1px solid #806040;
+      border-radius: 6px;
+    }
+    .hotbar-slot {
+      width: 52px; height: 52px; position: relative;
+      background: rgba(20,18,14,0.85); border: 2px solid #555;
+      border-radius: 4px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hotbar-slot:hover { border-color: #c8b88a; }
+    .hotbar-slot.active { border-color: #ffd060; box-shadow: 0 0 8px rgba(255,208,96,0.5); }
+    .hotbar-slot img { width: 44px; height: 44px; object-fit: contain; }
+    .hotbar-key {
+      position: absolute; top: 1px; left: 3px;
+      color: #ffd060; font-size: 10px; font-family: monospace;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .hotbar-count {
+      position: absolute; bottom: 1px; right: 3px;
+      color: #fff; font-size: 11px; font-weight: bold; font-family: monospace;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .hotbar-empty { opacity: 0.4; }
+
+    /* Item-Tooltip (Welle 35) */
+    #item-tooltip {
+      position: fixed; z-index: 200; pointer-events: none;
+      background: rgba(15,12,8,0.97); border: 1px solid #b89858;
+      padding: 8px 10px; color: #c8b88a; font-size: 11px;
+      font-family: monospace; min-width: 180px; max-width: 280px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: none;
+    }
+    #item-tooltip.active { display: block; }
+    .tt-name { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
+    .tt-quality { font-size: 10px; margin-bottom: 4px; opacity: 0.8; }
+    .tt-stats { margin: 4px 0; line-height: 1.4; }
+    .tt-stats div { color: #b0c0a0; }
+    .tt-stats .neg { color: #c08080; }
+    .tt-affix { color: #a0a060; font-size: 10px; margin-top: 3px; }
+    .tt-flavor { color: #807060; font-style: italic; margin-top: 4px; font-size: 10px; }
+
+    /* Faction-Panel (Welle 27) */
+    #factions-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #factions-overlay.active { display: flex; }
+    #factions-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #b88858;
+      color: #c8b88a; font-size: 12px; max-height: 80vh;
+      display: flex; flex-direction: column;
+    }
+    #factions-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8b870; font-weight: bold;
+    }
+    #factions-list { padding: 10px 14px; overflow-y: auto; }
+    .faction-row {
+      display: grid; grid-template-columns: 18px 1fr 80px 80px;
+      gap: 8px; padding: 6px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .faction-dot { width: 14px; height: 14px; border-radius: 50%; }
+    .faction-name { color: #e8c870; }
+    .faction-bar { width: 80px; height: 8px; background: rgba(0,0,0,0.5); border: 1px solid #555; position: relative; }
+    .faction-bar-fill { position: absolute; top: 0; bottom: 0; }
+    .faction-tier {
+      font-size: 10px; text-align: center; padding: 2px 4px; border-radius: 3px;
+    }
+    .faction-tier.hostile    { background: #802020; color: #ffcccc; }
+    .faction-tier.unfriendly { background: #604030; color: #ffdda0; }
+    .faction-tier.neutral    { background: #404040; color: #c0c0c0; }
+    .faction-tier.friendly   { background: #306030; color: #c0ffc0; }
+    .faction-tier.allied     { background: #2050a0; color: #c0e0ff; }
+
+    /* Status-Effekte (Welle 11) */
+    #status-effects-row {
+      position: fixed; top: 150px; left: 12px; z-index: 11;
+      display: flex; gap: 4px; flex-wrap: wrap;
+      max-width: 220px;
+    }
+    .status-chip {
+      background: rgba(0,0,0,0.55); border: 1px solid #806040;
+      padding: 2px 6px; color: #fff; font-size: 11px; font-family: monospace;
+      border-radius: 8px;
+    }
+    /* Tag/Nacht-Overlay (Welle 7) */
+    #time-tint {
+      position: fixed; inset: 0; z-index: 5; pointer-events: none;
+      transition: background 4s ease-in-out;
+      background: transparent;
+    }
+    #time-display {
+      position: fixed; top: 10px; right: 168px; z-index: 12;
+      background: rgba(0,0,0,0.55); border: 1px solid #806040;
+      padding: 4px 10px; color: #ffeec0; font-family: monospace;
+      font-size: 12px; font-weight: bold;
+    }
+    /* Quest-Panel (Welle 10) */
+    #quests-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #quests-overlay.active { display: flex; }
+    #quests-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 12px; max-height: 84vh;
+      display: flex; flex-direction: column;
+    }
+    #quests-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #quests-list { padding: 8px 14px; overflow-y: auto; }
+    .quest-row {
+      padding: 8px 0; border-bottom: 1px dashed #443a20;
+    }
+    .quest-row.completed { background: rgba(30, 60, 30, 0.25); }
+    .quest-title { color: #e8d870; font-weight: bold; }
+    .quest-desc { font-size: 11px; color: #b09870; margin: 2px 0; }
+    .quest-objective { font-size: 11px; color: #b8b890; }
+    .quest-reward { font-size: 11px; color: #80c0a0; }
+    .quest-claim {
+      background: #205020; border: 1px solid #50a050; color: #fff;
+      cursor: pointer; padding: 3px 8px; border-radius: 3px; margin-top: 3px;
+      font-size: 11px;
+    }
+    .skill-progress-text { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 9px; line-height: 12px; }
+    #hp-bar.damage-flash {
+      animation: hpFlash 0.3s;
+    }
+    @keyframes hpFlash {
+      0%   { box-shadow: 0 0 0 0 rgba(232,80,64,0); }
+      30%  { box-shadow: 0 0 12px 6px rgba(232,80,64,0.8); }
+      100% { box-shadow: 0 0 0 0 rgba(232,80,64,0); }
+    }
+    #screen-damage {
+      position: fixed; inset: 0; z-index: 50;
+      pointer-events: none;
+      box-shadow: inset 0 0 80px 30px rgba(232,40,40,0); opacity: 0;
+      transition: opacity 0.2s, box-shadow 0.2s;
+    }
+    #screen-damage.active {
+      opacity: 1;
+      box-shadow: inset 0 0 80px 30px rgba(232,40,40,0.7);
+    }
+    #build-bar {
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.75); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 12px; padding: 8px 16px;
+      z-index: 10; display: none;
+      max-width: 95vw;
+    }
+    #build-bar .key { color: #e8d870; font-weight: bold; }
+    #build-bar #build-selected { color: #fff; }
+    #build-palette {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      margin: 6px 0;
+      max-height: 180px; overflow-y: auto;
+    }
+    .palette-btn {
+      background: rgba(0,0,0,0.4); border: 1px solid #555;
+      color: #c8b88a; padding: 4px 8px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .palette-btn:hover { border-color: #c8b88a; }
+    .palette-btn.active { background: rgba(120,120,40,0.5); border-color: #e8d870; color: #fff; }
+    .palette-btn .palette-key { color: #e8d870; font-weight: bold; margin-left: 2px; }
+    .palette-btn .palette-icon { font-size: 14px; }
+
+    /* Chronik-Panel links — letzte Welt-Events */
+    #chronik {
+      position: fixed; left: 12px; top: 60px; z-index: 10;
+      width: 280px; max-height: 60vh;
+      background: rgba(0,0,0,0.65); border: 1px solid #555;
+      color: #c8b88a; font-size: 11px;
+      display: flex; flex-direction: column;
+    }
+    #chronik-header {
+      padding: 6px 10px; background: rgba(0,0,0,0.5);
+      border-bottom: 1px solid #555; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    #chronik-toggle { color: #e8d870; }
+    #chronik-list {
+      overflow-y: auto; padding: 6px 10px; flex: 1;
+      scrollbar-width: thin;
+    }
+    #chronik-list .ev {
+      margin-bottom: 8px; padding-bottom: 8px;
+      border-bottom: 1px dashed #333;
+    }
+    #chronik-list .ev:last-child { border-bottom: none; }
+    #chronik-list .ev-title { color: #e8d870; font-weight: bold; }
+    #chronik-list .ev-body  { color: #c8b88a; margin-top: 2px; line-height: 1.4; }
+    #chronik-list .ev-meta  { color: #888; font-size: 10px; margin-top: 2px; }
+    #chronik.collapsed #chronik-list { display: none; }
+
+    /* Dialog-Modal */
+    #dialog-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #dialog-overlay.active { display: flex; }
+    #dialog-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 75vh;
+    }
+    #dialog-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    #dialog-npc-name { color: #e8d870; font-weight: bold; }
+    #dialog-npc-kind { color: #aaaa88; font-size: 11px; margin-left: 4px; }
+    #dialog-npc-bg   { color: #888; font-style: italic; font-size: 11px;
+                       padding: 6px 14px; border-bottom: 1px solid #333; }
+    #dialog-close {
+      background: none; border: 1px solid #555; color: #c8b88a;
+      padding: 2px 8px; cursor: pointer; font-family: monospace;
+    }
+    #dialog-close:hover { background: rgba(255,255,255,0.05); }
+    #dialog-history {
+      flex: 1; overflow-y: auto; padding: 10px 14px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #dialog-history .bubble {
+      max-width: 85%; padding: 6px 10px; line-height: 1.4;
+      border-radius: 4px;
+    }
+    #dialog-history .bubble.user {
+      align-self: flex-end; background: rgba(80,80,40,0.5); color: #e8d870;
+    }
+    #dialog-history .bubble.npc {
+      align-self: flex-start; background: rgba(40,40,60,0.5); color: #c8d8e8;
+    }
+    #dialog-history .bubble.typing {
+      color: #888; font-style: italic;
+      animation: typingBlink 1.4s ease-in-out infinite;
+    }
+    @keyframes typingBlink {
+      0%, 100% { opacity: 0.35; }
+      50%      { opacity: 0.95; }
+    }
+    #dialog-input-row {
+      display: flex; gap: 6px;
+      padding: 10px 14px; border-top: 1px solid #555;
+    }
+    #dialog-input {
+      flex: 1; padding: 6px 10px; background: rgba(0,0,0,0.4);
+      border: 1px solid #555; color: #c8b88a; font-family: monospace;
+      font-size: 13px; outline: none;
+    }
+    #dialog-input:focus { border-color: #c8b88a; }
+    #dialog-send {
+      padding: 6px 14px; background: rgba(80,80,40,0.5);
+      border: 1px solid #c8b88a; color: #e8d870;
+      cursor: pointer; font-family: monospace;
+    }
+    #dialog-send:hover { background: rgba(120,120,60,0.5); }
+    #dialog-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Inventar-Modal */
+    #inventory-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #inventory-overlay.active { display: flex; }
+    #inventory-box {
+      width: 90%; max-width: 640px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    #inventory-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #inventory-close {
+      background: none; border: 1px solid #555; color: #c8b88a;
+      padding: 2px 8px; cursor: pointer; font-family: monospace;
+    }
+    .inv-section-title {
+      color: #aaaa88; font-size: 11px; padding: 8px 14px 4px 14px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    #inventory-slots {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 6px; padding: 6px 14px 14px 14px;
+    }
+    .slot {
+      background: rgba(0,0,0,0.4); border: 1px solid #555;
+      padding: 6px; text-align: center; cursor: pointer;
+      min-height: 80px;
+    }
+    .slot:hover { border-color: #c8b88a; }
+    .slot img { width: 48px; height: 48px; image-rendering: pixelated; }
+    .slot-empty { color: #555; font-size: 28px; padding: 12px 0; }
+    .slot-label { color: #888; font-size: 10px; display: block; margin-top: 2px; }
+    .slot-item { color: #e8d870; font-size: 11px; display: block; }
+    #inventory-list {
+      overflow-y: auto; padding: 6px 14px 14px 14px;
+      max-height: 50vh; flex: 1;
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+    }
+    .inv-slot {
+      position: relative; aspect-ratio: 1;
+      background: rgba(40,32,20,0.7); border: 2px solid #6a5a3a;
+      border-radius: 4px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .inv-slot:hover { border-color: #c8b88a; background: rgba(60,48,28,0.8); }
+    .inv-slot img { width: 80%; height: 80%; object-fit: contain; image-rendering: pixelated; }
+    .inv-slot-count {
+      position: absolute; bottom: 2px; right: 4px;
+      color: #fff; font-size: 11px; font-weight: bold; font-family: monospace;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .inv-slot-quality {
+      position: absolute; top: 2px; left: 3px; font-size: 10px;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .inv-slot-empty { opacity: 0.3; pointer-events: none; }
+    .inv-slot.legendary  { border-color: #ffd060; }
+    .inv-slot.masterwork { border-color: #c0a0ff; }
+    .inv-slot.fine       { border-color: #80c0ff; }
+    .inv-slot.rough      { border-color: #888; }
+    .item-cat { color: #888; font-size: 10px; margin-right: 8px; text-transform: uppercase; }
+    .item-actions { display: flex; gap: 4px; }
+    .item-actions button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 3px 8px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+    }
+    .item-actions button:hover { background: rgba(120,120,60,0.6); }
+    .inv-empty { color: #666; font-style: italic; padding: 10px; text-align: center; }
+
+    /* Trade-Modal — analog zu Chest */
+    #trade-overlay {
+      position: fixed; inset: 0; z-index: 160;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #trade-overlay.active { display: flex; }
+    #trade-box {
+      width: 90%; max-width: 720px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    #trade-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #trade-coins { color: #ffd060; }
+    #trade-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding: 10px 14px; flex: 1; overflow-y: auto;
+    }
+    #trade-cols .col-title { color: #aaaa88; font-size: 11px;
+      text-transform: uppercase; margin-bottom: 6px; }
+    /* Welle 38: Händler-Card-Layout */
+    .trade-col {
+      display: flex; flex-direction: column; gap: 4px;
+      background: rgba(0,0,0,0.25); border: 1px solid #4a3a20;
+      border-radius: 4px; padding: 8px;
+    }
+    .trade-row {
+      display: grid; grid-template-columns: 32px 1fr auto auto;
+      align-items: center; gap: 8px;
+      padding: 4px 6px; border-radius: 3px;
+      background: rgba(30,24,16,0.5);
+    }
+    .trade-row:hover { background: rgba(50,40,24,0.7); }
+    .trade-row img { width: 28px; height: 28px; image-rendering: pixelated; object-fit: contain; }
+    .trade-row .name { font-size: 12px; color: #c8b88a; }
+    .trade-row .qty { font-size: 10px; color: #aaaa88; }
+    .trade-row .price { color: #ffd060; font-size: 11px; font-weight: bold; }
+    .trade-row button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 3px 10px; cursor: pointer;
+      font-family: monospace; font-size: 11px; border-radius: 3px;
+    }
+    .trade-row button:hover { background: rgba(120,90,40,0.7); }
+    .trade-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .trade-row.unaffordable { opacity: 0.55; }
+
+    /* Chest- + Crafting-Modal */
+    #chest-overlay, #crafting-overlay {
+      position: fixed; inset: 0; z-index: 160;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #chest-overlay.active, #crafting-overlay.active { display: flex; }
+    #chest-box, #crafting-box {
+      width: 90%; max-width: 720px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    #chest-header, #crafting-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #chest-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding: 10px 14px; flex: 1; overflow-y: auto;
+    }
+    #chest-cols .col-title { color: #aaaa88; font-size: 11px;
+      text-transform: uppercase; margin-bottom: 6px; }
+    .chest-item-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px; border-bottom: 1px dashed #333;
+    }
+    .chest-item-row img { width: 24px; height: 24px; image-rendering: pixelated; }
+    .chest-item-row .name { flex: 1; }
+    .chest-item-row button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 2px 8px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+    }
+    #crafting-recipes { overflow-y: auto; padding: 10px 14px; max-height: 50vh; }
+    #crafting-bills-section { padding: 6px 14px 4px; border-bottom: 1px solid #4a3a20; max-height: 20vh; overflow-y: auto; background: rgba(40,20,8,0.4); }
+    #crafting-bills-header { font-size: 11px; color: #cfa060; margin-bottom: 4px; }
+    .bill-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 11px; }
+    .bill-row .bill-name { flex: 1; color: #e8d8a0; }
+    .bill-row .bill-progress { color: #a0c8a0; min-width: 60px; text-align: right; }
+    .bill-row .bill-status { font-size: 10px; min-width: 70px; text-align: center; }
+    .bill-row .bill-status.blocked { color: #d04040; }
+    .bill-row .bill-status.active  { color: #80c080; }
+    .bill-row .bill-remove { background: #602020; border: 1px solid #a04040; color: #fff; cursor: pointer; padding: 1px 6px; border-radius: 3px; }
+    .recipe-controls { display: flex; gap: 4px; align-items: center; }
+    .recipe-controls button { padding: 3px 7px; font-size: 10px; }
+    .recipe-controls .bill-btn { background: #303058; border: 1px solid #5a5aa0; color: #fff; cursor: pointer; border-radius: 3px; }
+    /* Welle 37: Crafting-UI als Card-Grid */
+    #crafting-recipes {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 8px;
+    }
+    .recipe-row {
+      padding: 8px; background: rgba(30,24,16,0.7);
+      border: 1px solid #6a5a3a; border-radius: 4px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .recipe-row.craftable { border-color: #c8b88a; }
+    .recipe-row.craftable:hover { background: rgba(50,40,24,0.9); }
+    .recipe-icon {
+      width: 48px; height: 48px;
+      background: rgba(0,0,0,0.4); border: 1px solid #555;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .recipe-icon img { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; }
+    .recipe-info { flex: 1; min-width: 0; }
+    .recipe-name { color: #e8d870; font-weight: bold; font-size: 12px; }
+    .recipe-ingredients {
+      font-size: 11px; margin-top: 3px; display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .ingredient-chip {
+      display: inline-flex; align-items: center; gap: 2px;
+      padding: 1px 4px; border-radius: 3px; background: rgba(0,0,0,0.4);
+    }
+    .ingredient-chip img { width: 14px; height: 14px; image-rendering: pixelated; }
+    .ingredient-chip.ok { color: #7aad6a; border: 1px solid #4a7a4a; }
+    .ingredient-chip.missing { color: #b85a5a; border: 1px solid #7a4040; }
+    .recipe-row button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 4px 10px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+    }
+    .recipe-row button:disabled {
+      opacity: 0.4; cursor: not-allowed; background: rgba(60,60,40,0.3);
+    }
+
+    /* Story-Toast: groß, mittig, für KI-Events */
+    .story-toast {
+      position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+      background: rgba(10,10,15,0.92); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 12px 20px; max-width: 480px;
+      z-index: 100; font-size: 13px; line-height: 1.5;
+      animation: storyFade 10s forwards;
+    }
+    .story-toast .st-title { color: #e8d870; font-weight: bold; margin-bottom: 4px; }
+    @keyframes storyFade {
+      0%   { opacity: 0; transform: translate(-50%, -10px); }
+      8%   { opacity: 1; transform: translate(-50%, 0); }
+      85%  { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -10px); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="ui">
+  🗡️ <span id="coords">x:0 y:0</span> &nbsp;|&nbsp;
+  🌿 <span id="tile-name">Grasland</span>
+</div>
+
+<div id="status">
+  ⚡ <span id="conn-status">Verbinde...</span><br>
+  👥 <span id="player-count">0 Spieler</span>
+</div>
+
+<div id="screen-damage"></div>
+
+<div id="hp-bar">
+  <div id="hp-fill"></div>
+  <div id="hp-text">100 / 100</div>
+</div>
+
+<div id="mana-bar">
+  <div id="mana-fill"></div>
+  <div id="mana-text">50 / 50</div>
+</div>
+
+<div id="hunger-bar"><div id="hunger-fill"></div><div id="hunger-text">100/100</div></div>
+<div id="stamina-bar"><div id="stamina-fill"></div><div id="stamina-text">100/100</div></div>
+<div id="status-effects-row"></div>
+<div id="hotbar"></div>
+<div id="item-tooltip"></div>
+<div id="time-tint"></div>
+<div id="time-display">☀️ 08:00</div>
+<div id="body-parts">
+  <div class="bp-row"><div class="bp-fill" id="bp-torso-fill"></div><div class="bp-label" id="bp-torso-text">🫀 Torso 100/100</div></div>
+  <div class="bp-row"><div class="bp-fill" id="bp-arms-fill"></div><div class="bp-label"  id="bp-arms-text">💪 Arme 100/100</div></div>
+  <div class="bp-row"><div class="bp-fill" id="bp-legs-fill"></div><div class="bp-label"  id="bp-legs-text">🦵 Beine 100/100</div></div>
+</div>
+
+<div id="skills-overlay">
+  <div id="skills-box">
+    <div id="skills-header">
+      <span>📚 Fähigkeiten</span>
+      <button id="skills-close" type="button">K / Esc</button>
+    </div>
+    <div id="skills-list"></div>
+  </div>
+</div>
+
+<div id="research-overlay">
+  <div id="research-box">
+    <div id="research-header">
+      <span>🔬 Forschung</span>
+      <button id="research-close" type="button">R / Esc</button>
+    </div>
+    <div id="research-list"></div>
+  </div>
+</div>
+
+<div id="attributes-overlay">
+  <div id="attributes-box">
+    <div id="attributes-header">
+      <span>📋 Charakter — Attribute</span>
+      <button id="attributes-close" type="button">C / Esc</button>
+    </div>
+    <div id="attributes-list"></div>
+  </div>
+</div>
+
+<div id="talents-overlay">
+  <div id="talents-box">
+    <div id="talents-header">
+      <span>🌟 Talente <span id="talents-points">0 Punkte</span></span>
+      <button id="talents-close" type="button">T / Esc</button>
+    </div>
+    <div id="talents-tabs"></div>
+    <div id="talents-list"></div>
+  </div>
+</div>
+
+<div id="factions-overlay">
+  <div id="factions-box">
+    <div id="factions-header">
+      <span>⚖️ Faktionen</span>
+      <button id="factions-close" type="button">F / Esc</button>
+    </div>
+    <div id="factions-list"></div>
+  </div>
+</div>
+
+<div id="quests-overlay">
+  <div id="quests-box">
+    <div id="quests-header">
+      <span>📜 Quests</span>
+      <button id="quests-close" type="button">Q / Esc</button>
+    </div>
+    <div id="quests-list"></div>
+  </div>
+</div>
+
+<canvas id="minimap" width="150" height="100"></canvas>
+
+<div id="build-bar">
+  <div>🔨 <span class="key">B</span> beenden &nbsp;|&nbsp; <span class="key">M</span> Material: <span id="build-material">Stein</span> &nbsp;|&nbsp; Aktiv: <span id="build-selected">Mauer</span></div>
+  <div id="build-palette"></div>
+  <div>Klick = platzieren, Rechtsklick = abreißen</div>
+</div>
+
+<div id="chronik">
+  <div id="chronik-header" onclick="document.getElementById('chronik').classList.toggle('collapsed')">
+    📜 Chronik <span id="chronik-toggle">−</span>
+  </div>
+  <div id="chronik-list"></div>
+</div>
+
+<div id="trade-overlay">
+  <div id="trade-box">
+    <div id="trade-header">
+      <span>🪙 <span id="trade-npc-name">Händler</span></span>
+      <span>Münzen: <span id="trade-coins">0</span></span>
+      <button id="trade-close" type="button">Esc</button>
+    </div>
+    <div id="trade-cols">
+      <div>
+        <div class="col-title">Mein Beutel (Verkaufen)</div>
+        <div id="trade-player-items"></div>
+      </div>
+      <div>
+        <div class="col-title">Angebot des Händlers</div>
+        <div id="trade-offerings"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="chest-overlay">
+  <div id="chest-box">
+    <div id="chest-header">
+      <span>📦 Truhe</span>
+      <button id="chest-close" type="button">Esc</button>
+    </div>
+    <div id="chest-cols">
+      <div>
+        <div class="col-title">Mein Beutel</div>
+        <div id="chest-player-items"></div>
+      </div>
+      <div>
+        <div class="col-title">Truhen-Inhalt</div>
+        <div id="chest-chest-items"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="crafting-overlay">
+  <div id="crafting-box">
+    <div id="crafting-header">
+      <span>🔨 <span id="crafting-station-label">Station</span></span>
+      <button id="crafting-close" type="button">Esc</button>
+    </div>
+    <div id="crafting-bills-section">
+      <div id="crafting-bills-header">📋 Aufträge (laufen im Hintergrund)</div>
+      <div id="crafting-bills-list"></div>
+    </div>
+    <div id="crafting-recipes"></div>
+  </div>
+</div>
+
+<div id="inventory-overlay">
+  <div id="inventory-box">
+    <div id="inventory-header">
+      <span>🎒 Inventar</span>
+      <button id="inventory-close" type="button">I / Esc</button>
+    </div>
+    <div class="inv-section-title">Ausrüstung</div>
+    <div id="inventory-slots"></div>
+    <div class="inv-section-title">Beutel</div>
+    <div id="inventory-list"></div>
+  </div>
+</div>
+
+<div id="dialog-overlay">
+  <div id="dialog-box">
+    <div id="dialog-header">
+      <span><span id="dialog-npc-name"></span><span id="dialog-npc-kind"></span></span>
+      <button id="dialog-close" type="button">Esc</button>
+    </div>
+    <div id="dialog-npc-bg"></div>
+    <div id="dialog-history"></div>
+    <div id="dialog-actions-row">
+      <button id="dialog-quest-btn" type="button" style="background:rgba(80,60,20,0.5);border:1px solid #c8a868;color:#e8d870;cursor:pointer;padding:4px 10px;margin:4px 0;border-radius:3px;font-size:11px;">📜 Auftrag annehmen</button>
+    </div>
+    <div id="dialog-input-row">
+      <input type="text" id="dialog-input" placeholder="Sag etwas …" maxlength="500" />
+      <button id="dialog-send" type="button">Senden</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Tile-Konfiguration ───────────────────────────────────────────────────────
+const TILE = {
+  WATER:    { id: 0, name: 'Wasser',   sprite: 'tile_water',    miniColor: '#1a4a7a' },
+  SAND:     { id: 1, name: 'Strand',   sprite: 'tile_sand',     miniColor: '#c8a85a' },
+  GRASS:    { id: 2, name: 'Grasland', sprite: 'tile_grass',    miniColor: '#3d7a3a' },
+  FOREST:   { id: 3, name: 'Wald',     sprite: 'tile_forest',   miniColor: '#1a4a1a' },
+  MOUNTAIN: { id: 4, name: 'Gebirge',  sprite: 'tile_mountain', miniColor: '#7a6a5a' },
+  DESERT:   { id: 5, name: 'Wüste',    sprite: 'tile_desert',   miniColor: '#d4a865' },
+  JUNGLE:   { id: 6, name: 'Dschungel',sprite: 'tile_jungle',   miniColor: '#1f5f1f' },
+  LAVA:     { id: 7, name: 'Lava',     sprite: 'tile_lava',     miniColor: '#c83820' },
+  SNOW:     { id: 8, name: 'Schnee',   sprite: 'tile_snow',     miniColor: '#e8f0f8' },
+  SWAMP:    { id: 9, name: 'Sumpf',    sprite: 'tile_swamp',    miniColor: '#4a5a3a' },
+};
+const TILE_BY_ID = {};
+for (const t of Object.values(TILE)) TILE_BY_ID[t.id] = t;
+const TILE_SIZE  = 64;
+const CHUNK_SIZE = 32;
+// IDs die nicht walkbar sind (Frontend-Prediction, sollte mit Backend WALKABLE übereinstimmen)
+const NON_WALKABLE_TILES = new Set([0, 4, 7]);  // Wasser, Berg, Lava
+
+// ─── Natürliche Welt-Deko (nicht im Bau-Menü, aber harvest-bar) ─────────────
+const NATURAL_STRUCTURE_TYPES = new Set([
+  'tree_oak','tree_pine','tree_dead','tree_stump','fallen_log',
+  'bush','tall_grass','flowers','mushrooms',
+  'rock_small','rock_large','rock_mossy',
+  'lily_pads','reeds','dock_straight','wooden_bridge','shipwreck',
+  'broken_cart','barrel','crate','sack','fence',
+  'ruin_pillar','rubble','statue_broken',
+  // Welle 11
+  'camp_tent','cooking_pot','bones_scatter','gravestone',
+  'dock_corner','boat_small','anchor','fishing_net','driftwood',
+]);
+
+// ─── Strukturen-Konfiguration ─────────────────────────────────────────────────
+const STRUCTURE = {
+  wall:        { key: '1', name: 'Mauer',       icon: '🧱', blocking: true,  sprite: 'struct_wall',       hasMaterial: true },
+  floor:       { key: '2', name: 'Boden',       icon: '▦',  blocking: false, sprite: 'struct_floor',      hasMaterial: true },
+  campfire:    { key: '3', name: 'Lagerfeuer',  icon: '🔥', blocking: false, sprite: 'struct_campfire' },
+  marker:      { key: '4', name: 'Marker',      icon: '🚩', blocking: false, sprite: 'struct_marker'   },
+  chest:       { key: '5', name: 'Truhe',       icon: '📦', blocking: true,  sprite: 'struct_chest'    },
+  workbench:   { key: '6', name: 'Werkbank',    icon: '🪓', blocking: true,  sprite: 'struct_workbench'},
+  furnace:     { key: '7', name: 'Schmelze',    icon: '🌋', blocking: true,  sprite: 'struct_furnace'  },
+  anvil:       { key: '8', name: 'Amboss',      icon: '⚒️', blocking: true,  sprite: 'struct_anvil'    },
+  bed:         { key: '9', name: 'Bett',        icon: '🛏️', blocking: false, sprite: 'struct_bed'      },
+  well:        { key: '0', name: 'Brunnen',     icon: '⛲', blocking: true,  sprite: 'struct_well'     },
+  farm_plot:   { key: '',  name: 'Acker',       icon: '🌱', blocking: false, sprite: 'struct_farm_plot'},
+  spike_trap:  { key: '',  name: 'Stachelfalle',icon: '🗡️', blocking: false, sprite: 'struct_spike_trap'},
+  poison_trap: { key: '',  name: 'Giftfalle',   icon: '💀', blocking: false, sprite: 'struct_poison_trap'},
+  stairs_down: { key: '',  name: 'Treppe nach unten',icon: '🏚️', blocking: false, sprite: 'struct_stairs_down'},
+  // Deko: Natur
+  tree_oak:    { key: '', name: 'Eiche',         icon: '🌳', blocking: true,  sprite: 'prop_tree_oak' },
+  tree_pine:   { key: '', name: 'Nadelbaum',     icon: '🌲', blocking: true,  sprite: 'prop_tree_pine' },
+  tree_dead:   { key: '', name: 'Toter Baum',    icon: '🪾', blocking: true,  sprite: 'prop_tree_dead' },
+  tree_stump:  { key: '', name: 'Baumstumpf',    icon: '🪵', blocking: true,  sprite: 'prop_tree_stump' },
+  fallen_log:  { key: '', name: 'Gefällter Stamm',icon: '🪵', blocking: true,  sprite: 'prop_fallen_log' },
+  bush:        { key: '', name: 'Busch',         icon: '🌿', blocking: false, sprite: 'prop_bush' },
+  tall_grass:  { key: '', name: 'Hohes Gras',    icon: '🌾', blocking: false, sprite: 'prop_tall_grass' },
+  flowers:     { key: '', name: 'Blumen',        icon: '🌸', blocking: false, sprite: 'prop_flowers' },
+  mushrooms:   { key: '', name: 'Pilze',         icon: '🍄', blocking: false, sprite: 'prop_mushrooms' },
+  rock_small:  { key: '', name: 'Kleiner Felsen',icon: '🪨', blocking: true,  sprite: 'prop_rock_small' },
+  rock_large:  { key: '', name: 'Großer Felsen', icon: '🪨', blocking: true,  sprite: 'prop_rock_large' },
+  rock_mossy:  { key: '', name: 'Moosfelsen',    icon: '🪨', blocking: true,  sprite: 'prop_rock_mossy' },
+  // Deko: Wasser
+  lily_pads:     { key: '', name: 'Seerosen',    icon: '🪷', blocking: false, sprite: 'prop_lily_pads' },
+  reeds:         { key: '', name: 'Schilf',      icon: '🌾', blocking: false, sprite: 'prop_reeds' },
+  dock_straight: { key: '', name: 'Steg',        icon: '🪵', blocking: false, sprite: 'prop_dock_straight' },
+  wooden_bridge: { key: '', name: 'Holzbrücke',  icon: '🌉', blocking: false, sprite: 'prop_wooden_bridge' },
+  shipwreck:     { key: '', name: 'Schiffswrack',icon: '🚢', blocking: true,  sprite: 'prop_shipwreck' },
+  // Deko: Siedlung
+  broken_cart: { key: '', name: 'Karren',        icon: '🛒', blocking: true,  sprite: 'prop_broken_cart' },
+  barrel:      { key: '', name: 'Fass',          icon: '🛢️', blocking: true,  sprite: 'prop_barrel' },
+  crate:       { key: '', name: 'Kiste',         icon: '📦', blocking: true,  sprite: 'prop_crate' },
+  sack:        { key: '', name: 'Sack',          icon: '🧺', blocking: false, sprite: 'prop_sack' },
+  fence:       { key: '', name: 'Zaun',          icon: '🚧', blocking: true,  sprite: 'prop_fence' },
+  // Deko: Ruinen
+  ruin_pillar:   { key: '', name: 'Säule',       icon: '🏛️', blocking: true,  sprite: 'prop_ruin_pillar' },
+  rubble:        { key: '', name: 'Trümmer',     icon: '⛏️', blocking: false, sprite: 'prop_rubble' },
+  statue_broken: { key: '', name: 'Statue',      icon: '🗿', blocking: true,  sprite: 'prop_statue_broken' },
+  // Neue Welt-Deko (Welle 11)
+  camp_tent:     { key: '', name: 'Zelt',        icon: '⛺', blocking: false, sprite: 'prop_camp_tent' },
+  cooking_pot:   { key: '', name: 'Kochtopf',    icon: '🍲', blocking: false, sprite: 'prop_cooking_pot' },
+  bones_scatter: { key: '', name: 'Knochen',     icon: '🦴', blocking: false, sprite: 'prop_bones_scatter' },
+  gravestone:    { key: '', name: 'Grabstein',   icon: '🪦', blocking: true,  sprite: 'prop_gravestone' },
+  dock_corner:   { key: '', name: 'Steg-Ecke',   icon: '🪵', blocking: false, sprite: 'prop_dock_corner' },
+  boat_small:    { key: '', name: 'Boot',        icon: '🛶', blocking: true,  sprite: 'prop_boat_small' },
+  anchor:        { key: '', name: 'Anker',       icon: '⚓', blocking: false, sprite: 'prop_anchor' },
+  fishing_net:   { key: '', name: 'Fischernetz', icon: '🎣', blocking: false, sprite: 'prop_fishing_net' },
+  driftwood:     { key: '', name: 'Treibholz',   icon: '🪵', blocking: false, sprite: 'prop_driftwood' },
+};
+const STRUCTURE_BY_KEY = Object.fromEntries(
+  Object.entries(STRUCTURE).map(([id, s]) => [s.key, id])
+);
+
+// ─── Event-Konfiguration ──────────────────────────────────────────────────────
+const EVENT_ICON = {
+  weather:   '☁️',
+  creature:  '🐉',
+  discovery: '✨',
+  faction:   '⚔️',
+  natural:   '🌍',
+  rumor:     '💬',
+};
+
+function relativeTime(iso) {
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return 'gerade eben';
+  if (diff < 3600) return `vor ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `vor ${Math.floor(diff / 3600)} h`;
+  return `vor ${Math.floor(diff / 86400)} Tagen`;
+}
+
+// ─── NPC-Konfiguration ────────────────────────────────────────────────────────
+// Deutsche Übersetzung für Item-Kategorien (Issue: Deutsche Konsistenz)
+const CATEGORY_DE = {
+  weapon: 'Waffe', armor: 'Rüstung', jewelry: 'Schmuck',
+  consumable: 'Verbrauchsgegenstand', food: 'Nahrung', magic: 'Magie',
+  tool: 'Werkzeug', resource: 'Rohstoff',
+};
+const QUALITY_DE = {
+  rough: 'grob', normal: 'normal', fine: 'fein',
+  masterwork: 'meisterhaft', legendary: 'legendär',
+};
+
+// Welle 33: Waffen-Reichweite (Tiles), spiegelt backend/item_stats.WEAPON_STATS
+const WEAPON_RANGE = {
+  sword: 1, axe: 1, mace: 1, dagger: 1, scythe: 1, greatsword: 1,
+  spear: 2,
+  bow: 5, crossbow: 6, throwing_knife: 3,
+  staff: 4, wand: 4,
+};
+// Welle 35: Volle Waffen-Stats für Tooltips
+const WEAPON_STATS = {
+  sword:         { dmg: 10, speed: 1.0, crit: 0.05, range: 1, two_h: false },
+  axe:           { dmg: 14, speed: 0.85, crit: 0.04, range: 1, two_h: false },
+  bow:           { dmg: 8,  speed: 1.0, crit: 0.08, range: 5, two_h: true },
+  staff:         { dmg: 7,  speed: 1.0, crit: 0.06, range: 4, two_h: true },
+  wand:          { dmg: 6,  speed: 1.3, crit: 0.10, range: 4, two_h: false },
+  greatsword:    { dmg: 22, speed: 0.65, crit: 0.06, range: 1, two_h: true },
+  spear:         { dmg: 12, speed: 1.0, crit: 0.07, range: 2, two_h: true },
+  crossbow:      { dmg: 16, speed: 0.55, crit: 0.12, range: 6, two_h: true },
+  throwing_knife:{ dmg: 5,  speed: 1.6, crit: 0.15, range: 3, two_h: false },
+  mace:          { dmg: 13, speed: 0.85, crit: 0.03, range: 1, two_h: false },
+  scythe:        { dmg: 16, speed: 0.75, crit: 0.08, range: 1, two_h: true },
+  dagger:        { dmg: 6,  speed: 1.8, crit: 0.20, range: 1, two_h: false },
+};
+const ARMOR_STATS = {
+  helmet:     { defense: 4,  weight: 2 },
+  chestplate: { defense: 12, weight: 5 },
+  shield:     { defense: 8,  weight: 4 },
+  boots:      { defense: 3,  weight: 1 },
+};
+
+const NPC_SPRITE = {
+  // Friendly — eigene NPC-Sprites wenn vorhanden, sonst Player+Tint
+  wanderer:    { sprite: 'npc_villager',     tint: 0xffffff, label: 'Wanderer' },
+  villager:    { sprite: 'npc_villager',     tint: 0xffffff, label: 'Dorfbewohner' },
+  merchant:    { sprite: 'npc_merchant',     tint: 0xffffff, label: 'Händler' },
+  hermit:      { sprite: 'char_player',      tint: 0xb0e0d0, label: 'Einsiedler' },
+  bard:        { sprite: 'char_player',      tint: 0xf0a0d0, label: 'Barde' },
+  scholar:     { sprite: 'npc_mage',         tint: 0xffffff, label: 'Gelehrter' },
+  soldier:     { sprite: 'npc_guard',        tint: 0xffffff, label: 'Soldat' },
+  // Welle 21 — neue NPC-Kinds mit eigenen Sprites
+  mage:        { sprite: 'npc_mage',         tint: 0xffffff, label: 'Magier' },
+  farmer:      { sprite: 'npc_farmer',       tint: 0xffffff, label: 'Bauer' },
+  guard:       { sprite: 'npc_guard',        tint: 0xffffff, label: 'Wache' },
+  healer:      { sprite: 'npc_healer',       tint: 0xffffff, label: 'Heiler' },
+  blacksmith:  { sprite: 'npc_blacksmith',   tint: 0xffffff, label: 'Schmied' },
+  quest_giver: { sprite: 'npc_quest_giver',  tint: 0xffffff, label: 'Auftraggeber' },
+  // Creatures — eigenes Sprite, kein Tint
+  goblin:   { sprite: 'monster_goblin',   tint: 0xffffff, label: 'Goblin' },
+  wolf:     { sprite: 'monster_wolf',     tint: 0xffffff, label: 'Wolf' },
+  skeleton: { sprite: 'monster_skeleton', tint: 0xffffff, label: 'Skelett' },
+  spider:   { sprite: 'monster_spider',   tint: 0xffffff, label: 'Spinne' },
+  slime:    { sprite: 'monster_slime',    tint: 0xffffff, label: 'Schleim' },
+  // Welle 3-Mobs
+  rat:      { sprite: 'monster_rat',      tint: 0xffffff, label: 'Ratte' },
+  bat:      { sprite: 'monster_bat',      tint: 0xffffff, label: 'Fledermaus' },
+  zombie:   { sprite: 'monster_zombie',   tint: 0xffffff, label: 'Zombie' },
+  bandit:   { sprite: 'monster_bandit',   tint: 0xffffff, label: 'Bandit' },
+  boar:     { sprite: 'monster_boar',     tint: 0xffffff, label: 'Wildschwein' },
+  bear:     { sprite: 'monster_bear',     tint: 0xffffff, label: 'Bär' },
+  // Bosse — größere Sprites, eigene Optik
+  ogre:         { sprite: 'monster_ogre',         tint: 0xffffff, label: 'Ogre' },
+  necromancer:  { sprite: 'monster_necromancer',  tint: 0xffffff, label: 'Nekromant' },
+  dragon_whelp: { sprite: 'monster_dragon_whelp', tint: 0xffffff, label: 'Drachling' },
+};
+const CREATURE_KINDS = new Set([
+  'goblin','wolf','skeleton','spider','slime',
+  'rat','bat','zombie','bandit','boar','bear',
+  'ogre','necromancer','dragon_whelp',
+]);
+
+// ─── Items ───────────────────────────────────────────────────────────────────
+const ITEM = {
+  sword:         { name: 'Schwert',       sprite: 'item_sword',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/sword.png' },
+  axe:           { name: 'Axt',           sprite: 'item_axe',           category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/axe.png' },
+  bow:           { name: 'Bogen',         sprite: 'item_bow',           category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/bow.png' },
+  staff:         { name: 'Stab',          sprite: 'item_staff',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/staff.png' },
+  wand:          { name: 'Zauberstab',    sprite: 'item_wand',          category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/wand.png' },
+  greatsword:    { name: 'Großschwert',   sprite: 'item_greatsword',    category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/greatsword.png' },
+  spear:         { name: 'Speer',         sprite: 'item_spear',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/spear.png' },
+  crossbow:      { name: 'Armbrust',      sprite: 'item_crossbow',      category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/crossbow.png' },
+  throwing_knife:{ name: 'Wurfmesser',    sprite: 'item_throwing_knife',category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/throwing_knife.png' },
+  mace:          { name: 'Streitkolben',  sprite: 'item_mace',          category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/mace.png' },
+  scythe:        { name: 'Sense',         sprite: 'item_scythe',        category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/scythe.png' },
+  dagger:        { name: 'Dolch',         sprite: 'item_dagger',        category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/dagger.png' },
+  helmet:        { name: 'Helm',        sprite: 'item_helmet',        category: 'armor',      slot: 'helmet',     path: '/assets/equipment/armor/helmet.png' },
+  chestplate:    { name: 'Brustpanzer', sprite: 'item_chestplate',    category: 'armor',      slot: 'chestplate', path: '/assets/equipment/armor/chestplate.png' },
+  shield:        { name: 'Schild',      sprite: 'item_shield',        category: 'armor',      slot: 'shield',     path: '/assets/equipment/armor/shield.png' },
+  boots:         { name: 'Stiefel',     sprite: 'item_boots',         category: 'armor',      slot: 'boots',      path: '/assets/equipment/armor/boots.png' },
+  ring:          { name: 'Ring',        sprite: 'item_ring',          category: 'jewelry',    slot: 'ring',       path: '/assets/equipment/jewelry/ring.png' },
+  amulet:        { name: 'Amulett',     sprite: 'item_amulet',        category: 'jewelry',    slot: 'amulet',     path: '/assets/equipment/jewelry/amulet.png' },
+  health_potion: { name: 'Heiltrank',   sprite: 'item_health_potion', category: 'consumable',                     path: '/assets/consumables/health_potion.png' },
+  mana_potion:   { name: 'Manatrank',   sprite: 'item_mana_potion',   category: 'consumable',                     path: '/assets/consumables/mana_potion.png' },
+  herb:          { name: 'Kraut',       sprite: 'item_herb',          category: 'consumable',                     path: '/assets/consumables/herb.png' },
+  apple:         { name: 'Apfel',       sprite: 'item_apple',         category: 'food',                           path: '/assets/food/apple.png' },
+  berries:       { name: 'Beeren',      sprite: 'item_berries',       category: 'food',                           path: '/assets/food/berries.png' },
+  wheat:         { name: 'Weizen',      sprite: 'item_wheat',         category: 'food',                           path: '/assets/food/wheat.png' },
+  bread:         { name: 'Brot',        sprite: 'item_bread',         category: 'food',                           path: '/assets/food/bread.png' },
+  raw_meat:      { name: 'Rohes Fleisch',sprite:'item_raw_meat',      category: 'food',                           path: '/assets/food/raw_meat.png' },
+  cooked_meat:   { name: 'Gebratenes Fleisch',sprite:'item_cooked_meat',category:'food',                          path: '/assets/food/cooked_meat.png' },
+  fish:          { name: 'Fisch',       sprite: 'item_fish',          category: 'food',                           path: '/assets/food/fish.png' },
+  mushroom_food: { name: 'Pilz-Mahl',   sprite: 'item_mushroom_food', category: 'food',                           path: '/assets/food/mushroom_food.png' },
+  spell_book:    { name: 'Feuerball-Buch', sprite: 'item_spell_book', category: 'magic',                          path: '/assets/magic/spell_book.png' },
+  scroll:        { name: 'Schriftrolle',sprite: 'item_scroll',        category: 'magic',                          path: '/assets/magic/scroll.png' },
+  rune_stone:    { name: 'Heilrune',    sprite: 'item_rune_stone',    category: 'magic',                          path: '/assets/magic/rune_stone.png' },
+  pickaxe:       { name: 'Spitzhacke',  sprite: 'item_pickaxe',       category: 'tool',       slot: 'tool',       path: '/assets/tools/pickaxe.png' },
+  shovel:        { name: 'Schaufel',    sprite: 'item_shovel',        category: 'tool',       slot: 'tool',       path: '/assets/tools/shovel.png' },
+  hammer:        { name: 'Hammer',      sprite: 'item_hammer',        category: 'tool',       slot: 'tool',       path: '/assets/tools/hammer.png' },
+  hoe:           { name: 'Hacke',       sprite: 'item_hoe',           category: 'tool',       slot: 'tool',       path: '/assets/tools/hoe.png' },
+  wood:          { name: 'Holz',        sprite: 'item_wood',          category: 'resource',                       path: '/assets/resources/wood.png' },
+  stone:         { name: 'Stein',       sprite: 'item_stone',         category: 'resource',                       path: '/assets/resources/stone.png' },
+  iron_ore:      { name: 'Eisenerz',    sprite: 'item_iron_ore',      category: 'resource',                       path: '/assets/resources/iron_ore.png' },
+  gold_ore:      { name: 'Golderz',     sprite: 'item_gold_ore',      category: 'resource',                       path: '/assets/resources/gold_ore.png' },
+  silver_ore:    { name: 'Silbererz',   sprite: 'item_silver_ore',    category: 'resource',                       path: '/assets/resources/silver_ore.png' },
+  mythril_ore:   { name: 'Mythril',     sprite: 'item_mythril_ore',   category: 'resource',                       path: '/assets/resources/mythril_ore.png' },
+  steel_ingot:   { name: 'Stahlbarren', sprite: 'item_steel_ingot',   category: 'resource',                       path: '/assets/resources/steel_ingot.png' },
+  crystal:       { name: 'Kristall',    sprite: 'item_crystal',       category: 'resource',                       path: '/assets/resources/crystal.png' },
+  bone:          { name: 'Knochen',     sprite: 'item_bone',          category: 'resource',                       path: '/assets/resources/bone.png' },
+  cloth:         { name: 'Stoff',       sprite: 'item_cloth',         category: 'resource',                       path: '/assets/resources/cloth.png' },
+  leather:       { name: 'Leder',       sprite: 'item_leather',       category: 'resource',                       path: '/assets/resources/leather.png' },
+};
+const EQUIP_SLOTS = [
+  { key: 'weapon',     label: 'Waffe' },
+  { key: 'helmet',     label: 'Helm' },
+  { key: 'chestplate', label: 'Brustpanzer' },
+  { key: 'shield',     label: 'Schild' },
+  { key: 'boots',      label: 'Stiefel' },
+  { key: 'ring',       label: 'Ring' },
+  { key: 'amulet',     label: 'Amulett' },
+  { key: 'tool',       label: 'Werkzeug' },
+];
+
+// ─── Material-Auswahl für Wände/Böden ─────────────────────────────────────────
+const MATERIALS = ['stone', 'wood', 'straw'];
+const MATERIAL_LABELS = { stone: 'Stein', wood: 'Holz', straw: 'Stroh' };
+
+// ─── Wand-Auto-Tiling Bitmask N=1 E=2 S=4 W=8 ────────────────────────────────
+// Map auf Sprite-Varianten (corner_ne, end_s, straight_ns etc.) — Fallback bei
+// fehlenden Varianten (T, Cross) ist die jeweilige Achse.
+const WALL_MASK_TO_VARIANT = {
+  0:  'straight_ns',  // alone — fallback
+  1:  'end_s',        // N
+  2:  'end_w',        // E
+  3:  'corner_ne',    // N+E
+  4:  'end_n',        // S
+  5:  'straight_ns',  // N+S
+  6:  'corner_es',    // E+S
+  7:  'straight_ns',  // N+E+S — kein T, fallback
+  8:  'end_e',        // W
+  9:  'corner_wn',    // N+W
+  10: 'straight_ew',  // E+W
+  11: 'straight_ew',  // N+E+W — kein T, fallback
+  12: 'corner_sw',    // S+W
+  13: 'straight_ns',  // N+S+W — kein T, fallback
+  14: 'straight_ew',  // E+S+W — kein T, fallback
+  15: 'straight_ew',  // Cross — kein Sprite, fallback
+};
+
+// Spieler-Name: localStorage → Prompt → Sanitize
+function getOrPromptName() {
+  let name = localStorage.getItem('liege_player_name');
+  if (!name) {
+    const input = window.prompt('Wie heißt du, Abenteurer?', '');
+    name = (input || '').trim().replace(/[^a-zA-Z0-9_\-\säöüÄÖÜß]/g, '').substring(0, 32).trim();
+    if (name) localStorage.setItem('liege_player_name', name);
+  }
+  return name || ('Reisender' + Math.floor(Math.random() * 9999));
+}
+const MY_ID = getOrPromptName();
+
+// ─── Phaser Scene ─────────────────────────────────────────────────────────────
+class WorldScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'WorldScene' });
+    this.otherPlayers   = {};
+    this.mySprite       = null;
+    this.myTileX        = 0;
+    this.myTileY        = 0;
+    // Pixel-Movement (kontinuierlich, smooth)
+    this.myPx           = 0;
+    this.myPy           = 0;
+    this.moveSpeed      = 240;        // px/sec
+    this.collisionHalf  = 16;         // px Hitbox-Radius (TILE_SIZE * 0.25) — schlanker
+    this.ws             = null;
+    this.wasd           = null;
+    this.tileSprites    = {};          // key: "x,y" → Phaser.Image für Welt-Tiles
+    this.chunks         = {};          // key: "cx,cy" → 2D-Array (CHUNK_SIZE × CHUNK_SIZE)
+    this.worldData      = { width: 0, height: 0 };  // Legacy, wird nicht mehr genutzt
+    this.structSprites  = {};          // key: "x,y" → Phaser.Image
+    this.structures     = {};          // key: "x,y" → { id, x, y, type, owner }
+    this.npcs           = {};          // key: npc_id → sprite + state
+    this.activeDialog   = null;        // { npc_id, waiting: bool }
+    this.selectedMaterial = 'stone';   // für Bauen: stone | wood | straw
+    this.itemSprites    = {};          // key: item_id → Phaser.Image (für Boden-Items)
+    this.inventory      = [];          // Spieler-Inventar [item dict, ...]
+    this.inventoryOpen  = false;
+    this.myHp           = 100;
+    this.myMaxHp        = 100;
+    this.myMana         = 50;
+    this.myMaxMana      = 50;
+    this.myHunger       = 100;
+    this.myMaxHunger    = 100;
+    this.myStamina      = 100;
+    this.myMaxStamina   = 100;
+    this.mySkills       = {};
+    this.skillsOpen     = false;
+    this.researchOpen   = false;
+    this.myResearch     = {};
+    this.questsOpen     = false;
+    this.myQuests       = [];
+    this.talentsOpen    = false;
+    this.myTalents      = { learned: [], points: 0, tree: {} };
+    this.activeTalentTab = 'combat';
+    this.factionsOpen   = false;
+    this.myFactions     = [];
+    this.attributesOpen = false;
+    this.myAttributes   = { values: {}, labels: {} };
+    this.learnedSpells  = [];
+    // Welle 9b: Dungeon-Mode
+    this.inDungeon      = false;
+    this.dungeonTiles   = null;
+    this.dungeonSize    = 0;
+    this.dungeonSprites = {};   // key: "x,y" → Phaser.Image
+    // Welle 34: Hotbar — 9 Slots mit item_id-Refs (localStorage-persistiert)
+    this.hotbar         = this._loadHotbar();
+    this.activeHotbar   = -1;
+    this.activeChest    = null;        // { chest_id, items }
+    this.activeCrafting = null;        // { station, recipes }
+    this.activeTrade    = null;        // { npc_id, npc_name, offerings, coins }
+    this.buildMode      = false;
+    this.selectedStruct = 'wall';
+    this.hoverGfx       = null;
+  }
+
+  preload() {
+    this.load.image('tile_water',      '/assets/tiles/water.png');
+    this.load.image('tile_sand',       '/assets/tiles/sand.png');
+    this.load.image('tile_grass',      '/assets/tiles/grass.png');
+    this.load.image('tile_forest',     '/assets/tiles/forest.png');
+    this.load.image('tile_mountain',   '/assets/tiles/mountain.png');
+    this.load.image('tile_desert',     '/assets/tiles/desert.png');
+    this.load.image('tile_jungle',     '/assets/tiles/jungle.png');
+    this.load.image('tile_lava',       '/assets/tiles/lava.png');
+    this.load.image('tile_snow',       '/assets/tiles/snow.png');
+    this.load.image('tile_swamp',      '/assets/tiles/swamp.png');
+    this.load.image('struct_wall',     '/assets/structures/wall.png');  // Legacy-Fallback
+    this.load.image('struct_floor',    '/assets/structures/floor.png');
+    this.load.image('struct_campfire', '/assets/structures/campfire.png');
+    this.load.image('struct_marker',   '/assets/structures/marker.png');
+    this.load.image('struct_chest',    '/assets/structures/chest.png');
+    this.load.image('struct_workbench','/assets/structures/workbench.png');
+    this.load.image('struct_furnace',  '/assets/structures/furnace.png');
+    this.load.image('struct_anvil',    '/assets/structures/anvil.png');
+    this.load.image('struct_bed',      '/assets/structures/bed.png');
+    this.load.image('struct_well',     '/assets/structures/well.png');
+    this.load.image('struct_farm_plot','/assets/structures/farm_plot.png');
+    this.load.image('struct_spike_trap',  '/assets/traps/spike_trap.png');
+    this.load.image('struct_poison_trap', '/assets/traps/poison_trap.png');
+    this.load.image('struct_stairs_down', '/assets/dungeons/stairs_down.png');
+
+    // Deko-Props
+    for (const p of ['tree_oak','tree_pine','tree_dead','tree_stump','fallen_log',
+                     'bush','tall_grass','flowers','mushrooms',
+                     'rock_small','rock_large','rock_mossy']) {
+      this.load.image(`prop_${p}`, `/assets/props/nature/${p}.png`);
+    }
+    for (const p of ['lily_pads','reeds','dock_straight','wooden_bridge','shipwreck']) {
+      this.load.image(`prop_${p}`, `/assets/props/water/${p}.png`);
+    }
+    for (const p of ['broken_cart','barrel','crate','sack','fence','camp_tent','cooking_pot']) {
+      this.load.image(`prop_${p}`, `/assets/props/settlement/${p}.png`);
+    }
+    for (const p of ['ruin_pillar','rubble','statue_broken','bones_scatter','gravestone']) {
+      this.load.image(`prop_${p}`, `/assets/props/ruins/${p}.png`);
+    }
+    for (const p of ['dock_corner','boat_small','anchor','fishing_net','driftwood']) {
+      this.load.image(`prop_${p}`, `/assets/props/water/${p}.png`);
+    }
+    // Welle 12: Biome-spezifische Props
+    for (const p of ['cactus','desert_skull','dry_bush']) {
+      this.load.image(`prop_${p}`, `/assets/props/biomes/desert/${p}.png`);
+    }
+    for (const p of ['jungle_flower','jungle_vines','palm_tree']) {
+      this.load.image(`prop_${p}`, `/assets/props/biomes/jungle/${p}.png`);
+    }
+    for (const p of ['frozen_bush','ice_crystal','snow_rock']) {
+      this.load.image(`prop_${p}`, `/assets/props/biomes/snow/${p}.png`);
+    }
+    for (const p of ['swamp_bubbles','swamp_log']) {
+      this.load.image(`prop_${p}`, `/assets/props/biomes/swamp/${p}.png`);
+    }
+    this.load.image('prop_lava_rock', '/assets/props/biomes/lava/lava_rock.png');
+    // Dungeon-Tiles + Props (für Welle 9b — bereits ladbar)
+    for (const t of ['dungeon_door','dungeon_floor','dungeon_wall','stairs_down']) {
+      this.load.image(`dungeon_${t}`, `/assets/dungeons/${t}.png`);
+    }
+    for (const p of ['altar','brazier','sarcophagus','treasure_chest','wall_torch']) {
+      this.load.image(`prop_${p}`, `/assets/dungeon_props/${p}.png`);
+    }
+
+    // Visual-Effects
+    this.load.image('fx_hit_spark',    '/assets/effects/hit_spark.png');
+    this.load.image('fx_heal_glow',    '/assets/effects/heal_glow.png');
+    this.load.image('fx_poison_cloud', '/assets/effects/poison_cloud.png');
+    this.load.image('char_player',     '/assets/characters/player.png');
+    this.load.image('fx_shadow',       '/assets/effects/shadow.png');
+
+    // Monster-Sprites (für Creature-NPCs + Bosse)
+    for (const m of ['goblin', 'wolf', 'skeleton', 'spider', 'slime',
+                     'rat', 'bat', 'zombie', 'bandit', 'boar', 'bear',
+                     'ogre', 'necromancer', 'dragon_whelp']) {
+      this.load.image(`monster_${m}`, `/assets/monsters/${m}.png`);
+    }
+    // Friendly-NPC-Sprites (Welle 21)
+    for (const n of ['mage', 'farmer', 'villager', 'guard', 'merchant',
+                     'healer', 'quest_giver', 'blacksmith']) {
+      this.load.image(`npc_${n}`, `/assets/characters/npcs/${n}.png`);
+    }
+
+    // Items (Waffen, Rüstung, Schmuck, Consumables, Resources)
+    for (const [kind, cfg] of Object.entries(ITEM)) {
+      this.load.image(cfg.sprite, cfg.path);
+    }
+
+    // Wand- und Boden-Sprites pro Material (3 × 10 walls + 3 floors)
+    for (const material of MATERIALS) {
+      for (const variant of ['corner_es', 'corner_ne', 'corner_sw', 'corner_wn',
+                             'end_e', 'end_n', 'end_s', 'end_w',
+                             'straight_ew', 'straight_ns']) {
+        this.load.image(`wall_${material}_${variant}`,
+                        `/assets/building/${material}/walls/${variant}.png`);
+      }
+      this.load.image(`floor_${material}`,
+                      `/assets/building/${material}/floor.png`);
+    }
+    this.load.on('loaderror', (file) => {
+      console.debug('Asset noch nicht da:', file.src);
+    });
+  }
+
+  create() {
+    this.wasd = this.input.keyboard.addKeys({
+      up:    Phaser.Input.Keyboard.KeyCodes.W,
+      down:  Phaser.Input.Keyboard.KeyCodes.S,
+      left:  Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Build-Mode-Toggle (deaktiviert wenn Dialog offen)
+    this.input.keyboard.on('keydown-B', () => { if (!this.activeDialog) this.toggleBuildMode(); });
+    // Tasten 1-9: Build-Mode → Struktur; sonst → Hotbar-Slot aktivieren (Welle 34)
+    const NUM_KEYS = ['ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE'];
+    const BUILD_KINDS = ['wall','floor','campfire','marker','chest','workbench','furnace','anvil','bed'];
+    NUM_KEYS.forEach((k, i) => {
+      this.input.keyboard.on('keydown-' + k, () => {
+        if (this.activeDialog) return;
+        if (this.buildMode) this.selectStructure(BUILD_KINDS[i]);
+        else this.activateHotbarSlot(i);
+      });
+    });
+    this.input.keyboard.on('keydown-ZERO',  () => {
+      if (this.activeDialog) return;
+      if (this.buildMode) this.selectStructure('well');
+    });
+    this.input.keyboard.on('keydown-M',     () => { if (!this.activeDialog) this.rotateMaterial(); });
+    this.input.keyboard.on('keydown-I',     () => { if (!this.activeDialog) this.toggleInventory(); });
+    this.input.keyboard.on('keydown-K',     () => { if (!this.activeDialog) this.toggleSkills(); });
+    this.input.keyboard.on('keydown-R',     () => { if (!this.activeDialog) this.toggleResearch(); });
+    this.input.keyboard.on('keydown-Q',     () => { if (!this.activeDialog) this.toggleQuests(); });
+    this.input.keyboard.on('keydown-T',     () => { if (!this.activeDialog) this.toggleTalents(); });
+    this.input.keyboard.on('keydown-F',     () => { if (!this.activeDialog && !this.buildMode) this.toggleFactions(); });
+    this.input.keyboard.on('keydown-C',     () => { if (!this.activeDialog) this.toggleAttributes(); });
+
+    // Click-Handler für Bauen/Abreißen / NPC-Talk
+    this.input.mouse.disableContextMenu();
+    this.input.on('pointerdown', (pointer) => this.onPointerDown(pointer));
+    this.input.on('pointermove', (pointer) => this.onPointerMove(pointer));
+
+    // Dialog-UI-Buttons
+    document.getElementById('dialog-close').addEventListener('click', () => this.closeDialog());
+    document.getElementById('dialog-send').addEventListener('click', () => this.sendDialog());
+    document.getElementById('dialog-quest-btn').addEventListener('click', () => {
+      if (this.activeDialog) this.acceptQuestFromNPC(this.activeDialog.npc_id);
+    });
+    document.getElementById('dialog-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); this.sendDialog(); }
+      else if (e.key === 'Escape') { e.preventDefault(); this.closeDialog(); }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.activeDialog) this.closeDialog();
+      else if (e.key === 'Escape' && this.activeChest) this.closeChest();
+      else if (e.key === 'Escape' && this.activeCrafting) this.closeCrafting();
+      else if (e.key === 'Escape' && this.activeTrade) this.closeTrade();
+      else if (e.key === 'Escape' && this.skillsOpen) this.toggleSkills();
+      else if (e.key === 'Escape' && this.researchOpen) this.toggleResearch();
+      else if (e.key === 'Escape' && this.questsOpen) this.toggleQuests();
+      else if (e.key === 'Escape' && this.talentsOpen) this.toggleTalents();
+      else if (e.key === 'Escape' && this.factionsOpen) this.toggleFactions();
+      else if (e.key === 'Escape' && this.attributesOpen) this.toggleAttributes();
+      else if (e.key === 'Escape' && this.inventoryOpen) this.toggleInventory();
+      else if (e.key.toLowerCase() === 'i' && this.inventoryOpen) this.toggleInventory();
+      else if (e.key.toLowerCase() === 'k' && this.skillsOpen) this.toggleSkills();
+      else if (e.key.toLowerCase() === 'r' && this.researchOpen) this.toggleResearch();
+      else if (e.key.toLowerCase() === 'q' && this.questsOpen) this.toggleQuests();
+      else if (e.key.toLowerCase() === 't' && this.talentsOpen) this.toggleTalents();
+      else if (e.key.toLowerCase() === 'f' && this.factionsOpen) this.toggleFactions();
+      else if (e.key.toLowerCase() === 'c' && this.attributesOpen) this.toggleAttributes();
+    });
+    document.getElementById('inventory-close').addEventListener('click', () => this.toggleInventory());
+    document.getElementById('chest-close').addEventListener('click', () => this.closeChest());
+    document.getElementById('crafting-close').addEventListener('click', () => this.closeCrafting());
+    document.getElementById('trade-close').addEventListener('click', () => this.closeTrade());
+    document.getElementById('skills-close').addEventListener('click', () => this.toggleSkills());
+    document.getElementById('research-close').addEventListener('click', () => this.toggleResearch());
+    document.getElementById('quests-close').addEventListener('click', () => this.toggleQuests());
+    document.getElementById('talents-close').addEventListener('click', () => this.toggleTalents());
+    document.getElementById('factions-close').addEventListener('click', () => this.toggleFactions());
+    document.getElementById('attributes-close').addEventListener('click', () => this.toggleAttributes());
+
+    this.connectWS();
+  }
+
+  toggleBuildMode() {
+    this.buildMode = !this.buildMode;
+    document.getElementById('build-bar').style.display = this.buildMode ? 'block' : 'none';
+    if (!this.buildMode && this.hoverGfx) {
+      this.hoverGfx.clear();
+    }
+    if (this.buildMode) this._populatePaletteOnce();
+  }
+
+  _populatePaletteOnce() {
+    const palette = document.getElementById('build-palette');
+    if (palette.children.length > 0) return;
+    for (const [type, cfg] of Object.entries(STRUCTURE)) {
+      // Natürliche Welt-Deko (Bäume, Felsen, Gras) ist nicht baubar — wird harvested
+      if (NATURAL_STRUCTURE_TYPES.has(type)) continue;
+      const btn = document.createElement('button');
+      btn.className = 'palette-btn';
+      btn.dataset.type = type;
+      btn.title = cfg.name + (cfg.key ? ` (Taste ${cfg.key})` : '');
+      btn.innerHTML =
+        `<span class="palette-icon">${cfg.icon || '•'}</span>` +
+        `<span class="palette-label">${cfg.name}</span>` +
+        (cfg.key ? `<span class="palette-key">${cfg.key}</span>` : '');
+      btn.addEventListener('click', () => this.selectStructure(type));
+      palette.appendChild(btn);
+    }
+    this.selectStructure(this.selectedStruct);
+  }
+
+  selectStructure(type) {
+    if (!this.buildMode) return;
+    if (!STRUCTURE[type]) return;
+    this.selectedStruct = type;
+    document.getElementById('build-selected').textContent = STRUCTURE[type].name;
+    document.querySelectorAll('#build-palette .palette-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.type === type)
+    );
+  }
+
+  rotateMaterial() {
+    if (!this.buildMode) return;
+    const idx = MATERIALS.indexOf(this.selectedMaterial);
+    this.selectedMaterial = MATERIALS[(idx + 1) % MATERIALS.length];
+    document.getElementById('build-material').textContent = MATERIAL_LABELS[this.selectedMaterial];
+  }
+
+  onPointerDown(pointer) {
+    if (!this.mySprite) return;
+    const wp = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const tx = Math.floor(wp.x / TILE_SIZE);
+    const ty = Math.floor(wp.y / TILE_SIZE);
+
+    if (this.buildMode) {
+      if (pointer.rightButtonDown()) {
+        this.ws.send(JSON.stringify({ type: 'remove_structure', x: tx, y: ty }));
+      } else {
+        this.ws.send(JSON.stringify({
+          type: 'place_structure',
+          x: tx, y: ty,
+          structure_type: this.selectedStruct,
+          material: this.selectedMaterial,
+        }));
+      }
+      return;
+    }
+
+    // Nicht im Build-Mode: NPC angeklickt?
+    const npc = this.findNPCAt(tx, ty);
+    if (npc) {
+      const kind = npc.npc.kind;
+      const isCreature = CREATURE_KINDS.has(kind);
+      const dist = Math.abs(npc.tileX - this.myTileX) + Math.abs(npc.tileY - this.myTileY);
+      if (isCreature) {
+        // Welle 33: Waffen-Range nutzen
+        const reach = this.currentWeaponRange();
+        if (dist <= reach) {
+          this.attackNPC(npc.npc.id);
+        } else {
+          this.showEvent(`⚔️ Zu weit weg (Reichweite ${reach})`);
+        }
+      } else if (kind === 'merchant') {
+        if (dist <= 2) {
+          this.ws.send(JSON.stringify({type: 'open_trade', npc_id: npc.npc.id}));
+        } else {
+          this.showEvent('🪙 Komm näher zum Händler');
+        }
+      } else {
+        this.openDialog(npc);
+      }
+      return;
+    }
+    // Klick auf Struktur (Bed/Well/Chest/Workbench/etc.) → Interaktion
+    const s = this.structures[`${tx},${ty}`];
+    if (s) {
+      const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
+      if (dist > 1) {
+        this.showEvent('🤚 Zu weit weg');
+      } else {
+        this.ws.send(JSON.stringify({ type: 'use_structure', x: tx, y: ty }));
+      }
+    }
+  }
+
+  attackNPC(npcId) {
+    this.ws.send(JSON.stringify({ type: 'attack_npc', npc_id: npcId }));
+  }
+
+  // Welle 33: Reichweite der aktuell ausgerüsteten Waffe
+  // Welle 34: Hotbar
+  _loadHotbar() {
+    try {
+      const raw = localStorage.getItem('liege_hotbar');
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length === 9) return arr;
+      }
+    } catch (e) {}
+    return new Array(9).fill(null);   // null oder item_kind
+  }
+  _saveHotbar() {
+    try { localStorage.setItem('liege_hotbar', JSON.stringify(this.hotbar)); } catch (e) {}
+  }
+  assignToHotbar(slotIndex, itemKind) {
+    if (slotIndex < 0 || slotIndex >= 9) return;
+    this.hotbar[slotIndex] = itemKind || null;
+    this._saveHotbar();
+    this.refreshHotbar();
+  }
+  refreshHotbar() {
+    const root = document.getElementById('hotbar');
+    if (!root) return;
+    root.innerHTML = '';
+    // Count items per kind
+    const counts = {};
+    const firstId = {};
+    for (const it of (this.inventory || [])) {
+      if (it.equipped_slot) continue;
+      counts[it.kind] = (counts[it.kind] || 0) + 1;
+      if (!firstId[it.kind]) firstId[it.kind] = it.id;
+    }
+    for (let i = 0; i < 9; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'hotbar-slot';
+      if (i === this.activeHotbar) slot.classList.add('active');
+      const key = document.createElement('div');
+      key.className = 'hotbar-key';
+      key.textContent = (i + 1);
+      slot.appendChild(key);
+      const kind = this.hotbar[i];
+      if (kind && ITEM[kind]) {
+        const cfg = ITEM[kind];
+        const cnt = counts[kind] || 0;
+        // Equipped-Markierung
+        const isEquipped = !!(this.inventory || []).find(
+          it => it.kind === kind && it.equipped_slot
+        );
+        if (isEquipped) slot.style.boxShadow = '0 0 8px rgba(120,200,80,0.7)';
+        const img = document.createElement('img');
+        img.src = cfg.path || '';
+        if (cnt === 0 && !isEquipped) slot.classList.add('hotbar-empty');
+        slot.appendChild(img);
+        if (cnt > 1) {
+          const c = document.createElement('div');
+          c.className = 'hotbar-count';
+          c.textContent = cnt;
+          slot.appendChild(c);
+        } else if (isEquipped && cfg.slot) {
+          // Show equipped indicator
+          const e = document.createElement('div');
+          e.className = 'hotbar-count';
+          e.textContent = '✓';
+          e.style.color = '#80f080';
+          slot.appendChild(e);
+        }
+        // Tooltip
+        const item = (this.inventory || []).find(it => it.kind === kind && !it.equipped_slot);
+        if (item) {
+          slot.addEventListener('mouseenter', (ev) => this.showItemTooltip(item, ev));
+          slot.addEventListener('mousemove',  (ev) => this.showItemTooltip(item, ev));
+          slot.addEventListener('mouseleave', () => this.hideItemTooltip());
+        }
+        slot.addEventListener('click', () => this.activateHotbarSlot(i));
+        slot.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault(); this.assignToHotbar(i, null);
+        });
+      } else {
+        slot.addEventListener('click', () => {
+          this.showEvent('Slot leer — Rechtsklick im Inventar zum Belegen');
+        });
+      }
+      root.appendChild(slot);
+    }
+  }
+  activateHotbarSlot(idx) {
+    if (idx < 0 || idx >= 9) return;
+    this.activeHotbar = idx;
+    const kind = this.hotbar[idx];
+    if (!kind) { this.refreshHotbar(); return; }
+    const cfg = ITEM[kind] || {};
+    // Toggle für equippable: schon equipped → ablegen; sonst anlegen
+    if (cfg.slot) {
+      const equipped = (this.inventory || []).find(
+        it => it.kind === kind && it.equipped_slot
+      );
+      if (equipped) {
+        this.unequipItem(equipped.id);
+      } else {
+        const free = (this.inventory || []).find(
+          it => it.kind === kind && !it.equipped_slot
+        );
+        if (free) this.equipItem(free.id);
+        else this.showEvent('Nichts mehr von ' + (cfg.name || kind));
+      }
+      this.refreshHotbar();
+      return;
+    }
+    // Verbrauchsgegenstand / Nahrung / Magie
+    const item = (this.inventory || []).find(it => it.kind === kind && !it.equipped_slot);
+    if (!item) {
+      this.showEvent('Nichts mehr von ' + (cfg.name || kind));
+      this.refreshHotbar();
+      return;
+    }
+    if (cfg.category === 'consumable' || cfg.category === 'food') {
+      this.useItem(item.id);
+    } else if (cfg.category === 'magic') {
+      this.castSpell(item.id);
+    }
+    this.refreshHotbar();
+  }
+
+  // Welle 35: Item-Stats-Tooltip
+  showItemTooltip(item, ev) {
+    const tt = document.getElementById('item-tooltip');
+    if (!tt) return;
+    const cfg = ITEM[item.kind] || { name: item.kind };
+    const Q_COLOR = { rough: '#888', normal: '#ccc', fine: '#80c0ff',
+                       masterwork: '#c0a0ff', legendary: '#ffd060' };
+    const qIcon = QUALITY_ICONS[item.quality] || '';
+    const name = item.unique_name || cfg.name;
+    const qcol = Q_COLOR[item.quality] || '#ccc';
+    let html = `<div class="tt-name" style="color:${qcol}">${qIcon} ${name}</div>`;
+    if (item.quality) html += `<div class="tt-quality">Qualität: ${QUALITY_DE[item.quality] || item.quality}</div>`;
+    if (item.category) html += `<div class="tt-quality">Kategorie: ${CATEGORY_DE[item.category] || item.category}</div>`;
+    // Stats
+    const stats = [];
+    if (WEAPON_STATS[item.kind]) {
+      const w = WEAPON_STATS[item.kind];
+      const qm = ({rough:0.75,normal:1.0,fine:1.15,masterwork:1.3,legendary:1.5})[item.quality||'normal'];
+      stats.push(`⚔️ Schaden: ${Math.round(w.dmg * qm)}`);
+      stats.push(`⚡ Speed: ${w.speed.toFixed(2)}×`);
+      stats.push(`💥 Crit: ${(w.crit*100).toFixed(0)}%`);
+      stats.push(`🎯 Reichweite: ${w.range} Tiles`);
+      if (w.two_h) stats.push(`🤲 Zweihändig`);
+    } else if (ARMOR_STATS[item.kind]) {
+      const a = ARMOR_STATS[item.kind];
+      const qm = ({rough:0.75,normal:1.0,fine:1.15,masterwork:1.3,legendary:1.5})[item.quality||'normal'];
+      stats.push(`🛡️ Defense: ${Math.round(a.defense * qm)}`);
+      stats.push(`⚖️ Gewicht: ${a.weight}`);
+    } else if (item.category === 'food') {
+      stats.push(`🍖 Sättigung wird beim Essen verbraucht`);
+    } else if (item.category === 'consumable') {
+      stats.push(`💊 Verbrauchsgegenstand`);
+    } else if (item.category === 'tool') {
+      stats.push(`🔧 Werkzeug — Skill-Bonus beim Equipping`);
+    } else if (item.category === 'resource') {
+      stats.push(`📦 Rohstoff`);
+    }
+    // Stack-Limit anzeigen
+    const STACK_LIMITS = { resource:500, food:150, consumable:25, magic:25 };
+    if (STACK_LIMITS[item.category]) {
+      stats.push(`📚 Stapel: ${item.quantity || 1} / ${STACK_LIMITS[item.category]}`);
+    }
+    if (stats.length > 0) {
+      html += `<div class="tt-stats">${stats.map(s => `<div>${s}</div>`).join('')}</div>`;
+    }
+    // Affixes
+    if (item.affixes && item.affixes.length > 0) {
+      html += '<div class="tt-affix">✦ ' +
+              item.affixes.map(a => `${a.name_part} (T${a.tier})`).join(' · ') + '</div>';
+    }
+    // Flavor
+    if (item.flavor) {
+      html += `<div class="tt-flavor">"${item.flavor}"</div>`;
+    }
+    tt.innerHTML = html;
+    tt.classList.add('active');
+    // Position oberhalb/rechts vom Mauszeiger
+    const x = (ev && ev.clientX) ? ev.clientX + 14 : 100;
+    const y = (ev && ev.clientY) ? ev.clientY - 8 : 100;
+    tt.style.left = Math.min(window.innerWidth - 300, x) + 'px';
+    tt.style.top  = Math.max(10, y) + 'px';
+  }
+
+  hideItemTooltip() {
+    const tt = document.getElementById('item-tooltip');
+    if (tt) tt.classList.remove('active');
+  }
+
+  currentWeaponRange() {
+    if (!this.inventory) return 1;
+    const w = this.inventory.find(it => it.equipped_slot === 'weapon');
+    if (!w) return 1;
+    return (WEAPON_RANGE[w.kind] || 1);
+  }
+
+  findNPCAt(x, y) {
+    for (const id of Object.keys(this.npcs)) {
+      const n = this.npcs[id];
+      if (n.tileX === x && n.tileY === y) return n;
+    }
+    return null;
+  }
+
+  openDialog(npcEntry) {
+    const npc = npcEntry.npc;
+    this.activeDialog = { npc_id: npc.id, waiting: false };
+    document.getElementById('dialog-npc-name').textContent = npc.name;
+    document.getElementById('dialog-npc-kind').textContent = ' — ' + (NPC_SPRITE[npc.kind]?.label || npc.kind);
+    document.getElementById('dialog-npc-bg').textContent = npc.backstory;
+    document.getElementById('dialog-history').innerHTML = '';
+    document.getElementById('dialog-input').value = '';
+    document.getElementById('dialog-overlay').classList.add('active');
+    // Quest-Button nur bei NPC-Kinds die Quests vergeben können
+    const QUEST_GIVING_KINDS = new Set([
+      'quest_giver','merchant','blacksmith','mage','scholar',
+      'guard','soldier','healer',
+    ]);
+    const canGive = QUEST_GIVING_KINDS.has(npc.kind);
+    const qb = document.getElementById('dialog-quest-btn');
+    if (qb) qb.style.display = canGive ? 'inline-block' : 'none';
+    // Phaser-Keyboard komplett ausschalten + alle Captures freigeben,
+    // damit Tasten ans Input-Feld durchkommen
+    this.input.keyboard.enabled = false;
+    this.input.keyboard.clearCaptures();
+    // Focus erst im nächsten Tick — manche Browser klauen Focus zurück
+    setTimeout(() => {
+      const el = document.getElementById('dialog-input');
+      el.focus();
+      el.click();  // safety: bei manchen Browsern hilft das mit dem Cursor
+    }, 30);
+  }
+
+  closeDialog() {
+    this.activeDialog = null;
+    document.getElementById('dialog-overlay').classList.remove('active');
+    this.input.keyboard.enabled = true;
+  }
+
+  appendDialogBubble(role, text, isTyping = false) {
+    const list = document.getElementById('dialog-history');
+    const div = document.createElement('div');
+    div.className = 'bubble ' + role + (isTyping ? ' typing' : '');
+    div.textContent = text;
+    list.appendChild(div);
+    list.scrollTop = list.scrollHeight;
+    return div;
+  }
+
+  sendDialog() {
+    if (!this.activeDialog || this.activeDialog.waiting) return;
+    const input = document.getElementById('dialog-input');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    this.appendDialogBubble('user', text);
+    this.activeDialog.typingEl = this.appendDialogBubble('npc', '…', true);
+    this.activeDialog.waiting = true;
+    this.ws.send(JSON.stringify({
+      type: 'talk_to_npc',
+      npc_id: this.activeDialog.npc_id,
+      message: text,
+    }));
+  }
+
+  receiveDialogReply(text) {
+    if (!this.activeDialog) return;
+    if (this.activeDialog.typingEl) {
+      this.activeDialog.typingEl.className = 'bubble npc';
+      this.activeDialog.typingEl.textContent = text;
+      this.activeDialog.typingEl = null;
+    } else {
+      this.appendDialogBubble('npc', text);
+    }
+    this.activeDialog.waiting = false;
+    document.getElementById('dialog-input').focus();
+  }
+
+  onPointerMove(pointer) {
+    if (!this.buildMode) return;
+    if (!this.hoverGfx) {
+      this.hoverGfx = this.add.graphics();
+      this.hoverGfx.setDepth(5);
+    }
+    const wp = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const tx = Math.floor(wp.x / TILE_SIZE);
+    const ty = Math.floor(wp.y / TILE_SIZE);
+    this.hoverGfx.clear();
+    this.hoverGfx.lineStyle(2, 0xe8d870, 0.9);
+    this.hoverGfx.strokeRect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  connectWS() {
+    const host = window.location.hostname;
+    this.ws = new WebSocket(`ws://${host}:8000/ws/${encodeURIComponent(MY_ID)}`);
+
+    this.ws.onopen = () => {
+      document.getElementById('conn-status').textContent = 'Verbunden';
+    };
+
+    this.ws.onclose = () => {
+      document.getElementById('conn-status').textContent = '❌ Getrennt';
+    };
+
+    this.ws.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data);
+      this.handleMsg(msg);
+    };
+  }
+
+  handleMsg(msg) {
+    switch (msg.type) {
+      case 'init':
+        this.worldData.width = 999999;
+        this.worldData.height = 999999;
+        // Chunks aus init aufnehmen
+        for (const c of (msg.chunks || [])) {
+          this.chunks[`${c.cx},${c.cy}`] = c.tiles;
+        }
+        this.drawWorld();
+        this.drawMinimap();
+        // Strukturen aus Init laden
+        this.structures = {};
+        for (const s of (msg.structures || [])) {
+          this.structures[`${s.x},${s.y}`] = s;
+        }
+        this.drawStructures();
+        // Chronik mit vergangenen Events füllen
+        this.loadInitialEvents(msg.events || []);
+        // NPCs in die Welt setzen
+        this.loadNPCs(msg.npcs || []);
+        // Items am Boden
+        this.loadGroundItems(msg.items_ground || []);
+        // Inventar
+        this.inventory = msg.inventory || [];
+        this.refreshInventoryUI();
+        this.refreshHotbar();
+        // HP / Mana / Hunger / Stamina / Skills
+        this.myHp        = msg.hp         ?? 100;
+        this.myMaxHp     = msg.max_hp     ?? 100;
+        this.myMana      = msg.mana       ?? 50;
+        this.myMaxMana   = msg.max_mana   ?? 50;
+        this.myHunger    = msg.hunger     ?? 100;
+        this.myMaxHunger = msg.max_hunger ?? 100;
+        this.myStamina   = msg.stamina    ?? 100;
+        this.myMaxStamina = msg.max_stamina ?? 100;
+        this.mySkills    = msg.skills || {};
+        this.myBodyParts = msg.body_parts || { legs: 100, arms: 100, torso: 100 };
+        this.myResearch  = msg.research || {};
+        if (msg.time) this.updateTimeOfDay(msg.time);
+        this.myQuests = msg.quests || [];
+        this.myTalents = msg.talents || { learned: [], points: 0, tree: {} };
+        this.myFactions = msg.factions || [];
+        this.myAttributes = msg.attributes || { values: {}, labels: {} };
+        this.learnedSpells = msg.learned_spells || [];
+        this.refreshHpBar();
+        this.refreshManaBar();
+        this.refreshNeedsBars();
+        this.refreshBodyParts();
+        this.refreshSkillsUI();
+        this.myTileX = msg.spawn.x;
+        this.myTileY = msg.spawn.y;
+        this.myPx = msg.spawn.x * TILE_SIZE + TILE_SIZE / 2;
+        this.myPy = msg.spawn.y * TILE_SIZE + TILE_SIZE / 2;
+        this.mySprite = this.spawnSprite(MY_ID, msg.spawn.x, msg.spawn.y, true);
+        this.cameras.main.startFollow(this.mySprite.container, true, 0.15, 0.15);
+        this.cameras.main.setZoom(1.0);
+        // Keine Camera-Bounds — Welt ist effektiv unendlich (chunked)
+
+        // Bestehende Spieler spawnen
+        for (const [id, data] of Object.entries(msg.players)) {
+          if (id !== MY_ID) this.spawnOther(id, data.x, data.y);
+        }
+        this.updatePlayerCount();
+        break;
+
+      case 'player_joined':
+        this.spawnOther(msg.player_id, msg.x, msg.y);
+        this.updatePlayerCount();
+        this.showEvent(`🧙 ${msg.player_id.substr(0,8)} betritt die Welt`);
+        break;
+
+      case 'player_moved':
+        if (this.otherPlayers[msg.player_id]) {
+          const p = this.otherPlayers[msg.player_id];
+          const dx = msg.x - p.tileX;
+          p.tileX = msg.x;
+          p.tileY = msg.y;
+          this.movePlayerSmooth(p, msg.x, msg.y, dx);
+          this.drawMinimap();
+        }
+        break;
+
+      case 'player_left':
+        if (this.otherPlayers[msg.player_id]) {
+          const p = this.otherPlayers[msg.player_id];
+          if (p.tween) p.tween.stop();
+          p.container.destroy();
+          delete this.otherPlayers[msg.player_id];
+          this.updatePlayerCount();
+        }
+        break;
+
+      case 'structure_placed':
+        this.structures[`${msg.structure.x},${msg.structure.y}`] = msg.structure;
+        this.addStructureSprite(msg.structure);
+        break;
+
+      case 'structure_removed':
+        delete this.structures[`${msg.x},${msg.y}`];
+        this.removeStructureSprite(msg.x, msg.y);
+        break;
+
+      case 'structure_damaged':
+        this.shakeStructure(msg.x, msg.y);
+        break;
+
+      case 'event':
+        this.addEventToChronik(msg.event);
+        this.showStoryEvent(msg.event);
+        break;
+
+      case 'npc_spawned':
+        this.spawnNPCSprite(msg.npc);
+        this.showEvent(`🌿 ${msg.npc.name} ist in der Welt erschienen`);
+        this.drawMinimap();
+        break;
+
+      case 'npc_moved':
+        if (this.npcs[msg.npc_id]) {
+          const n = this.npcs[msg.npc_id];
+          const dx = msg.x - n.tileX;
+          n.tileX = msg.x;
+          n.tileY = msg.y;
+          this.movePlayerSmooth(n, msg.x, msg.y, dx);
+          this.drawMinimap();
+        }
+        break;
+
+      case 'npc_reply':
+        this.receiveDialogReply(msg.text);
+        break;
+
+      case 'item_spawned':
+        this.addItemSprite(msg.item);
+        break;
+
+      case 'item_picked_up':
+        this.removeItemSprite(msg.item_id);
+        if (msg.by !== MY_ID) {
+          // Optional: kleines Hinweis-Toast
+        }
+        break;
+
+      case 'inventory_add':
+        this.inventory.push(msg.item);
+        this.refreshInventoryUI();
+        this.showEvent(`🎒 ${msg.item.name} aufgehoben`);
+        break;
+
+      case 'inventory_update':
+        // Item in inventory aktualisieren (z.B. equipped_slot geändert)
+        for (let i = 0; i < this.inventory.length; i++) {
+          if (this.inventory[i].id === msg.item.id) {
+            this.inventory[i] = msg.item;
+          } else if (msg.item.equipped_slot &&
+                     this.inventory[i].equipped_slot === msg.item.equipped_slot) {
+            // Anderer Item im selben Slot wurde rausgezogen
+            this.inventory[i].equipped_slot = null;
+          }
+        }
+        this.refreshInventoryUI();
+        break;
+
+      case 'inventory_remove':
+        this.inventory = this.inventory.filter(it => it.id !== msg.item_id);
+        this.refreshInventoryUI();
+        break;
+
+      case 'player_damaged':
+        this.myHp = msg.hp;
+        this.myMaxHp = msg.max_hp;
+        this.refreshHpBar(true);
+        this.showEvent(`💢 -${msg.dmg} HP`);
+        this.flashScreenDamage();
+        if (this.mySprite) this.knockbackSprite(this.mySprite);
+        break;
+
+      case 'player_respawned':
+        this.myHp = msg.hp;
+        this.myMaxHp = msg.max_hp;
+        this.setLocalPositionFromTile(msg.x, msg.y);
+        this.refreshHpBar();
+        this.showStoryEvent({ kind: 'natural', title: '💀 Du bist gefallen', body: 'Die Welt setzt dich wieder am Spawn ab.' });
+        break;
+
+      case 'player_died':
+        // Andere Spieler sehen das nur als Toast
+        this.showEvent(`💀 ${msg.player_id} ist gefallen`);
+        break;
+
+      case 'npc_damaged':
+        if (this.npcs[msg.npc_id]) {
+          this.npcs[msg.npc_id].npc.hp = msg.hp;
+          this.npcs[msg.npc_id].npc.max_hp = msg.max_hp;
+          this.updateNPCHpBar(msg.npc_id);
+          this.flashNPCHit(msg.npc_id);
+        }
+        break;
+
+      case 'npc_died':
+        if (this.npcs[msg.npc_id]) {
+          const n = this.npcs[msg.npc_id];
+          if (n.tween) n.tween.stop();
+          n.container.destroy();
+          delete this.npcs[msg.npc_id];
+          this.drawMinimap();
+        }
+        this.showEvent(`☠️ ${msg.name} wurde besiegt`);
+        break;
+
+      case 'npc_attacked':
+        if (msg.target === MY_ID) {
+          // player_damaged kommt eh separat
+        }
+        break;
+
+      case 'visual_effect':
+        this.showVisualEffect(msg.kind, msg.x, msg.y);
+        break;
+
+      case 'player_healed':
+        this.myHp = msg.hp;
+        this.myMaxHp = msg.max_hp;
+        this.refreshHpBar();
+        this.showEvent(`✨ +${msg.amount} HP`);
+        break;
+
+      case 'player_mana':
+        this.myMana = msg.mana;
+        this.myMaxMana = msg.max_mana;
+        this.refreshManaBar();
+        break;
+
+      case 'toast':
+        this.showEvent(msg.text);
+        break;
+
+      case 'chest_open':
+        this.openChest(msg.chest_id, msg.items);
+        break;
+
+      case 'chest_add':
+        if (this.activeChest && this.activeChest.chest_id === msg.chest_id) {
+          this.activeChest.items.push(msg.item);
+          this.refreshChestUI();
+        }
+        break;
+
+      case 'chest_remove':
+        if (this.activeChest && this.activeChest.chest_id === msg.chest_id) {
+          this.activeChest.items = this.activeChest.items.filter(it => it.id !== msg.item_id);
+          this.refreshChestUI();
+        }
+        break;
+
+      case 'crafting_open':
+        this.openCrafting(msg.station, msg.recipes);
+        break;
+
+      case 'inventory_full_refresh':
+        this.inventory = msg.inventory;
+        this.refreshInventoryUI();
+        if (this.activeChest) this.refreshChestUI();
+        if (this.activeCrafting) this.refreshCraftingUI();
+        if (this.activeTrade) this.refreshTradeUI();
+        break;
+
+      case 'chunks':
+        for (const c of msg.chunks) {
+          this.chunks[`${c.cx},${c.cy}`] = c.tiles;
+          this.drawChunkTiles(c.cx, c.cy);
+        }
+        this.drawMinimap();
+        break;
+
+      case 'player_needs':
+        this.myHunger     = msg.hunger;
+        this.myMaxHunger  = msg.max_hunger;
+        this.myStamina    = msg.stamina;
+        this.myMaxStamina = msg.max_stamina;
+        this.refreshNeedsBars();
+        break;
+
+      case 'status_effects':
+        this.renderStatusEffects(msg.effects || []);
+        break;
+
+      case 'time_update':
+        this.updateTimeOfDay(msg);
+        break;
+
+      case 'dungeon_enter':
+        this.enterDungeonMode(msg);
+        break;
+
+      case 'dungeon_exit':
+        this.exitDungeonMode(msg);
+        break;
+
+      case 'factions_update':
+        this.myFactions = msg.factions || [];
+        if (this.factionsOpen) this.refreshFactionsUI();
+        break;
+
+      case 'attributes_update':
+        this.myAttributes = { values: msg.values || {}, labels: msg.labels || {} };
+        if (this.attributesOpen) this.refreshAttributesUI();
+        break;
+
+      case 'spell_learned':
+        this.learnedSpells = msg.learned || this.learnedSpells;
+        break;
+
+      case 'talent_learned':
+      case 'talents_update': {
+        this.myTalents.learned = msg.learned || this.myTalents.learned;
+        this.myTalents.points  = msg.points  ?? this.myTalents.points;
+        this.myTalents.tree    = msg.tree    || this.myTalents.tree;
+        if (this.talentsOpen) this.refreshTalentsUI();
+        break;
+      }
+
+      case 'quests_update':
+        this.myQuests = msg.quests || [];
+        if (this.questsOpen) this.refreshQuestsUI();
+        break;
+
+      case 'quest_new':
+        this.myQuests.push(msg.quest);
+        if (this.questsOpen) this.refreshQuestsUI();
+        break;
+
+      case 'quest_progress': {
+        const i = this.myQuests.findIndex(q => q.id === msg.quest.id);
+        if (i >= 0) this.myQuests[i] = msg.quest; else this.myQuests.push(msg.quest);
+        if (this.questsOpen) this.refreshQuestsUI();
+        if (msg.quest.status === 'completed') this.showEvent(`📜 Quest erfüllt: ${msg.quest.title}`);
+        break;
+      }
+
+      case 'quest_closed':
+        this.myQuests = this.myQuests.filter(q => q.id !== msg.quest_id);
+        if (this.questsOpen) this.refreshQuestsUI();
+        break;
+
+      case 'research_update': {
+        const n = this.myResearch[msg.node_id];
+        if (n) {
+          n.points = msg.points;
+          n.done   = msg.done;
+        }
+        // Wenn fertig: andere Knoten könnten jetzt verfügbar sein
+        if (msg.done) {
+          for (const [id, other] of Object.entries(this.myResearch)) {
+            if (other.prereq === msg.node_id) other.available = true;
+          }
+          this.showEvent(`🔬 Forschung abgeschlossen: ${n?.name || msg.node_id}`);
+        }
+        if (this.researchOpen) this.refreshResearchUI();
+        break;
+      }
+
+      case 'bills_update':
+        this.bills = msg.bills || [];
+        if (this.activeCrafting) this.refreshBillsUI();
+        break;
+
+      case 'bill_progress': {
+        const b = (this.bills || []).find(x => x.id === msg.bill_id);
+        if (b) {
+          b.completed = msg.completed;
+          b.target_count = msg.target;
+          b.status = 'active';
+        }
+        if (this.activeCrafting) this.refreshBillsUI();
+        break;
+      }
+
+      case 'bill_done':
+        this.bills = (this.bills || []).filter(x => x.id !== msg.bill_id);
+        if (this.activeCrafting) this.refreshBillsUI();
+        this.showEvent(`✅ Auftrag fertig: ${msg.recipe_id}`);
+        break;
+
+      case 'bill_blocked': {
+        const b = (this.bills || []).find(x => x.id === msg.bill_id);
+        if (b) b.status = 'blocked';
+        if (this.activeCrafting) this.refreshBillsUI();
+        break;
+      }
+
+      case 'npc_mood': {
+        const entry = this.npcs[msg.npc_id];
+        if (entry) {
+          if (!entry.npc) entry.npc = {};
+          entry.npc.mental_state = msg.mental_state;
+          entry.npc.mood_value = msg.mood_value;
+          this.refreshNPCMood(msg.npc_id);
+        }
+        break;
+      }
+
+      case 'body_part_damaged':
+        if (!this.myBodyParts) this.myBodyParts = { legs:100, arms:100, torso:100 };
+        this.myBodyParts[msg.part] = msg.remaining;
+        this.refreshBodyParts();
+        // Kleiner Toast bei stärkerem Treffer
+        if (msg.dmg >= 10) {
+          const label = { torso:'Torso', arms:'Arme', legs:'Beine' }[msg.part] || msg.part;
+          this.showEvent(`💢 ${label} getroffen (-${msg.dmg})`);
+        }
+        break;
+
+      case 'skill_xp':
+        if (!this.mySkills[msg.skill]) this.mySkills[msg.skill] = {xp:0, level:0};
+        this.mySkills[msg.skill] = { xp: msg.xp, level: msg.level };
+        if (msg.leveled_up) this.showEvent(`🎉 ${msg.skill} Level ${msg.level}!`);
+        if (this.skillsOpen) this.refreshSkillsUI();
+        break;
+
+      case 'trade_open':
+        this.openTrade(msg);
+        break;
+
+      case 'trade_coins':
+        if (this.activeTrade) {
+          this.activeTrade.coins = msg.coins;
+          this.refreshTradeUI();
+        }
+        break;
+    }
+  }
+
+  // — Trade —
+  openTrade(payload) {
+    if (this.activeDialog || this.inventoryOpen || this.activeChest || this.activeCrafting) return;
+    this.activeTrade = {
+      npc_id: payload.npc_id,
+      npc_name: payload.npc_name,
+      offerings: payload.offerings,
+      coins: payload.coins,
+    };
+    document.getElementById('trade-npc-name').textContent = payload.npc_name;
+    document.getElementById('trade-overlay').classList.add('active');
+    this.input.keyboard.enabled = false;
+    this.input.keyboard.clearCaptures();
+    this.refreshTradeUI();
+  }
+
+  closeTrade() {
+    this.activeTrade = null;
+    document.getElementById('trade-overlay').classList.remove('active');
+    this.input.keyboard.enabled = true;
+  }
+
+  refreshTradeUI() {
+    if (!this.activeTrade) return;
+    document.getElementById('trade-coins').textContent = this.activeTrade.coins;
+    // Welle 38: Stacking-aware sellable list
+    const left = document.getElementById('trade-player-items');
+    left.innerHTML = '';
+    left.className = 'trade-col';
+    const sellable = this.inventory.filter(it => !it.equipped_slot && it.kind !== 'gold_ore');
+    for (const it of sellable) {
+      const cfg = ITEM[it.kind] || {};
+      const row = document.createElement('div');
+      row.className = 'trade-row';
+      const img = document.createElement('img'); img.src = cfg.path || ''; row.appendChild(img);
+      const name = document.createElement('div');
+      const nm = document.createElement('div');
+      nm.className = 'name';
+      nm.textContent = it.unique_name || it.name;
+      name.appendChild(nm);
+      if ((it.quantity || 1) > 1) {
+        const q = document.createElement('div');
+        q.className = 'qty';
+        q.textContent = `× ${it.quantity}`;
+        name.appendChild(q);
+      }
+      row.appendChild(name);
+      const price = document.createElement('span'); price.className = 'price';
+      price.textContent = '?'; row.appendChild(price);
+      const btn = document.createElement('button');
+      btn.textContent = '→ Verkaufen';
+      btn.title = (it.quantity || 1) > 1 ? 'Verkauft 1 Stück (Stack bleibt)' : '';
+      btn.addEventListener('click', () => {
+        this.ws.send(JSON.stringify({type: 'sell_item', item_id: it.id}));
+      });
+      row.appendChild(btn);
+      // Tooltip
+      row.addEventListener('mouseenter', (ev) => this.showItemTooltip(it, ev));
+      row.addEventListener('mousemove',  (ev) => this.showItemTooltip(it, ev));
+      row.addEventListener('mouseleave', () => this.hideItemTooltip());
+      left.appendChild(row);
+    }
+    if (sellable.length === 0) {
+      const e = document.createElement('div');
+      e.style.cssText = 'color:#807060;font-size:11px;padding:10px;text-align:center;';
+      e.textContent = '(nichts zu verkaufen)';
+      left.appendChild(e);
+    }
+    // Händler-Angebot
+    const right = document.getElementById('trade-offerings');
+    right.innerHTML = '';
+    right.className = 'trade-col';
+    for (const off of this.activeTrade.offerings) {
+      const row = document.createElement('div');
+      row.className = 'trade-row';
+      const canAfford = this.activeTrade.coins >= off.price;
+      if (!canAfford) row.classList.add('unaffordable');
+      const img = document.createElement('img'); img.src = off.sprite_path; row.appendChild(img);
+      const name = document.createElement('span'); name.className = 'name';
+      name.textContent = off.name; row.appendChild(name);
+      const price = document.createElement('span'); price.className = 'price';
+      price.textContent = `${off.price} 🪙`; row.appendChild(price);
+      const btn = document.createElement('button');
+      btn.textContent = '← Kaufen';
+      btn.disabled = !canAfford;
+      btn.addEventListener('click', () => {
+        this.ws.send(JSON.stringify({type: 'buy_item', kind: off.kind}));
+      });
+      row.appendChild(btn);
+      // Tooltip mit fake-item Daten
+      const fakeItem = { kind: off.kind, name: off.name, category: ITEM[off.kind]?.category, quality: 'normal' };
+      row.addEventListener('mouseenter', (ev) => this.showItemTooltip(fakeItem, ev));
+      row.addEventListener('mousemove',  (ev) => this.showItemTooltip(fakeItem, ev));
+      row.addEventListener('mouseleave', () => this.hideItemTooltip());
+      right.appendChild(row);
+    }
+  }
+
+  // — Chunked World ——————————————————————————————————————————————————————————
+  tileAt(x, y) {
+    const cx = Math.floor(x / CHUNK_SIZE);
+    const cy = Math.floor(y / CHUNK_SIZE);
+    const chunk = this.chunks[`${cx},${cy}`];
+    if (!chunk) return null;
+    const lx = x - cx * CHUNK_SIZE;
+    const ly = y - cy * CHUNK_SIZE;
+    return chunk[ly][lx];
+  }
+
+  drawChunkTiles(cx, cy) {
+    const chunk = this.chunks[`${cx},${cy}`];
+    if (!chunk) return;
+    for (let ly = 0; ly < CHUNK_SIZE; ly++) {
+      for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+        const wx = cx * CHUNK_SIZE + lx;
+        const wy = cy * CHUNK_SIZE + ly;
+        const key = `${wx},${wy}`;
+        if (this.tileSprites[key]) continue;  // schon gerendert
+        const t = TILE_BY_ID[chunk[ly][lx]];
+        if (!t) continue;
+        const img = this.add.image(wx * TILE_SIZE, wy * TILE_SIZE, t.sprite).setOrigin(0, 0);
+        img.setDisplaySize(TILE_SIZE, TILE_SIZE);
+        img.setDepth(0);
+        this.tileSprites[key] = img;
+      }
+    }
+  }
+
+  // — Chest —
+  openChest(chestId, items) {
+    if (this.activeDialog || this.inventoryOpen || this.activeCrafting) return;
+    this.activeChest = { chest_id: chestId, items };
+    document.getElementById('chest-overlay').classList.add('active');
+    this.input.keyboard.enabled = false;
+    this.input.keyboard.clearCaptures();
+    this.refreshChestUI();
+  }
+
+  closeChest() {
+    this.activeChest = null;
+    document.getElementById('chest-overlay').classList.remove('active');
+    this.input.keyboard.enabled = true;
+  }
+
+  refreshChestUI() {
+    if (!this.activeChest) return;
+    const left = document.getElementById('chest-player-items');
+    const right = document.getElementById('chest-chest-items');
+    left.innerHTML = ''; right.innerHTML = '';
+    const playerItems = this.inventory.filter(it => !it.equipped_slot);
+    const mkRow = (item, btnLabel, onClick) => {
+      const cfg = ITEM[item.kind] || {};
+      const row = document.createElement('div');
+      row.className = 'chest-item-row';
+      const img = document.createElement('img'); img.src = cfg.path || ''; row.appendChild(img);
+      const name = document.createElement('span'); name.className = 'name';
+      name.textContent = item.name; row.appendChild(name);
+      const btn = document.createElement('button'); btn.textContent = btnLabel;
+      btn.addEventListener('click', onClick); row.appendChild(btn);
+      return row;
+    };
+    for (const it of playerItems) {
+      left.appendChild(mkRow(it, '→ Truhe', () => this.transferToChest(it.id)));
+    }
+    for (const it of this.activeChest.items) {
+      right.appendChild(mkRow(it, '↑ Beutel', () => this.transferFromChest(it.id)));
+    }
+    if (playerItems.length === 0) {
+      const e = document.createElement('div'); e.className = 'inv-empty';
+      e.textContent = '(leer)'; left.appendChild(e);
+    }
+    if (this.activeChest.items.length === 0) {
+      const e = document.createElement('div'); e.className = 'inv-empty';
+      e.textContent = '(leer)'; right.appendChild(e);
+    }
+  }
+
+  transferToChest(itemId) {
+    this.ws.send(JSON.stringify({
+      type: 'chest_transfer_to', chest_id: this.activeChest.chest_id, item_id: itemId,
+    }));
+  }
+  transferFromChest(itemId) {
+    this.ws.send(JSON.stringify({
+      type: 'chest_transfer_from', chest_id: this.activeChest.chest_id, item_id: itemId,
+    }));
+  }
+
+  // — Crafting —
+  openCrafting(station, recipeList) {
+    if (this.activeDialog || this.inventoryOpen || this.activeChest) return;
+    this.activeCrafting = { station, recipes: recipeList };
+    if (!this.bills) this.bills = [];     // initial leer; Server schickt bills_update
+    const labels = { workbench: 'Werkbank', furnace: 'Schmelze', anvil: 'Amboss' };
+    document.getElementById('crafting-station-label').textContent = labels[station] || station;
+    document.getElementById('crafting-overlay').classList.add('active');
+    this.input.keyboard.enabled = false;
+    this.input.keyboard.clearCaptures();
+    // Beim Öffnen frische Bill-Liste vom Server abrufen
+    this.ws.send(JSON.stringify({ type: 'list_bills', station_type: station }));
+    this.refreshCraftingUI();
+    this.refreshBillsUI();
+  }
+
+  closeCrafting() {
+    this.activeCrafting = null;
+    document.getElementById('crafting-overlay').classList.remove('active');
+    this.input.keyboard.enabled = true;
+  }
+
+  refreshCraftingUI() {
+    if (!this.activeCrafting) return;
+    const list = document.getElementById('crafting-recipes');
+    list.innerHTML = '';
+    // Welle 36: Stacking-aware counts
+    const counts = {};
+    for (const it of this.inventory) {
+      if (it.equipped_slot) continue;
+      counts[it.kind] = (counts[it.kind] || 0) + (it.quantity || 1);
+    }
+    for (const recipe of this.activeCrafting.recipes) {
+      const row = document.createElement('div');
+      row.className = 'recipe-row';
+      const canCraft = recipe.inputs.every(([k, n]) => (counts[k] || 0) >= n);
+      if (canCraft) row.classList.add('craftable');
+      // Output-Icon
+      const outItem = ITEM[recipe.output] || { name: recipe.output };
+      const icon = document.createElement('div');
+      icon.className = 'recipe-icon';
+      if (outItem.path) {
+        const img = document.createElement('img');
+        img.src = outItem.path;
+        icon.appendChild(img);
+      }
+      row.appendChild(icon);
+      // Info: Name + Ingredient-Chips
+      const info = document.createElement('div'); info.className = 'recipe-info';
+      const name = document.createElement('div');
+      name.className = 'recipe-name';
+      name.textContent = recipe.name;
+      info.appendChild(name);
+      const ing = document.createElement('div');
+      ing.className = 'recipe-ingredients';
+      for (const [k, n] of recipe.inputs) {
+        const has = counts[k] || 0;
+        const ok = has >= n;
+        const chip = document.createElement('span');
+        chip.className = 'ingredient-chip ' + (ok ? 'ok' : 'missing');
+        if (ITEM[k]?.path) {
+          const img = document.createElement('img');
+          img.src = ITEM[k].path;
+          chip.appendChild(img);
+        }
+        const txt = document.createElement('span');
+        txt.textContent = `${has}/${n}`;
+        chip.appendChild(txt);
+        chip.title = ITEM[k]?.name || k;
+        ing.appendChild(chip);
+      }
+      info.appendChild(ing);
+      row.appendChild(info);
+      // Controls
+      const ctrls = document.createElement('div');
+      ctrls.className = 'recipe-controls';
+      const btn = document.createElement('button');
+      btn.textContent = '🔨';
+      btn.title = 'Herstellen';
+      btn.disabled = !canCraft;
+      btn.addEventListener('click', () => this.craft(recipe.id));
+      ctrls.appendChild(btn);
+      const b5 = document.createElement('button');
+      b5.className = 'bill-btn';
+      b5.textContent = '×5';
+      b5.title = 'Auftrag für 5 Stück (Bills-Queue)';
+      b5.addEventListener('click', () => this.addBill(recipe.id, 5));
+      ctrls.appendChild(b5);
+      row.appendChild(ctrls);
+      list.appendChild(row);
+    }
+  }
+
+  refreshBillsUI() {
+    const list = document.getElementById('crafting-bills-list');
+    if (!list || !this.activeCrafting) return;
+    list.innerHTML = '';
+    const stationBills = (this.bills || [])
+      .filter(b => b.station_type === this.activeCrafting.station);
+    if (stationBills.length === 0) {
+      list.innerHTML = '<div style="font-size:10px;color:#806040;">— keine Aufträge —</div>';
+      return;
+    }
+    for (const bill of stationBills) {
+      const row = document.createElement('div');
+      row.className = 'bill-row';
+      // Rezept-Name suchen
+      const rec = this.activeCrafting.recipes.find(r => r.id === bill.recipe_id);
+      const recName = rec ? rec.name : bill.recipe_id;
+      const name = document.createElement('span');
+      name.className = 'bill-name';
+      name.textContent = recName;
+      row.appendChild(name);
+      const prog = document.createElement('span');
+      prog.className = 'bill-progress';
+      prog.textContent = `${bill.completed}/${bill.target_count}`;
+      row.appendChild(prog);
+      const st = document.createElement('span');
+      st.className = 'bill-status ' + (bill.status || '');
+      st.textContent = bill.status || '';
+      row.appendChild(st);
+      const rm = document.createElement('button');
+      rm.className = 'bill-remove';
+      rm.textContent = '×';
+      rm.addEventListener('click', () => this.removeBill(bill.id));
+      row.appendChild(rm);
+      list.appendChild(row);
+    }
+  }
+
+  addBill(recipeId, count) {
+    if (!this.activeCrafting) return;
+    this.ws.send(JSON.stringify({
+      type: 'add_bill',
+      station_type: this.activeCrafting.station,
+      recipe_id: recipeId,
+      count: count,
+    }));
+  }
+
+  removeBill(billId) {
+    this.ws.send(JSON.stringify({ type: 'remove_bill', bill_id: billId }));
+  }
+
+  craft(recipeId) {
+    this.ws.send(JSON.stringify({
+      type: 'craft', station: this.activeCrafting.station, recipe_id: recipeId,
+    }));
+  }
+
+  showVisualEffect(kind, x, y) {
+    const key = `fx_${kind}`;
+    if (!this.textures.exists(key)) return;
+    const cx = x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = y * TILE_SIZE + TILE_SIZE / 2;
+    const img = this.add.image(cx, cy, key).setOrigin(0.5).setDepth(8);
+    img.setDisplaySize(TILE_SIZE, TILE_SIZE);
+    img.setAlpha(0.95);
+    this.tweens.add({
+      targets: img,
+      alpha: 0,
+      scale: { from: img.scale * 1.0, to: img.scale * 1.3 },
+      duration: 600,
+      ease: 'Quad.easeOut',
+      onComplete: () => img.destroy(),
+    });
+  }
+
+  refreshHpBar(flash = false) {
+    const fill = document.getElementById('hp-fill');
+    const text = document.getElementById('hp-text');
+    const bar = document.getElementById('hp-bar');
+    const ratio = this.myMaxHp > 0 ? this.myHp / this.myMaxHp : 0;
+    fill.style.width = (ratio * 100) + '%';
+    text.textContent = `${this.myHp} / ${this.myMaxHp}`;
+    if (flash) {
+      bar.classList.remove('damage-flash');
+      void bar.offsetWidth;
+      bar.classList.add('damage-flash');
+    }
+  }
+
+  refreshManaBar() {
+    const fill = document.getElementById('mana-fill');
+    const text = document.getElementById('mana-text');
+    const ratio = this.myMaxMana > 0 ? this.myMana / this.myMaxMana : 0;
+    fill.style.width = (ratio * 100) + '%';
+    text.textContent = `${this.myMana} / ${this.myMaxMana}`;
+  }
+
+  refreshBodyParts() {
+    const bp = this.myBodyParts || { legs: 100, arms: 100, torso: 100 };
+    for (const part of ['torso', 'arms', 'legs']) {
+      const val = bp[part] ?? 100;
+      const fill = document.getElementById(`bp-${part}-fill`);
+      const text = document.getElementById(`bp-${part}-text`);
+      if (!fill || !text) continue;
+      fill.style.width = val + '%';
+      const icon = { torso: '🫀', arms: '💪', legs: '🦵' }[part];
+      const label = { torso: 'Torso', arms: 'Arme', legs: 'Beine' }[part];
+      text.textContent = `${icon} ${label} ${val}/100`;
+    }
+  }
+
+  refreshNeedsBars() {
+    const hf = document.getElementById('hunger-fill');
+    const ht = document.getElementById('hunger-text');
+    const hr = this.myMaxHunger > 0 ? this.myHunger / this.myMaxHunger : 0;
+    hf.style.width = (hr * 100) + '%';
+    ht.textContent = `🍖 ${this.myHunger}/${this.myMaxHunger}`;
+    const sf = document.getElementById('stamina-fill');
+    const st = document.getElementById('stamina-text');
+    const sr = this.myMaxStamina > 0 ? this.myStamina / this.myMaxStamina : 0;
+    sf.style.width = (sr * 100) + '%';
+    st.textContent = `⚡ ${this.myStamina}/${this.myMaxStamina}`;
+  }
+
+  refreshSkillsUI() {
+    const list = document.getElementById('skills-list');
+    if (!list) return;
+    const skills = [
+      ['mining',       '⛏️', 'Bergbau'],
+      ['woodcutting',  '🪓', 'Holzfällen'],
+      ['gathering',    '🌿', 'Sammeln'],
+      ['construction', '🔨', 'Bauen'],
+      ['crafting',     '⚒️', 'Handwerk'],
+      ['combat',       '⚔️', 'Kampf'],
+      ['magic',        '✨', 'Magie'],
+      ['cooking',      '🍳', 'Kochen'],
+      ['medical',      '❤️‍🩹', 'Heilkunde'],
+      ['farming',      '🌾', 'Landwirtschaft'],
+      ['social',       '💬', 'Sozial'],
+    ];
+    list.innerHTML = '';
+    for (const [key, icon, label] of skills) {
+      const s = this.mySkills[key] || {xp:0, level:0};
+      // approx xp-to-next-level
+      const xpForLevel = (n) => Math.floor(100 * Math.pow(n, 1.5));
+      const totalForLevel = (lv) => { let c=0; for (let i=1;i<=lv;i++) c+=xpForLevel(i); return c; };
+      const cur = s.xp - totalForLevel(s.level);
+      const need = xpForLevel(s.level + 1);
+      const pct = need > 0 ? (cur / need) * 100 : 100;
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      row.innerHTML = `
+        <span class="skill-icon">${icon}</span>
+        <span class="skill-name">${label}</span>
+        <span class="skill-level">Lv ${s.level}</span>
+        <div class="skill-progress">
+          <div class="skill-progress-fill" style="width:${pct}%"></div>
+          <div class="skill-progress-text">${cur} / ${need} XP</div>
+        </div>
+      `;
+      list.appendChild(row);
+    }
+  }
+
+  toggleSkills() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.skillsOpen = !this.skillsOpen;
+    const overlay = document.getElementById('skills-overlay');
+    if (this.skillsOpen) {
+      overlay.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.refreshSkillsUI();
+    } else {
+      overlay.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  toggleResearch() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.researchOpen = !this.researchOpen;
+    const overlay = document.getElementById('research-overlay');
+    if (this.researchOpen) {
+      overlay.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.refreshResearchUI();
+    } else {
+      overlay.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  refreshResearchUI() {
+    const list = document.getElementById('research-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const order = Object.entries(this.myResearch || {});
+    if (order.length === 0) {
+      list.innerHTML = '<div style="padding:14px;color:#807060">Noch keine Forschungs-Knoten verfügbar.</div>';
+      return;
+    }
+    for (const [nodeId, node] of order) {
+      const row = document.createElement('div');
+      row.className = 'research-row';
+      if (!node.available) row.classList.add('locked');
+      if (node.done) row.classList.add('done');
+      const icon = document.createElement('div');
+      icon.className = 'research-icon';
+      icon.textContent = node.icon || '🔬';
+      row.appendChild(icon);
+      const info = document.createElement('div');
+      const prereqText = node.prereq && !node.available
+        ? `<div class="research-desc">benötigt: ${node.prereq}</div>` : '';
+      const unlocksText = node.unlocks?.length
+        ? `<div class="research-desc">schaltet frei: ${node.unlocks.join(', ')}</div>` : '';
+      info.innerHTML = `<div class="research-name">${node.name}</div>${prereqText}${unlocksText}`;
+      row.appendChild(info);
+      const bar = document.createElement('div');
+      bar.className = 'research-bar';
+      const fill = document.createElement('div');
+      fill.className = 'research-bar-fill';
+      const ratio = node.points_max > 0 ? Math.min(1, node.points / node.points_max) : 0;
+      fill.style.width = (ratio * 100) + '%';
+      const txt = document.createElement('div');
+      txt.className = 'research-bar-text';
+      txt.textContent = node.done ? '✓ fertig' : `${node.points}/${node.points_max}`;
+      bar.appendChild(fill); bar.appendChild(txt);
+      row.appendChild(bar);
+      const acts = document.createElement('div');
+      acts.className = 'research-actions';
+      const b1 = document.createElement('button');
+      b1.textContent = '+1';
+      b1.disabled = node.done || !node.available;
+      b1.addEventListener('click', () => this.investResearch(nodeId, 1));
+      acts.appendChild(b1);
+      const b5 = document.createElement('button');
+      b5.textContent = '+5';
+      b5.disabled = node.done || !node.available;
+      b5.addEventListener('click', () => this.investResearch(nodeId, 5));
+      acts.appendChild(b5);
+      row.appendChild(acts);
+      list.appendChild(row);
+    }
+  }
+
+  investResearch(nodeId, points) {
+    this.ws.send(JSON.stringify({
+      type: 'invest_research', node_id: nodeId, points: points,
+    }));
+  }
+
+  toggleAttributes() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.attributesOpen = !this.attributesOpen;
+    const ov = document.getElementById('attributes-overlay');
+    if (this.attributesOpen) {
+      ov.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      // Frisch berechnen lassen
+      this.ws.send(JSON.stringify({ type: 'list_attributes' }));
+      this.refreshAttributesUI();
+    } else {
+      ov.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  refreshAttributesUI() {
+    const list = document.getElementById('attributes-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const values = this.myAttributes?.values || {};
+    const labels = this.myAttributes?.labels || {};
+    // Reihenfolge wie definiert
+    const ORDER = ['stärke','ausdauer','energie','intelligenz','weisheit',
+                   'verteidigung','geschick','ausweichen','schleichen',
+                   'krit_rate','krit_schaden','charisma'];
+    for (const key of ORDER) {
+      const v = values[key] ?? 0;
+      const [label, desc] = labels[key] || [key, ''];
+      const row = document.createElement('div');
+      row.className = 'attr-row';
+      const lbl = document.createElement('div');
+      lbl.className = 'attr-label';
+      lbl.textContent = label;
+      row.appendChild(lbl);
+      const d = document.createElement('div');
+      d.className = 'attr-desc';
+      d.textContent = desc;
+      row.appendChild(d);
+      const val = document.createElement('div');
+      val.className = 'attr-value';
+      val.textContent = v;
+      row.appendChild(val);
+      list.appendChild(row);
+    }
+  }
+
+  toggleFactions() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.factionsOpen = !this.factionsOpen;
+    const ov = document.getElementById('factions-overlay');
+    if (this.factionsOpen) {
+      ov.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.refreshFactionsUI();
+    } else {
+      ov.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  refreshFactionsUI() {
+    const list = document.getElementById('factions-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!this.myFactions || this.myFactions.length === 0) {
+      list.innerHTML = '<div style="padding:14px;color:#807060">Keine Faktion-Beziehungen.</div>';
+      return;
+    }
+    const TIER_LABEL = {
+      hostile: 'Feindlich', unfriendly: 'Unfreundlich',
+      neutral: 'Neutral', friendly: 'Freundlich', allied: 'Verbündet',
+    };
+    for (const f of this.myFactions) {
+      const row = document.createElement('div');
+      row.className = 'faction-row';
+      const dot = document.createElement('div');
+      dot.className = 'faction-dot';
+      dot.style.background = f.color || '#888';
+      row.appendChild(dot);
+      const name = document.createElement('div');
+      name.className = 'faction-name';
+      name.textContent = f.name;
+      row.appendChild(name);
+      // Bar: -100..+100 → 0..100% Position
+      const bar = document.createElement('div');
+      bar.className = 'faction-bar';
+      const fill = document.createElement('div');
+      fill.className = 'faction-bar-fill';
+      const pct = Math.abs(f.goodwill);
+      if (f.goodwill >= 0) {
+        fill.style.left = '50%';
+        fill.style.width = (pct/2) + '%';
+        fill.style.background = '#50a050';
+      } else {
+        fill.style.right = '50%';
+        fill.style.width = (pct/2) + '%';
+        fill.style.background = '#a05050';
+      }
+      bar.appendChild(fill);
+      row.appendChild(bar);
+      const tier = document.createElement('div');
+      tier.className = 'faction-tier ' + (f.tier || 'neutral');
+      tier.textContent = `${TIER_LABEL[f.tier] || f.tier} ${f.goodwill>=0?'+':''}${f.goodwill}`;
+      row.appendChild(tier);
+      list.appendChild(row);
+    }
+  }
+
+  toggleTalents() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.talentsOpen = !this.talentsOpen;
+    const overlay = document.getElementById('talents-overlay');
+    if (this.talentsOpen) {
+      overlay.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.ws.send(JSON.stringify({ type: 'list_talents' }));
+      this.refreshTalentsUI();
+    } else {
+      overlay.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  refreshTalentsUI() {
+    const tree = this.myTalents.tree || {};
+    const points = this.myTalents.points || 0;
+    document.getElementById('talents-points').textContent = `${points} Punkte`;
+    // Tabs (1 pro Skill)
+    const tabs = document.getElementById('talents-tabs');
+    const skills = Object.keys(tree);
+    const SKILL_LABEL = {
+      mining:'⛏️ Bergbau', woodcutting:'🪓 Holzfällen', gathering:'🌿 Sammeln',
+      construction:'🔨 Bauen', crafting:'⚒️ Handwerk', combat:'⚔️ Kampf',
+      magic:'✨ Magie', cooking:'🍳 Kochen', medical:'❤️‍🩹 Heilkunde',
+      farming:'🌾 Landwirtschaft', social:'💬 Sozial',
+    };
+    tabs.innerHTML = '';
+    for (const sk of skills) {
+      const btn = document.createElement('button');
+      btn.className = 'talents-tab' + (sk === this.activeTalentTab ? ' active' : '');
+      btn.textContent = SKILL_LABEL[sk] || sk;
+      btn.addEventListener('click', () => {
+        this.activeTalentTab = sk;
+        this.refreshTalentsUI();
+      });
+      tabs.appendChild(btn);
+    }
+    // Talents im aktiven Tab
+    const list = document.getElementById('talents-list');
+    list.innerHTML = '';
+    const items = tree[this.activeTalentTab] || [];
+    if (items.length === 0) {
+      list.innerHTML = '<div style="padding:14px;color:#807060">Keine Talente in dieser Kategorie.</div>';
+      return;
+    }
+    // Nach Tier gruppiert
+    const tiers = [1, 2, 3];
+    for (const tier of tiers) {
+      const tierItems = items.filter(it => it.tier === tier);
+      if (tierItems.length === 0) continue;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'color:#806040;font-size:10px;padding:6px 0 2px;border-bottom:1px solid #4a3a20;';
+      sep.textContent = `— Stufe ${tier} —`;
+      list.appendChild(sep);
+      for (const t of tierItems) {
+        const row = document.createElement('div');
+        row.className = 'talent-row ' + (t.status || 'locked');
+        const icon = document.createElement('div');
+        icon.className = 'talent-icon';
+        icon.textContent = t.icon || '🌟';
+        row.appendChild(icon);
+        const info = document.createElement('div');
+        const prereqText = t.prereq ? ` · braucht: ${t.prereq}` : '';
+        info.innerHTML = `<div class="talent-name">${t.name}</div>
+                          <div class="talent-desc">${t.desc}</div>
+                          <div class="talent-meta">Skill Lvl ${t.skill_min}${prereqText}</div>`;
+        row.appendChild(info);
+        const act = document.createElement('div');
+        act.className = 'talent-action';
+        if (t.status === 'available') {
+          const btn = document.createElement('button');
+          btn.textContent = 'Lernen (1 P)';
+          btn.addEventListener('click', () => this.learnTalent(t.id));
+          act.appendChild(btn);
+        } else {
+          const stat = document.createElement('div');
+          stat.className = 'talent-status ' + (t.status || '');
+          stat.textContent = ({
+            learned: '✓ Gelernt', locked: 'Gesperrt',
+            needs_points: 'Brauche Punkte',
+          })[t.status] || t.status;
+          act.appendChild(stat);
+        }
+        row.appendChild(act);
+        list.appendChild(row);
+      }
+    }
+  }
+
+  learnTalent(talent_id) {
+    this.ws.send(JSON.stringify({ type: 'learn_talent', talent_id }));
+  }
+
+  toggleQuests() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.questsOpen = !this.questsOpen;
+    const overlay = document.getElementById('quests-overlay');
+    if (this.questsOpen) {
+      overlay.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.refreshQuestsUI();
+    } else {
+      overlay.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  refreshQuestsUI() {
+    const list = document.getElementById('quests-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!this.myQuests || this.myQuests.length === 0) {
+      list.innerHTML = '<div style="padding:14px;color:#807060">Keine aktiven Quests. Sprich mit Bewohnern, um Aufträge zu erhalten.</div>';
+      return;
+    }
+    for (const q of this.myQuests) {
+      const row = document.createElement('div');
+      row.className = 'quest-row ' + (q.status || '');
+      const title = document.createElement('div');
+      title.className = 'quest-title';
+      title.textContent = (q.status === 'completed' ? '✓ ' : '') + q.title;
+      row.appendChild(title);
+      const desc = document.createElement('div');
+      desc.className = 'quest-desc';
+      desc.textContent = q.description;
+      row.appendChild(desc);
+      const obj = document.createElement('div');
+      obj.className = 'quest-objective';
+      if (q.quest_type === 'fetch') {
+        const have = q.progress?.collected || 0;
+        const need = q.objective?.count || 0;
+        const kind = q.objective?.item_kind || '';
+        const itemName = (ITEM[kind] || { name: kind }).name;
+        obj.textContent = `🎯 Sammle ${itemName}: ${have}/${need}`;
+      } else if (q.quest_type === 'kill') {
+        const have = q.progress?.killed || 0;
+        const need = q.objective?.count || 0;
+        obj.textContent = `⚔️ Erlege ${q.objective?.creature_kind}: ${have}/${need}`;
+      } else if (q.quest_type === 'multi_stage') {
+        // Welle 28: Stages anzeigen
+        const stages = q.objective?.stages || [];
+        const lines = stages.map(s => {
+          const icon = s.state === 'completed' ? '✓' :
+                       s.state === 'locked' ? '🔒' :
+                       s.state === 'in_progress' ? '⏳' : '▷';
+          let progTxt = '';
+          if (s.type === 'collect' && s.data?.count) {
+            const have = s.progress?.collected || 0;
+            progTxt = ` (${have}/${s.data.count})`;
+          } else if (s.type === 'kill' && s.data?.count) {
+            const have = s.progress?.killed || 0;
+            progTxt = ` (${have}/${s.data.count})`;
+          }
+          return `${icon} ${s.description}${progTxt}`;
+        });
+        obj.innerHTML = lines.map(l => `<div style="margin-top:2px">${l}</div>`).join('');
+      } else {
+        obj.textContent = JSON.stringify(q.objective);
+      }
+      row.appendChild(obj);
+      const rwd = document.createElement('div');
+      rwd.className = 'quest-reward';
+      rwd.textContent = '🎁 ' + Object.entries(q.reward || {}).map(([k, v]) => {
+        if (k === 'xp') return `${v} XP`;
+        const name = (ITEM[k] || { name: k }).name;
+        return `${v}× ${name}`;
+      }).join(', ');
+      row.appendChild(rwd);
+      if (q.status === 'completed') {
+        const claim = document.createElement('button');
+        claim.className = 'quest-claim';
+        claim.textContent = 'Belohnung einsammeln';
+        claim.addEventListener('click', () => this.claimQuest(q.id));
+        row.appendChild(claim);
+      }
+      list.appendChild(row);
+    }
+  }
+
+  claimQuest(quest_id) {
+    this.ws.send(JSON.stringify({ type: 'claim_quest_reward', quest_id }));
+  }
+
+  acceptQuestFromNPC(npc_id) {
+    this.ws.send(JSON.stringify({ type: 'accept_quest_from_npc', npc_id }));
+  }
+
+  renderStatusEffects(effects) {
+    const row = document.getElementById('status-effects-row');
+    if (!row) return;
+    row.innerHTML = '';
+    const ICON = {
+      burning: '🔥', poisoned: '☠️', bleeding: '🩸',
+      blessed: '✨', shielded: '🛡️', slowed: '🐢',
+    };
+    for (const eff of effects) {
+      const exp = new Date(eff.expires_at);
+      const remaining = Math.max(0, Math.round((exp - new Date()) / 1000));
+      const chip = document.createElement('span');
+      chip.className = 'status-chip';
+      chip.textContent = `${ICON[eff.effect] || '•'} ${eff.effect} ${remaining}s`;
+      row.appendChild(chip);
+    }
+  }
+
+  // Welle 9b: Dungeon-Welt-Wechsel
+  enterDungeonMode(msg) {
+    this.inDungeon    = true;
+    this.dungeonTiles = msg.tiles;
+    this.dungeonSize  = msg.size;
+    // Alle Overworld-Tiles + Structures + NPCs verstecken
+    for (const k in this.tileSprites) { this.tileSprites[k].setVisible(false); }
+    for (const k in this.structSprites) { this.structSprites[k]?.setVisible(false); }
+    for (const id in this.npcs) {
+      if (this.npcs[id].container) this.npcs[id].container.setVisible(false);
+    }
+    for (const id in this.otherPlayers) {
+      if (this.otherPlayers[id].container) this.otherPlayers[id].container.setVisible(false);
+    }
+    // Items am Boden verstecken
+    for (const k in this.groundItemSprites || {}) { this.groundItemSprites[k]?.setVisible(false); }
+    // Dungeon-Tiles rendern
+    this.renderDungeonTiles();
+    // Spieler-Position setzen
+    this.setLocalPositionFromTile(msg.spawn.x, msg.spawn.y);
+    this.showStoryEvent({
+      kind: 'natural',
+      title: '🏚️ ' + msg.name.split(':')[0],
+      body: 'Du betrittst die Tiefen. Suche den Aufstieg.',
+    });
+  }
+
+  renderDungeonTiles() {
+    // Cleanup vorheriger dungeon-sprites
+    for (const k in this.dungeonSprites) { this.dungeonSprites[k].destroy(); }
+    this.dungeonSprites = {};
+    if (!this.dungeonTiles) return;
+    const DUNG_TILE = {
+      0: 'dungeon_dungeon_wall',
+      1: 'dungeon_dungeon_floor',
+      2: 'dungeon_dungeon_floor',
+      3: 'dungeon_stairs_down',  // stairs_up zeigt das stairs-Asset
+    };
+    for (let y = 0; y < this.dungeonSize; y++) {
+      for (let x = 0; x < this.dungeonSize; x++) {
+        const tile = this.dungeonTiles[y][x];
+        const key = DUNG_TILE[tile];
+        if (!key || !this.textures.exists(key)) continue;
+        const img = this.add.image(x * TILE_SIZE, y * TILE_SIZE, key).setOrigin(0, 0);
+        img.setDisplaySize(TILE_SIZE, TILE_SIZE);
+        img.setDepth(0);
+        this.dungeonSprites[`${x},${y}`] = img;
+      }
+    }
+  }
+
+  exitDungeonMode(msg) {
+    this.inDungeon = false;
+    this.dungeonTiles = null;
+    // Dungeon-Sprites abräumen
+    for (const k in this.dungeonSprites) { this.dungeonSprites[k].destroy(); }
+    this.dungeonSprites = {};
+    // Overworld-Tiles wieder einblenden
+    for (const k in this.tileSprites) { this.tileSprites[k].setVisible(true); }
+    for (const k in this.structSprites) { this.structSprites[k]?.setVisible(true); }
+    for (const id in this.npcs) {
+      if (this.npcs[id].container) this.npcs[id].container.setVisible(true);
+    }
+    for (const id in this.otherPlayers) {
+      if (this.otherPlayers[id].container) this.otherPlayers[id].container.setVisible(true);
+    }
+    for (const k in this.groundItemSprites || {}) { this.groundItemSprites[k]?.setVisible(true); }
+    // Frische Chunks anwenden
+    if (msg.chunks) {
+      for (const c of msg.chunks) {
+        this.chunks[`${c.cx},${c.cy}`] = c.tiles;
+        this.drawChunkTiles(c.cx, c.cy);
+      }
+      this.drawMinimap();
+    }
+    // Spieler-Position
+    if (msg.spawn) this.setLocalPositionFromTile(msg.spawn.x, msg.spawn.y);
+  }
+
+  // Overrides für Dungeon-Mode: tileAt liest aus Dungeon-Tiles statt Chunks
+  dungeonTileAt(x, y) {
+    if (!this.dungeonTiles || x < 0 || y < 0
+        || x >= this.dungeonSize || y >= this.dungeonSize) return 0;
+    return this.dungeonTiles[y][x];
+  }
+
+  updateTimeOfDay(t) {
+    const phase = t.phase || 'day';
+    const hour = t.hour ?? 12;
+    const minute = (t.minute_of_day ?? hour * 60) % 60;
+    const display = document.getElementById('time-display');
+    const icon = { morning: '🌅', day: '☀️', evening: '🌇', night: '🌙' }[phase] || '☀️';
+    if (display) display.textContent = `${icon} ${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+    const tint = document.getElementById('time-tint');
+    if (tint) {
+      const colors = {
+        morning: 'rgba(255,180, 80,0.10)',
+        day:     'rgba(0,0,0,0)',
+        evening: 'rgba(180, 80, 40,0.20)',
+        night:   'rgba(10, 20, 60,0.55)',
+      };
+      tint.style.background = colors[phase] || 'transparent';
+    }
+  }
+
+  flashScreenDamage() {
+    const el = document.getElementById('screen-damage');
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), 200);
+  }
+
+  knockbackSprite(p) {
+    if (!p || !p.container) return;
+    const originalX = p.container.x;
+    const originalY = p.container.y;
+    // Kleine sin-Vibration
+    this.tweens.add({
+      targets: p.container,
+      x: originalX + 4,
+      duration: 60,
+      yoyo: true,
+      repeat: 2,
+    });
+  }
+
+  flashNPCHit(npcId) {
+    const entry = this.npcs[npcId];
+    if (!entry || !entry.body) return;
+    const originalTint = entry.body.tintTopLeft;
+    entry.body.setTint(0xff4040);
+    setTimeout(() => {
+      if (entry.body && entry.body.scene) {
+        // Originalfarbe wiederherstellen — friendly NPCs hatten Tint, Creatures hatten 0xffffff
+        const cfg = NPC_SPRITE[entry.npc.kind];
+        if (cfg) entry.body.setTint(cfg.tint);
+        else entry.body.clearTint();
+      }
+    }, 250);
+  }
+
+  updateNPCHpBar(npcId) {
+    const entry = this.npcs[npcId];
+    if (!entry) return;
+    const ratio = entry.npc.max_hp > 0 ? entry.npc.hp / entry.npc.max_hp : 0;
+    if (!entry.hpBar) {
+      entry.hpBar = this.add.graphics();
+      entry.container.add(entry.hpBar);
+    }
+    entry.hpBar.clear();
+    if (ratio >= 1) return;  // volle HP — kein Balken
+    const w = 36;
+    entry.hpBar.y = -TILE_SIZE * 0.65;
+    entry.hpBar.fillStyle(0x000000, 0.7);
+    entry.hpBar.fillRect(-w / 2, 0, w, 4);
+    entry.hpBar.fillStyle(0xc83020, 1);
+    entry.hpBar.fillRect(-w / 2, 0, w * ratio, 4);
+  }
+
+  loadGroundItems(itemList) {
+    // Bestehende Item-Sprites entfernen
+    for (const id of Object.keys(this.itemSprites)) {
+      this.itemSprites[id].destroy();
+    }
+    this.itemSprites = {};
+    for (const item of itemList) this.addItemSprite(item);
+  }
+
+  addItemSprite(item) {
+    const cfg = ITEM[item.kind];
+    if (!cfg) return;
+    if (this.itemSprites[item.id]) return;
+    const cx = item.x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = item.y * TILE_SIZE + TILE_SIZE / 2;
+    const img = this.add.image(cx, cy, cfg.sprite).setOrigin(0.5);
+    img.setDisplaySize(TILE_SIZE * 0.5, TILE_SIZE * 0.5);  // Items kleiner als Tiles
+    img.setDepth(2);  // über Strukturen (1), unter Charakteren (3)
+    this.itemSprites[item.id] = img;
+  }
+
+  removeItemSprite(itemId) {
+    if (this.itemSprites[itemId]) {
+      this.itemSprites[itemId].destroy();
+      delete this.itemSprites[itemId];
+    }
+  }
+
+  toggleInventory() {
+    if (this.activeDialog) return;
+    this.inventoryOpen = !this.inventoryOpen;
+    const overlay = document.getElementById('inventory-overlay');
+    if (this.inventoryOpen) {
+      overlay.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.refreshInventoryUI();
+    } else {
+      overlay.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  refreshInventoryUI() {
+    // Welle 34: Hotbar mit aktualisieren
+    this.refreshHotbar();
+    // Equipment-Slots
+    const slotsDiv = document.getElementById('inventory-slots');
+    slotsDiv.innerHTML = '';
+    for (const slot of EQUIP_SLOTS) {
+      const equipped = this.inventory.find(it => it.equipped_slot === slot.key);
+      const div = document.createElement('div');
+      div.className = 'slot';
+      if (equipped) {
+        const cfg = ITEM[equipped.kind] || {};
+        const img = document.createElement('img');
+        img.src = cfg.path || '';
+        div.appendChild(img);
+        const lbl = document.createElement('div');
+        lbl.className = 'slot-label';
+        lbl.textContent = slot.label;
+        div.appendChild(lbl);
+        const itemName = document.createElement('div');
+        itemName.className = 'slot-item';
+        itemName.textContent = equipped.name;
+        div.appendChild(itemName);
+        div.title = 'Klick zum Ablegen';
+        div.addEventListener('click', () => this.unequipItem(equipped.id));
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'slot-empty';
+        empty.textContent = '∅';
+        div.appendChild(empty);
+        const lbl = document.createElement('div');
+        lbl.className = 'slot-label';
+        lbl.textContent = slot.label;
+        div.appendChild(lbl);
+      }
+      slotsDiv.appendChild(div);
+    }
+
+    // Welle 36: Beutel als Slot-Grid (40 Slots)
+    const listDiv = document.getElementById('inventory-list');
+    listDiv.innerHTML = '';
+    const unequipped = this.inventory.filter(it => !it.equipped_slot);
+    const QUALITY_ICONS = {fine:'✨', masterwork:'🌟', legendary:'👑', rough:'⚠️'};
+    const SLOT_COUNT = 40;
+    for (let i = 0; i < SLOT_COUNT; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'inv-slot';
+      const item = unequipped[i];
+      if (!item) {
+        slot.classList.add('inv-slot-empty');
+        listDiv.appendChild(slot);
+        continue;
+      }
+      const cfg = ITEM[item.kind] || {};
+      if (item.quality && item.quality !== 'normal') slot.classList.add(item.quality);
+      const img = document.createElement('img');
+      img.src = cfg.path || '';
+      slot.appendChild(img);
+      // Quality-Icon top-left
+      if (QUALITY_ICONS[item.quality]) {
+        const q = document.createElement('div');
+        q.className = 'inv-slot-quality';
+        q.textContent = QUALITY_ICONS[item.quality];
+        slot.appendChild(q);
+      }
+      // Count (nur wenn > 1)
+      const qty = item.quantity || 1;
+      if (qty > 1) {
+        const c = document.createElement('div');
+        c.className = 'inv-slot-count';
+        c.textContent = qty;
+        slot.appendChild(c);
+      }
+      // Hover-Tooltip
+      slot.addEventListener('mouseenter', (ev) => this.showItemTooltip(item, ev));
+      slot.addEventListener('mousemove',  (ev) => this.showItemTooltip(item, ev));
+      slot.addEventListener('mouseleave', () => this.hideItemTooltip());
+      // Linksklick: kontext-passende Aktion (use/equip/learn/cast)
+      slot.addEventListener('click', () => {
+        if (cfg.slot) this.equipItem(item.id);
+        else if (cfg.category === 'consumable' || cfg.category === 'food') this.useItem(item.id);
+        else if (cfg.category === 'magic') {
+          // Wenn schon gelernt → casten; sonst → lernen
+          if ((this.learnedSpells || []).includes(item.kind)) {
+            this.castSpell(item.id);
+          } else {
+            this.ws.send(JSON.stringify({ type: 'learn_spell', item_id: item.id }));
+          }
+        }
+        else this.showEvent(`${cfg.name || item.kind} (kein Effekt)`);
+      });
+      // Rechtsklick: Drop-/Hotbar-Menü als Toast
+      slot.addEventListener('contextmenu', (ev) => {
+        ev.preventDefault();
+        let slotIdx = this.hotbar.findIndex(s => !s);
+        if (slotIdx < 0) slotIdx = 0;
+        this.assignToHotbar(slotIdx, item.kind);
+        this.showEvent(`📌 ${(ITEM[item.kind]||{name:item.kind}).name} → Hotbar ${slotIdx+1}`);
+      });
+      // Shift+Klick: Drop
+      slot.addEventListener('auxclick', (ev) => {
+        if (ev.button === 1) {
+          ev.preventDefault(); this.dropItem(item.id);
+        }
+      });
+      listDiv.appendChild(slot);
+    }
+  }
+
+  equipItem(itemId) {
+    this.ws.send(JSON.stringify({ type: 'equip_item',   item_id: itemId }));
+  }
+  unequipItem(itemId) {
+    this.ws.send(JSON.stringify({ type: 'unequip_item', item_id: itemId }));
+  }
+  useItem(itemId) {
+    this.ws.send(JSON.stringify({ type: 'use_item',     item_id: itemId }));
+  }
+  dropItem(itemId) {
+    this.ws.send(JSON.stringify({ type: 'drop_item',    item_id: itemId }));
+  }
+  castSpell(itemId) {
+    this.ws.send(JSON.stringify({ type: 'cast_spell',   item_id: itemId }));
+  }
+
+  loadNPCs(npcList) {
+    for (const id of Object.keys(this.npcs)) {
+      const n = this.npcs[id];
+      if (n.tween) n.tween.stop();
+      n.container.destroy();
+    }
+    this.npcs = {};
+    for (const npc of npcList) this.spawnNPCSprite(npc);
+  }
+
+  spawnNPCSprite(npc) {
+    if (this.npcs[npc.id]) return;
+    const cfg = NPC_SPRITE[npc.kind] || NPC_SPRITE.wanderer;
+    const cx = npc.x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = npc.y * TILE_SIZE + TILE_SIZE / 2;
+
+    const shadow = this.add.image(0, 14, 'fx_shadow')
+      .setOrigin(0.5)
+      .setAlpha(0.55);
+
+    const body = this.add.image(0, 0, cfg.sprite).setOrigin(0.5, 0.55);
+    body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+    body.setTint(cfg.tint);
+
+    const label = this.add.text(0, -TILE_SIZE * 0.55, npc.name.substr(0, 20), {
+      fontSize: '10px', color: '#ffeec0', stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    // Mental-State-Icon (über NPC) — Welle 4
+    const moodIcon = this.add.text(0, -TILE_SIZE * 0.78, '', {
+      fontSize: '13px',
+    }).setOrigin(0.5);
+
+    const container = this.add.container(cx, cy, [shadow, body, label, moodIcon]);
+    container.setDepth(3);
+
+    this.npcs[npc.id] = {
+      container, body, shadow, label, moodIcon,
+      tween: null,
+      tileX: npc.x, tileY: npc.y,
+      npc,  // raw data für späteren Dialog-Kontext
+    };
+    this.refreshNPCMood(npc.id);
+  }
+
+  refreshNPCMood(npcId) {
+    const entry = this.npcs[npcId];
+    if (!entry || !entry.moodIcon) return;
+    const state = entry.npc?.mental_state || 'normal';
+    const ICON = { normal: '', sad: '😢', fleeing: '😨', berserk: '💢' };
+    entry.moodIcon.setText(ICON[state] || '');
+  }
+
+  // Beim init: Chronik mit vorhandenen Events füllen (älteste zuerst, da scroll-down zeigt neueste)
+  loadInitialEvents(events) {
+    const list = document.getElementById('chronik-list');
+    list.innerHTML = '';
+    for (const ev of events) this.addEventToChronik(ev, false);
+    list.scrollTop = list.scrollHeight;
+  }
+
+  addEventToChronik(ev, autoscroll = true) {
+    const list = document.getElementById('chronik-list');
+    const icon = EVENT_ICON[ev.kind] || '•';
+    const div = document.createElement('div');
+    div.className = 'ev';
+    div.innerHTML = `
+      <div class="ev-title">${icon} ${this.escapeHtml(ev.title)}</div>
+      <div class="ev-body">${this.escapeHtml(ev.body)}</div>
+      <div class="ev-meta">${relativeTime(ev.created_at)}</div>
+    `;
+    list.appendChild(div);
+    if (autoscroll) list.scrollTop = list.scrollHeight;
+  }
+
+  showStoryEvent(ev) {
+    const icon = EVENT_ICON[ev.kind] || '•';
+    const el = document.createElement('div');
+    el.className = 'story-toast';
+    el.innerHTML = `
+      <div class="st-title">${icon} ${this.escapeHtml(ev.title)}</div>
+      <div>${this.escapeHtml(ev.body)}</div>
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 10000);
+  }
+
+  escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+  }
+
+  drawStructures() {
+    // Full-redraw: alle bestehenden Struktur-Sprites entfernen, dann neu zeichnen
+    for (const s of Object.values(this.structSprites)) s.destroy();
+    this.structSprites = {};
+    for (const s of Object.values(this.structures)) this.addStructureSprite(s, false);
+    // Nach dem Setzen aller Sprites Wand-Orientierungen ausrichten
+    for (const s of Object.values(this.structures)) {
+      if (s.type === 'wall') this.updateWallOrientation(s.x, s.y);
+    }
+  }
+
+  addStructureSprite(s, refreshNeighbors = true) {
+    const cfg = STRUCTURE[s.type];
+    if (!cfg) return;
+    const cx = s.x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = s.y * TILE_SIZE + TILE_SIZE / 2;
+
+    // Sprite-Key bestimmen — material-spezifisch für walls/floor, fix für andere
+    const material = s.material || 'stone';
+    let initialKey;
+    if (s.type === 'wall') {
+      initialKey = this.pickWallSprite(material, 0);
+    } else if (s.type === 'floor') {
+      initialKey = this.textures.exists(`floor_${material}`)
+        ? `floor_${material}` : cfg.sprite;
+    } else {
+      initialKey = cfg.sprite;
+    }
+
+    const img = this.add.image(cx, cy, initialKey).setOrigin(0.5);
+    img.setDisplaySize(TILE_SIZE, TILE_SIZE);
+    img.setDepth(1);  // über Tiles, unter Charakteren
+    this.structSprites[`${s.x},${s.y}`] = img;
+
+    if (s.type === 'wall') {
+      this.updateWallOrientation(s.x, s.y);
+      if (refreshNeighbors) {
+        this.updateWallOrientation(s.x - 1, s.y);
+        this.updateWallOrientation(s.x + 1, s.y);
+        this.updateWallOrientation(s.x, s.y - 1);
+        this.updateWallOrientation(s.x, s.y + 1);
+      }
+    }
+  }
+
+  removeStructureSprite(x, y) {
+    const key = `${x},${y}`;
+    if (this.structSprites[key]) {
+      this.structSprites[key].destroy();
+      delete this.structSprites[key];
+    }
+    // Nachbar-Wände neu ausrichten, jetzt wo diese weg ist
+    this.updateWallOrientation(x - 1, y);
+    this.updateWallOrientation(x + 1, y);
+    this.updateWallOrientation(x, y - 1);
+    this.updateWallOrientation(x, y + 1);
+  }
+
+  shakeStructure(x, y) {
+    const sprite = this.structSprites[`${x},${y}`];
+    if (!sprite) return;
+    const origX = sprite.x;
+    this.tweens.add({
+      targets: sprite,
+      x: origX + 3,
+      duration: 50,
+      yoyo: true,
+      repeat: 1,
+      onComplete: () => sprite.x = origX,
+    });
+  }
+
+  updateWallOrientation(x, y) {
+    const s = this.structures[`${x},${y}`];
+    if (!s || s.type !== 'wall') return;
+    const img = this.structSprites[`${x},${y}`];
+    if (!img) return;
+
+    let mask = 0;
+    if (this.structures[`${x},${y - 1}`]?.type === 'wall') mask |= 1;  // N
+    if (this.structures[`${x + 1},${y}`]?.type === 'wall') mask |= 2;  // E
+    if (this.structures[`${x},${y + 1}`]?.type === 'wall') mask |= 4;  // S
+    if (this.structures[`${x - 1},${y}`]?.type === 'wall') mask |= 8;  // W
+
+    const material = s.material || 'stone';
+    img.setTexture(this.pickWallSprite(material, mask));
+    img.setAngle(0);
+  }
+
+  pickWallSprite(material, mask) {
+    const variant = WALL_MASK_TO_VARIANT[mask] || 'straight_ns';
+    const primary = `wall_${material}_${variant}`;
+    if (this.textures.exists(primary)) return primary;
+    // Fallback: Stone-Variante
+    const stone = `wall_stone_${variant}`;
+    if (this.textures.exists(stone)) return stone;
+    // Legacy-Fallback
+    return 'struct_wall';
+  }
+
+  drawWorld() {
+    // Alle bekannten Chunks rendern
+    for (const key of Object.keys(this.chunks)) {
+      const [cx, cy] = key.split(',').map(Number);
+      this.drawChunkTiles(cx, cy);
+    }
+  }
+
+  drawMinimap() {
+    const canvas = document.getElementById('minimap');
+    const ctx    = canvas.getContext('2d');
+    if (!this.mySprite) return;
+    // Minimap zentriert um Spieler, zeigt ~30×20 Tiles
+    const VIEW_W = 30, VIEW_H = 20;
+    const scaleX = canvas.width  / VIEW_W;
+    const scaleY = canvas.height / VIEW_H;
+    const ox = this.myTileX - VIEW_W / 2;
+    const oy = this.myTileY - VIEW_H / 2;
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let dy = 0; dy < VIEW_H; dy++) {
+      for (let dx = 0; dx < VIEW_W; dx++) {
+        const wx = Math.floor(ox + dx);
+        const wy = Math.floor(oy + dy);
+        const t = this.tileAt(wx, wy);
+        if (t === null) continue;
+        const cfg = TILE_BY_ID[t];
+        if (!cfg) continue;
+        ctx.fillStyle = cfg.miniColor;
+        ctx.fillRect(Math.floor(dx * scaleX), Math.floor(dy * scaleY),
+                     Math.ceil(scaleX), Math.ceil(scaleY));
+      }
+    }
+
+    for (const id of Object.keys(this.npcs)) {
+      const n = this.npcs[id];
+      ctx.fillStyle = CREATURE_KINDS.has(n.npc.kind) ? '#e84040' : '#ffe070';
+      const px = (n.tileX - ox) * scaleX;
+      const py = (n.tileY - oy) * scaleY;
+      if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+        ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, 3, 3);
+      }
+    }
+    for (const id of Object.keys(this.otherPlayers)) {
+      const p = this.otherPlayers[id];
+      ctx.fillStyle = '#a0c8ff';
+      const px = (p.tileX - ox) * scaleX;
+      const py = (p.tileY - oy) * scaleY;
+      if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+        ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, 3, 3);
+      }
+    }
+    // Eigener Spieler: zentral
+    ctx.fillStyle = '#000';
+    ctx.fillRect(canvas.width / 2 - 2, canvas.height / 2 - 2, 5, 5);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(canvas.width / 2 - 1, canvas.height / 2 - 1, 3, 3);
+  }
+
+  // Player-Sprite: Container mit shadow+body als Kinder. So kann der ganze
+  // Container per Tween smooth zwischen Tile-Positionen animiert werden.
+  // Welle 32: Facing — flip horizontal + leichter tilt
+  _applyFacing(entry, vx, vy) {
+    if (!entry || !entry.body) return;
+    if (vx < 0) entry.body.flipX = true;
+    else if (vx > 0) entry.body.flipX = false;
+    // Leichter tilt: nach unten 0°, nach oben −3°, sideways 0°
+    if (vy < 0) entry.body.setRotation(-0.05);
+    else if (vy > 0) entry.body.setRotation(0.05);
+    else entry.body.setRotation(0);
+  }
+
+  spawnSprite(id, tileX, tileY, isMe) {
+    const px = tileX * TILE_SIZE + TILE_SIZE / 2;
+    const py = tileY * TILE_SIZE + TILE_SIZE / 2;
+
+    const shadow = this.add.image(0, 14, 'fx_shadow')
+      .setOrigin(0.5)
+      .setAlpha(0.55);
+
+    const body = this.add.image(0, 0, 'char_player')
+      .setOrigin(0.5, 0.55);
+    body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+
+    if (!isMe) body.setTint(0xb8c8ff);
+
+    const container = this.add.container(px, py, [shadow, body]);
+    container.setDepth(3);
+
+    return { container, body, shadow, label: null, tween: null };
+  }
+
+  movePlayerSmooth(p, tileX, tileY, dx = 0) {
+    // Linearer Tween für andere Entitäten — interpoliert zwischen Server-Updates
+    const px = tileX * TILE_SIZE + TILE_SIZE / 2;
+    const py = tileY * TILE_SIZE + TILE_SIZE / 2;
+    // Welle 32: Facing aus Position-Delta ableiten
+    const dx2 = px - p.container.x;
+    const dy2 = py - p.container.y;
+    this._applyFacing(p, dx2, dy2);
+    if (p.tween) p.tween.stop();
+    p.tween = this.tweens.add({
+      targets:  p.container,
+      x:        px,
+      y:        py,
+      duration: 220,
+      ease:     'Linear',
+    });
+  }
+
+  // Server-getriggerter Position-Snap (z.B. Knockback, Teleport, Korrektur)
+  setLocalPositionFromTile(tileX, tileY) {
+    this.myTileX = tileX;
+    this.myTileY = tileY;
+    this.myPx = tileX * TILE_SIZE + TILE_SIZE / 2;
+    this.myPy = tileY * TILE_SIZE + TILE_SIZE / 2;
+    if (this.mySprite) {
+      if (this.mySprite.tween) this.mySprite.tween.stop();
+      this.mySprite.container.x = this.myPx;
+      this.mySprite.container.y = this.myPy;
+    }
+  }
+
+  // Wandkollision per Achse — erlaubt slide-along-wall
+  _canMoveTo(px, py) {
+    // 4 Ecken der Hitbox prüfen
+    const h = this.collisionHalf;
+    const corners = [
+      [px - h, py - h], [px + h, py - h],
+      [px - h, py + h], [px + h, py + h],
+    ];
+    for (const [cx, cy] of corners) {
+      const tx = Math.floor(cx / TILE_SIZE);
+      const ty = Math.floor(cy / TILE_SIZE);
+      if (!this.isWalkable(tx, ty)) return false;
+    }
+    return true;
+  }
+
+  spawnOther(id, tileX, tileY) {
+    if (this.otherPlayers[id]) return;
+    const sprite = this.spawnSprite(id, tileX, tileY, false);
+    const label = this.add.text(0, -TILE_SIZE * 0.55, id.substr(0, 12), {
+      fontSize: '10px', color: '#ddddff', stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    sprite.container.add(label);
+    sprite.label = label;
+    this.otherPlayers[id] = { ...sprite, tileX, tileY };
+  }
+
+  updatePlayerCount() {
+    const n = Object.keys(this.otherPlayers).length + 1;
+    document.getElementById('player-count').textContent = `${n} Spieler`;
+  }
+
+  showEvent(text) {
+    const el = document.createElement('div');
+    el.style.cssText = `
+      position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,0.7); color:#c8b88a; padding:6px 16px;
+      border:1px solid #555; font-family:monospace; font-size:13px;
+      z-index:100; animation:fadeout 3s forwards;
+    `;
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  update(time, delta) {
+    if (!this.mySprite) return;
+    if (this.activeDialog || this.inventoryOpen || this.activeChest ||
+        this.activeCrafting || this.activeTrade || this.skillsOpen ||
+        this.researchOpen || this.questsOpen) return;
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+
+    // Eingabe-Richtung
+    let vx = 0, vy = 0;
+    if (this.wasd.left.isDown  || this.cursors.left.isDown)  vx = -1;
+    else if (this.wasd.right.isDown || this.cursors.right.isDown) vx = 1;
+    if (this.wasd.up.isDown    || this.cursors.up.isDown)    vy = -1;
+    else if (this.wasd.down.isDown  || this.cursors.down.isDown)  vy = 1;
+    if (vx === 0 && vy === 0) return;
+
+    // Diagonal normalisieren (sonst √2× schneller diagonal)
+    if (vx !== 0 && vy !== 0) {
+      const inv = 1 / Math.SQRT2;
+      vx *= inv; vy *= inv;
+    }
+
+    // Delta clampen gegen Lag-Spikes (max 100ms pro Frame)
+    const dt = Math.min(0.1, (delta || 16) / 1000);
+    const dpx = vx * this.moveSpeed * dt;
+    const dpy = vy * this.moveSpeed * dt;
+
+    // Achsen-separate Kollision: erlaubt Sliding an Wänden
+    if (dpx !== 0) {
+      const newPx = this.myPx + dpx;
+      if (this._canMoveTo(newPx, this.myPy)) this.myPx = newPx;
+    }
+    if (dpy !== 0) {
+      const newPy = this.myPy + dpy;
+      if (this._canMoveTo(this.myPx, newPy)) this.myPy = newPy;
+    }
+
+    // Sprite direkt setzen — keine Tween-Treppe
+    this.mySprite.container.x = this.myPx;
+    this.mySprite.container.y = this.myPy;
+    // Welle 32: Facing — horizontal flip + sanfter vertical tilt
+    this._applyFacing(this.mySprite, vx, vy);
+
+    // Tile-Wechsel → Server informieren + UI/Chunks updaten
+    const newTileX = Math.floor(this.myPx / TILE_SIZE);
+    const newTileY = Math.floor(this.myPy / TILE_SIZE);
+    if (newTileX !== this.myTileX || newTileY !== this.myTileY) {
+      this.myTileX = newTileX;
+      this.myTileY = newTileY;
+      this.ws.send(JSON.stringify({ type: 'move', x: newTileX, y: newTileY }));
+      this.updateUI(newTileX, newTileY);
+      this.drawMinimap();
+    }
+  }
+
+  isWalkable(x, y) {
+    // Welle 9b: in Dungeons andere Validierung
+    if (this.inDungeon) {
+      if (x < 0 || y < 0 || x >= this.dungeonSize || y >= this.dungeonSize) return false;
+      const dt = this.dungeonTiles[y][x];
+      return dt === 1 || dt === 2 || dt === 3;   // floor, corridor, stairs_up
+    }
+    const t = this.tileAt(x, y);
+    if (t === null) return false;  // Chunk noch nicht geladen → blockt vorerst
+    if (NON_WALKABLE_TILES.has(t)) return false;
+    const s = this.structures[`${x},${y}`];
+    if (s && STRUCTURE[s.type] && STRUCTURE[s.type].blocking) return false;
+    return true;
+  }
+
+  updateUI(x, y) {
+    document.getElementById('coords').textContent = `x:${x} y:${y}`;
+    const t = this.tileAt(x, y);
+    const cfg = (t !== null) ? TILE_BY_ID[t] : null;
+    document.getElementById('tile-name').textContent = cfg ? cfg.name : '???';
+  }
+}
+
+// ─── Phaser Config ────────────────────────────────────────────────────────────
+const config = {
+  type:            Phaser.AUTO,
+  scale: {
+    mode:        Phaser.Scale.RESIZE,
+    parent:      document.body,
+    autoCenter:  Phaser.Scale.CENTER_BOTH,
+    width:       window.innerWidth,
+    height:      window.innerHeight,
+  },
+  backgroundColor: '#0a0a0f',
+  scene:           [WorldScene],
+};
+
+const game = new Phaser.Game(config);
+// Resize-Handling für Browser-Fenster
+window.addEventListener('resize', () => {
+  game.scale.resize(window.innerWidth, window.innerHeight);
+});
+
+// Fade-Animation für Events
+const style = document.createElement('style');
+style.textContent = `@keyframes fadeout { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
