@@ -66,6 +66,46 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS max_stamina INTEGER NOT NULL DEFAUL
 ALTER TABLE items ADD COLUMN IF NOT EXISTS quality TEXT NOT NULL DEFAULT 'normal';
 -- Welle 36: Item-Stacking — quantity-Spalte
 ALTER TABLE items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1;
+-- One-time-Merge: konsolidiert alte Multi-Row-Items in Stacks (idempotent)
+DO $stack_merge$
+BEGIN
+  -- Schritt 1: Summen in keeper-Rows aufaddieren
+  WITH groups AS (
+    SELECT MIN(id) AS keeper_id, owner, kind, SUM(quantity)::INTEGER AS total_qty
+    FROM items
+    WHERE owner IS NOT NULL
+      AND equipped_slot IS NULL
+      AND quality = 'normal'
+      AND category IN ('resource', 'food', 'consumable', 'magic')
+      AND (affixes IS NULL OR affixes = 'null'::jsonb)
+    GROUP BY owner, kind
+    HAVING COUNT(*) > 1
+  )
+  UPDATE items SET quantity = groups.total_qty
+  FROM groups
+  WHERE items.id = groups.keeper_id;
+  -- Schritt 2: Duplicate-Rows löschen
+  DELETE FROM items
+  USING (
+    SELECT MIN(id) AS keeper_id, owner, kind
+    FROM items
+    WHERE owner IS NOT NULL
+      AND equipped_slot IS NULL
+      AND quality = 'normal'
+      AND category IN ('resource', 'food', 'consumable', 'magic')
+      AND (affixes IS NULL OR affixes = 'null'::jsonb)
+    GROUP BY owner, kind
+    HAVING COUNT(*) > 1
+  ) AS k
+  WHERE items.owner = k.owner
+    AND items.kind = k.kind
+    AND items.equipped_slot IS NULL
+    AND items.quality = 'normal'
+    AND items.category IN ('resource', 'food', 'consumable', 'magic')
+    AND (items.affixes IS NULL OR items.affixes = 'null'::jsonb)
+    AND items.id <> k.keeper_id;
+END
+$stack_merge$;
 
 CREATE TABLE IF NOT EXISTS player_skills (
     player_name TEXT NOT NULL,

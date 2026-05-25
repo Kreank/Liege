@@ -10,10 +10,13 @@ import llm
 
 log = logging.getLogger("liege.npc_worker")
 
-INITIAL_NPC_COUNT = int(os.environ.get("INITIAL_NPC_COUNT", "4"))
+INITIAL_NPC_COUNT = int(os.environ.get("INITIAL_NPC_COUNT", "20"))
 # Periodisches Creature-Respawn: hält die Welt belebt nach Tötungen
-MIN_CREATURE_COUNT = int(os.environ.get("MIN_CREATURE_COUNT", "4"))
-CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "180"))
+MIN_CREATURE_COUNT = int(os.environ.get("MIN_CREATURE_COUNT", "30"))
+CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "45"))
+# Gruppen-Spawn: pro Respawn-Tick bis zu N Creatures (Gruppen statt einzeln)
+CREATURE_GROUP_SIZE_MIN = int(os.environ.get("CREATURE_GROUP_SIZE_MIN", "2"))
+CREATURE_GROUP_SIZE_MAX = int(os.environ.get("CREATURE_GROUP_SIZE_MAX", "5"))
 FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier",
                   "mage", "farmer", "villager", "guard", "healer",
                   "quest_giver", "blacksmith"]
@@ -151,10 +154,16 @@ async def respawn_loop(world, npc_manager, connection_manager) -> None:
         try:
             await asyncio.sleep(CREATURE_RESPAWN_INTERVAL)
             creatures = [n for n in npc_manager.all() if n["kind"] in CREATURE_KINDS]
-            if len(creatures) >= MIN_CREATURE_COUNT:
+            deficit = MIN_CREATURE_COUNT - len(creatures)
+            if deficit <= 0:
                 continue
+            # Gruppen-Spawn: 1 Kind, mehrere Instanzen — nahe beieinander
+            group_size = random.randint(CREATURE_GROUP_SIZE_MIN, CREATURE_GROUP_SIZE_MAX)
+            group_size = min(group_size, deficit)
             kind = random.choice(CREATURE_KINDS)
-            await spawn_one(world, npc_manager, connection_manager, kind=kind)
+            log.info("Gruppen-Respawn: %d × %s (deficit=%d)", group_size, kind, deficit)
+            for _ in range(group_size):
+                await spawn_one(world, npc_manager, connection_manager, kind=kind)
         except asyncio.CancelledError:
             log.info("Creature-Respawn-Loop gestoppt")
             raise

@@ -271,7 +271,24 @@
     .tt-stats div { color: #b0c0a0; }
     .tt-stats .neg { color: #c08080; }
     .tt-affix { color: #a0a060; font-size: 10px; margin-top: 3px; }
+    .tt-desc { color: #b0a080; font-size: 11px; margin-top: 4px; line-height: 1.4; }
     .tt-flavor { color: #807060; font-style: italic; margin-top: 4px; font-size: 10px; }
+    /* Persistenter Tooltip (Rechtsklick) */
+    #item-tooltip.pinned { pointer-events: auto; box-shadow: 0 0 12px rgba(255,208,96,0.4); }
+    #item-tooltip .tt-actions {
+      display: flex; gap: 4px; margin-top: 6px; padding-top: 6px;
+      border-top: 1px solid #4a3a20;
+    }
+    #item-tooltip .tt-actions button {
+      flex: 1; background: rgba(60,50,30,0.7); border: 1px solid #806040;
+      color: #c8b88a; padding: 3px 6px; cursor: pointer; font-size: 10px;
+      border-radius: 3px;
+    }
+    #item-tooltip .tt-actions button:hover { background: rgba(120,90,40,0.7); }
+    #item-tooltip .tt-close {
+      position: absolute; top: 2px; right: 4px;
+      color: #806040; cursor: pointer; font-size: 14px;
+    }
 
     /* Faction-Panel (Welle 27) */
     #factions-overlay {
@@ -1054,6 +1071,66 @@ function relativeTime(iso) {
 }
 
 // ─── NPC-Konfiguration ────────────────────────────────────────────────────────
+// Item-Beschreibungen (für Tooltips)
+const ITEM_DESC = {
+  // Waffen
+  sword:         'Eine ausgewogene Klinge. Zuverlässig im Nahkampf.',
+  axe:           'Bauernkriegsaxt. Hart auf Holz, härter auf Gegner.',
+  bow:           'Langbogen mit Hanfsehne. Trifft auf 5 Felder.',
+  staff:         'Magisches Holz, mit Runen verziert. Verstärkt Zauber.',
+  wand:          'Kurzer Zauberstab — schneller als ein Stab, weniger Wucht.',
+  greatsword:    'Zweihänder. Träge, aber jeder Treffer sitzt.',
+  spear:         'Reichweiten-Waffe. Hält Bestien auf Distanz.',
+  crossbow:      'Aufwendig gespannt, präzise — 6 Felder Reichweite.',
+  throwing_knife:'Mehrere kleine Klingen zum Werfen. Hohe Krit-Chance.',
+  mace:          'Stumpfe Wucht — durchschlägt Rüstung leichter.',
+  scythe:        'Sense — eigentlich Bauernwerkzeug, in der Schlacht tödlich.',
+  dagger:        'Kurze, scharfe Klinge. Sehr schnell, sehr kritisch.',
+  // Rüstung
+  helmet:        'Schützt den Kopf vor stumpfen Schlägen.',
+  chestplate:    'Brustpanzer — schwer, aber rettet Leben.',
+  shield:        'Holz- oder Eisenschild. Erhöht Defense.',
+  boots:         'Stiefel — leichter Schutz, bisschen mehr Tempo.',
+  ring:          'Schmuckstück mit verborgener Macht.',
+  amulet:        'Anhänger gegen das Böse — oder zumindest verspricht es das.',
+  // Werkzeug
+  pickaxe:       'Spitzhacke — beschleunigt Bergbau enorm.',
+  shovel:        'Schaufel — gut zum Sammeln und Buddeln.',
+  hammer:        'Schmiedehammer — beschleunigt das Bauen.',
+  hoe:           'Hacke — für die Landwirtschaft.',
+  // Verbrauchsgegenstände
+  health_potion: 'Heilkraut + Kristall. Stellt 30 HP wieder her.',
+  mana_potion:   'Bläuliche Flüssigkeit. Füllt 30 Mana auf.',
+  herb:          'Frisches Kraut — kann gegessen oder gebraut werden.',
+  torch:         'Fackel — leuchtet in dunklen Höhlen und Dungeons.',
+  food_ration:   'Trockenfleisch + Brot in einem Paket. Sehr haltbar.',
+  // Nahrung
+  apple:         'Knackiger Apfel. Etwas Sättigung.',
+  berries:       'Süße Waldbeeren. Schnelle Energie.',
+  wheat:         'Roher Weizen — verarbeitet ergibt Brot.',
+  bread:         'Frisch gebackenes Brot. Sättigt sehr lange.',
+  raw_meat:      'Rohes Fleisch — besser kochen, sonst Bauchweh.',
+  cooked_meat:   'Gebratenes Fleisch. Heilt und sättigt zugleich.',
+  fish:          'Frischer Fisch. Gegart noch besser.',
+  mushroom_food: 'Pilz-Mahl — solide Sättigung, lange haltbar.',
+  // Magie
+  spell_book:    'Buch mit Feuerball-Zauber. Beim Lernen wird es Teil von dir.',
+  scroll:        'Schriftrolle mit "Magisches Geschoss". Lernbar.',
+  rune_stone:    'Stein mit Heilrune. Lernbar — gibt blessed-Status.',
+  // Rohstoffe
+  wood:          'Allzweck-Holz aus Bäumen. Stapelbar bis 500.',
+  stone:         'Bruchstein vom Bergbau. Stapelbar bis 500.',
+  iron_ore:      'Eisenerz — am Amboss zu Stahl schmiedbar.',
+  gold_ore:      'Goldnugget. Funktioniert als Währung beim Händler.',
+  silver_ore:    'Silbererz — wertvoll, magisch leitend.',
+  mythril_ore:   'Sagenhaftes Mythril. Sehr selten.',
+  steel_ingot:   'Stahlbarren — Hauptmaterial für hochwertige Waffen.',
+  crystal:       'Kristall mit arkanen Eigenschaften.',
+  bone:          'Knochen — Material für rituelle Arbeiten.',
+  cloth:         'Stoff — für Kleidung und Sackware.',
+  leather:       'Gegerbtes Leder — robust, aber leicht.',
+};
+
 // Deutsche Übersetzung für Item-Kategorien (Issue: Deutsche Konsistenz)
 const CATEGORY_DE = {
   weapon: 'Waffe', armor: 'Rüstung', jewelry: 'Schmuck',
@@ -1064,6 +1141,7 @@ const QUALITY_DE = {
   rough: 'grob', normal: 'normal', fine: 'fein',
   masterwork: 'meisterhaft', legendary: 'legendär',
 };
+const QUALITY_ICONS = { fine:'✨', masterwork:'🌟', legendary:'👑', rough:'⚠️' };
 
 // Welle 33: Waffen-Reichweite (Tiles), spiegelt backend/item_stats.WEAPON_STATS
 const WEAPON_RANGE = {
@@ -1157,6 +1235,8 @@ const ITEM = {
   health_potion: { name: 'Heiltrank',   sprite: 'item_health_potion', category: 'consumable',                     path: '/assets/consumables/health_potion.png' },
   mana_potion:   { name: 'Manatrank',   sprite: 'item_mana_potion',   category: 'consumable',                     path: '/assets/consumables/mana_potion.png' },
   herb:          { name: 'Kraut',       sprite: 'item_herb',          category: 'consumable',                     path: '/assets/consumables/herb.png' },
+  torch:         { name: 'Fackel',      sprite: 'item_torch',         category: 'consumable',                     path: '/assets/consumables/torch.png' },
+  food_ration:   { name: 'Proviant',    sprite: 'item_food_ration',   category: 'food',                           path: '/assets/consumables/food_ration.png' },
   apple:         { name: 'Apfel',       sprite: 'item_apple',         category: 'food',                           path: '/assets/food/apple.png' },
   berries:       { name: 'Beeren',      sprite: 'item_berries',       category: 'food',                           path: '/assets/food/berries.png' },
   wheat:         { name: 'Weizen',      sprite: 'item_wheat',         category: 'food',                           path: '/assets/food/wheat.png' },
@@ -1376,6 +1456,35 @@ class WorldScene extends Phaser.Scene {
                      'ogre', 'necromancer', 'dragon_whelp']) {
       this.load.image(`monster_${m}`, `/assets/monsters/${m}.png`);
     }
+    // Walk-Animation (Welle 40)
+    for (const dir of ['down','up','left','right']) {
+      for (const f of [1, 2]) {
+        this.load.image(`player_walk_${dir}_${f}`, `/assets/animations/player/walk_${dir}_${f}.png`);
+      }
+    }
+    // Spell-Animationen (Welle 40)
+    for (const f of [1, 2, 3]) {
+      this.load.image(`fx_fireball_${f}`, `/assets/animations/spells/fireball_explosion_${f}.png`);
+    }
+    this.load.image('fx_fireball_projectile', '/assets/animations/spells/fireball_projectile.png');
+    for (const f of [1, 2]) {
+      this.load.image(`fx_heal_${f}`, `/assets/animations/spells/heal_pulse_${f}.png`);
+      this.load.image(`fx_lightning_${f}`, `/assets/animations/spells/lightning_strike_${f}.png`);
+      this.load.image(`fx_magic_circle_${f}`, `/assets/animations/spells/magic_circle_${f}.png`);
+    }
+    this.load.image('fx_ice_shard', '/assets/animations/spells/ice_shard_projectile.png');
+    this.load.image('fx_ice_impact', '/assets/animations/spells/ice_impact.png');
+    // Attack-Animationen (Welle 40)
+    for (const f of [1, 2, 3]) {
+      this.load.image(`fx_sword_slash_${f}`, `/assets/animations/attacks/sword_slash_${f}.png`);
+      this.load.image(`fx_axe_swing_${f}`, `/assets/animations/attacks/axe_swing_${f}.png`);
+    }
+    for (const f of [1, 2]) {
+      this.load.image(`fx_mace_hit_${f}`, `/assets/animations/attacks/mace_hit_${f}.png`);
+    }
+    this.load.image('fx_arrow_projectile', '/assets/animations/attacks/arrow_projectile.png');
+    this.load.image('fx_arrow_hit', '/assets/animations/attacks/arrow_hit.png');
+
     // Friendly-NPC-Sprites (Welle 21)
     for (const n of ['mage', 'farmer', 'villager', 'guard', 'merchant',
                      'healer', 'quest_giver', 'blacksmith']) {
@@ -1482,6 +1591,17 @@ class WorldScene extends Phaser.Scene {
     document.getElementById('talents-close').addEventListener('click', () => this.toggleTalents());
     document.getElementById('factions-close').addEventListener('click', () => this.toggleFactions());
     document.getElementById('attributes-close').addEventListener('click', () => this.toggleAttributes());
+
+    // Pinned-Tooltip: ESC oder Click-outside schließt
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.unpinItemTooltip();
+    });
+    document.addEventListener('click', (e) => {
+      const tt = document.getElementById('item-tooltip');
+      if (tt && tt.classList.contains('pinned') && !tt.contains(e.target)) {
+        this.unpinItemTooltip();
+      }
+    });
 
     this.connectWS();
   }
@@ -1730,6 +1850,9 @@ class WorldScene extends Phaser.Scene {
     let html = `<div class="tt-name" style="color:${qcol}">${qIcon} ${name}</div>`;
     if (item.quality) html += `<div class="tt-quality">Qualität: ${QUALITY_DE[item.quality] || item.quality}</div>`;
     if (item.category) html += `<div class="tt-quality">Kategorie: ${CATEGORY_DE[item.category] || item.category}</div>`;
+    // Beschreibung
+    const desc = ITEM_DESC[item.kind];
+    if (desc) html += `<div class="tt-desc">${desc}</div>`;
     // Stats
     const stats = [];
     if (WEAPON_STATS[item.kind]) {
@@ -1782,7 +1905,105 @@ class WorldScene extends Phaser.Scene {
 
   hideItemTooltip() {
     const tt = document.getElementById('item-tooltip');
-    if (tt) tt.classList.remove('active');
+    if (!tt) return;
+    // Pinned-Tooltip nicht auf hover-out schließen
+    if (tt.classList.contains('pinned')) return;
+    tt.classList.remove('active');
+  }
+
+  // Persistenter Rechtsklick-Tooltip mit Aktions-Buttons
+  pinItemTooltip(item, ev) {
+    const tt = document.getElementById('item-tooltip');
+    if (!tt) return;
+    const cfg = ITEM[item.kind] || {};
+    // Stats wie im normalen Tooltip aufbauen
+    const Q_COLOR = { rough: '#888', normal: '#ccc', fine: '#80c0ff',
+                       masterwork: '#c0a0ff', legendary: '#ffd060' };
+    const qIcon = QUALITY_ICONS[item.quality] || '';
+    const name = item.unique_name || cfg.name || item.kind;
+    const qcol = Q_COLOR[item.quality] || '#ccc';
+    let html = `<div class="tt-close">×</div>`;
+    html += `<div class="tt-name" style="color:${qcol}">${qIcon} ${name}</div>`;
+    if (item.quality) html += `<div class="tt-quality">Qualität: ${QUALITY_DE[item.quality] || item.quality}</div>`;
+    if (item.category) html += `<div class="tt-quality">Kategorie: ${CATEGORY_DE[item.category] || item.category}</div>`;
+    const desc = ITEM_DESC[item.kind];
+    if (desc) html += `<div class="tt-desc">${desc}</div>`;
+    // Stats
+    const stats = [];
+    if (WEAPON_STATS[item.kind]) {
+      const w = WEAPON_STATS[item.kind];
+      const qm = ({rough:0.75,normal:1.0,fine:1.15,masterwork:1.3,legendary:1.5})[item.quality||'normal'];
+      stats.push(`⚔️ Schaden: ${Math.round(w.dmg * qm)}`);
+      stats.push(`⚡ Speed: ${w.speed.toFixed(2)}×`);
+      stats.push(`💥 Crit: ${(w.crit*100).toFixed(0)}%`);
+      stats.push(`🎯 Reichweite: ${w.range} Felder`);
+      if (w.two_h) stats.push(`🤲 Zweihändig`);
+    } else if (ARMOR_STATS[item.kind]) {
+      const a = ARMOR_STATS[item.kind];
+      const qm = ({rough:0.75,normal:1.0,fine:1.15,masterwork:1.3,legendary:1.5})[item.quality||'normal'];
+      stats.push(`🛡️ Verteidigung: ${Math.round(a.defense * qm)}`);
+      stats.push(`⚖️ Gewicht: ${a.weight}`);
+    }
+    if (stats.length > 0) html += `<div class="tt-stats">${stats.map(s => `<div>${s}</div>`).join('')}</div>`;
+    if (item.affixes && item.affixes.length > 0) {
+      html += '<div class="tt-affix">✦ ' + item.affixes.map(a => `${a.name_part} (T${a.tier})`).join(' · ') + '</div>';
+    }
+    if (item.flavor) html += `<div class="tt-flavor">"${item.flavor}"</div>`;
+    // Aktions-Buttons in HTML
+    let actionsHtml = '<div class="tt-actions">';
+    if (cfg.slot) {
+      actionsHtml += `<button data-act="equip">${item.equipped_slot ? '↓ Ablegen' : '↑ Anlegen'}</button>`;
+    }
+    if (cfg.category === 'consumable' || cfg.category === 'food') {
+      actionsHtml += `<button data-act="use">${cfg.category === 'food' ? '🍖 Essen' : '🍷 Benutzen'}</button>`;
+    }
+    if (cfg.category === 'magic') {
+      const knows = (this.learnedSpells || []).includes(item.kind);
+      actionsHtml += `<button data-act="magic">${knows ? '✨ Wirken' : '📖 Lernen'}</button>`;
+    }
+    actionsHtml += `<button data-act="hotbar">📌 Hotbar</button>`;
+    if (!item.equipped_slot) actionsHtml += `<button data-act="drop">🗑️ Wegwerfen</button>`;
+    actionsHtml += '</div>';
+    html += actionsHtml;
+    tt.innerHTML = html;
+    tt.classList.add('active', 'pinned');
+    // Position
+    const x = (ev && ev.clientX) ? ev.clientX + 14 : 100;
+    const y = (ev && ev.clientY) ? ev.clientY - 8 : 100;
+    tt.style.left = Math.min(window.innerWidth - 300, x) + 'px';
+    tt.style.top  = Math.max(10, y) + 'px';
+    // Event-Bindings
+    tt.querySelector('.tt-close')?.addEventListener('click', () => this.unpinItemTooltip());
+    tt.querySelectorAll('.tt-actions button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const act = btn.getAttribute('data-act');
+        if (act === 'equip') {
+          if (item.equipped_slot) this.unequipItem(item.id);
+          else this.equipItem(item.id);
+        } else if (act === 'use') {
+          this.useItem(item.id);
+        } else if (act === 'magic') {
+          const knows = (this.learnedSpells || []).includes(item.kind);
+          if (knows) this.castSpell(item.id);
+          else this.ws.send(JSON.stringify({ type: 'learn_spell', item_id: item.id }));
+        } else if (act === 'hotbar') {
+          let s = this.hotbar.findIndex(x => !x);
+          if (s < 0) s = 0;
+          this.assignToHotbar(s, item.kind);
+          this.showEvent(`📌 → Slot ${s+1}`);
+        } else if (act === 'drop') {
+          this.dropItem(item.id);
+        }
+        this.unpinItemTooltip();
+      });
+    });
+  }
+
+  unpinItemTooltip() {
+    const tt = document.getElementById('item-tooltip');
+    if (!tt) return;
+    tt.classList.remove('pinned', 'active');
   }
 
   currentWeaponRange() {
@@ -2679,10 +2900,48 @@ class WorldScene extends Phaser.Scene {
   }
 
   showVisualEffect(kind, x, y) {
-    const key = `fx_${kind}`;
-    if (!this.textures.exists(key)) return;
+    // Welle 40: Multi-Frame-Sequenzen für Spell-Effekte
+    const SEQUENCES = {
+      fireball_explosion: ['fx_fireball_1','fx_fireball_2','fx_fireball_3'],
+      heal_glow:          ['fx_heal_1','fx_heal_2'],
+      lightning_strike:   ['fx_lightning_1','fx_lightning_2'],
+      magic_circle:       ['fx_magic_circle_1','fx_magic_circle_2'],
+      sword_slash:        ['fx_sword_slash_1','fx_sword_slash_2','fx_sword_slash_3'],
+      axe_swing:          ['fx_axe_swing_1','fx_axe_swing_2','fx_axe_swing_3'],
+      mace_hit:           ['fx_mace_hit_1','fx_mace_hit_2'],
+      arrow_hit:          ['fx_arrow_hit'],
+      ice_impact:         ['fx_ice_impact'],
+    };
     const cx = x * TILE_SIZE + TILE_SIZE / 2;
     const cy = y * TILE_SIZE + TILE_SIZE / 2;
+    const seq = SEQUENCES[kind];
+    if (seq) {
+      // Frame-Sequenz abspielen
+      const firstKey = seq.find(k => this.textures.exists(k));
+      if (!firstKey) return;
+      const img = this.add.image(cx, cy, firstKey).setOrigin(0.5).setDepth(8);
+      img.setDisplaySize(TILE_SIZE * 1.3, TILE_SIZE * 1.3);
+      let frame = 0;
+      const frameTime = 90;
+      const advance = () => {
+        frame++;
+        if (frame >= seq.length || !this.textures.exists(seq[frame])) {
+          // Fade-out
+          this.tweens.add({
+            targets: img, alpha: 0, duration: 180,
+            onComplete: () => img.destroy(),
+          });
+          return;
+        }
+        img.setTexture(seq[frame]);
+        this.time.delayedCall(frameTime, advance);
+      };
+      this.time.delayedCall(frameTime, advance);
+      return;
+    }
+    // Single-Frame-Fallback (hit_spark etc.)
+    const key = `fx_${kind}`;
+    if (!this.textures.exists(key)) return;
     const img = this.add.image(cx, cy, key).setOrigin(0.5).setDepth(8);
     img.setDisplaySize(TILE_SIZE, TILE_SIZE);
     img.setAlpha(0.95);
@@ -3437,7 +3696,6 @@ class WorldScene extends Phaser.Scene {
     const listDiv = document.getElementById('inventory-list');
     listDiv.innerHTML = '';
     const unequipped = this.inventory.filter(it => !it.equipped_slot);
-    const QUALITY_ICONS = {fine:'✨', masterwork:'🌟', legendary:'👑', rough:'⚠️'};
     const SLOT_COUNT = 40;
     for (let i = 0; i < SLOT_COUNT; i++) {
       const slot = document.createElement('div');
@@ -3486,13 +3744,10 @@ class WorldScene extends Phaser.Scene {
         }
         else this.showEvent(`${cfg.name || item.kind} (kein Effekt)`);
       });
-      // Rechtsklick: Drop-/Hotbar-Menü als Toast
+      // Rechtsklick: persistenter Tooltip mit Beschreibung + Aktions-Menü
       slot.addEventListener('contextmenu', (ev) => {
         ev.preventDefault();
-        let slotIdx = this.hotbar.findIndex(s => !s);
-        if (slotIdx < 0) slotIdx = 0;
-        this.assignToHotbar(slotIdx, item.kind);
-        this.showEvent(`📌 ${(ITEM[item.kind]||{name:item.kind}).name} → Hotbar ${slotIdx+1}`);
+        this.pinItemTooltip(item, ev);
       });
       // Shift+Klick: Drop
       slot.addEventListener('auxclick', (ev) => {
@@ -3794,8 +4049,9 @@ class WorldScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setAlpha(0.55);
 
-    const body = this.add.image(0, 0, 'char_player')
-      .setOrigin(0.5, 0.55);
+    // Welle 40: Walk-Animation — Default-Frame walk_down_1
+    const startKey = this.textures.exists('player_walk_down_1') ? 'player_walk_down_1' : 'char_player';
+    const body = this.add.image(0, 0, startKey).setOrigin(0.5, 0.55);
     body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
 
     if (!isMe) body.setTint(0xb8c8ff);
@@ -3803,17 +4059,65 @@ class WorldScene extends Phaser.Scene {
     const container = this.add.container(px, py, [shadow, body]);
     container.setDepth(3);
 
-    return { container, body, shadow, label: null, tween: null };
+    return {
+      container, body, shadow, label: null, tween: null,
+      facing: 'down', walkFrame: 0, walkTimer: 0, moving: false,
+    };
+  }
+
+  // Welle 40: Walk-Animation update — vom Pixel-Movement aufgerufen
+  _updateWalkFrame(entry, vx, vy, delta) {
+    if (!entry || !entry.body) return;
+    // Reset hängengebliebene Transformations-States
+    entry.body.flipX = false;
+    entry.body.setRotation(0);
+    if (vx === 0 && vy === 0) {
+      // Idle: zurück auf walk_X_1 (Stand-Frame)
+      entry.moving = false;
+      entry.walkTimer = 0;
+      const key = `player_walk_${entry.facing || 'down'}_1`;
+      if (this.textures.exists(key)) {
+        entry.body.setTexture(key);
+        entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+      }
+      return;
+    }
+    // Richtung wählen (größere Achse gewinnt)
+    let dir = entry.facing || 'down';
+    if (Math.abs(vx) >= Math.abs(vy)) {
+      dir = vx > 0 ? 'right' : (vx < 0 ? 'left' : dir);
+    } else {
+      dir = vy > 0 ? 'down' : 'up';
+    }
+    entry.facing = dir;
+    entry.moving = true;
+    // Frame alle 180 ms toggeln
+    entry.walkTimer = (entry.walkTimer || 0) + (delta || 16);
+    if (entry.walkTimer >= 180) {
+      entry.walkTimer = 0;
+      entry.walkFrame = entry.walkFrame === 1 ? 2 : 1;
+    }
+    const frame = entry.walkFrame || 1;
+    const key = `player_walk_${dir}_${frame}`;
+    if (this.textures.exists(key)) {
+      entry.body.setTexture(key);
+      entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+    }
   }
 
   movePlayerSmooth(p, tileX, tileY, dx = 0) {
     // Linearer Tween für andere Entitäten — interpoliert zwischen Server-Updates
     const px = tileX * TILE_SIZE + TILE_SIZE / 2;
     const py = tileY * TILE_SIZE + TILE_SIZE / 2;
-    // Welle 32: Facing aus Position-Delta ableiten
+    // Welle 40: Walk-Frame-Update basierend auf Bewegungsrichtung
     const dx2 = px - p.container.x;
     const dy2 = py - p.container.y;
-    this._applyFacing(p, dx2, dy2);
+    this._updateWalkFrame(p, dx2, dy2, 200);
+    // Nach ein paar Frames auf idle zurück
+    if (p._walkResetTimer) clearTimeout(p._walkResetTimer);
+    p._walkResetTimer = setTimeout(() => {
+      this._updateWalkFrame(p, 0, 0, 0);
+    }, 240);
     if (p.tween) p.tween.stop();
     p.tween = this.tweens.add({
       targets:  p.container,
@@ -3921,8 +4225,8 @@ class WorldScene extends Phaser.Scene {
     // Sprite direkt setzen — keine Tween-Treppe
     this.mySprite.container.x = this.myPx;
     this.mySprite.container.y = this.myPy;
-    // Welle 32: Facing — horizontal flip + sanfter vertical tilt
-    this._applyFacing(this.mySprite, vx, vy);
+    // Welle 40: Walk-Animation mit 4-Richtungs-Sprites
+    this._updateWalkFrame(this.mySprite, vx, vy, delta);
 
     // Tile-Wechsel → Server informieren + UI/Chunks updaten
     const newTileX = Math.floor(this.myPx / TILE_SIZE);

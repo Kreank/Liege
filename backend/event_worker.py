@@ -11,7 +11,7 @@ import storyteller
 
 log = logging.getLogger("liege.event_worker")
 
-EVENT_INTERVAL_SECONDS = int(os.environ.get("EVENT_INTERVAL_SECONDS", "180"))
+EVENT_INTERVAL_SECONDS = int(os.environ.get("EVENT_INTERVAL_SECONDS", "3600"))
 EVENT_KIND_HINTS = ["weather", "creature", "discovery", "faction", "natural", "rumor"]
 
 # Storyteller-Modi nach RimWorld-Vorbild (Cassandra/Phoebe/Randy)

@@ -27,6 +27,8 @@ ITEM_KINDS = {
     "health_potion": {"category": "consumable", "name": "Heiltrank",  "sprite": "/assets/consumables/health_potion.png"},
     "mana_potion":   {"category": "consumable", "name": "Manatrank",  "sprite": "/assets/consumables/mana_potion.png"},
     "herb":          {"category": "consumable", "name": "Kraut",      "sprite": "/assets/consumables/herb.png"},
+    "torch":         {"category": "consumable", "name": "Fackel",     "sprite": "/assets/consumables/torch.png"},
+    "food_ration":   {"category": "food",       "name": "Proviant",   "sprite": "/assets/consumables/food_ration.png"},
     # Food
     "apple":          {"category": "food", "name": "Apfel",       "sprite": "/assets/food/apple.png"},
     "berries":        {"category": "food", "name": "Beeren",      "sprite": "/assets/food/berries.png"},

@@ -727,9 +727,16 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
                     dmg = int(dmg * body_parts.arm_damage_multiplier(bp["arms"]))
                     if dmg < 1:
                         dmg = 1
-                # Visual: Hit-Spark auf NPC-Position
+                # Welle 40: Waffen-spezifischer Attack-Visual
+                weapon_fx = {
+                    "sword": "sword_slash", "greatsword": "sword_slash", "dagger": "sword_slash",
+                    "axe": "axe_swing", "scythe": "axe_swing",
+                    "mace": "mace_hit",
+                    "bow": "arrow_hit", "crossbow": "arrow_hit", "throwing_knife": "arrow_hit",
+                    "staff": "magic_circle", "wand": "magic_circle",
+                }.get(weapon, "hit_spark")
                 await manager.broadcast({
-                    "type": "visual_effect", "kind": "hit_spark",
+                    "type": "visual_effect", "kind": weapon_fx,
                     "x": npc["x"], "y": npc["y"],
                 })
                 result = await npcs.damage(npc_id, dmg)
@@ -845,8 +852,14 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
                                 ]
                             else:
                                 targets = [target]
+                            # Welle 40: Spell-spezifischer Visual-Effekt
+                            spell_fx = {
+                                "spell_book": "fireball_explosion",
+                                "scroll":     "lightning_strike",
+                                "rune_stone": "heal_glow",
+                            }.get(row["kind"], "fireball_explosion")
                             await manager.broadcast({
-                                "type": "visual_effect", "kind": "hit_spark",
+                                "type": "visual_effect", "kind": spell_fx,
                                 "x": target["x"], "y": target["y"],
                             })
                             for t in targets:

@@ -36,6 +36,7 @@ FOOD_RESTORE: dict[str, int] = {
     "cooked_meat":   45,    # gegart noch sättigender
     "fish":          25,
     "mushroom_food": 20,
+    "food_ration":   35,    # Proviant — gut sättigend, lange haltbar
     "wood": 0,
     "stone": 0,
     "iron_ore": 0,
