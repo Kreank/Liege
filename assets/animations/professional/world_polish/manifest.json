@@ -1,0 +1,386 @@
+{
+  "generated": "2026-05-26",
+  "style": "transparent 2D top-down world polish effects, RimWorld-like readability, hand-painted pixel-adjacent sprites",
+  "frame_size": [
+    192,
+    192
+  ],
+  "default_fps": 12,
+  "usage": "Use frames as one-shot overlays anchored above pawns, objects or tiles. Sheets are horizontal strips in frame order.",
+  "animations": [
+    {
+      "name": "water_flowers",
+      "category": "farming",
+      "description": "Blumen giessen: weicher Wasserbogen, Tropfen und Blattglanz",
+      "frames": 14,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "farming/water_flowers/water_flowers_##.png",
+      "sheet": "farming/water_flowers/water_flowers_sheet.png",
+      "preview_gif": "farming/water_flowers/water_flowers_preview.gif",
+      "preview_frame": "farming/water_flowers/water_flowers_07.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "water_crop_tile",
+      "category": "farming",
+      "description": "Ackerfeld giessen: gestaffelte Tropfen, dunkler werdender Boden",
+      "frames": 14,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "farming/water_crop_tile/water_crop_tile_##.png",
+      "sheet": "farming/water_crop_tile/water_crop_tile_sheet.png",
+      "preview_gif": "farming/water_crop_tile/water_crop_tile_preview.gif",
+      "preview_frame": "farming/water_crop_tile/water_crop_tile_07.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "hoe_soil",
+      "category": "farming",
+      "description": "Acker hacken: Hackenschwung, Erdkrume, frische Furche",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "farming/hoe_soil/hoe_soil_##.png",
+      "sheet": "farming/hoe_soil/hoe_soil_sheet.png",
+      "preview_gif": "farming/hoe_soil/hoe_soil_preview.gif",
+      "preview_frame": "farming/hoe_soil/hoe_soil_06.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "sow_seeds",
+      "category": "farming",
+      "description": "Samen ausstreuen: Samenflug, kleine Bodeneinschlaege",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "farming/sow_seeds/sow_seeds_##.png",
+      "sheet": "farming/sow_seeds/sow_seeds_sheet.png",
+      "preview_gif": "farming/sow_seeds/sow_seeds_preview.gif",
+      "preview_frame": "farming/sow_seeds/sow_seeds_06.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "harvest_crop",
+      "category": "farming",
+      "description": "Ernte-Pop: Blattschimmer, kleine Staubwolke, Ertragshinweis ohne Text",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "farming/harvest_crop/harvest_crop_##.png",
+      "sheet": "farming/harvest_crop/harvest_crop_sheet.png",
+      "preview_gif": "farming/harvest_crop/harvest_crop_preview.gif",
+      "preview_frame": "farming/harvest_crop/harvest_crop_06.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "crop_growth_sparkle",
+      "category": "farming",
+      "description": "Wachstumsimpuls: sanfte Ringe, gruene Partikel, Blatt-Pop",
+      "frames": 16,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "farming/crop_growth_sparkle/crop_growth_sparkle_##.png",
+      "sheet": "farming/crop_growth_sparkle/crop_growth_sparkle_sheet.png",
+      "preview_gif": "farming/crop_growth_sparkle/crop_growth_sparkle_preview.gif",
+      "preview_frame": "farming/crop_growth_sparkle/crop_growth_sparkle_08.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "speech_bubble_talk",
+      "category": "social",
+      "description": "Sprechblase neutral ohne Text, drei animierte Punkte",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "social/speech_bubble_talk/speech_bubble_talk_##.png",
+      "sheet": "social/speech_bubble_talk/speech_bubble_talk_sheet.png",
+      "preview_gif": "social/speech_bubble_talk/speech_bubble_talk_preview.gif",
+      "preview_frame": "social/speech_bubble_talk/speech_bubble_talk_06.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "speech_bubble_trade",
+      "category": "social",
+      "description": "Handels-Sprechblase ohne Text, Muenzen/Handshake-Symbolik",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "social/speech_bubble_trade/speech_bubble_trade_##.png",
+      "sheet": "social/speech_bubble_trade/speech_bubble_trade_sheet.png",
+      "preview_gif": "social/speech_bubble_trade/speech_bubble_trade_preview.gif",
+      "preview_frame": "social/speech_bubble_trade/speech_bubble_trade_06.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "speech_bubble_question",
+      "category": "social",
+      "description": "Frage-Sprechblase ohne Textinhalt, Symbol animiert",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "social/speech_bubble_question/speech_bubble_question_##.png",
+      "sheet": "social/speech_bubble_question/speech_bubble_question_sheet.png",
+      "preview_gif": "social/speech_bubble_question/speech_bubble_question_preview.gif",
+      "preview_frame": "social/speech_bubble_question/speech_bubble_question_06.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "speech_bubble_alert",
+      "category": "social",
+      "description": "Warn-/Ausrufe-Sprechblase ohne Textinhalt",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "social/speech_bubble_alert/speech_bubble_alert_##.png",
+      "sheet": "social/speech_bubble_alert/speech_bubble_alert_sheet.png",
+      "preview_gif": "social/speech_bubble_alert/speech_bubble_alert_preview.gif",
+      "preview_frame": "social/speech_bubble_alert/speech_bubble_alert_06.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "thought_bubble_work",
+      "category": "social",
+      "description": "Gedankenblase fuer Arbeit/Planung ohne Text",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "social/thought_bubble_work/thought_bubble_work_##.png",
+      "sheet": "social/thought_bubble_work/thought_bubble_work_sheet.png",
+      "preview_gif": "social/thought_bubble_work/thought_bubble_work_preview.gif",
+      "preview_frame": "social/thought_bubble_work/thought_bubble_work_06.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "mining_chip",
+      "category": "work",
+      "description": "Bergbau-Treffer: Splitter, Staub, kurzer Kontaktblitz",
+      "frames": 10,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "work/mining_chip/mining_chip_##.png",
+      "sheet": "work/mining_chip/mining_chip_sheet.png",
+      "preview_gif": "work/mining_chip/mining_chip_preview.gif",
+      "preview_frame": "work/mining_chip/mining_chip_05.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "chop_wood",
+      "category": "work",
+      "description": "Holzfaellen-Treffer: Rindensplitter, Blattvibration, Trefferbogen",
+      "frames": 10,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "work/chop_wood/chop_wood_##.png",
+      "sheet": "work/chop_wood/chop_wood_sheet.png",
+      "preview_gif": "work/chop_wood/chop_wood_preview.gif",
+      "preview_frame": "work/chop_wood/chop_wood_05.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "build_hammer",
+      "category": "work",
+      "description": "Bauen/Reparieren: Hammer-Impact, Holzspaene, Funken",
+      "frames": 10,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "work/build_hammer/build_hammer_##.png",
+      "sheet": "work/build_hammer/build_hammer_sheet.png",
+      "preview_gif": "work/build_hammer/build_hammer_preview.gif",
+      "preview_frame": "work/build_hammer/build_hammer_05.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "crafting_sparks",
+      "category": "work",
+      "description": "Schmiede/Crafting: warme Funken, kleiner Rauch, Amboss-Glimmen",
+      "frames": 14,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "work/crafting_sparks/crafting_sparks_##.png",
+      "sheet": "work/crafting_sparks/crafting_sparks_sheet.png",
+      "preview_gif": "work/crafting_sparks/crafting_sparks_preview.gif",
+      "preview_frame": "work/crafting_sparks/crafting_sparks_07.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "item_pickup_pop",
+      "category": "feedback",
+      "description": "Item aufnehmen: Ring, Sternchen, kurzer Aufwaerts-Pop",
+      "frames": 10,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "feedback/item_pickup_pop/item_pickup_pop_##.png",
+      "sheet": "feedback/item_pickup_pop/item_pickup_pop_sheet.png",
+      "preview_gif": "feedback/item_pickup_pop/item_pickup_pop_preview.gif",
+      "preview_frame": "feedback/item_pickup_pop/item_pickup_pop_05.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "loot_twinkle",
+      "category": "feedback",
+      "description": "Loot-Sparkle: goldene Glanzpunkte und Lichtkreuz",
+      "frames": 14,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "feedback/loot_twinkle/loot_twinkle_##.png",
+      "sheet": "feedback/loot_twinkle/loot_twinkle_sheet.png",
+      "preview_gif": "feedback/loot_twinkle/loot_twinkle_preview.gif",
+      "preview_frame": "feedback/loot_twinkle/loot_twinkle_07.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "level_up_ring",
+      "category": "feedback",
+      "description": "Level-/Erfolgseffekt: aufsteigender Ring, Laubgold-Partikel",
+      "frames": 16,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "feedback/level_up_ring/level_up_ring_##.png",
+      "sheet": "feedback/level_up_ring/level_up_ring_sheet.png",
+      "preview_gif": "feedback/level_up_ring/level_up_ring_preview.gif",
+      "preview_frame": "feedback/level_up_ring/level_up_ring_08.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "negative_mood_pulse",
+      "category": "feedback",
+      "description": "Negativer Stimmungsimpuls: roter Puls, kleine Bruch-Partikel",
+      "frames": 12,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "feedback/negative_mood_pulse/negative_mood_pulse_##.png",
+      "sheet": "feedback/negative_mood_pulse/negative_mood_pulse_sheet.png",
+      "preview_gif": "feedback/negative_mood_pulse/negative_mood_pulse_preview.gif",
+      "preview_frame": "feedback/negative_mood_pulse/negative_mood_pulse_06.png",
+      "alpha": true,
+      "looping": false
+    },
+    {
+      "name": "footstep_dust",
+      "category": "ambient",
+      "description": "Schritte auf trockenem Boden: kleine versetzte Staub-Puffs",
+      "frames": 8,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "ambient/footstep_dust/footstep_dust_##.png",
+      "sheet": "ambient/footstep_dust/footstep_dust_sheet.png",
+      "preview_gif": "ambient/footstep_dust/footstep_dust_preview.gif",
+      "preview_frame": "ambient/footstep_dust/footstep_dust_04.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "leaf_rustle",
+      "category": "ambient",
+      "description": "Laubrascheln: windige Blaetter und feine Staubmotes",
+      "frames": 16,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "ambient/leaf_rustle/leaf_rustle_##.png",
+      "sheet": "ambient/leaf_rustle/leaf_rustle_sheet.png",
+      "preview_gif": "ambient/leaf_rustle/leaf_rustle_preview.gif",
+      "preview_frame": "ambient/leaf_rustle/leaf_rustle_08.png",
+      "alpha": true,
+      "looping": true
+    },
+    {
+      "name": "campfire_embers",
+      "category": "ambient",
+      "description": "Lagerfeuer-Ember: aufsteigende Gluehpartikel und Rauch",
+      "frames": 16,
+      "fps": 12,
+      "frame_size": [
+        192,
+        192
+      ],
+      "frame_pattern": "ambient/campfire_embers/campfire_embers_##.png",
+      "sheet": "ambient/campfire_embers/campfire_embers_sheet.png",
+      "preview_gif": "ambient/campfire_embers/campfire_embers_preview.gif",
+      "preview_frame": "ambient/campfire_embers/campfire_embers_08.png",
+      "alpha": true,
+      "looping": true
+    }
+  ]
+}
