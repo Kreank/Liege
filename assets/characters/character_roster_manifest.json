@@ -1,0 +1,24 @@
+{
+  "npc_note": "Core NPC files updated in assets/characters/npcs; weapon/role variants live in assets/characters/npcs/variants.",
+  "player_note": "Player presets are 96x96 and intentionally more distinctive than 64x64 NPCs.",
+  "npc_variants": [
+    "bandit_axe",
+    "bandit_bow",
+    "bandit_dagger",
+    "bandit_spear",
+    "miner_pickaxe",
+    "soldier_axe",
+    "soldier_spear",
+    "soldier_sword_shield",
+    "watchman_crossbow",
+    "watchman_lantern"
+  ],
+  "player_presets": [
+    "ember_mage",
+    "iron_delver",
+    "knife_runner",
+    "shieldbearer",
+    "wanderer_cloak",
+    "wild_ranger"
+  ]
+}
