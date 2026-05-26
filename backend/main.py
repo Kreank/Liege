@@ -8,6 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import uvicorn
 
+import auth
+from auth_routes import router as auth_router
+from dev_chat import dev_chat_handler
 import db
 import llm
 import combat
@@ -115,6 +118,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.include_router(auth_router)
+app.add_api_websocket_route("/ws/dev-chat", dev_chat_handler)
+
 app.mount("/static", StaticFiles(directory="../frontend"), name="static")
 app.mount("/assets", StaticFiles(directory="../assets"), name="assets")
 
@@ -122,6 +128,34 @@ app.mount("/assets", StaticFiles(directory="../assets"), name="assets")
 @app.get("/")
 async def root():
     return FileResponse("../frontend/index.html")
+
+
+@app.get("/login")
+async def login_page():
+    return FileResponse("../frontend/login.html")
+
+
+@app.get("/admin")
+async def admin_page():
+    return FileResponse("../frontend/admin.html")
+
+
+@app.get("/manifest.webmanifest")
+async def pwa_manifest():
+    return FileResponse(
+        "../frontend/manifest.webmanifest",
+        media_type="application/manifest+json",
+    )
+
+
+@app.get("/sw.js")
+async def pwa_sw():
+    # Muss von root serviert werden, damit der Scope `/` ist.
+    return FileResponse(
+        "../frontend/sw.js",
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
+    )
 
 
 DEFAULT_SPAWN_CENTER = (60, 40)  # nahe Mitte der Legacy-Welt
@@ -359,8 +393,14 @@ async def damage_player(name: str, dmg: int, source_npc_id: int | None = None) -
         })
 
 
-@app.websocket("/ws/{player_id}")
-async def websocket_endpoint(websocket: WebSocket, player_id: str):
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    user = await auth.get_user_from_ws(websocket)
+    if not user:
+        await websocket.accept()
+        await websocket.close(code=1008)
+        return
+    player_id = user["name"]
     state = await load_or_create_player(player_id)
     spawn = {"x": state["x"], "y": state["y"]}
     await manager.connect(websocket, player_id, spawn["x"], spawn["y"])
@@ -431,6 +471,16 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
         while True:
             data = await websocket.receive_json()
             mtype = data.get("type")
+
+            if mtype == "chat":
+                text = (data.get("text") or "").strip()
+                if text and len(text) <= 500:
+                    await manager.broadcast({
+                        "type": "chat",
+                        "from": player_id,
+                        "text": text,
+                    })
+                continue
 
             if mtype == "move":
                 x, y = data["x"], data["y"]
@@ -605,11 +655,19 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
                 consumed = await items.consume(item_id, player_id)
                 if consumed is None:
                     continue
-                await websocket.send_json({
-                    "type": "inventory_remove",
-                    "item_id": consumed["id"],
-                    "consumed": True,
-                })
+                if consumed.get("stack_remaining", 0) > 0:
+                    # Stack hat noch Items übrig: nur quantity aktualisieren
+                    await websocket.send_json({
+                        "type": "inventory_update",
+                        "item_id": consumed["id"],
+                        "quantity": consumed["stack_remaining"],
+                    })
+                else:
+                    await websocket.send_json({
+                        "type": "inventory_remove",
+                        "item_id": consumed["id"],
+                        "consumed": True,
+                    })
                 effect = combat.USE_EFFECTS.get(kind or "")
                 if effect:
                     # Medical-Talent-Bonus
@@ -650,6 +708,38 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
                     if (kind in ("bread", "cooked_meat")
                             and talent_eff_c.get("cooking_heal_bonus", 0) > 0):
                         await heal_player(player_id, int(talent_eff_c["cooking_heal_bonus"]))
+
+            elif mtype == "pick_item":
+                # Expliziter Pickup: Spieler klickt auf Item am Boden in Reichweite (≤1 Tile).
+                item_id = int(data.get("item_id", 0))
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                ground = await db.pool().fetchrow(
+                    "SELECT x, y FROM items WHERE id = $1 AND owner IS NULL",
+                    item_id,
+                )
+                if ground is None:
+                    continue  # schon weg
+                if abs(int(ground["x"]) - player["x"]) + abs(int(ground["y"]) - player["y"]) > 1:
+                    continue  # zu weit weg (Sanity-Check — Frontend prüft auch)
+                picked = await items.pickup(item_id, player_id)
+                if picked is None:
+                    continue
+                await manager.broadcast({"type": "item_picked_up", "item_id": item_id})
+                # Wenn in einen existierenden Stack gemergt: inventory_update mit neuer qty.
+                # Sonst (neue Row im Inventar): inventory_add mit dem ganzen Item.
+                if picked["id"] != item_id:
+                    await websocket.send_json({
+                        "type": "inventory_update",
+                        "item_id": picked["id"],
+                        "quantity": int(picked.get("quantity", 1)),
+                    })
+                else:
+                    await websocket.send_json({
+                        "type": "inventory_add",
+                        "item": picked,
+                    })
 
             elif mtype == "drop_item":
                 item_id = int(data.get("item_id", 0))

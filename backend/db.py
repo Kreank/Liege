@@ -50,6 +50,36 @@ CREATE TABLE IF NOT EXISTS structures (
 ALTER TABLE structures ADD COLUMN IF NOT EXISTS material   TEXT    NOT NULL DEFAULT 'stone';
 ALTER TABLE structures ADD COLUMN IF NOT EXISTS durability INTEGER NOT NULL DEFAULT 1;
 
+-- Frühe Vorab-CREATEs für nachfolgende ALTERs (Fresh-DB-Init).
+CREATE TABLE IF NOT EXISTS npcs (
+    id           BIGSERIAL PRIMARY KEY,
+    name         TEXT    NOT NULL,
+    kind         TEXT    NOT NULL,
+    x            INTEGER NOT NULL,
+    y            INTEGER NOT NULL,
+    backstory    TEXT    NOT NULL,
+    mood         TEXT    NOT NULL DEFAULT 'neutral',
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_moved   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS items (
+    id            BIGSERIAL PRIMARY KEY,
+    kind          TEXT    NOT NULL,
+    name          TEXT    NOT NULL,
+    category      TEXT    NOT NULL,
+    x             INTEGER,
+    y             INTEGER,
+    owner         TEXT,
+    equipped_slot TEXT,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT items_location_xor CHECK (
+        (x IS NOT NULL AND y IS NOT NULL AND owner IS NULL)
+        OR
+        (owner IS NOT NULL AND x IS NULL AND y IS NULL)
+    )
+);
+
 -- Combat-Felder
 ALTER TABLE players ADD COLUMN IF NOT EXISTS hp       INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS max_hp   INTEGER NOT NULL DEFAULT 100;
@@ -119,6 +149,10 @@ CREATE TABLE IF NOT EXISTS player_skills (
 ALTER TABLE players ADD COLUMN IF NOT EXISTS legs_health  INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS arms_health  INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS torso_health INTEGER NOT NULL DEFAULT 100;
+
+-- Auth
+ALTER TABLE players ADD COLUMN IF NOT EXISTS password_hash TEXT;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS role          TEXT NOT NULL DEFAULT 'user';
 
 -- Research-Progression
 CREATE TABLE IF NOT EXISTS research_progress (
@@ -372,13 +406,80 @@ async def _init_conn(conn: asyncpg.Connection) -> None:
     )
 
 
+def _split_sql_statements(sql: str) -> list[str]:
+    """Splittet SQL an ';' — respektiert $$-Dollar-Quoting (z. B. DO $tag$ ... $tag$;)."""
+    out: list[str] = []
+    buf: list[str] = []
+    i = 0
+    n = len(sql)
+    in_tag: str | None = None
+    while i < n:
+        c = sql[i]
+        if in_tag is None:
+            if c == "$":
+                j = sql.find("$", i + 1)
+                if j != -1 and all(ch.isalnum() or ch == "_" for ch in sql[i + 1:j]):
+                    in_tag = sql[i:j + 1]
+                    buf.append(in_tag)
+                    i = j + 1
+                    continue
+            if c == ";":
+                stmt = "".join(buf).strip()
+                if stmt:
+                    out.append(stmt)
+                buf = []
+                i += 1
+                continue
+            buf.append(c)
+            i += 1
+        else:
+            if sql.startswith(in_tag, i):
+                buf.append(in_tag)
+                i += len(in_tag)
+                in_tag = None
+                continue
+            buf.append(c)
+            i += 1
+    tail = "".join(buf).strip()
+    if tail:
+        out.append(tail)
+    return out
+
+
+async def _apply_schema_with_retry(conn, schema: str) -> None:
+    """Führt jedes Statement einzeln aus; failing Statements werden in der nächsten Runde wiederholt
+    (bis Konvergenz). Macht die SCHEMA-Reihenfolge robust gegen ALTER-vor-CREATE-Konstellationen."""
+    import logging
+    pending = _split_sql_statements(schema)
+    last_err: BaseException | None = None
+    while pending:
+        next_pending: list[str] = []
+        progress = False
+        round_err: BaseException | None = None
+        for stmt in pending:
+            try:
+                await conn.execute(stmt)
+                progress = True
+            except Exception as e:
+                next_pending.append(stmt)
+                round_err = e
+        if not progress:
+            logging.error("Schema-Init: %d Statements bleiben fehlerhaft. Letzter Fehler: %s",
+                          len(next_pending), round_err)
+            raise round_err if round_err else RuntimeError("Schema-Init fehlgeschlagen")
+        last_err = round_err
+        pending = next_pending
+    if last_err:
+        logging.info("Schema-Init: mit Retry erfolgreich aufgelöst")
+
+
 async def init_db() -> asyncpg.Pool:
     global _pool
     _pool = await asyncpg.create_pool(
         DATABASE_URL, min_size=1, max_size=10, init=_init_conn
     )
     async with _pool.acquire() as conn:
-        await conn.execute(SCHEMA)
+        await _apply_schema_with_retry(conn, SCHEMA)
     return _pool
 
 

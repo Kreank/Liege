@@ -234,14 +234,37 @@ class ItemManager:
         return _row_to_dict(row) if row else None
 
     async def consume(self, item_id: int, player_name: str) -> dict | None:
-        """Verbraucht ein Consumable/Food — Item wird gelöscht."""
+        """Verbraucht EIN Consumable/Food.
+        - Stack mit quantity > 1: decrement, Item bleibt mit neuer quantity.
+        - Stack mit quantity = 1 (oder non-stack): Row gelöscht.
+        Return-Dict bekommt zusätzlich `stack_remaining` (0 = gelöscht, >0 = neue qty)."""
+        # Erst: Stack mit quantity > 1 → decrement
+        row = await db.pool().fetchrow(
+            "UPDATE items SET quantity = quantity - 1 "
+            "WHERE id = $1 AND owner = $2 "
+            "AND category IN ('consumable', 'food') "
+            "AND quantity > 1 "
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
+            "created_at, affixes, unique_name, flavor, quantity",
+            item_id, player_name,
+        )
+        if row:
+            d = _row_to_dict(row)
+            d["stack_remaining"] = int(row["quantity"])
+            return d
+        # Sonst: einzelnes Item (qty = 1 oder non-stack) → delete
         row = await db.pool().fetchrow(
             "DELETE FROM items WHERE id = $1 AND owner = $2 "
             "AND category IN ('consumable', 'food') "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
+            "created_at, affixes, unique_name, flavor",
             item_id, player_name,
         )
-        return _row_to_dict(row) if row else None
+        if row:
+            d = _row_to_dict(row)
+            d["stack_remaining"] = 0
+            return d
+        return None
 
     # — Chest-Storage —————————————————————————————————————————————————————————
 
