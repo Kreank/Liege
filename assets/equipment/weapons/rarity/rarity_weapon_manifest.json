@@ -1,0 +1,70 @@
+{
+  "canvas": {
+    "width": 64,
+    "height": 64,
+    "format": "RGBA"
+  },
+  "rarity_order": [
+    "poor",
+    "common",
+    "rare",
+    "very_rare",
+    "legendary"
+  ],
+  "rarities": {
+    "poor": {
+      "label": "Schlecht",
+      "color_rgb": [
+        136,
+        142,
+        145
+      ]
+    },
+    "common": {
+      "label": "Normal",
+      "color_rgb": [
+        79,
+        171,
+        88
+      ]
+    },
+    "rare": {
+      "label": "Selten",
+      "color_rgb": [
+        69,
+        129,
+        224
+      ]
+    },
+    "very_rare": {
+      "label": "Sehr selten",
+      "color_rgb": [
+        231,
+        196,
+        75
+      ]
+    },
+    "legendary": {
+      "label": "Legendär",
+      "color_rgb": [
+        238,
+        119,
+        43
+      ]
+    }
+  },
+  "weapons": [
+    "sword",
+    "greatsword",
+    "axe",
+    "spear",
+    "bow",
+    "crossbow",
+    "dagger",
+    "mace",
+    "staff",
+    "scythe"
+  ],
+  "path_pattern": "assets/equipment/weapons/rarity/{rarity}/{weapon}.png",
+  "note": "Rarity art is separate from material-tier art. Suggested user labels: Grau/Schlecht, Gruen/Normal, Blau/Selten, Gelb/Sehr selten, Orange/Legendaer."
+}
