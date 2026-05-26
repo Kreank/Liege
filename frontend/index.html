@@ -1183,6 +1183,26 @@ const STRUCTURE_BY_KEY = Object.fromEntries(
   Object.entries(STRUCTURE).map(([id, s]) => [s.key, id])
 );
 
+// Display-Größe pro Struktur-Typ relativ zu TILE_SIZE.
+// Default 1.0; größere "Bauten" wirken sonst klein gegen Charaktere (32px).
+const STRUCTURE_DISPLAY_SCALE = {
+  camp_tent:     1.5,
+  shipwreck:     1.7,
+  boat_small:    1.3,
+  broken_cart:   1.3,
+  ruin_pillar:   1.4,
+  statue_broken: 1.3,
+  gravestone:    1.2,
+  tree_oak:      1.4,
+  tree_pine:     1.4,
+  palm_tree:     1.5,
+  treant:        1.5,
+  well:          1.3,
+  anvil:         1.2,
+  furnace:       1.3,
+  workbench:     1.2,
+};
+
 // ─── Event-Konfiguration ──────────────────────────────────────────────────────
 const EVENT_ICON = {
   weather:   '☁️',
@@ -4259,10 +4279,35 @@ class WorldScene extends Phaser.Scene {
   //   fog     intensity 1=light, 2=+dense
   //   swamp_mist intensity 1+ = single layer
   setWeather(phase, intensity) {
+    // Vom Server kommendes Wetter merken — Rendering passiert in _applyWeather,
+    // welches zusätzlich das Biome unter dem Player berücksichtigt.
     this.weatherPhase = phase || 'clear';
     this.weatherIntensity = Math.max(0, Math.min(4, intensity || 0));
+    this._applyWeather();
+  }
+
+  _applyWeather() {
     this._clearWeatherLayers();
     if (this.weatherPhase === 'clear' || this.weatherIntensity === 0) return;
+    // Biome-Filter: in der Wüste schneit/regnet es nicht, Lava-Tiles haben
+    // gar kein Wetter, Schnee-Tiles bekommen keinen Regen, etc.
+    // tile-ids siehe TILES const (WATER=0, SAND=1, GRASS=2, FOREST=3,
+    // MOUNTAIN=4, DESERT=5, JUNGLE=6, LAVA=7, SNOW=8, SWAMP=9)
+    const WEATHER_ALLOWED_BY_BIOME = {
+      0: ['rain','fog','swamp_mist'],
+      1: ['rain','fog'],
+      2: ['rain','snow','fog'],
+      3: ['rain','snow','fog'],
+      4: ['snow','fog'],
+      5: [],                          // Wüste: kein Standard-Niederschlag
+      6: ['rain','fog','swamp_mist'],
+      7: [],                          // Lava: nichts
+      8: ['snow','fog'],
+      9: ['rain','fog','swamp_mist'],
+    };
+    const tile = this.tileAt(this.myTileX, this.myTileY);
+    const allowed = WEATHER_ALLOWED_BY_BIOME[tile];
+    if (allowed && !allowed.includes(this.weatherPhase)) return;
     const stack = {
       rain: ['rain_light','rain_medium','rain_heavy','rain_downpour'],
       snow: ['snow_light','snow_medium','snow_heavy','snow_blizzard'],
@@ -4272,17 +4317,18 @@ class WorldScene extends Phaser.Scene {
     for (let i = 0; i < Math.min(this.weatherIntensity, stack.length); i++) {
       this._addWeatherLayer(stack[i], 6, 0.35 + 0.15 * i);
     }
-    // Storm-Lightning als Spitze bei Regen-Peak
     if (this.weatherPhase === 'rain' && this.weatherIntensity >= 4) {
       this._addWeatherLayer('storm_lightning', 4, 0.55);
     }
   }
 
   _addWeatherLayer(name, frameCount, alpha) {
+    // tileSprite kachelt das 256×256-Pattern statt es zu stretchen — Tropfen/
+    // Schneeflocken behalten ihre originale Größe.
     const w = this.scale.width, h = this.scale.height;
-    const img = this.add.image(0, 0, `weather_${name}_1`).setOrigin(0, 0);
-    img.setScrollFactor(0).setDepth(200).setAlpha(alpha).setDisplaySize(w, h);
-    const state = { img, frame: 1, count: frameCount };
+    const ts = this.add.tileSprite(0, 0, w, h, `weather_${name}_1`).setOrigin(0, 0);
+    ts.setScrollFactor(0).setDepth(200).setAlpha(alpha);
+    const state = { img: ts, frame: 1, count: frameCount };
     const timer = this.time.addEvent({
       delay: 130, loop: true,
       callback: () => {
@@ -4619,7 +4665,10 @@ class WorldScene extends Phaser.Scene {
     }
 
     const img = this.add.image(cx, cy, initialKey).setOrigin(0.5);
-    img.setDisplaySize(TILE_SIZE, TILE_SIZE);
+    // Größen-Override für Strukturen die größer als ein Tile aussehen sollen
+    // (Zelte, Schiffe, große Statuen). Default = 1.0 × TILE_SIZE.
+    const structScale = STRUCTURE_DISPLAY_SCALE[s.type] || 1.0;
+    img.setDisplaySize(TILE_SIZE * structScale, TILE_SIZE * structScale);
     if (doorRotation) img.setAngle(doorRotation);
     // Floor liegt UNTER Objects (zwei separate Sprite-Maps + Depth-Levels)
     const isFloor = (s.layer === 'floor') || (s.type === 'floor');
@@ -5022,11 +5071,15 @@ class WorldScene extends Phaser.Scene {
     const newTileX = Math.floor(this.myPx / TILE_SIZE);
     const newTileY = Math.floor(this.myPy / TILE_SIZE);
     if (newTileX !== this.myTileX || newTileY !== this.myTileY) {
+      const prevTile = this.tileAt(this.myTileX, this.myTileY);
       this.myTileX = newTileX;
       this.myTileY = newTileY;
       this.ws.send(JSON.stringify({ type: 'move', x: newTileX, y: newTileY }));
       this.updateUI(newTileX, newTileY);
       this.drawMinimap();
+      // Biome geändert → Wetter neu evaluieren (Wüste/Lava blocken Niederschlag)
+      const curTile = this.tileAt(newTileX, newTileY);
+      if (curTile !== prevTile) this._applyWeather();
     }
   }
 
