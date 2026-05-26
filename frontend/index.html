@@ -2343,6 +2343,14 @@ class WorldScene extends Phaser.Scene {
       actionsHtml += `<button data-act="magic">${knows ? '✨ Wirken' : '📖 Lernen'}</button>`;
     }
     actionsHtml += `<button data-act="hotbar">📌 Hotbar</button>`;
+    // Stack-Aktionen: Teilen nur wenn quantity>1, Stapeln nur für stackable Kategorien
+    const STACKABLE = new Set(['resource','food','consumable','magic']);
+    if ((item.quantity || 1) > 1) {
+      actionsHtml += `<button data-act="split">✂️ Teilen</button>`;
+    }
+    if (STACKABLE.has(cfg.category)) {
+      actionsHtml += `<button data-act="merge">🧱 Stapeln</button>`;
+    }
     if (!item.equipped_slot) actionsHtml += `<button data-act="drop">🗑️ Wegwerfen</button>`;
     actionsHtml += '</div>';
     html += actionsHtml;
@@ -2376,6 +2384,15 @@ class WorldScene extends Phaser.Scene {
           this.showEvent(`📌 → Slot ${s+1}`);
         } else if (act === 'drop') {
           this.dropItem(item.id);
+        } else if (act === 'split') {
+          const maxQ = (item.quantity || 1) - 1;
+          const ans = window.prompt(`Wie viele aus dem Stapel teilen? (1–${maxQ})`, String(Math.max(1, Math.floor(maxQ / 2))));
+          const n = parseInt(ans || '0', 10);
+          if (n >= 1 && n <= maxQ) {
+            this.ws.send(JSON.stringify({ type: 'split_stack', item_id: item.id, amount: n }));
+          }
+        } else if (act === 'merge') {
+          this.ws.send(JSON.stringify({ type: 'merge_stacks', kind: item.kind, quality: item.quality || 'normal' }));
         }
         this.unpinItemTooltip();
       });

@@ -707,6 +707,36 @@ async def websocket_endpoint(websocket: WebSocket):
                         "layer": removed["layer"],
                     })
 
+            elif mtype == "split_stack":
+                item_id = int(data.get("item_id", 0))
+                amount = int(data.get("amount", 0))
+                result = await items.split_stack(item_id, player_id, amount)
+                if result is not None:
+                    updated, new_item = result
+                    await websocket.send_json({
+                        "type": "inventory_update",
+                        "item_id": updated["id"],
+                        "quantity": int(updated.get("quantity", 1)),
+                    })
+                    await websocket.send_json({
+                        "type": "inventory_add",
+                        "item": new_item,
+                    })
+
+            elif mtype == "merge_stacks":
+                kind = str(data.get("kind", ""))
+                quality = str(data.get("quality", "normal"))
+                if not kind:
+                    continue
+                result = await items.merge_stacks(player_id, kind, quality)
+                if result is not None:
+                    # Full-refresh damit Frontend die gelöschten Rows + neue Quantities sieht
+                    new_inv = await items.get_inventory(player_id)
+                    await websocket.send_json({
+                        "type": "inventory_full_refresh",
+                        "inventory": new_inv,
+                    })
+
             elif mtype == "equip_item":
                 item_id = int(data.get("item_id", 0))
                 item = await items.equip(item_id, player_id)

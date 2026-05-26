@@ -288,6 +288,104 @@ class ItemManager:
             return d
         return None
 
+    # — Stack-Split / Merge ————————————————————————————————————————————————————
+
+    async def split_stack(self, item_id: int, player_name: str,
+                          amount: int) -> tuple[dict, dict] | None:
+        """Nimmt `amount` aus einem Stack heraus in eine neue Row.
+        Returns (updated_original, new_row) oder None bei ungültiger Operation."""
+        if amount < 1:
+            return None
+        row = await db.pool().fetchrow(
+            "SELECT kind, name, category, quality, quantity, equipped_slot, "
+            "affixes, unique_name, flavor, material "
+            "FROM items WHERE id = $1 AND owner = $2", item_id, player_name,
+        )
+        if row is None or row["equipped_slot"] is not None:
+            return None
+        cur_qty = int(row["quantity"] or 1)
+        if amount >= cur_qty:
+            return None  # Ergäbe leere Original-Row
+        updated = await db.pool().fetchrow(
+            "UPDATE items SET quantity = quantity - $2 WHERE id = $1 "
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
+            "created_at, affixes, unique_name, flavor, quantity, material",
+            item_id, amount,
+        )
+        new_row = await db.pool().fetchrow(
+            "INSERT INTO items (kind, name, category, owner, quality, quantity, "
+            "material, affixes, unique_name, flavor) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
+            "created_at, affixes, unique_name, flavor, quantity, material",
+            row["kind"], row["name"], row["category"], player_name, row["quality"],
+            amount, row["material"], row["affixes"], row["unique_name"], row["flavor"],
+        )
+        return (_row_to_dict(updated), _row_to_dict(new_row))
+
+    async def merge_stacks(self, player_name: str, kind: str,
+                           quality: str = "normal") -> dict | None:
+        """Konsolidiert alle Stacks gleichen kinds/qualities ins erste Row bis
+        zum Stack-Limit; überschüssige rows bleiben mit Rest-quantity.
+        Returns ein zusammenfassendes Dict {merged_rows, deleted_ids, kept_ids} oder None."""
+        cfg = ITEM_KINDS.get(kind)
+        if cfg is None or not is_stackable(cfg["category"]):
+            return None
+        limit = stack_limit_for(cfg["category"])
+        rows = await db.pool().fetch(
+            "SELECT id, quantity FROM items "
+            "WHERE owner = $1 AND kind = $2 AND quality = $3 "
+            "  AND equipped_slot IS NULL "
+            "  AND (affixes IS NULL OR affixes = 'null'::jsonb) "
+            "ORDER BY id",
+            player_name, kind, quality,
+        )
+        if len(rows) < 2:
+            return None
+        # Greedy fill: erste Row als Ziel, weitere Rows hineinleeren bis voll
+        target_id = rows[0]["id"]
+        target_qty = int(rows[0]["quantity"])
+        deleted_ids: list[int] = []
+        kept_ids: list[int] = [target_id]
+        for r in rows[1:]:
+            src_id = r["id"]
+            src_qty = int(r["quantity"])
+            capacity = limit - target_qty
+            if capacity >= src_qty:
+                target_qty += src_qty
+                deleted_ids.append(src_id)
+            elif capacity > 0:
+                target_qty = limit
+                # target voll-schreiben
+                await db.pool().execute(
+                    "UPDATE items SET quantity = $2 WHERE id = $1",
+                    target_id, target_qty,
+                )
+                # source bekommt rest
+                new_src_qty = src_qty - capacity
+                await db.pool().execute(
+                    "UPDATE items SET quantity = $2 WHERE id = $1",
+                    src_id, new_src_qty,
+                )
+                # source wird neues target (Rest könnte noch wachsen)
+                target_id = src_id
+                target_qty = new_src_qty
+                kept_ids.append(target_id)
+            else:
+                # target schon voll — source wird neues target
+                target_id = src_id
+                target_qty = src_qty
+                kept_ids.append(target_id)
+        # Final target schreiben
+        await db.pool().execute(
+            "UPDATE items SET quantity = $2 WHERE id = $1", target_id, target_qty,
+        )
+        if deleted_ids:
+            await db.pool().execute(
+                "DELETE FROM items WHERE id = ANY($1::bigint[])", deleted_ids,
+            )
+        return {"deleted_ids": deleted_ids, "kept_ids": kept_ids}
+
     # — Chest-Storage —————————————————————————————————————————————————————————
 
     async def get_chest_contents(self, chest_id: int) -> list[dict]:
@@ -356,6 +454,11 @@ class ItemManager:
         cfg = ITEM_KINDS.get(kind)
         if cfg is None:
             return None
+        # Resources haben keine echte Qualität — quality immer 'normal' damit
+        # Stack-Merge funktioniert (sonst landen rough-iron-ingots in eigenen
+        # Rows statt im Stack mit normal-iron-ingots).
+        if cfg["category"] == "resource":
+            quality_kind = "normal"
         # Welle 36: Wenn stackable und Quality=normal → in existing stack mergen
         # (Resources/Food/Consumables haben kein material — stack-merge unverändert)
         if is_stackable(cfg["category"]) and quality_kind == "normal":

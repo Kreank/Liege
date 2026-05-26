@@ -164,6 +164,10 @@ UPDATE structures SET layer = 'floor' WHERE type = 'floor' AND layer <> 'floor';
 ALTER TABLE structures DROP CONSTRAINT IF EXISTS structures_x_y_key;
 CREATE UNIQUE INDEX IF NOT EXISTS structures_x_y_layer_idx ON structures (x, y, layer);
 
+-- Resources sollen quality-los sein (sonst kein Stack-Merge bei rough/fine ingots).
+-- Bestehende Rows auf 'normal' setzen.
+UPDATE items SET quality = 'normal' WHERE category = 'resource' AND quality <> 'normal';
+
 -- Research-Progression
 CREATE TABLE IF NOT EXISTS research_progress (
     player_name TEXT NOT NULL,
