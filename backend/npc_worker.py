@@ -34,13 +34,71 @@ CREATURE_SPAWN_PROFILE = {
     "ogre":         {"group": (1, 1),  "biomes": {SNOW, DESERT}},
     "necromancer":  {"group": (1, 1),  "biomes": {SWAMP, DESERT}},
     "dragon_whelp": {"group": (1, 1),  "biomes": {SNOW, DESERT}},  # nahe Berge/Lava
+
+    # — Welle 13 — Tiere (meist Gruppen) —
+    "stag":         {"group": (2, 4),  "biomes": {GRASS, FOREST}},
+    "lynx":         {"group": (1, 1),  "biomes": {FOREST, SNOW}},     # solo
+    "cougar":       {"group": (1, 2),  "biomes": {FOREST, GRASS}},
+    "wolverine":    {"group": (1, 1),  "biomes": {SNOW}},
+    "dire_wolf":    {"group": (3, 5),  "biomes": {FOREST, SNOW}},
+    "wolf_alpha":   {"group": (1, 1),  "biomes": {FOREST, SNOW}},      # solo (anführer)
+    "cave_bear":    {"group": (1, 1),  "biomes": {FOREST}},
+    "polar_bear":   {"group": (1, 2),  "biomes": {SNOW}},
+    "crocodile":    {"group": (1, 2),  "biomes": {SWAMP, JUNGLE}},
+    "cobra":        {"group": (1, 1),  "biomes": {DESERT, JUNGLE}},
+    # — Insekten/Kleinkram (oft Gruppen) —
+    "slimelet":     {"group": (3, 6),  "biomes": {SWAMP, JUNGLE}},
+    "fae_mite":     {"group": (4, 8),  "biomes": {JUNGLE, FOREST}},
+    "gloom_moth":   {"group": (2, 5),  "biomes": {SWAMP}},
+    "ember_newt":   {"group": (2, 4),  "biomes": {DESERT}},
+    "ember_rat":    {"group": (3, 6),  "biomes": {DESERT}},
+    "shadow_bat":   {"group": (3, 7),  "biomes": {FOREST, SWAMP}},
+    "thorn_scarab": {"group": (2, 4),  "biomes": {JUNGLE, FOREST}},
+    "crystal_beetle":{"group": (1, 3), "biomes": {SNOW, DESERT}},
+    "crystal_tick": {"group": (2, 5),  "biomes": {SNOW}},
+    # — Geister/Fae —
+    "frost_sprite": {"group": (1, 2),  "biomes": {SNOW}},
+    "fire_imp":     {"group": (1, 3),  "biomes": {DESERT}},
+    "mushroom_imp": {"group": (2, 4),  "biomes": {JUNGLE, SWAMP}},
+    "thornling":    {"group": (2, 4),  "biomes": {FOREST, JUNGLE}},
+    "treant":       {"group": (1, 1),  "biomes": {FOREST, JUNGLE}},    # solo
+    # — Stein/Kristall (selten, solo) —
+    "stone_golem":  {"group": (1, 1),  "biomes": {SNOW, DESERT}},
+    "crystal_golem":{"group": (1, 1),  "biomes": {SNOW}},
+    "gargoyle":     {"group": (1, 2),  "biomes": {SNOW, DESERT}},
+    "bone_crawler": {"group": (1, 3),  "biomes": {DESERT, SWAMP}},
+    "giant_spider": {"group": (1, 1),  "biomes": {FOREST, JUNGLE, SWAMP}},
+    # — Bosse — alle solo —
+    "minotaur":     {"group": (1, 1),  "biomes": {SNOW, DESERT}},
+    "harpy":        {"group": (1, 2),  "biomes": {SNOW, DESERT}},
+    "basilisk":     {"group": (1, 1),  "biomes": {DESERT}},
+    "chimera":      {"group": (1, 1),  "biomes": {SNOW, DESERT}},
+    "griffin":      {"group": (1, 1),  "biomes": {SNOW}},
+    "hydra":        {"group": (1, 1),  "biomes": {SWAMP}},
+    "manticore":    {"group": (1, 1),  "biomes": {DESERT}},
 }
 FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier",
                   "mage", "farmer", "villager", "guard", "healer",
                   "quest_giver", "blacksmith"]
-CREATURE_KINDS = ["goblin", "wolf", "skeleton", "spider", "slime",
-                  "rat", "bat", "zombie", "bandit", "boar", "bear"]
-BOSS_KINDS = ["ogre", "necromancer", "dragon_whelp"]
+CREATURE_KINDS = [
+    # Welle 1-3
+    "goblin", "wolf", "skeleton", "spider", "slime",
+    "rat", "bat", "zombie", "bandit", "boar", "bear",
+    # Welle 13 — neue Tiere
+    "stag", "lynx", "cougar", "wolverine", "dire_wolf", "wolf_alpha",
+    "cave_bear", "polar_bear", "crocodile", "cobra",
+    # Welle 13 — Insekten/Kleinkram
+    "slimelet", "fae_mite", "gloom_moth", "ember_newt", "ember_rat",
+    "shadow_bat", "thorn_scarab", "crystal_beetle", "crystal_tick",
+    # Welle 13 — Geister/Fae/Plants
+    "frost_sprite", "fire_imp", "mushroom_imp", "thornling", "treant",
+    # Welle 13 — Stein/Kristall/Untot
+    "stone_golem", "crystal_golem", "gargoyle", "bone_crawler", "giant_spider",
+    # Welle 13 — Bosse
+    "minotaur", "harpy", "basilisk", "chimera", "griffin", "hydra", "manticore",
+]
+BOSS_KINDS = ["ogre", "necromancer", "dragon_whelp",
+              "minotaur", "harpy", "basilisk", "chimera", "griffin", "hydra", "manticore"]
 NPC_KINDS = FRIENDLY_KINDS + CREATURE_KINDS
 
 # Wander-Tick alle N Sekunden, pro NPC unabhängige Wahrscheinlichkeit zu bewegen
@@ -76,6 +134,43 @@ NPC_MOVE_CHANCE = {
     "ogre":         0.08,
     "necromancer":  0.10,
     "dragon_whelp": 0.25,
+    # Welle 13
+    "stag":         0.35,  # scheu, schnell
+    "lynx":         0.40,  # lauernd, schnell
+    "cougar":       0.30,
+    "wolverine":    0.28,
+    "dire_wolf":    0.38,
+    "wolf_alpha":   0.30,  # bedacht, führt Rudel
+    "cave_bear":    0.20,
+    "polar_bear":   0.18,
+    "crocodile":    0.10,  # lauernd
+    "cobra":        0.25,
+    "slimelet":     0.18,
+    "fae_mite":     0.45,  # flink
+    "gloom_moth":   0.35,
+    "ember_newt":   0.20,
+    "ember_rat":    0.50,  # huschig
+    "shadow_bat":   0.55,
+    "thorn_scarab": 0.25,
+    "crystal_beetle":0.20,
+    "crystal_tick": 0.30,
+    "frost_sprite": 0.30,
+    "fire_imp":     0.35,
+    "mushroom_imp": 0.22,
+    "thornling":    0.20,
+    "treant":       0.05,  # langsam
+    "stone_golem":  0.04,  # sehr langsam
+    "crystal_golem":0.05,
+    "gargoyle":     0.08,
+    "bone_crawler": 0.18,
+    "giant_spider": 0.22,
+    "minotaur":     0.18,
+    "harpy":        0.30,
+    "basilisk":     0.12,
+    "chimera":      0.20,
+    "griffin":      0.28,
+    "hydra":        0.10,
+    "manticore":    0.22,
 }
 
 IDENTITY_SYSTEM = (

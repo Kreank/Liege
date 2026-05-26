@@ -69,6 +69,57 @@ LOOT_TABLE = {
     "bandit": [
         ("cloth", 50), ("leather", 30), ("health_potion", 8), ("herb", 10),
     ],
+
+    # — Welle 13 — Tiere —
+    "stag":      [("raw_meat", 70), ("leather", 60), ("bone", 40)],
+    "lynx":      [("raw_meat", 55), ("leather", 60), ("bone", 35)],
+    "cougar":    [("raw_meat", 65), ("leather", 65), ("bone", 40)],
+    "wolverine": [("raw_meat", 60), ("leather", 65), ("bone", 45)],
+    "dire_wolf": [("raw_meat", 75), ("leather", 70), ("bone", 55)],
+    "wolf_alpha":[("raw_meat", 80), ("leather", 75), ("bone", 60), ("silver_coin", 15)],
+    "cave_bear": [("raw_meat", 85), ("leather", 75), ("bone", 70), ("herb", 10)],
+    "polar_bear":[("raw_meat", 80), ("leather", 80), ("bone", 65), ("crystal", 8)],
+    "crocodile": [("raw_meat", 70), ("leather", 80), ("bone", 60)],
+    "cobra":     [("raw_meat", 30), ("leather", 50), ("herb", 25), ("mana_potion", 5)],
+    # — Insekten / Kleinkram —
+    "slimelet":  [("herb", 30), ("crystal", 12), ("mana_potion", 3)],
+    "fae_mite":  [("cloth", 25), ("herb", 30), ("crystal", 10)],
+    "gloom_moth":[("cloth", 30), ("herb", 25)],
+    "ember_newt":[("bone", 20), ("crystal", 15), ("herb", 20)],
+    "ember_rat": [("bone", 35), ("raw_meat", 40), ("cloth", 8)],
+    "shadow_bat":[("bone", 45), ("leather", 25), ("raw_meat", 20)],
+    "thorn_scarab":[("bone", 30), ("cloth", 20), ("crystal", 12)],
+    "crystal_beetle":[("crystal", 50), ("bone", 20), ("silver_ore", 10)],
+    "crystal_tick":[("crystal", 35), ("bone", 15)],
+    # — Geister/Fae —
+    "frost_sprite":[("crystal", 30), ("herb", 25), ("mana_potion", 8)],
+    "fire_imp":  [("crystal", 20), ("iron_ore", 25), ("scroll", 8)],
+    "mushroom_imp":[("herb", 50), ("mushroom_food", 35), ("cloth", 20)],
+    "thornling": [("wood", 45), ("herb", 30), ("cloth", 15)],
+    # — Pflanzlich/Treant —
+    "treant":    [("wood", 90), ("herb", 35), ("apple", 30), ("crystal", 10)],
+    # — Stein/Kristall —
+    "stone_golem":[("stone", 90), ("iron_ore", 40), ("crystal", 20), ("silver_ore", 15)],
+    "crystal_golem":[("crystal", 95), ("silver_ore", 30), ("gold_ore", 15), ("mythril_ore", 10)],
+    "gargoyle":  [("stone", 60), ("crystal", 25), ("bone", 30)],
+    "bone_crawler":[("bone", 90), ("cloth", 20), ("herb", 10)],
+    # — Spinnen-Variante —
+    "giant_spider":[("cloth", 80), ("bone", 50), ("crystal", 15), ("herb", 20)],
+    # — Bosse — fette Drops mit Münzen + Equipment-Chance —
+    "minotaur":  [("raw_meat", 60), ("leather", 60), ("bone", 60),
+                  ("gold_coin", 25), ("silver_coin", 35), ("axe", 8)],
+    "harpy":     [("leather", 50), ("bone", 40), ("silver_coin", 25),
+                  ("cloth", 35), ("crystal", 15)],
+    "basilisk":  [("leather", 80), ("bone", 60), ("crystal", 40),
+                  ("mythril_ore", 15), ("gold_coin", 30), ("scroll", 15)],
+    "chimera":   [("raw_meat", 70), ("leather", 70), ("bone", 60),
+                  ("gold_coin", 40), ("crystal", 30), ("sword", 10)],
+    "griffin":   [("leather", 75), ("bone", 50), ("gold_coin", 35),
+                  ("crystal", 25), ("mythril_ore", 12)],
+    "hydra":     [("raw_meat", 80), ("bone", 70), ("leather", 60),
+                  ("gold_coin", 45), ("mythril_ore", 20), ("crystal", 40), ("scroll", 20)],
+    "manticore": [("raw_meat", 65), ("leather", 65), ("bone", 55),
+                  ("gold_coin", 35), ("crystal", 25), ("spear", 10)],
 }
 
 # Münz-Gewichte für Banditen — Bronze sehr häufig, Gold selten

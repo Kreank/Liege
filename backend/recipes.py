@@ -45,7 +45,11 @@ RECIPES = {
          "inputs": [("bone", 2), ("cloth", 1)]},
         # Sichel / Steinpickaxe — minimale Tools ohne Ingots, damit man ohne
         # geschmolzenes Metall ins Holzfäller-/Sammler-Game einsteigen kann
-        {"id": "wooden_scythe", "name": "Holzsichel",   "output": "scythe",
+        # Sichel als Tool (Ernten von Gras/Pflanzen) — günstige Anfangswaffe-Alternative
+        {"id": "wooden_sickle", "name": "Holzsichel",   "output": "sickle",
+         "inputs": [("wood", 2), ("stone", 1)]},
+        # scythe als Waffe (zweihänder) — größere Variante
+        {"id": "wooden_scythe", "name": "Sense",        "output": "scythe",
          "material": "wood",
          "inputs": [("wood", 3), ("stone", 1)]},
         {"id": "stone_pickaxe","name": "Steinspitzhacke","output": "pickaxe",

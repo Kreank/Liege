@@ -1137,7 +1137,24 @@ const STRUCTURE = {
   barrel:      { key: '', name: 'Fass',          icon: '🛢️', blocking: true,  sprite: 'prop_barrel' },
   crate:       { key: '', name: 'Kiste',         icon: '📦', blocking: true,  sprite: 'prop_crate' },
   sack:        { key: '', name: 'Sack',          icon: '🧺', blocking: false, sprite: 'prop_sack' },
-  fence:       { key: '', name: 'Zaun',          icon: '🚧', blocking: true,  sprite: 'prop_fence' },
+  fence:       { key: '', name: 'Zaun',          icon: '🚧', blocking: true,  sprite: 'fence_straight_ns' },
+  garden_gate_ew_closed: { key: '', name: 'Gartentor ↔', icon: '🚪', blocking: true,  sprite: 'garden_gate_ew_closed' },
+  garden_gate_ew_open:   { key: '', name: 'Gartentor ↔', icon: '🚪', blocking: false, sprite: 'garden_gate_ew_open' },
+  garden_gate_ns_closed: { key: '', name: 'Gartentor ↕', icon: '🚪', blocking: true,  sprite: 'garden_gate_ns_closed' },
+  garden_gate_ns_open:   { key: '', name: 'Gartentor ↕', icon: '🚪', blocking: false, sprite: 'garden_gate_ns_open' },
+  // Türen
+  door_wood:        { key: '', name: 'Holztür',         icon: '🚪', blocking: true,  sprite: 'door_wood' },
+  door_wood_open:   { key: '', name: 'Holztür offen',   icon: '🚪', blocking: false, sprite: 'door_wood_open' },
+  door_iron:        { key: '', name: 'Eisentür',        icon: '🚪', blocking: true,  sprite: 'door_iron' },
+  door_iron_open:   { key: '', name: 'Eisentür offen',  icon: '🚪', blocking: false, sprite: 'door_iron_open' },
+  door_stone:       { key: '', name: 'Steintür',        icon: '🚪', blocking: true,  sprite: 'door_stone' },
+  door_stone_open:  { key: '', name: 'Steintür offen',  icon: '🚪', blocking: false, sprite: 'door_stone_open' },
+  door_reinforced:  { key: '', name: 'Verstärkte Tür',  icon: '🚪', blocking: true,  sprite: 'door_reinforced' },
+  // Treppen
+  stairs_wood_up:    { key: '', name: 'Holztreppe hoch',  icon: '🪜', blocking: false, sprite: 'stairs_wood_up' },
+  stairs_wood_down:  { key: '', name: 'Holztreppe runter',icon: '🪜', blocking: false, sprite: 'stairs_wood_down' },
+  stairs_stone_up:   { key: '', name: 'Steintreppe hoch', icon: '🪜', blocking: false, sprite: 'stairs_stone_up' },
+  stairs_stone_down: { key: '', name: 'Steintreppe runter',icon: '🪜', blocking: false, sprite: 'stairs_stone_down' },
   // Deko: Ruinen
   ruin_pillar:   { key: '', name: 'Säule',       icon: '🏛️', blocking: true,  sprite: 'prop_ruin_pillar' },
   rubble:        { key: '', name: 'Trümmer',     icon: '⛏️', blocking: false, sprite: 'prop_rubble' },
@@ -1310,11 +1327,56 @@ const NPC_SPRITE = {
   ogre:         { sprite: 'monster_ogre',         tint: 0xffffff, label: 'Ogre' },
   necromancer:  { sprite: 'monster_necromancer',  tint: 0xffffff, label: 'Nekromant' },
   dragon_whelp: { sprite: 'monster_dragon_whelp', tint: 0xffffff, label: 'Drachling' },
+  // Welle 13 — neue Monster (asset-drop 2026-05-26)
+  stag:           { sprite: 'monster_stag',           tint: 0xffffff, label: 'Hirsch' },
+  lynx:           { sprite: 'monster_lynx',           tint: 0xffffff, label: 'Luchs' },
+  cougar:         { sprite: 'monster_cougar',         tint: 0xffffff, label: 'Puma' },
+  wolverine:      { sprite: 'monster_wolverine',      tint: 0xffffff, label: 'Vielfraß' },
+  dire_wolf:      { sprite: 'monster_dire_wolf',      tint: 0xffffff, label: 'Schreckenswolf' },
+  wolf_alpha:     { sprite: 'monster_wolf_alpha',     tint: 0xffffff, label: 'Alpha-Wolf' },
+  cave_bear:      { sprite: 'monster_cave_bear',      tint: 0xffffff, label: 'Höhlenbär' },
+  polar_bear:     { sprite: 'monster_polar_bear',     tint: 0xffffff, label: 'Eisbär' },
+  crocodile:      { sprite: 'monster_crocodile',      tint: 0xffffff, label: 'Krokodil' },
+  cobra:          { sprite: 'monster_cobra',          tint: 0xffffff, label: 'Kobra' },
+  slimelet:       { sprite: 'monster_slimelet',       tint: 0xffffff, label: 'Schleimlein' },
+  fae_mite:       { sprite: 'monster_fae_mite',       tint: 0xffffff, label: 'Feen-Milbe' },
+  gloom_moth:     { sprite: 'monster_gloom_moth',     tint: 0xffffff, label: 'Düstermotte' },
+  ember_newt:     { sprite: 'monster_ember_newt',     tint: 0xffffff, label: 'Glutmolch' },
+  ember_rat:      { sprite: 'monster_ember_rat',      tint: 0xffffff, label: 'Aschratte' },
+  shadow_bat:     { sprite: 'monster_shadow_bat',     tint: 0xffffff, label: 'Schattenfledermaus' },
+  thorn_scarab:   { sprite: 'monster_thorn_scarab',   tint: 0xffffff, label: 'Dornenkäfer' },
+  crystal_beetle: { sprite: 'monster_crystal_beetle', tint: 0xffffff, label: 'Kristallkäfer' },
+  crystal_tick:   { sprite: 'monster_crystal_tick',   tint: 0xffffff, label: 'Kristallzecke' },
+  frost_sprite:   { sprite: 'monster_frost_sprite',   tint: 0xffffff, label: 'Frostgeist' },
+  fire_imp:       { sprite: 'monster_fire_imp',       tint: 0xffffff, label: 'Feuerteufel' },
+  mushroom_imp:   { sprite: 'monster_mushroom_imp',   tint: 0xffffff, label: 'Pilzkobold' },
+  thornling:      { sprite: 'monster_thornling',      tint: 0xffffff, label: 'Dornenkind' },
+  treant:         { sprite: 'monster_treant',         tint: 0xffffff, label: 'Baumhirte' },
+  stone_golem:    { sprite: 'monster_stone_golem',    tint: 0xffffff, label: 'Steingolem' },
+  crystal_golem:  { sprite: 'monster_crystal_golem',  tint: 0xffffff, label: 'Kristallgolem' },
+  gargoyle:       { sprite: 'monster_gargoyle',       tint: 0xffffff, label: 'Gargoyle' },
+  bone_crawler:   { sprite: 'monster_bone_crawler',   tint: 0xffffff, label: 'Knochenkriecher' },
+  giant_spider:   { sprite: 'monster_giant_spider',   tint: 0xffffff, label: 'Riesenspinne' },
+  minotaur:       { sprite: 'monster_minotaur',       tint: 0xffffff, label: 'Minotaur' },
+  harpy:          { sprite: 'monster_harpy',          tint: 0xffffff, label: 'Harpyie' },
+  basilisk:       { sprite: 'monster_basilisk',       tint: 0xffffff, label: 'Basilisk' },
+  chimera:        { sprite: 'monster_chimera',        tint: 0xffffff, label: 'Chimäre' },
+  griffin:        { sprite: 'monster_griffin',        tint: 0xffffff, label: 'Greif' },
+  hydra:          { sprite: 'monster_hydra',          tint: 0xffffff, label: 'Hydra' },
+  manticore:      { sprite: 'monster_manticore',      tint: 0xffffff, label: 'Mantikor' },
 };
 const CREATURE_KINDS = new Set([
   'goblin','wolf','skeleton','spider','slime',
   'rat','bat','zombie','bandit','boar','bear',
   'ogre','necromancer','dragon_whelp',
+  // Welle 13
+  'stag','lynx','cougar','wolverine','dire_wolf','wolf_alpha',
+  'cave_bear','polar_bear','crocodile','cobra',
+  'slimelet','fae_mite','gloom_moth','ember_newt','ember_rat',
+  'shadow_bat','thorn_scarab','crystal_beetle','crystal_tick',
+  'frost_sprite','fire_imp','mushroom_imp','thornling','treant',
+  'stone_golem','crystal_golem','gargoyle','bone_crawler','giant_spider',
+  'minotaur','harpy','basilisk','chimera','griffin','hydra','manticore',
 ]);
 
 // ─── Items ───────────────────────────────────────────────────────────────────
@@ -1357,6 +1419,7 @@ const ITEM = {
   shovel:        { name: 'Schaufel',    sprite: 'item_shovel',        category: 'tool',       slot: 'tool',       path: '/assets/tools/shovel.png' },
   hammer:        { name: 'Hammer',      sprite: 'item_hammer',        category: 'tool',       slot: 'tool',       path: '/assets/tools/hammer.png' },
   hoe:           { name: 'Hacke',       sprite: 'item_hoe',           category: 'tool',       slot: 'tool',       path: '/assets/tools/hoe.png' },
+  sickle:        { name: 'Sichel',      sprite: 'item_sickle',        category: 'tool',       slot: 'tool',       path: '/assets/tools/sickle.png' },
   wood:          { name: 'Holz',        sprite: 'item_wood',          category: 'resource',                       path: '/assets/resources/wood.png' },
   stone:         { name: 'Stein',       sprite: 'item_stone',         category: 'resource',                       path: '/assets/resources/stone.png' },
   iron_ore:      { name: 'Eisenerz',    sprite: 'item_iron_ore',      category: 'resource',                       path: '/assets/resources/iron_ore.png' },
@@ -1549,6 +1612,9 @@ class WorldScene extends Phaser.Scene {
     this.activeDialog   = null;        // { npc_id, waiting: bool }
     this.selectedMaterial = 'stone';   // für Bauen: stone | wood | straw
     this.itemSprites    = {};          // key: item_id → Phaser.Image (für Boden-Items)
+    this.weatherLayers  = {};          // key: layer-name → {img, frame, count, alpha}
+    this.weatherPhase   = 'clear';     // 'clear' | 'rain' | 'snow' | 'fog' | 'swamp_mist'
+    this.weatherIntensity = 0;         // 0=clear, 1=light, 2=medium, 3=heavy, 4=peak
     this.inventory      = [];          // Spieler-Inventar [item dict, ...]
     this.inventoryOpen  = false;
     this.myHp           = 100;
@@ -1665,7 +1731,15 @@ class WorldScene extends Phaser.Scene {
     // Monster-Sprites (für Creature-NPCs + Bosse)
     for (const m of ['goblin', 'wolf', 'skeleton', 'spider', 'slime',
                      'rat', 'bat', 'zombie', 'bandit', 'boar', 'bear',
-                     'ogre', 'necromancer', 'dragon_whelp']) {
+                     'ogre', 'necromancer', 'dragon_whelp',
+                     // Welle 13
+                     'stag','lynx','cougar','wolverine','dire_wolf','wolf_alpha',
+                     'cave_bear','polar_bear','crocodile','cobra',
+                     'slimelet','fae_mite','gloom_moth','ember_newt','ember_rat',
+                     'shadow_bat','thorn_scarab','crystal_beetle','crystal_tick',
+                     'frost_sprite','fire_imp','mushroom_imp','thornling','treant',
+                     'stone_golem','crystal_golem','gargoyle','bone_crawler','giant_spider',
+                     'minotaur','harpy','basilisk','chimera','griffin','hydra','manticore']) {
       this.load.image(`monster_${m}`, `/assets/monsters/${m}.png`);
     }
     // Walk-Animation (Welle 40)
@@ -1732,6 +1806,45 @@ class WorldScene extends Phaser.Scene {
       }
       this.load.image(`floor_${material}`,
                       `/assets/building/${material}/floor.png`);
+    }
+    // Fence-Varianten (gleiches Mask-System wie Walls)
+    for (const variant of ['corner_es', 'corner_ne', 'corner_sw', 'corner_wn',
+                           'end_e', 'end_n', 'end_s', 'end_w',
+                           'straight_ew', 'straight_ns']) {
+      this.load.image(`fence_${variant}`,
+                      `/assets/props/settlement/fence_${variant}.png`);
+    }
+    // Garden-Gates (open/closed × ew/ns)
+    for (const dir of ['ew', 'ns']) {
+      for (const state of ['open', 'closed']) {
+        this.load.image(`garden_gate_${dir}_${state}`,
+                        `/assets/props/settlement/garden_gate_${dir}_${state}.png`);
+      }
+    }
+    // Türen + Treppen
+    for (const door of ['door_wood', 'door_wood_open',
+                        'door_iron', 'door_iron_open',
+                        'door_stone', 'door_stone_open',
+                        'door_reinforced']) {
+      this.load.image(door, `/assets/buildings/${door}.png`);
+    }
+    for (const stair of ['stairs_wood_up','stairs_wood_down',
+                         'stairs_stone_up','stairs_stone_down']) {
+      this.load.image(stair, `/assets/buildings/${stair}.png`);
+    }
+    // Wetter-Frames (stapelbar: light < medium < heavy < downpour/blizzard)
+    const WEATHER_FRAMES = {
+      rain_light: 6, rain_medium: 6, rain_heavy: 6, rain_downpour: 6,
+      snow_light: 6, snow_medium: 6, snow_heavy: 6, snow_blizzard: 6,
+      fog_light: 6, fog_dense: 6,
+      swamp_mist: 6,
+      storm_lightning: 4,
+    };
+    for (const [name, count] of Object.entries(WEATHER_FRAMES)) {
+      for (let f = 1; f <= count; f++) {
+        this.load.image(`weather_${name}_${f}`,
+                        `/assets/animations/weather/${name}_${f}.png`);
+      }
     }
     this.load.on('loaderror', (file) => {
       console.debug('Asset noch nicht da:', file.src);
@@ -2563,6 +2676,10 @@ class WorldScene extends Phaser.Scene {
         if (msg.by !== MY_ID) {
           // Optional: kleines Hinweis-Toast
         }
+        break;
+
+      case 'weather':
+        this.setWeather(msg.phase, msg.intensity);
         break;
 
       case 'inventory_add':
@@ -3957,6 +4074,58 @@ class WorldScene extends Phaser.Scene {
     }
   }
 
+  // — Wetter ——————————————————————————————————————————————————————
+  // Stapelbares Layer-System: stärkeres Wetter = mehr Layer übereinander.
+  //   rain    intensity 1=light, 2=+medium, 3=+heavy, 4=+downpour (+lightning)
+  //   snow    intensity 1=light, 2=+medium, 3=+heavy, 4=+blizzard
+  //   fog     intensity 1=light, 2=+dense
+  //   swamp_mist intensity 1+ = single layer
+  setWeather(phase, intensity) {
+    this.weatherPhase = phase || 'clear';
+    this.weatherIntensity = Math.max(0, Math.min(4, intensity || 0));
+    this._clearWeatherLayers();
+    if (this.weatherPhase === 'clear' || this.weatherIntensity === 0) return;
+    const stack = {
+      rain: ['rain_light','rain_medium','rain_heavy','rain_downpour'],
+      snow: ['snow_light','snow_medium','snow_heavy','snow_blizzard'],
+      fog:  ['fog_light','fog_dense'],
+      swamp_mist: ['swamp_mist'],
+    }[this.weatherPhase] || [];
+    for (let i = 0; i < Math.min(this.weatherIntensity, stack.length); i++) {
+      this._addWeatherLayer(stack[i], 6, 0.35 + 0.15 * i);
+    }
+    // Storm-Lightning als Spitze bei Regen-Peak
+    if (this.weatherPhase === 'rain' && this.weatherIntensity >= 4) {
+      this._addWeatherLayer('storm_lightning', 4, 0.55);
+    }
+  }
+
+  _addWeatherLayer(name, frameCount, alpha) {
+    const w = this.scale.width, h = this.scale.height;
+    const img = this.add.image(0, 0, `weather_${name}_1`).setOrigin(0, 0);
+    img.setScrollFactor(0).setDepth(200).setAlpha(alpha).setDisplaySize(w, h);
+    const state = { img, frame: 1, count: frameCount };
+    const timer = this.time.addEvent({
+      delay: 130, loop: true,
+      callback: () => {
+        if (!state.img.active) return;
+        state.frame = state.frame % state.count + 1;
+        state.img.setTexture(`weather_${name}_${state.frame}`);
+      },
+    });
+    state.timer = timer;
+    this.weatherLayers[name] = state;
+  }
+
+  _clearWeatherLayers() {
+    for (const k of Object.keys(this.weatherLayers)) {
+      const s = this.weatherLayers[k];
+      s.timer && s.timer.remove();
+      s.img && s.img.destroy();
+    }
+    this.weatherLayers = {};
+  }
+
   toggleInventory() {
     if (this.activeDialog) return;
     this.inventoryOpen = !this.inventoryOpen;
@@ -4191,9 +4360,10 @@ class WorldScene extends Phaser.Scene {
     for (const s of Object.values(this.structSprites)) s.destroy();
     this.structSprites = {};
     for (const s of Object.values(this.structures)) this.addStructureSprite(s, false);
-    // Nach dem Setzen aller Sprites Wand-Orientierungen ausrichten
+    // Nach dem Setzen aller Sprites Wand-/Fence-Orientierungen ausrichten
     for (const s of Object.values(this.structures)) {
-      if (s.type === 'wall') this.updateWallOrientation(s.x, s.y);
+      if (s.type === 'wall')  this.updateWallOrientation(s.x, s.y);
+      if (s.type === 'fence') this.updateFenceOrientation(s.x, s.y);
     }
   }
 
@@ -4228,6 +4398,14 @@ class WorldScene extends Phaser.Scene {
         this.updateWallOrientation(s.x, s.y - 1);
         this.updateWallOrientation(s.x, s.y + 1);
       }
+    } else if (s.type === 'fence') {
+      this.updateFenceOrientation(s.x, s.y);
+      if (refreshNeighbors) {
+        this.updateFenceOrientation(s.x - 1, s.y);
+        this.updateFenceOrientation(s.x + 1, s.y);
+        this.updateFenceOrientation(s.x, s.y - 1);
+        this.updateFenceOrientation(s.x, s.y + 1);
+      }
     }
   }
 
@@ -4237,11 +4415,15 @@ class WorldScene extends Phaser.Scene {
       this.structSprites[key].destroy();
       delete this.structSprites[key];
     }
-    // Nachbar-Wände neu ausrichten, jetzt wo diese weg ist
+    // Nachbar-Wände/Fences neu ausrichten, jetzt wo diese weg ist
     this.updateWallOrientation(x - 1, y);
     this.updateWallOrientation(x + 1, y);
     this.updateWallOrientation(x, y - 1);
     this.updateWallOrientation(x, y + 1);
+    this.updateFenceOrientation(x - 1, y);
+    this.updateFenceOrientation(x + 1, y);
+    this.updateFenceOrientation(x, y - 1);
+    this.updateFenceOrientation(x, y + 1);
   }
 
   shakeStructure(x, y) {
@@ -4284,6 +4466,25 @@ class WorldScene extends Phaser.Scene {
     if (this.textures.exists(stone)) return stone;
     // Legacy-Fallback
     return 'struct_wall';
+  }
+
+  updateFenceOrientation(x, y) {
+    const s = this.structures[`${x},${y}`];
+    if (!s || s.type !== 'fence') return;
+    const img = this.structSprites[`${x},${y}`];
+    if (!img) return;
+    // Mask wie bei Walls — Fences connecten auch an garden_gates
+    const isConnector = (t) => t === 'fence'
+                            || t === 'garden_gate_ew_closed' || t === 'garden_gate_ew_open'
+                            || t === 'garden_gate_ns_closed' || t === 'garden_gate_ns_open';
+    let mask = 0;
+    if (isConnector(this.structures[`${x},${y - 1}`]?.type)) mask |= 1;  // N
+    if (isConnector(this.structures[`${x + 1},${y}`]?.type)) mask |= 2;  // E
+    if (isConnector(this.structures[`${x},${y + 1}`]?.type)) mask |= 4;  // S
+    if (isConnector(this.structures[`${x - 1},${y}`]?.type)) mask |= 8;  // W
+    const variant = WALL_MASK_TO_VARIANT[mask] || 'straight_ns';
+    const key = `fence_${variant}`;
+    if (this.textures.exists(key)) img.setTexture(key);
   }
 
   drawWorld() {

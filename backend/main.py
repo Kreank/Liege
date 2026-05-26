@@ -34,6 +34,7 @@ import respawn_worker
 import skills
 import raid_director
 import time_system
+import weather_worker
 import quests
 import status_effects
 import talents
@@ -96,6 +97,7 @@ async def lifespan(app: FastAPI):
     mood_task = asyncio.create_task(npc_mood.run(npcs, manager))
     raid_task = asyncio.create_task(raid_director.run(world, npcs, manager, events))
     time_task = asyncio.create_task(time_system.run(manager))
+    weather_task = asyncio.create_task(weather_worker.weather_loop(manager))
     status_task = asyncio.create_task(
         status_effects.run(manager, damage_player, heal_player)
     )
@@ -254,7 +256,7 @@ async def get_equipped_tool_kind(player_name: str) -> str | None:
 TOOL_FOR_SKILL = {
     "mining":       {"pickaxe"},
     "woodcutting":  {"axe"},
-    "gathering":    {"scythe", "hoe", "shovel"},  # Sichel (weapon) oder Hacke/Schaufel (tool)
+    "gathering":    {"sickle", "scythe", "hoe", "shovel"},  # Sichel (tool), Sense (weapon), oder Hacke/Schaufel
     "construction": {"hammer"},
 }
 

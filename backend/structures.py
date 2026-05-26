@@ -53,6 +53,24 @@ STRUCTURE_TYPES = {
     "crate":       {"blocking": True},
     "sack":        {"blocking": False},
     "fence":       {"blocking": True},
+    # Garden-Gates: zwei Richtungen (ew/ns), zwei Zustände (open/closed)
+    "garden_gate_ew_closed": {"blocking": True},
+    "garden_gate_ew_open":   {"blocking": False},
+    "garden_gate_ns_closed": {"blocking": True},
+    "garden_gate_ns_open":   {"blocking": False},
+    # Türen — open/closed pro Material
+    "door_wood":         {"blocking": True},
+    "door_wood_open":    {"blocking": False},
+    "door_iron":         {"blocking": True},
+    "door_iron_open":    {"blocking": False},
+    "door_stone":        {"blocking": True},
+    "door_stone_open":   {"blocking": False},
+    "door_reinforced":   {"blocking": True},
+    # Treppen — auf/ab pro Material (laufbar wie Floor)
+    "stairs_wood_up":    {"blocking": False},
+    "stairs_wood_down":  {"blocking": False},
+    "stairs_stone_up":   {"blocking": False},
+    "stairs_stone_down": {"blocking": False},
     # Deko: Ruinen
     "ruin_pillar":    {"blocking": True},
     "rubble":         {"blocking": False},

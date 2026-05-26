@@ -47,6 +47,7 @@ ITEM_KINDS = {
     "shovel":  {"category": "tool", "name": "Schaufel",   "slot": "tool", "sprite": "/assets/tools/shovel.png"},
     "hammer":  {"category": "tool", "name": "Hammer",     "slot": "tool", "sprite": "/assets/tools/hammer.png"},
     "hoe":     {"category": "tool", "name": "Hacke",      "slot": "tool", "sprite": "/assets/tools/hoe.png"},
+    "sickle":  {"category": "tool", "name": "Sichel",     "slot": "tool", "sprite": "/assets/tools/sickle.png"},
     # Ressourcen
     "wood":         {"category": "resource", "name": "Holz",          "sprite": "/assets/resources/wood.png"},
     "stone":        {"category": "resource", "name": "Stein",         "sprite": "/assets/resources/stone.png"},
