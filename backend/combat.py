@@ -181,32 +181,46 @@ def manhattan(ax: int, ay: int, bx: int, by: int) -> int:
     return abs(ax - bx) + abs(ay - by)
 
 
-# Effekte beim Use eines Consumables / Lebensmittels
-# (Hunger-Restoration läuft separat über needs.FOOD_RESTORE)
+# Effekte beim Use eines Consumables / Lebensmittels.
+# Hunger-Restoration läuft separat über needs.FOOD_RESTORE.
+# HP-Werte koordiniert mit needs.py:
+#   - Tränke sind Spezialisten (HP/Mana primär, kaum Sättigung)
+#   - Vitaminreich (Pilze, Kohl, Kürbis) → mehr HP
+#   - Reine Stärke-Sättigung (Kartoffel, Mais) → moderater HP
+#   - Snacks (Beeren) → kleiner HP
 USE_EFFECTS = {
+    # Tränke
     "health_potion": {"hp": 30},
     "mana_potion":   {"mana": 30},
     "herb":          {"hp": 5},
-    # Beeren: kleiner HP-Boost dazu — Vitamine
+    # Beeren — alle gleich
     "strawberry":    {"hp": 2},
     "blueberry":     {"hp": 2},
     "blackberry":    {"hp": 2},
     "raspberry":     {"hp": 2},
-    # Obst: etwas mehr HP
+    "berries":       {"hp": 2},
+    # Obst
     "apple":         {"hp": 3},
     "pear":          {"hp": 3},
-    "plum":          {"hp": 3},
+    "plum":          {"hp": 2},
     "cherry":        {"hp": 2},
-    # Gegartes ist im needs.py separat — hier nur rohes Obst/Gemüse
+    # Pilze
+    "mushroom_food": {"hp": 3},
+    # Gemüse — größer / vitaminreicher = mehr HP
     "carrot":        {"hp": 2},
     "tomato":        {"hp": 2},
-    "cabbage":       {"hp": 4},
+    "potato":        {"hp": 2},
+    "cabbage":       {"hp": 3},
+    "corn":          {"hp": 3},
     "pumpkin":       {"hp": 5},
-    "corn":          {"hp": 4},
-    "cooked_meat":   {"hp": 8},    # gegartes Fleisch heilt mehr
+    # cucumber + onion bleiben pure Sättigung (kein HP)
+    # Fleisch / Fisch
     "fish":          {"hp": 4},
+    # raw_meat: kein HP (roh, sättigt aber heilt nicht)
+    # Verarbeitet
     "bread":         {"hp": 4},
     "food_ration":   {"hp": 6},
+    "cooked_meat":   {"hp": 8},
 }
 
 # Spells aus Magic-Items

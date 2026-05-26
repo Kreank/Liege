@@ -22,44 +22,49 @@ HUNGER_STARVE_HP_DAMAGE: int = 2
 STAMINA_REGEN_PER_TICK: int = 5
 SLEEP_STAMINA_RESTORE: int = 100
 
-# Welche Items füllen Hunger auf (0 oder Abwesenheit => kein Food)
+# Welche Items füllen Hunger auf (0 oder Abwesenheit => kein Food).
+# Balance-Achsen:
+#   - Größe → Sättigung (Beere 10, Apfel 16, Kohl 20, Kürbis 28, gegartes
+#     Fleisch 50)
+#   - Verarbeitung → Bonus (gegart > roh; Brot 38 vs Weizen 5)
+#   - Tränke sind Spezialisten: kleine Sättigung, dafür großer HP/Mana-Effekt
 FOOD_RESTORE: dict[str, int] = {
-    "herb": 8,
-    "health_potion": 30,
-    "mana_potion": 20,
-    # Echte Foods
-    "apple":         15,
-    "berries":       12,
-    "wheat":         8,
-    "bread":         40,    # verarbeitet, sehr sättigend
-    "raw_meat":      18,    # rohes Fleisch
-    "cooked_meat":   45,    # gegart noch sättigender
-    "fish":          25,
-    "mushroom_food": 20,
-    "food_ration":   35,    # Proviant — gut sättigend, lange haltbar
-    # — Farming-Drop 2026-05-26 — frisch geerntet —
-    # Beeren: schnelle Snacks
+    # Tränke / Kraut
+    "herb":           6,
+    "health_potion": 25,
+    "mana_potion":   15,
+    # Beeren — alle gleich (4× Snack)
     "strawberry":    10,
     "blueberry":     10,
-    "blackberry":    11,
+    "blackberry":    10,
     "raspberry":     10,
-    # Obstbäume: mittel sättigend
-    "pear":          15,
-    "plum":          14,
-    "cherry":        12,
-    # Feldfrüchte: roh, gut sättigend
-    "carrot":        12,
-    "potato":        15,
+    "berries":       10,    # Legacy-Alias
+    # Obst
+    "apple":         16,
+    "pear":          16,
+    "plum":          12,
+    "cherry":        10,
+    # Pilze
+    "mushroom_food": 18,
+    # Feldfrüchte — sortiert nach Größe
+    "wheat":          5,    # Rohstoff, kaum essbar
     "cucumber":      10,
-    "tomato":        12,
     "onion":         10,
-    "cabbage":       18,
-    "pumpkin":       25,   # groß und sehr sättigend
-    "corn":          20,
-    "wood": 0,
-    "stone": 0,
-    "iron_ore": 0,
-    "bone": 0,
+    "carrot":        12,
+    "tomato":        12,
+    "potato":        18,
+    "cabbage":       20,
+    "corn":          22,
+    "pumpkin":       28,
+    # Fleisch / Fisch
+    "raw_meat":      16,    # Sättigend, aber kein HP
+    "fish":          22,
+    # Verarbeitet — höchste Sättigung
+    "bread":         38,
+    "food_ration":   35,
+    "cooked_meat":   50,
+    # Nicht-Food (explizit 0)
+    "wood": 0, "stone": 0, "iron_ore": 0, "bone": 0, "plant_fiber": 0,
 }
 
 
