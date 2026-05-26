@@ -249,13 +249,51 @@ async def get_equipped_tool_kind(player_name: str) -> str | None:
     return row["kind"] if row else None
 
 
-# Welche Tools welchem Skill helfen
+# Welche Tools/Waffen welchem Harvest-Skill genügen
+# Werden gegen items.equipped_slot IN ('tool', 'weapon') geprüft.
 TOOL_FOR_SKILL = {
     "mining":       {"pickaxe"},
-    "woodcutting":  {"axe"},          # Axt ist im weapon-slot, prüfen wir separat
-    "gathering":    {"shovel", "hoe"},
+    "woodcutting":  {"axe"},
+    "gathering":    {"scythe", "hoe", "shovel"},  # Sichel (weapon) oder Hacke/Schaufel (tool)
     "construction": {"hammer"},
 }
+
+# Welche Strukturen welches Tool brauchen.
+# Mapping prop_type → skill_name. Default ist "gathering" (Sichel/Hacke).
+PROP_SKILL = {
+    # Holz → Axt
+    "tree_oak": "woodcutting", "tree_pine": "woodcutting", "tree_dead": "woodcutting",
+    "tree_stump": "woodcutting", "fallen_log": "woodcutting", "palm_tree": "woodcutting",
+    "swamp_log": "woodcutting",
+    "broken_cart": "woodcutting", "barrel": "woodcutting", "crate": "woodcutting",
+    "fence": "woodcutting", "dock_straight": "woodcutting", "dock_corner": "woodcutting",
+    "wooden_bridge": "woodcutting", "shipwreck": "woodcutting", "boat_small": "woodcutting",
+    "driftwood": "woodcutting", "camp_tent": "woodcutting",
+    # Stein → Spitzhacke
+    "rock_small": "mining", "rock_large": "mining", "rock_mossy": "mining",
+    "ruin_pillar": "mining", "rubble": "mining", "statue_broken": "mining",
+    "gravestone": "mining", "lava_rock": "mining", "snow_rock": "mining",
+    "ice_crystal": "mining", "anchor": "mining", "cooking_pot": "mining",
+    # Pflanzen/Stoff → Sichel/Hacke/Schaufel
+    "bush": "gathering", "tall_grass": "gathering", "flowers": "gathering",
+    "mushrooms": "gathering", "reeds": "gathering", "lily_pads": "gathering",
+    "sack": "gathering", "fishing_net": "gathering",
+    "cactus": "gathering", "desert_skull": "gathering", "dry_bush": "gathering",
+    "jungle_flower": "gathering", "jungle_vines": "gathering",
+    "frozen_bush": "gathering", "swamp_bubbles": "gathering",
+    "bones_scatter": "gathering",
+}
+
+# Tool-Hint-Text pro Skill für UI-Feedback
+TOOL_HINT = {
+    "mining":      "⛏️ Du brauchst eine Spitzhacke",
+    "woodcutting": "🪓 Du brauchst eine Axt",
+    "gathering":   "🌿 Du brauchst eine Sichel oder Hacke",
+}
+
+# Basic-Props die OHNE Tool harvestbar bleiben — wichtig damit neue Spieler
+# überhaupt Wood/Stone für die ersten Tools bekommen.
+NO_TOOL_PROPS = {"tree_stump", "fallen_log", "rubble", "driftwood"}
 
 
 async def has_tool_for_skill(player_name: str, skill: str) -> bool:
@@ -1043,20 +1081,20 @@ async def websocket_endpoint(websocket: WebSocket):
                     })
                     continue
                 if harvest.is_harvestable(s["type"]):
-                    # Skill bestimmen + Bonus-Drop wenn skill hoch
-                    if s["type"].startswith("tree_") or s["type"] == "fallen_log":
-                        skill_name = "woodcutting"
-                    elif s["type"].startswith("rock_"):
-                        skill_name = "mining"
-                    elif s["type"] in ("ruin_pillar", "rubble", "statue_broken", "gravestone"):
-                        skill_name = "mining"
-                    else:
-                        skill_name = "gathering"
+                    # Skill bestimmen — explizites Mapping mit Fallback gathering
+                    skill_name = PROP_SKILL.get(s["type"], "gathering")
+                    has_tool = await has_tool_for_skill(player_id, skill_name)
+                    if not has_tool and s["type"] not in NO_TOOL_PROPS:
+                        # Kein passendes Tool und kein freebie-Prop: Hinweis und abbrechen
+                        await websocket.send_json({
+                            "type": "toast",
+                            "text": TOOL_HINT.get(skill_name, "Du brauchst das passende Werkzeug"),
+                        })
+                        continue
                     skill_level = await skills.get_skill_level(player_id, skill_name)
                     yield_bonus = skills.harvest_yield_bonus(skill_level)
-                    has_tool = await has_tool_for_skill(player_id, skill_name)
                     talent_effects_h = await talents.aggregate_effects(player_id)
-                    damage_amount = 2 if has_tool else 1
+                    damage_amount = 2
                     # Talent: extra damage am structure
                     if skill_name == "mining":
                         damage_amount += int(talent_effects_h.get("mining_extra_damage", 0))

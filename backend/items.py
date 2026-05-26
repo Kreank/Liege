@@ -69,6 +69,10 @@ ITEM_KINDS = {
     "bone":         {"category": "resource", "name": "Knochen",       "sprite": "/assets/resources/bone.png"},
     "cloth":        {"category": "resource", "name": "Stoff",         "sprite": "/assets/resources/cloth.png"},
     "leather":      {"category": "resource", "name": "Leder",         "sprite": "/assets/resources/leather.png"},
+    # Münzen — von Banditen/NPCs als Loot
+    "copper_coin":  {"category": "resource", "name": "Kupfermünze",   "sprite": "/assets/currency/coin_copper.png"},
+    "silver_coin":  {"category": "resource", "name": "Silbermünze",   "sprite": "/assets/currency/coin_silver.png"},
+    "gold_coin":    {"category": "resource", "name": "Goldmünze",     "sprite": "/assets/currency/coin_gold.png"},
 }
 
 EQUIP_SLOTS = ["weapon", "helmet", "chestplate", "shield", "boots", "ring", "amulet", "tool"]

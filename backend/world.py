@@ -95,17 +95,27 @@ class World:
 
     # — Noise-Layer (großflächige Frequenzen für kohärente Biome) ——————————
 
+    # Distance vom Äquator (y=0) bis zum Pol in tiles. Innerhalb dieser Distanz
+    # geht das Klima von "tropisch" zu "polar". Größerer Wert = sanftere Übergänge.
+    EQUATOR_TO_POLE = 600
+
     def height(self, x: int, y: int) -> float:
         return _fbm(x * 0.012, y * 0.012, self.seed * 1 + 100, octaves=5,
                     persistence=0.55)
 
     def moisture(self, x: int, y: int) -> float:
+        # Pures Noise mit moderater Skala — damit Wüsten/Dschungel-Patches
+        # sich gut von Klima-Zonen abheben (nicht gerade Linien).
         return _fbm(x * 0.018, y * 0.018, self.seed * 1 + 200, octaves=4)
 
     def temperature(self, x: int, y: int) -> float:
-        # leichte Latitude-Gradient (y-axis), gekreuzt mit Noise
-        base = _fbm(x * 0.010, y * 0.010, self.seed * 1 + 300, octaves=3)
-        return max(0.0, min(1.0, base))
+        """Klimazonen: heiß am Äquator (y=0), kalt an den Polen (|y|>=EQUATOR_TO_POLE).
+        Plus fbm-Noise damit die Übergänge nicht als gerade Linien wirken."""
+        lat_norm = min(1.0, abs(y) / self.EQUATOR_TO_POLE)  # 0=Äquator, 1+=Pol
+        climate = 1.0 - lat_norm  # 1.0=heiß, 0.0=eiskalt
+        # Noise-Overlay sorgt für unregelmäßige Übergangsgrenzen
+        noise = _fbm(x * 0.010, y * 0.010, self.seed * 1 + 300, octaves=3)
+        return max(0.0, min(1.0, 0.65 * climate + 0.35 * noise))
 
     def fertility(self, x: int, y: int) -> float:
         """Density-Map für Vegetation."""

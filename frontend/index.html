@@ -92,18 +92,20 @@
     }
     #stamina-fill { height: 100%; width: 100%; background: linear-gradient(to right, #205020, #50a050); transition: width 0.3s; }
     #stamina-text { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 9px; line-height: 12px; text-shadow: 1px 1px 2px #000; font-family: monospace; }
-    /* Body-Parts (Welle 4) */
+    /* Body-Parts — oben rechts, weg von Chronik */
     #body-parts {
-      position: fixed; top: 112px; left: 12px; z-index: 10;
-      width: 220px;
-      display: flex; flex-direction: column; gap: 2px;
+      position: fixed; top: 60px; right: 12px; z-index: 30;
+      width: 200px;
+      display: flex; flex-direction: column; gap: 3px;
+      background: rgba(0,0,0,0.45); padding: 6px; border: 1px solid #555;
     }
     .bp-row {
-      position: relative; height: 9px; background: rgba(0,0,0,0.55);
+      position: relative; height: 16px; background: rgba(0,0,0,0.6);
       border: 1px solid #707080;
     }
     .bp-fill { height: 100%; background: linear-gradient(to right, #802020, #d04040); transition: width 0.3s; }
-    .bp-label { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 8px; line-height: 9px; text-shadow: 1px 1px 1px #000; font-family: monospace; }
+    .bp-label { position: absolute; inset: 0; text-align: center; color: #fff;
+      font-size: 11px; line-height: 16px; text-shadow: 1px 1px 1px #000; font-family: monospace; }
 
     /* Skills-Panel */
     #skills-overlay {
@@ -447,10 +449,10 @@
     .palette-btn .palette-key { color: #e8d870; font-weight: bold; margin-left: 2px; }
     .palette-btn .palette-icon { font-size: 14px; }
 
-    /* Chronik-Panel links — letzte Welt-Events */
+    /* Chronik-Panel — links unten, weg von Vitals/Body-Parts oben */
     #chronik {
-      position: fixed; left: 12px; top: 60px; z-index: 10;
-      width: 280px; max-height: 60vh;
+      position: fixed; left: 12px; bottom: 120px; z-index: 10;
+      width: 280px; max-height: 40vh;
       background: rgba(0,0,0,0.65); border: 1px solid #555;
       color: #c8b88a; font-size: 11px;
       display: flex; flex-direction: column;
@@ -482,8 +484,9 @@
     #chronik.collapsed #chronik-list { display: none; }
     @media (max-width: 720px) {
       #chronik {
-        left: 8px; top: 100px;
+        left: 8px; bottom: 100px; top: auto;
         width: calc(50vw - 12px); max-width: 240px;
+        max-height: 30vh;
         font-size: 10px;
       }
       #chronik-header { padding: 12px; min-height: 40px; }
@@ -809,7 +812,13 @@
       #mana-bar { top: 48px !important; }
       #hunger-bar { top: 64px !important; height: 11px !important; }
       #stamina-bar { top: 77px !important; height: 11px !important; }
-      #body-parts { display: none; }  /* zu klein zum Lesen, später bessere Lösung */
+      /* Body-Parts auf Mobile: oben rechts, kompakter */
+      #body-parts {
+        top: 60px !important; right: 8px !important; left: auto !important;
+        width: 140px !important; padding: 4px !important; gap: 2px !important;
+      }
+      #body-parts .bp-row { height: 13px !important; }
+      #body-parts .bp-label { font-size: 9px !important; line-height: 13px !important; }
       /* Minimap kleiner */
       #minimap {
         width: 84px !important; height: 84px !important;
@@ -1368,6 +1377,9 @@ const ITEM = {
   bone:          { name: 'Knochen',     sprite: 'item_bone',          category: 'resource',                       path: '/assets/resources/bone.png' },
   cloth:         { name: 'Stoff',       sprite: 'item_cloth',         category: 'resource',                       path: '/assets/resources/cloth.png' },
   leather:       { name: 'Leder',       sprite: 'item_leather',       category: 'resource',                       path: '/assets/resources/leather.png' },
+  copper_coin:   { name: 'Kupfermünze', sprite: 'item_copper_coin',   category: 'resource',                       path: '/assets/currency/coin_copper.png' },
+  silver_coin:   { name: 'Silbermünze', sprite: 'item_silver_coin',   category: 'resource',                       path: '/assets/currency/coin_silver.png' },
+  gold_coin:     { name: 'Goldmünze',   sprite: 'item_gold_coin',     category: 'resource',                       path: '/assets/currency/coin_gold.png' },
 };
 const EQUIP_SLOTS = [
   { key: 'weapon',     label: 'Waffe' },
@@ -1476,10 +1488,17 @@ class WorldScene extends Phaser.Scene {
     this.myTileX        = 0;
     this.myTileY        = 0;
     // Pixel-Movement (kontinuierlich, smooth)
+    // Hitbox-Best-Practice für tile-based 2D top-down (Stardew, Pokémon, RimWorld):
+    //  • Movement-Hitbox ist KLEINER als das Sprite (forgiveness, "fair feels")
+    //  • Combat-Range wird tile-basiert geprüft (Manhattan/Chebyshev), nicht pixel-perfect
+    //  • Origin am Sprite-Mittelpunkt für sauberes Z-Order
+    //  • Tap-Targets (Items, NPCs) min. 32×32 px für Mobile (Apple HIG/Material)
+    // → collisionHalf 14px (44% von TILE_SIZE) statt 50% — Player rutscht durch enge Lücken,
+    //   Treffer fühlt sich "knapp aber fair" an
     this.myPx           = 0;
     this.myPy           = 0;
     this.moveSpeed      = 240;        // px/sec
-    this.collisionHalf  = 16;         // px Hitbox-Radius (TILE_SIZE * 0.25) — schlanker
+    this.collisionHalf  = 14;         // px Hitbox-Radius (≈44% TILE_SIZE) — forgiveness
     this.ws             = null;
     this.wasd           = null;
     this.tileSprites    = {};          // key: "x,y" → Phaser.Image für Welt-Tiles
@@ -3872,7 +3891,9 @@ class WorldScene extends Phaser.Scene {
     const cx = item.x * TILE_SIZE + TILE_SIZE / 2;
     const cy = item.y * TILE_SIZE + TILE_SIZE / 2;
     const img = this.add.image(cx, cy, itemSpriteKey(this, item)).setOrigin(0.5);
-    img.setDisplaySize(TILE_SIZE * 0.5, TILE_SIZE * 0.5);  // Items kleiner als Tiles
+    // Hitbox-Best-Practice: Ground-Items größer rendern als Standard 0.5 — bessere
+    // Visibility + Mobile-Tap-Target (mind. ~24×24 px sichtbares Sprite-Area).
+    img.setDisplaySize(TILE_SIZE * 0.75, TILE_SIZE * 0.75);
     img.setDepth(2);  // über Strukturen (1), unter Charakteren (3)
     // Für Pickup-Click: Item-ID und Tile-Koordinaten am Sprite hinterlegen
     img._itemId = item.id;

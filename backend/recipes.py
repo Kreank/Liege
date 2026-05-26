@@ -43,6 +43,13 @@ RECIPES = {
         # Schmuck (kein material)
         {"id": "bone_amulet",   "name": "Knochenamulett","output": "amulet",
          "inputs": [("bone", 2), ("cloth", 1)]},
+        # Sichel / Steinpickaxe — minimale Tools ohne Ingots, damit man ohne
+        # geschmolzenes Metall ins Holzfäller-/Sammler-Game einsteigen kann
+        {"id": "wooden_scythe", "name": "Holzsichel",   "output": "scythe",
+         "material": "wood",
+         "inputs": [("wood", 3), ("stone", 1)]},
+        {"id": "stone_pickaxe","name": "Steinspitzhacke","output": "pickaxe",
+         "inputs": [("wood", 2), ("stone", 3)]},
     ],
     "furnace": [
         # Ingot-Schmelze (nur was wir als Erz haben)

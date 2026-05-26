@@ -7,6 +7,7 @@ import random
 
 import combat
 import llm
+from world import GRASS, FOREST, MOUNTAIN, DESERT, JUNGLE, LAVA, SNOW, SWAMP, SAND
 
 log = logging.getLogger("liege.npc_worker")
 
@@ -14,9 +15,26 @@ INITIAL_NPC_COUNT = int(os.environ.get("INITIAL_NPC_COUNT", "20"))
 # Periodisches Creature-Respawn: hält die Welt belebt nach Tötungen
 MIN_CREATURE_COUNT = int(os.environ.get("MIN_CREATURE_COUNT", "30"))
 CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "45"))
-# Gruppen-Spawn: pro Respawn-Tick bis zu N Creatures (Gruppen statt einzeln)
-CREATURE_GROUP_SIZE_MIN = int(os.environ.get("CREATURE_GROUP_SIZE_MIN", "2"))
-CREATURE_GROUP_SIZE_MAX = int(os.environ.get("CREATURE_GROUP_SIZE_MAX", "5"))
+
+# Pro Creature-Kind: typische Gruppengröße + bevorzugte Biome.
+# biomes=None bedeutet "überall walkable". Group-Size (min, max) inklusiv.
+CREATURE_SPAWN_PROFILE = {
+    "boar":         {"group": (3, 5),  "biomes": {GRASS, FOREST, JUNGLE}},
+    "bandit":       {"group": (2, 6),  "biomes": None},
+    "goblin":       {"group": (5, 10), "biomes": None},
+    "wolf":         {"group": (2, 4),  "biomes": {GRASS, FOREST, SNOW}},
+    "spider":       {"group": (1, 1),  "biomes": None},        # Einzelgänger
+    "skeleton":     {"group": (1, 3),  "biomes": {SWAMP, DESERT, SNOW}},
+    "rat":          {"group": (2, 5),  "biomes": None},
+    "bat":          {"group": (1, 3),  "biomes": {FOREST, JUNGLE}},
+    "zombie":       {"group": (1, 4),  "biomes": {SWAMP, DESERT}},
+    "bear":         {"group": (1, 2),  "biomes": {FOREST, SNOW}},
+    "slime":        {"group": (1, 3),  "biomes": {SWAMP, JUNGLE}},
+    # Bosse — überwiegend solo, in extremen Gebieten
+    "ogre":         {"group": (1, 1),  "biomes": {SNOW, DESERT}},
+    "necromancer":  {"group": (1, 1),  "biomes": {SWAMP, DESERT}},
+    "dragon_whelp": {"group": (1, 1),  "biomes": {SNOW, DESERT}},  # nahe Berge/Lava
+}
 FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier",
                   "mage", "farmer", "villager", "guard", "healer",
                   "quest_giver", "blacksmith"]
@@ -89,16 +107,28 @@ def _identity_prompt(kind: str) -> str:
     )
 
 
-async def _find_spawn_position(world, connection_manager=None) -> tuple[int, int]:
-    """Findet ein walkbares Tile in der Nähe eines aktiven Spielers (sonst nahe Welt-Mitte)."""
-    # Welt-Mitte als Fallback wenn keine Spieler online
+async def _find_spawn_position(world, connection_manager=None,
+                               biomes: set[int] | None = None) -> tuple[int, int]:
+    """Findet ein walkbares Tile in der Nähe eines aktiven Spielers (sonst nahe Welt-Mitte).
+    Wenn `biomes` gegeben: bevorzugt Tiles dieser Biome; fällt nach Versuchen auf
+    irgendein walkbares Tile zurück."""
     center_x, center_y = 60, 40
     if connection_manager is not None:
         players = connection_manager.get_players()
         if players:
             p = random.choice(list(players.values()))
             center_x, center_y = p["x"], p["y"]
-    # Random offset 5-25 Tiles vom Spieler weg (außer Sichtweite, aber nahe)
+    # Erst Versuch mit Biome-Match
+    if biomes:
+        for _ in range(160):
+            angle = random.random() * 6.283
+            dist = random.randint(8, 30)
+            x = center_x + int(math.cos(angle) * dist)
+            y = center_y + int(math.sin(angle) * dist)
+            tile = await world.tile_at(x, y)
+            if tile in biomes:
+                return x, y
+    # Fallback: irgendein walkbares Tile
     for _ in range(200):
         angle = random.random() * 6.283
         dist = random.randint(8, 25)
@@ -110,7 +140,18 @@ async def _find_spawn_position(world, connection_manager=None) -> tuple[int, int
     return s["x"], s["y"]
 
 
-async def spawn_one(world, npc_manager, connection_manager, kind: str | None = None) -> dict | None:
+async def _find_nearby_walkable(world, cx: int, cy: int, radius: int = 3) -> tuple[int, int]:
+    """Findet ein walkbares Tile im Quadrat radius um (cx, cy) — für Gruppen-Spawning."""
+    for _ in range(50):
+        x = cx + random.randint(-radius, radius)
+        y = cy + random.randint(-radius, radius)
+        if await world.is_walkable(x, y):
+            return x, y
+    return cx, cy
+
+
+async def spawn_one(world, npc_manager, connection_manager, kind: str | None = None,
+                    at: tuple[int, int] | None = None) -> dict | None:
     kind = kind or random.choice(NPC_KINDS)
     try:
         raw = await llm.slow_brain(_identity_prompt(kind), system=IDENTITY_SYSTEM, json_mode=True)
@@ -125,7 +166,11 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
         log.warning("NPC-Identität LLM-Fehler: %s", e)
         return None
 
-    x, y = await _find_spawn_position(world, connection_manager)
+    if at is not None:
+        x, y = at
+    else:
+        biomes = (CREATURE_SPAWN_PROFILE.get(kind) or {}).get("biomes")
+        x, y = await _find_spawn_position(world, connection_manager, biomes=biomes)
     base_hp = combat.NPC_HP_BY_KIND.get(kind, 40)
     # Welle 30: Power-Budget — Mob-HP skaliert mit nahem Player-Level
     try:
@@ -146,7 +191,8 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
 
 
 async def respawn_loop(world, npc_manager, connection_manager) -> None:
-    """Periodisch: wenn weniger als MIN_CREATURE_COUNT Creatures existieren, spawne nach."""
+    """Periodisch: wenn weniger als MIN_CREATURE_COUNT Creatures existieren, spawne nach.
+    Gruppen-Größe und Biome richten sich nach CREATURE_SPAWN_PROFILE pro Kind."""
     log.info("Creature-Respawn-Loop startet (interval=%ds, min=%d)",
              CREATURE_RESPAWN_INTERVAL, MIN_CREATURE_COUNT)
     await asyncio.sleep(60)  # Lange Anlaufzeit damit Initial-Spawn vorbei ist
@@ -157,13 +203,19 @@ async def respawn_loop(world, npc_manager, connection_manager) -> None:
             deficit = MIN_CREATURE_COUNT - len(creatures)
             if deficit <= 0:
                 continue
-            # Gruppen-Spawn: 1 Kind, mehrere Instanzen — nahe beieinander
-            group_size = random.randint(CREATURE_GROUP_SIZE_MIN, CREATURE_GROUP_SIZE_MAX)
-            group_size = min(group_size, deficit)
             kind = random.choice(CREATURE_KINDS)
-            log.info("Gruppen-Respawn: %d × %s (deficit=%d)", group_size, kind, deficit)
-            for _ in range(group_size):
-                await spawn_one(world, npc_manager, connection_manager, kind=kind)
+            profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
+            group_min, group_max = profile["group"]
+            group_size = min(random.randint(group_min, group_max), deficit)
+            biomes = profile["biomes"]
+            # Center für Gruppe finden (biome-präferiert), dann Gruppen-Mitglieder in radius
+            cx, cy = await _find_spawn_position(world, connection_manager, biomes=biomes)
+            log.info("Gruppen-Respawn: %d × %s @(%d,%d) biome=%s (deficit=%d)",
+                     group_size, kind, cx, cy, biomes, deficit)
+            await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(cx, cy))
+            for _ in range(group_size - 1):
+                nx, ny = await _find_nearby_walkable(world, cx, cy, radius=3)
+                await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(nx, ny))
         except asyncio.CancelledError:
             log.info("Creature-Respawn-Loop gestoppt")
             raise
