@@ -30,6 +30,9 @@
       touch-action: none;
       -webkit-user-select: none; user-select: none;
       -webkit-tap-highlight-color: transparent;
+      /* Phaser RESIZE setzt das per JS; explizit damit kein Letterbox bleibt */
+      width: 100% !important; height: 100% !important;
+      position: absolute; top: 0; left: 0;
     }
     #ui {
       position: fixed; top: 12px; left: 12px; z-index: 10;
@@ -1113,6 +1116,12 @@ const NATURAL_STRUCTURE_TYPES = new Set([
   // Welle 11
   'camp_tent','cooking_pot','bones_scatter','gravestone',
   'dock_corner','boat_small','anchor','fishing_net','driftwood',
+  // Farming-Drop 2026-05-26 — wilde Sträucher / Pflanzen / Obstbäume
+  'strawberry_bush','blueberry_bush','blackberry_bush','raspberry_bush',
+  'apple_tree','pear_tree','plum_tree','cherry_tree',
+  'carrot_plant','potato_plant','cucumber_plant','tomato_plant',
+  'onion_plant','cabbage_plant','pumpkin_plant','corn_plant',
+  'wheat_seedling','wheat_grown',
 ]);
 
 // ─── Strukturen-Konfiguration ─────────────────────────────────────────────────
@@ -1187,6 +1196,25 @@ const STRUCTURE = {
   anchor:        { key: '', name: 'Anker',       icon: '⚓', blocking: false, sprite: 'prop_anchor' },
   fishing_net:   { key: '', name: 'Fischernetz', icon: '🎣', blocking: false, sprite: 'prop_fishing_net' },
   driftwood:     { key: '', name: 'Treibholz',   icon: '🪵', blocking: false, sprite: 'prop_driftwood' },
+  // Farming-Drop 2026-05-26 — wilde Sträucher / Pflanzen / Obstbäume
+  strawberry_bush:{ key:'', name:'Erdbeerstrauch',  icon:'🍓', blocking:false, sprite:'prop_strawberry_bush' },
+  blueberry_bush: { key:'', name:'Blaubeerstrauch', icon:'🫐', blocking:false, sprite:'prop_blueberry_bush' },
+  blackberry_bush:{ key:'', name:'Brombeerstrauch', icon:'🌑', blocking:false, sprite:'prop_blackberry_bush' },
+  raspberry_bush: { key:'', name:'Himbeerstrauch',  icon:'🌸', blocking:false, sprite:'prop_raspberry_bush' },
+  apple_tree:     { key:'', name:'Apfelbaum',       icon:'🍎', blocking:true,  sprite:'prop_apple_tree' },
+  pear_tree:      { key:'', name:'Birnbaum',        icon:'🍐', blocking:true,  sprite:'prop_pear_tree' },
+  plum_tree:      { key:'', name:'Pflaumenbaum',    icon:'🟣', blocking:true,  sprite:'prop_plum_tree' },
+  cherry_tree:    { key:'', name:'Kirschbaum',      icon:'🌸', blocking:true,  sprite:'prop_cherry_tree' },
+  carrot_plant:   { key:'', name:'Karottenfeld',    icon:'🥕', blocking:false, sprite:'prop_carrot_plant' },
+  potato_plant:   { key:'', name:'Kartoffelfeld',   icon:'🥔', blocking:false, sprite:'prop_potato_plant' },
+  cucumber_plant: { key:'', name:'Gurkenpflanze',   icon:'🥒', blocking:false, sprite:'prop_cucumber_plant' },
+  tomato_plant:   { key:'', name:'Tomatenpflanze',  icon:'🍅', blocking:false, sprite:'prop_tomato_plant' },
+  onion_plant:    { key:'', name:'Zwiebelfeld',     icon:'🧅', blocking:false, sprite:'prop_onion_plant' },
+  cabbage_plant:  { key:'', name:'Kohlfeld',        icon:'🥬', blocking:false, sprite:'prop_cabbage_plant' },
+  pumpkin_plant:  { key:'', name:'Kürbisfeld',      icon:'🎃', blocking:false, sprite:'prop_pumpkin_plant' },
+  corn_plant:     { key:'', name:'Maisfeld',        icon:'🌽', blocking:false, sprite:'prop_corn_plant' },
+  wheat_seedling: { key:'', name:'Weizenkeimling',  icon:'🌱', blocking:false, sprite:'prop_wheat_seedling' },
+  wheat_grown:    { key:'', name:'Weizenfeld',      icon:'🌾', blocking:false, sprite:'prop_wheat_grown' },
 };
 const STRUCTURE_BY_KEY = Object.fromEntries(
   Object.entries(STRUCTURE).map(([id, s]) => [s.key, id])
@@ -1457,6 +1485,38 @@ const ITEM = {
   cooked_meat:   { name: 'Gebratenes Fleisch',sprite:'item_cooked_meat',category:'food',                          path: '/assets/food/cooked_meat.png' },
   fish:          { name: 'Fisch',       sprite: 'item_fish',          category: 'food',                           path: '/assets/food/fish.png' },
   mushroom_food: { name: 'Pilz-Mahl',   sprite: 'item_mushroom_food', category: 'food',                           path: '/assets/food/mushroom_food.png' },
+  // Farming-Drop 2026-05-26
+  strawberry:    { name: 'Erdbeere',    sprite: 'item_strawberry',    category: 'food',                           path: '/assets/food/strawberry.png' },
+  blueberry:     { name: 'Blaubeere',   sprite: 'item_blueberry',     category: 'food',                           path: '/assets/food/blueberry.png' },
+  blackberry:    { name: 'Brombeere',   sprite: 'item_blackberry',    category: 'food',                           path: '/assets/food/blackberry.png' },
+  raspberry:     { name: 'Himbeere',    sprite: 'item_raspberry',     category: 'food',                           path: '/assets/food/raspberry.png' },
+  pear:          { name: 'Birne',       sprite: 'item_pear',          category: 'food',                           path: '/assets/food/pear.png' },
+  plum:          { name: 'Pflaume',     sprite: 'item_plum',          category: 'food',                           path: '/assets/food/plum.png' },
+  cherry:        { name: 'Kirsche',     sprite: 'item_cherry',        category: 'food',                           path: '/assets/food/cherry.png' },
+  carrot:        { name: 'Karotte',     sprite: 'item_carrot',        category: 'food',                           path: '/assets/food/carrot.png' },
+  potato:        { name: 'Kartoffel',   sprite: 'item_potato',        category: 'food',                           path: '/assets/food/potato.png' },
+  cucumber:      { name: 'Gurke',       sprite: 'item_cucumber',      category: 'food',                           path: '/assets/food/cucumber.png' },
+  tomato:        { name: 'Tomate',      sprite: 'item_tomato',        category: 'food',                           path: '/assets/food/tomato.png' },
+  onion:         { name: 'Zwiebel',     sprite: 'item_onion',         category: 'food',                           path: '/assets/food/onion.png' },
+  cabbage:       { name: 'Kohl',        sprite: 'item_cabbage',       category: 'food',                           path: '/assets/food/cabbage.png' },
+  pumpkin:       { name: 'Kürbis',      sprite: 'item_pumpkin',       category: 'food',                           path: '/assets/food/pumpkin.png' },
+  corn:          { name: 'Mais',        sprite: 'item_corn',          category: 'food',                           path: '/assets/food/corn.png' },
+  strawberry_seeds:{ name:'Erdbeer-Samen',  sprite:'item_strawberry_seeds', category:'resource', path:'/assets/seeds/strawberry_seeds.png' },
+  blueberry_seeds: { name:'Blaubeer-Samen', sprite:'item_blueberry_seeds',  category:'resource', path:'/assets/seeds/blueberry_seeds.png' },
+  blackberry_seeds:{ name:'Brombeer-Samen', sprite:'item_blackberry_seeds', category:'resource', path:'/assets/seeds/blackberry_seeds.png' },
+  raspberry_seeds: { name:'Himbeer-Samen',  sprite:'item_raspberry_seeds',  category:'resource', path:'/assets/seeds/raspberry_seeds.png' },
+  apple_seeds:     { name:'Apfelkerne',     sprite:'item_apple_seeds',      category:'resource', path:'/assets/seeds/apple_seeds.png' },
+  pear_seeds:      { name:'Birnenkerne',    sprite:'item_pear_seeds',       category:'resource', path:'/assets/seeds/pear_seeds.png' },
+  plum_seeds:      { name:'Pflaumenkerne',  sprite:'item_plum_seeds',       category:'resource', path:'/assets/seeds/plum_seeds.png' },
+  cherry_seeds:    { name:'Kirschkerne',    sprite:'item_cherry_seeds',     category:'resource', path:'/assets/seeds/cherry_seeds.png' },
+  carrot_seeds:    { name:'Karotten-Samen', sprite:'item_carrot_seeds',     category:'resource', path:'/assets/seeds/carrot_seeds.png' },
+  potato_seeds:    { name:'Kartoffel-Saat', sprite:'item_potato_seeds',     category:'resource', path:'/assets/seeds/potato_seeds.png' },
+  cucumber_seeds:  { name:'Gurken-Samen',   sprite:'item_cucumber_seeds',   category:'resource', path:'/assets/seeds/cucumber_seeds.png' },
+  tomato_seeds:    { name:'Tomaten-Samen',  sprite:'item_tomato_seeds',     category:'resource', path:'/assets/seeds/tomato_seeds.png' },
+  onion_seeds:     { name:'Zwiebel-Samen',  sprite:'item_onion_seeds',      category:'resource', path:'/assets/seeds/onion_seeds.png' },
+  cabbage_seeds:   { name:'Kohl-Samen',     sprite:'item_cabbage_seeds',    category:'resource', path:'/assets/seeds/cabbage_seeds.png' },
+  pumpkin_seeds:   { name:'Kürbis-Samen',   sprite:'item_pumpkin_seeds',    category:'resource', path:'/assets/seeds/pumpkin_seeds.png' },
+  corn_seeds:      { name:'Mais-Samen',     sprite:'item_corn_seeds',       category:'resource', path:'/assets/seeds/corn_seeds.png' },
   spell_book:    { name: 'Feuerball-Buch', sprite: 'item_spell_book', category: 'magic',                          path: '/assets/magic/spell_book.png' },
   scroll:        { name: 'Schriftrolle',sprite: 'item_scroll',        category: 'magic',                          path: '/assets/magic/scroll.png' },
   rune_stone:    { name: 'Heilrune',    sprite: 'item_rune_stone',    category: 'magic',                          path: '/assets/magic/rune_stone.png' },
@@ -1778,6 +1838,16 @@ class WorldScene extends Phaser.Scene {
     }
     for (const p of ['frozen_bush','ice_crystal','snow_rock']) {
       this.load.image(`prop_${p}`, `/assets/props/biomes/snow/${p}.png`);
+    }
+    // Farming-Drop 2026-05-26
+    for (const p of ['strawberry_bush','blueberry_bush','blackberry_bush','raspberry_bush',
+                     'carrot_plant','potato_plant','cucumber_plant','tomato_plant',
+                     'onion_plant','cabbage_plant','pumpkin_plant','corn_plant',
+                     'wheat_seedling','wheat_grown']) {
+      this.load.image(`prop_${p}`, `/assets/props/crops/${p}.png`);
+    }
+    for (const p of ['apple_tree','pear_tree','plum_tree','cherry_tree']) {
+      this.load.image(`prop_${p}`, `/assets/props/orchard/${p}.png`);
     }
     for (const p of ['swamp_bubbles','swamp_log']) {
       this.load.image(`prop_${p}`, `/assets/props/biomes/swamp/${p}.png`);
@@ -5127,9 +5197,9 @@ const config = {
   scale: {
     mode:        Phaser.Scale.RESIZE,
     parent:      document.body,
-    autoCenter:  Phaser.Scale.CENTER_BOTH,
-    width:       window.innerWidth,
-    height:      window.innerHeight,
+    // Bei RESIZE braucht man weder autoCenter noch fixed width/height — die
+    // canvas-Größe folgt dem parent (body = 100vw × 100dvh). Fixed width/height
+    // beim Init führte auf Mobile zu Letterboxing nach Orientation-Change.
   },
   backgroundColor: '#0a0a0f',
   scene:           [WorldScene],
@@ -5178,9 +5248,17 @@ const config = {
 
   const game = new Phaser.Game(config);
   window._gameInstance = game;
-  window.addEventListener('resize', () => {
+  const refreshCanvas = () => {
+    // Phaser auf aktuellen Viewport zwingen — wichtig nach Orientation-Change
+    // damit kein Letterbox-Rand bleibt.
     game.scale.resize(window.innerWidth, window.innerHeight);
-  });
+    game.scale.refresh();
+  };
+  window.addEventListener('resize', refreshCanvas);
+  window.addEventListener('orientationchange', () => setTimeout(refreshCanvas, 200));
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', refreshCanvas);
+  }
   setupTouchControls();
 })();
 
@@ -5245,13 +5323,13 @@ function setupChatConsole(myRole) {
       color: #c8b88a; padding: 6px 12px;
       font-family: monospace; font-size: 12px; cursor: pointer;
     }
-    @media (max-width: 720px) {
+    @media (max-width: 720px), (max-height: 500px) {
       #chat-console {
         top: auto !important; right: 0 !important; left: 0 !important;
         bottom: 0 !important;
         width: 100vw !important;
-        height: 50vh;
-        max-height: 50vh;
+        height: 60dvh !important;
+        max-height: 60dvh !important;
         border-left: none; border-right: none; border-bottom: none;
       }
       #chat-header { cursor: default; padding: 10px; }
@@ -5263,6 +5341,16 @@ function setupChatConsole(myRole) {
       #chat-input-row { padding: 8px; }
       #chat-input { font-size: 16px; padding: 10px; }  /* font-size:16px verhindert iOS-Autozoom */
       #chat-send { padding: 10px 18px; }
+    }
+    /* Landscape-Phone: schmal hoch — chat als rechte Spalte statt Bottom-Sheet */
+    @media (orientation: landscape) and (max-height: 500px) {
+      #chat-console {
+        top: 0 !important; bottom: 0 !important; left: auto !important;
+        right: 0 !important;
+        width: 55vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+      }
     }
   `;
   const styleEl = document.createElement('style');

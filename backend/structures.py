@@ -75,6 +75,25 @@ STRUCTURE_TYPES = {
     "ruin_pillar":    {"blocking": True},
     "rubble":         {"blocking": False},
     "statue_broken":  {"blocking": True},
+    # — Farming-Drop 2026-05-26 — wilde Crops/Sträucher/Obstbäume —
+    "strawberry_bush": {"blocking": False},
+    "blueberry_bush":  {"blocking": False},
+    "blackberry_bush": {"blocking": False},
+    "raspberry_bush":  {"blocking": False},
+    "apple_tree":      {"blocking": True},
+    "pear_tree":       {"blocking": True},
+    "plum_tree":       {"blocking": True},
+    "cherry_tree":     {"blocking": True},
+    "carrot_plant":    {"blocking": False},
+    "potato_plant":    {"blocking": False},
+    "cucumber_plant":  {"blocking": False},
+    "tomato_plant":    {"blocking": False},
+    "onion_plant":     {"blocking": False},
+    "cabbage_plant":   {"blocking": False},
+    "pumpkin_plant":   {"blocking": False},
+    "corn_plant":      {"blocking": False},
+    "wheat_seedling":  {"blocking": False},
+    "wheat_grown":     {"blocking": False},
 }
 
 VALID_MATERIALS = {"stone", "wood", "straw"}

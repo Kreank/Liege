@@ -336,6 +336,83 @@ ENCOUNTER_TEMPLATES = {
         ],
         "fillers": [("cactus", 0.15), ("dry_bush", 0.20)],
     },
+    # — Farming-Drop 2026-05-26 — wilde Vegetations-Cluster —
+    # Beeren-Hain
+    "berry_patch": {
+        "biomes": {GRASS, FOREST},
+        "weight": 3,
+        "spread": 3,
+        "placements": [
+            (0, 0, "strawberry_bush"),
+            (1, 0, "blueberry_bush"),
+            (-1, 0, "raspberry_bush"),
+            (0, 1, "blackberry_bush"),
+            (1, 1, "strawberry_bush"),
+        ],
+        "fillers": [("strawberry_bush", 0.15), ("blueberry_bush", 0.10),
+                    ("raspberry_bush", 0.10), ("plant_fiber", 0)],
+    },
+    # Obst-Hain (Orchard)
+    "orchard": {
+        "biomes": {GRASS, FOREST},
+        "weight": 2,
+        "spread": 4,
+        "placements": [
+            (0, 0, "apple_tree"),
+            (3, 0, "apple_tree"),
+            (-2, 0, "pear_tree"),
+            (1, 2, "cherry_tree"),
+            (-1, -2, "plum_tree"),
+            (2, -2, "apple_tree"),
+        ],
+        "fillers": [("apple_tree", 0.10), ("flowers", 0.10), ("tall_grass", 0.15)],
+    },
+    # Weizenfeld
+    "wheat_field": {
+        "biomes": {GRASS},
+        "weight": 2,
+        "spread": 3,
+        "placements": [
+            (0, 0, "wheat_grown"),
+            (1, 0, "wheat_grown"),
+            (-1, 0, "wheat_grown"),
+            (0, 1, "wheat_grown"),
+            (1, 1, "wheat_seedling"),
+            (-1, 1, "wheat_grown"),
+            (0, -1, "wheat_seedling"),
+        ],
+        "fillers": [("wheat_grown", 0.35), ("wheat_seedling", 0.15)],
+    },
+    # Verwildertes Feld (gemüse-cluster)
+    "wild_vegetable_patch": {
+        "biomes": {GRASS, JUNGLE},
+        "weight": 2,
+        "spread": 3,
+        "placements": [
+            (0, 0, "carrot_plant"),
+            (1, 0, "onion_plant"),
+            (-1, 0, "potato_plant"),
+            (0, 1, "cabbage_plant"),
+            (1, 1, "tomato_plant"),
+            (-1, 1, "cucumber_plant"),
+        ],
+        "fillers": [("carrot_plant", 0.12), ("potato_plant", 0.12),
+                    ("onion_plant", 0.10)],
+    },
+    # Kürbis/Mais Feld
+    "pumpkin_patch": {
+        "biomes": {GRASS, FOREST},
+        "weight": 1,
+        "spread": 3,
+        "placements": [
+            (0, 0, "pumpkin_plant"),
+            (1, 0, "pumpkin_plant"),
+            (0, 1, "corn_plant"),
+            (-1, 1, "corn_plant"),
+            (1, 1, "pumpkin_plant"),
+        ],
+        "fillers": [("pumpkin_plant", 0.15), ("corn_plant", 0.15)],
+    },
 }
 
 

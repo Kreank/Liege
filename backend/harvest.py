@@ -71,6 +71,12 @@ DURABILITY = {
     "snow_rock":      3,
     "swamp_bubbles":  1,
     "swamp_log":      2,
+    # — Farming-Drop 2026-05-26 —
+    "strawberry_bush": 1, "blueberry_bush": 1, "blackberry_bush": 1, "raspberry_bush": 1,
+    "apple_tree": 5, "pear_tree": 5, "plum_tree": 5, "cherry_tree": 5,
+    "carrot_plant": 1, "potato_plant": 1, "cucumber_plant": 1, "tomato_plant": 1,
+    "onion_plant": 1, "cabbage_plant": 1, "pumpkin_plant": 1, "corn_plant": 1,
+    "wheat_seedling": 1, "wheat_grown": 1,
 }
 
 # Yield pro Schlag: [(item_kind, min, max, chance_in_pct), ...]
@@ -128,6 +134,25 @@ YIELD_PER_HIT = {
     "snow_rock":      [("stone", 1, 2, 100)],
     "swamp_bubbles":  [("herb", 0, 1, 60)],
     "swamp_log":      [("wood", 1, 2, 100), ("mushroom_food", 0, 1, 30)],
+    # — Farming-Drop 2026-05-26 — wilde Sträucher/Pflanzen/Obstbäume —
+    "strawberry_bush":[("strawberry", 1, 3, 100), ("plant_fiber", 0, 1, 30), ("strawberry_seeds", 0, 1, 40)],
+    "blueberry_bush": [("blueberry", 1, 3, 100), ("plant_fiber", 0, 1, 30), ("blueberry_seeds", 0, 1, 40)],
+    "blackberry_bush":[("blackberry",1, 3, 100), ("plant_fiber", 0, 1, 30), ("blackberry_seeds",0, 1, 40)],
+    "raspberry_bush": [("raspberry", 1, 3, 100), ("plant_fiber", 0, 1, 30), ("raspberry_seeds", 0, 1, 40)],
+    "apple_tree":     [("apple", 1, 3, 100), ("wood", 1, 2, 100), ("apple_seeds", 0, 1, 30)],
+    "pear_tree":      [("pear",  1, 3, 100), ("wood", 1, 2, 100), ("pear_seeds",  0, 1, 30)],
+    "plum_tree":      [("plum",  1, 3, 100), ("wood", 1, 2, 100), ("plum_seeds",  0, 1, 30)],
+    "cherry_tree":    [("cherry",1, 3, 100), ("wood", 1, 2, 100), ("cherry_seeds",0, 1, 30)],
+    "carrot_plant":   [("carrot",   1, 2, 100), ("carrot_seeds",   0, 1, 35)],
+    "potato_plant":   [("potato",   1, 2, 100), ("potato_seeds",   0, 1, 35)],
+    "cucumber_plant": [("cucumber", 1, 2, 100), ("cucumber_seeds", 0, 1, 35)],
+    "tomato_plant":   [("tomato",   1, 2, 100), ("tomato_seeds",   0, 1, 35)],
+    "onion_plant":    [("onion",    1, 2, 100), ("onion_seeds",    0, 1, 35)],
+    "cabbage_plant":  [("cabbage",  1, 1, 100), ("cabbage_seeds",  0, 1, 35)],
+    "pumpkin_plant":  [("pumpkin",  1, 1, 100), ("pumpkin_seeds",  0, 1, 35)],
+    "corn_plant":     [("corn",     1, 2, 100), ("corn_seeds",     0, 1, 35)],
+    "wheat_seedling": [("plant_fiber", 0, 1, 80)],
+    "wheat_grown":    [("wheat", 1, 2, 100), ("plant_fiber", 0, 1, 40)],
 }
 
 HARVESTABLE_TYPES = set(YIELD_PER_HIT.keys())
