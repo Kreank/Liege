@@ -181,11 +181,32 @@ def manhattan(ax: int, ay: int, bx: int, by: int) -> int:
     return abs(ax - bx) + abs(ay - by)
 
 
-# Effekte beim Use eines Consumables
+# Effekte beim Use eines Consumables / Lebensmittels
+# (Hunger-Restoration läuft separat über needs.FOOD_RESTORE)
 USE_EFFECTS = {
     "health_potion": {"hp": 30},
     "mana_potion":   {"mana": 30},
     "herb":          {"hp": 5},
+    # Beeren: kleiner HP-Boost dazu — Vitamine
+    "strawberry":    {"hp": 2},
+    "blueberry":     {"hp": 2},
+    "blackberry":    {"hp": 2},
+    "raspberry":     {"hp": 2},
+    # Obst: etwas mehr HP
+    "apple":         {"hp": 3},
+    "pear":          {"hp": 3},
+    "plum":          {"hp": 3},
+    "cherry":        {"hp": 2},
+    # Gegartes ist im needs.py separat — hier nur rohes Obst/Gemüse
+    "carrot":        {"hp": 2},
+    "tomato":        {"hp": 2},
+    "cabbage":       {"hp": 4},
+    "pumpkin":       {"hp": 5},
+    "corn":          {"hp": 4},
+    "cooked_meat":   {"hp": 8},    # gegartes Fleisch heilt mehr
+    "fish":          {"hp": 4},
+    "bread":         {"hp": 4},
+    "food_ration":   {"hp": 6},
 }
 
 # Spells aus Magic-Items

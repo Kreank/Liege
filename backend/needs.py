@@ -37,6 +37,25 @@ FOOD_RESTORE: dict[str, int] = {
     "fish":          25,
     "mushroom_food": 20,
     "food_ration":   35,    # Proviant — gut sättigend, lange haltbar
+    # — Farming-Drop 2026-05-26 — frisch geerntet —
+    # Beeren: schnelle Snacks
+    "strawberry":    10,
+    "blueberry":     10,
+    "blackberry":    11,
+    "raspberry":     10,
+    # Obstbäume: mittel sättigend
+    "pear":          15,
+    "plum":          14,
+    "cherry":        12,
+    # Feldfrüchte: roh, gut sättigend
+    "carrot":        12,
+    "potato":        15,
+    "cucumber":      10,
+    "tomato":        12,
+    "onion":         10,
+    "cabbage":       18,
+    "pumpkin":       25,   # groß und sehr sättigend
+    "corn":          20,
     "wood": 0,
     "stone": 0,
     "iron_ore": 0,
