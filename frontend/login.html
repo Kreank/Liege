@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Liege – Login</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🗡️%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100vw; height: 100vh;
+      background: #0a0a0f; color: #c8b88a;
+      font-family: monospace;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card {
+      background: rgba(20, 20, 28, 0.95);
+      border: 1px solid #444;
+      padding: 32px;
+      width: min(360px, 92vw);
+      max-width: 360px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    @media (max-width: 480px) {
+      .card { padding: 24px 20px; }
+    }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .sub { font-size: 12px; color: #888; margin-bottom: 24px; }
+    label { display: block; font-size: 12px; margin-top: 14px; margin-bottom: 4px; color: #a09478; }
+    input[type=text], input[type=password] {
+      width: 100%; padding: 10px;
+      background: #0a0a0f; color: #c8b88a;
+      border: 1px solid #444; font-family: monospace;
+      font-size: 14px;
+    }
+    input:focus { outline: none; border-color: #c8b88a; }
+    button {
+      margin-top: 20px; width: 100%; padding: 12px;
+      background: #c8b88a; color: #0a0a0f; border: none;
+      font-family: monospace; font-size: 14px; font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #d8c89a; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error {
+      margin-top: 14px; padding: 10px;
+      background: rgba(160, 40, 32, 0.2);
+      border: 1px solid #a02820; color: #e85040;
+      font-size: 12px;
+    }
+    .info {
+      margin-top: 14px; padding: 10px;
+      background: rgba(122, 173, 106, 0.15);
+      border: 1px solid #7aad6a; color: #7aad6a;
+      font-size: 12px;
+    }
+    .switch {
+      margin-top: 16px; text-align: center; font-size: 12px;
+      color: #888;
+    }
+    .switch a { color: #c8b88a; cursor: pointer; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🗡️ Liege</h1>
+    <div class="sub" id="mode-sub">Anmelden</div>
+
+    <form id="auth-form">
+      <label for="username">Username</label>
+      <input type="text" id="username" autocomplete="username" required minlength="3" maxlength="32" />
+
+      <label for="password">Passwort</label>
+      <input type="password" id="password" autocomplete="current-password" required minlength="8" maxlength="128" />
+
+      <button type="submit" id="submit-btn">Anmelden</button>
+    </form>
+
+    <div id="message"></div>
+
+    <div class="switch" id="switch-area" style="display:none;"></div>
+  </div>
+
+  <script>
+    let mode = 'login'; // 'login' | 'register'
+
+    function setMessage(text, kind) {
+      const el = document.getElementById('message');
+      if (!text) { el.innerHTML = ''; return; }
+      el.innerHTML = `<div class="${kind}">${text}</div>`;
+    }
+
+    function setMode(newMode) {
+      mode = newMode;
+      document.getElementById('mode-sub').textContent =
+        mode === 'register' ? 'Ersten Admin-Account anlegen' : 'Anmelden';
+      document.getElementById('submit-btn').textContent =
+        mode === 'register' ? 'Account anlegen' : 'Anmelden';
+      document.getElementById('password').autocomplete =
+        mode === 'register' ? 'new-password' : 'current-password';
+      setMessage('', '');
+    }
+
+    async function init() {
+      // Bereits eingeloggt? → ab ins Game
+      try {
+        const me = await fetch('/auth/me');
+        if (me.ok) {
+          window.location.href = '/';
+          return;
+        }
+      } catch (e) {}
+
+      // Gibt's schon User? Wenn nein → erster Admin
+      try {
+        const st = await fetch('/auth/status');
+        const data = await st.json();
+        if (!data.has_users) {
+          setMode('register');
+          setMessage('Noch kein Account vorhanden. Lege jetzt den ersten Admin-Account an.', 'info');
+        }
+      } catch (e) {
+        setMessage('Server nicht erreichbar', 'error');
+      }
+    }
+
+    document.getElementById('auth-form').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      setMessage('', '');
+      try {
+        const url = mode === 'register' ? '/auth/register' : '/auth/login';
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        if (resp.ok) {
+          window.location.href = '/';
+          return;
+        }
+        const err = await resp.json().catch(() => ({}));
+        setMessage(err.detail || `Fehler ${resp.status}`, 'error');
+      } catch (e) {
+        setMessage('Netzwerkfehler', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

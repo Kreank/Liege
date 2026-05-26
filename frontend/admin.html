@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Liege – Admin</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🗡️%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100vw; min-height: 100vh;
+      background: #0a0a0f; color: #c8b88a;
+      font-family: monospace; padding: 24px;
+    }
+    h1 { font-size: 22px; margin-bottom: 4px; }
+    .sub { font-size: 12px; color: #888; margin-bottom: 24px; }
+    .top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .top a, .top button {
+      color: #c8b88a; background: transparent; border: 1px solid #444;
+      padding: 8px 14px; font-family: monospace; font-size: 12px;
+      text-decoration: none; cursor: pointer; margin-left: 8px;
+    }
+    .top a:hover, .top button:hover { border-color: #c8b88a; }
+    .section {
+      background: rgba(20,20,28,0.9); border: 1px solid #333;
+      padding: 20px; margin-bottom: 20px;
+    }
+    .section h2 { font-size: 16px; margin-bottom: 16px; color: #d8c89a; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #2a2a35; }
+    th { color: #a09478; font-weight: normal; font-size: 11px; text-transform: uppercase; }
+    .role-admin { color: #e85040; font-weight: bold; }
+    .role-user { color: #7aad6a; }
+    .no-pw { color: #666; font-style: italic; }
+    .actions button {
+      background: transparent; color: #c8b88a; border: 1px solid #444;
+      padding: 4px 8px; font-family: monospace; font-size: 11px; cursor: pointer;
+      margin-right: 4px;
+    }
+    .actions button:hover { border-color: #c8b88a; }
+    .actions button.danger { color: #e85040; }
+    .actions button.danger:hover { border-color: #e85040; }
+    form.create-form {
+      display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 8px;
+      align-items: end;
+    }
+    @media (max-width: 720px) {
+      html, body { padding: 12px; }
+      .top { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .top .right-actions { display: flex; }
+      form.create-form {
+        grid-template-columns: 1fr;
+      }
+      form.create-form button { width: 100%; padding: 10px; }
+      .section { padding: 14px; }
+      table { font-size: 12px; }
+      th, td { padding: 6px 4px; }
+      /* Tabelle horizontal scrollbar machen */
+      #users-table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+    .create-form label { font-size: 11px; color: #a09478; display: block; margin-bottom: 4px; }
+    .create-form input, .create-form select {
+      padding: 8px; background: #0a0a0f; color: #c8b88a;
+      border: 1px solid #444; font-family: monospace; font-size: 13px;
+      width: 100%;
+    }
+    .create-form button {
+      padding: 8px 16px; background: #c8b88a; color: #0a0a0f;
+      border: none; font-family: monospace; font-weight: bold; cursor: pointer;
+    }
+    .msg { padding: 10px; margin-top: 12px; font-size: 12px; }
+    .msg.error { background: rgba(160,40,32,0.2); border: 1px solid #a02820; color: #e85040; }
+    .msg.ok    { background: rgba(122,173,106,0.15); border: 1px solid #7aad6a; color: #7aad6a; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <h1>🛠️ Admin-Panel</h1>
+      <div class="sub">Eingeloggt als <span id="me-name">…</span></div>
+    </div>
+    <div>
+      <a href="/">→ Zum Game</a>
+      <button id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Neuen User anlegen</h2>
+    <form class="create-form" id="create-form">
+      <div>
+        <label>Username</label>
+        <input type="text" id="cf-username" required minlength="3" maxlength="32" />
+      </div>
+      <div>
+        <label>Passwort</label>
+        <input type="password" id="cf-password" required minlength="8" maxlength="128" />
+      </div>
+      <div>
+        <label>Rolle</label>
+        <select id="cf-role">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+        </select>
+      </div>
+      <button type="submit">Anlegen</button>
+    </form>
+    <div id="create-msg"></div>
+  </div>
+
+  <div class="section">
+    <h2>Alle User</h2>
+    <table id="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Rolle</th>
+          <th>Erstellt</th>
+          <th>Zuletzt gesehen</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const me = { username: null, role: null };
+
+    function fmtDate(s) {
+      if (!s) return '–';
+      return new Date(s).toLocaleString('de-DE');
+    }
+
+    function showMsg(id, text, kind) {
+      const el = document.getElementById(id);
+      if (!text) { el.innerHTML = ''; return; }
+      el.innerHTML = `<div class="msg ${kind}">${text}</div>`;
+    }
+
+    async function loadMe() {
+      const r = await fetch('/auth/me');
+      if (!r.ok) {
+        window.location.href = '/login';
+        return;
+      }
+      const data = await r.json();
+      me.username = data.username;
+      me.role = data.role;
+      document.getElementById('me-name').textContent = `${data.username} (${data.role})`;
+      if (data.role !== 'admin') {
+        document.body.innerHTML =
+          '<div style="padding:40px;color:#e85040;">Kein Admin-Zugriff. <a href="/" style="color:#c8b88a;">Zurück zum Game</a></div>';
+      }
+    }
+
+    async function loadUsers() {
+      const r = await fetch('/admin/users');
+      if (!r.ok) {
+        document.getElementById('users-tbody').innerHTML =
+          `<tr><td colspan="5" style="color:#e85040;">Fehler beim Laden (${r.status})</td></tr>`;
+        return;
+      }
+      const users = await r.json();
+      const tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = users.map(u => `
+        <tr data-username="${u.username}">
+          <td>${u.username}${u.username === me.username ? ' <span style="color:#888;">(du)</span>' : ''}</td>
+          <td>
+            ${u.has_password
+              ? `<span class="role-${u.role}">${u.role}</span>`
+              : '<span class="no-pw">deaktiviert</span>'}
+          </td>
+          <td>${fmtDate(u.created_at)}</td>
+          <td>${fmtDate(u.last_seen)}</td>
+          <td class="actions">
+            ${u.has_password && u.username !== me.username ? `
+              <button data-action="toggle-role" data-target="${u.role === 'admin' ? 'user' : 'admin'}">
+                → ${u.role === 'admin' ? 'user' : 'admin'}
+              </button>
+              <button class="danger" data-action="delete">Login entfernen</button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('users-tbody').addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('button');
+      if (!btn) return;
+      const row = btn.closest('tr');
+      const username = row.dataset.username;
+      const action = btn.dataset.action;
+
+      if (action === 'toggle-role') {
+        const newRole = btn.dataset.target;
+        const r = await fetch(`/admin/users/${encodeURIComponent(username)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: newRole }),
+        });
+        if (!r.ok) {
+          const err = await r.json().catch(() => ({}));
+          alert(err.detail || `Fehler ${r.status}`);
+        }
+        loadUsers();
+      } else if (action === 'delete') {
+        if (!confirm(`Login von "${username}" wirklich entfernen?\n(Spielfortschritt bleibt erhalten)`)) return;
+        const r = await fetch(`/admin/users/${encodeURIComponent(username)}`, { method: 'DELETE' });
+        if (!r.ok) {
+          const err = await r.json().catch(() => ({}));
+          alert(err.detail || `Fehler ${r.status}`);
+        }
+        loadUsers();
+      }
+    });
+
+    document.getElementById('create-form').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      showMsg('create-msg', '', '');
+      const username = document.getElementById('cf-username').value.trim();
+      const password = document.getElementById('cf-password').value;
+      const role = document.getElementById('cf-role').value;
+      const r = await fetch('/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role }),
+      });
+      if (r.ok) {
+        showMsg('create-msg', `User "${username}" angelegt.`, 'ok');
+        document.getElementById('create-form').reset();
+        loadUsers();
+      } else {
+        const err = await r.json().catch(() => ({}));
+        showMsg('create-msg', err.detail || `Fehler ${r.status}`, 'error');
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await fetch('/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    });
+
+    (async () => {
+      await loadMe();
+      if (me.role === 'admin') await loadUsers();
+    })();
+  </script>
+</body>
+</html>

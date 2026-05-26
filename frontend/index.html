@@ -2,14 +2,35 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Liege" />
   <title>Liege</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🗡️%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <script>
+    // SW-Registrierung — nicht blockierend
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100vw; height: 100vh; }
+    html, body { width: 100vw; height: 100vh; height: 100dvh; }
     body { background: #0a0a0f; overflow: hidden; font-family: monospace; }
-    canvas { display: block; }
+    canvas {
+      display: block;
+      touch-action: none;
+      -webkit-user-select: none; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
     #ui {
       position: fixed; top: 12px; left: 12px; z-index: 10;
       color: #c8b88a; font-size: 13px; text-shadow: 1px 1px 3px #000;
@@ -435,11 +456,17 @@
       display: flex; flex-direction: column;
     }
     #chronik-header {
-      padding: 6px 10px; background: rgba(0,0,0,0.5);
+      padding: 10px 12px; background: rgba(0,0,0,0.55);
       border-bottom: 1px solid #555; cursor: pointer;
       display: flex; justify-content: space-between; align-items: center;
+      touch-action: manipulation;
+      -webkit-user-select: none; user-select: none;
+      min-height: 32px;
     }
-    #chronik-toggle { color: #e8d870; }
+    #chronik-header:active { background: rgba(60,60,80,0.7); }
+    #chronik-toggle {
+      color: #e8d870; font-size: 18px; line-height: 1; padding: 0 4px;
+    }
     #chronik-list {
       overflow-y: auto; padding: 6px 10px; flex: 1;
       scrollbar-width: thin;
@@ -453,6 +480,15 @@
     #chronik-list .ev-body  { color: #c8b88a; margin-top: 2px; line-height: 1.4; }
     #chronik-list .ev-meta  { color: #888; font-size: 10px; margin-top: 2px; }
     #chronik.collapsed #chronik-list { display: none; }
+    @media (max-width: 720px) {
+      #chronik {
+        left: 8px; top: 100px;
+        width: calc(50vw - 12px); max-width: 240px;
+        font-size: 10px;
+      }
+      #chronik-header { padding: 12px; min-height: 40px; }
+      #chronik-toggle { font-size: 20px; }
+    }
 
     /* Dialog-Modal */
     #dialog-overlay {
@@ -759,6 +795,42 @@
       85%  { opacity: 1; transform: translate(-50%, 0); }
       100% { opacity: 0; transform: translate(-50%, -10px); }
     }
+
+    /* ───── Mobile (Phone-Portrait) Anpassungen ───── */
+    @media (max-width: 720px) {
+      /* UI links oben kleiner, kompakt */
+      #ui { font-size: 11px; top: 8px; left: 8px; }
+      #status { font-size: 10px; top: 8px; right: 8px; }
+      /* Vitals-Bars schmaler */
+      #hp-bar, #mana-bar, #hunger-bar, #stamina-bar {
+        width: 140px !important; left: 8px !important;
+      }
+      #hp-bar { top: 28px !important; }
+      #mana-bar { top: 48px !important; }
+      #hunger-bar { top: 64px !important; height: 11px !important; }
+      #stamina-bar { top: 77px !important; height: 11px !important; }
+      #body-parts { display: none; }  /* zu klein zum Lesen, später bessere Lösung */
+      /* Minimap kleiner */
+      #minimap {
+        width: 84px !important; height: 84px !important;
+        bottom: 8px !important; right: 8px !important;
+      }
+      /* Overlays füllen Screen */
+      #skills-box, #research-box, #talents-box,
+      #inventory-box, #quests-box, #factions-box,
+      #chest-box, #trade-box, #npc-dialog {
+        width: 96vw !important; max-width: 96vw !important;
+        max-height: 86vh !important;
+      }
+      /* Logout/Admin Links nach unten links damit sie nicht mit Minimap kollidieren */
+      /* (admin/logout werden per JS angehängt, position rechts oben – passt aber gerade bei kleinen Screens) */
+    }
+    /* Touch-Optimierung: keine Hover-Effekte erzwingen, Tap-Highlight aus */
+    @media (hover: none) {
+      * { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+    }
+    /* Pull-to-refresh aus, damit Touch-Scroll im Game nicht den Browser triggert */
+    html, body { overscroll-behavior: none; }
   </style>
 </head>
 <body>
@@ -868,11 +940,35 @@
 </div>
 
 <div id="chronik">
-  <div id="chronik-header" onclick="document.getElementById('chronik').classList.toggle('collapsed')">
-    📜 Chronik <span id="chronik-toggle">−</span>
+  <div id="chronik-header">
+    <span>📜 Chronik</span>
+    <span id="chronik-toggle">−</span>
   </div>
   <div id="chronik-list"></div>
 </div>
+<script>
+  // Chronik-Toggle: robust für Mouse + Touch (kein onclick-Attribut wegen Touch-Quirks
+  // auf manchen Mobile-Browsern, und +/− Indikator soll mitwechseln).
+  (function () {
+    const root = document.getElementById('chronik');
+    const head = document.getElementById('chronik-header');
+    const tog  = document.getElementById('chronik-toggle');
+    const apply = () => { tog.textContent = root.classList.contains('collapsed') ? '+' : '−'; };
+    const toggle = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      root.classList.toggle('collapsed');
+      apply();
+    };
+    head.addEventListener('click', toggle);
+    head.addEventListener('touchend', toggle, { passive: false });
+    // Auf schmalen Screens default-eingeklappt damit's nicht den halben Bildschirm frisst
+    if (window.matchMedia('(max-width: 720px)').matches) {
+      root.classList.add('collapsed');
+    }
+    apply();
+  })();
+</script>
 
 <div id="trade-overlay">
   <div id="trade-box">
@@ -1301,17 +1397,9 @@ const WALL_MASK_TO_VARIANT = {
   15: 'straight_ew',  // Cross — kein Sprite, fallback
 };
 
-// Spieler-Name: localStorage → Prompt → Sanitize
-function getOrPromptName() {
-  let name = localStorage.getItem('liege_player_name');
-  if (!name) {
-    const input = window.prompt('Wie heißt du, Abenteurer?', '');
-    name = (input || '').trim().replace(/[^a-zA-Z0-9_\-\säöüÄÖÜß]/g, '').substring(0, 32).trim();
-    if (name) localStorage.setItem('liege_player_name', name);
-  }
-  return name || ('Reisender' + Math.floor(Math.random() * 9999));
-}
-const MY_ID = getOrPromptName();
+// Spieler-Name kommt aus dem Auth-Cookie (siehe IIFE am Ende). Phaser-Init wartet darauf.
+let MY_ID = null;
+let MY_ROLE = null;
 
 // ─── Phaser Scene ─────────────────────────────────────────────────────────────
 class WorldScene extends Phaser.Scene {
@@ -1548,8 +1636,11 @@ class WorldScene extends Phaser.Scene {
 
     // Click-Handler für Bauen/Abreißen / NPC-Talk
     this.input.mouse.disableContextMenu();
+    // Multi-Touch: Phaser hat default 2 Pointer; für Joystick+Tap+Button gleichzeitig brauchen wir mehr
+    this.input.addPointer(3);  // ergibt total 5 Pointer
     this.input.on('pointerdown', (pointer) => this.onPointerDown(pointer));
     this.input.on('pointermove', (pointer) => this.onPointerMove(pointer));
+    this.input.on('pointerup',   (pointer) => this.onPointerUp(pointer));
 
     // Dialog-UI-Buttons
     document.getElementById('dialog-close').addEventListener('click', () => this.closeDialog());
@@ -1659,15 +1750,45 @@ class WorldScene extends Phaser.Scene {
     const ty = Math.floor(wp.y / TILE_SIZE);
 
     if (this.buildMode) {
+      // Maus: rechte Taste = remove. Touch: Long-Press (500ms) = remove.
       if (pointer.rightButtonDown()) {
         this.ws.send(JSON.stringify({ type: 'remove_structure', x: tx, y: ty }));
+        return;
+      }
+      if (pointer.wasTouch) {
+        // Tap-Action erst auf Pointer-Up entscheiden (Long-Press vs Tap)
+        if (this._longPress) clearTimeout(this._longPress.timer);
+        this._longPress = {
+          pid: pointer.id,
+          x: pointer.x, y: pointer.y,
+          tx, ty,
+          fired: false,
+          timer: setTimeout(() => {
+            this._longPress.fired = true;
+            this.ws.send(JSON.stringify({ type: 'remove_structure', x: tx, y: ty }));
+            this.showEvent('🗑️ entfernt');
+          }, 500),
+        };
+        return;
+      }
+      // Maus-Tap im Build-Mode → place
+      this.ws.send(JSON.stringify({
+        type: 'place_structure',
+        x: tx, y: ty,
+        structure_type: this.selectedStruct,
+        material: this.selectedMaterial,
+      }));
+      return;
+    }
+
+    // Nicht im Build-Mode: zuerst Item-Pickup prüfen
+    const itemSprite = this._findGroundItemAt(tx, ty);
+    if (itemSprite) {
+      const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
+      if (dist <= 1) {
+        this.ws.send(JSON.stringify({ type: 'pick_item', item_id: itemSprite._itemId }));
       } else {
-        this.ws.send(JSON.stringify({
-          type: 'place_structure',
-          x: tx, y: ty,
-          structure_type: this.selectedStruct,
-          material: this.selectedMaterial,
-        }));
+        this.showEvent('🤚 Zu weit weg zum Aufheben');
       }
       return;
     }
@@ -2096,6 +2217,15 @@ class WorldScene extends Phaser.Scene {
   }
 
   onPointerMove(pointer) {
+    // Long-Press abbrechen wenn Finger sich zu weit bewegt
+    if (this._longPress && this._longPress.pid === pointer.id && !this._longPress.fired) {
+      const ddx = pointer.x - this._longPress.x;
+      const ddy = pointer.y - this._longPress.y;
+      if (Math.hypot(ddx, ddy) > 18) {
+        clearTimeout(this._longPress.timer);
+        this._longPress = null;
+      }
+    }
     if (!this.buildMode) return;
     if (!this.hoverGfx) {
       this.hoverGfx = this.add.graphics();
@@ -2109,9 +2239,27 @@ class WorldScene extends Phaser.Scene {
     this.hoverGfx.strokeRect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
+  onPointerUp(pointer) {
+    // Long-Press im Build-Mode: wenn nicht gefeuert → war ein Tap → place
+    if (this._longPress && this._longPress.pid === pointer.id) {
+      clearTimeout(this._longPress.timer);
+      if (!this._longPress.fired) {
+        const { tx, ty } = this._longPress;
+        this.ws.send(JSON.stringify({
+          type: 'place_structure',
+          x: tx, y: ty,
+          structure_type: this.selectedStruct,
+          material: this.selectedMaterial,
+        }));
+      }
+      this._longPress = null;
+    }
+  }
+
   connectWS() {
-    const host = window.location.hostname;
-    this.ws = new WebSocket(`ws://${host}:8000/ws/${encodeURIComponent(MY_ID)}`);
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    this.ws = new WebSocket(`${proto}//${window.location.host}/ws`);
+    window.GAME_WS = this.ws;
 
     this.ws.onopen = () => {
       document.getElementById('conn-status').textContent = 'Verbunden';
@@ -2191,6 +2339,12 @@ class WorldScene extends Phaser.Scene {
           if (id !== MY_ID) this.spawnOther(id, data.x, data.y);
         }
         this.updatePlayerCount();
+        break;
+
+      case 'chat':
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('player', msg.from, msg.text);
+        }
         break;
 
       case 'player_joined':
@@ -2278,14 +2432,23 @@ class WorldScene extends Phaser.Scene {
         break;
 
       case 'inventory_update':
-        // Item in inventory aktualisieren (z.B. equipped_slot geändert)
-        for (let i = 0; i < this.inventory.length; i++) {
-          if (this.inventory[i].id === msg.item.id) {
-            this.inventory[i] = msg.item;
-          } else if (msg.item.equipped_slot &&
-                     this.inventory[i].equipped_slot === msg.item.equipped_slot) {
-            // Anderer Item im selben Slot wurde rausgezogen
-            this.inventory[i].equipped_slot = null;
+        // Format A: voll {item: {...}} — z.B. equipped_slot Change
+        // Format B: schlank {item_id, quantity} — z.B. Stack-Decrement nach Consume / Stack-Merge nach Pickup
+        if (msg.item) {
+          for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].id === msg.item.id) {
+              this.inventory[i] = msg.item;
+            } else if (msg.item.equipped_slot &&
+                       this.inventory[i].equipped_slot === msg.item.equipped_slot) {
+              this.inventory[i].equipped_slot = null;
+            }
+          }
+        } else if (msg.item_id != null && msg.quantity != null) {
+          for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].id === msg.item_id) {
+              this.inventory[i].quantity = msg.quantity;
+              break;
+            }
           }
         }
         this.refreshInventoryUI();
@@ -3629,7 +3792,20 @@ class WorldScene extends Phaser.Scene {
     const img = this.add.image(cx, cy, cfg.sprite).setOrigin(0.5);
     img.setDisplaySize(TILE_SIZE * 0.5, TILE_SIZE * 0.5);  // Items kleiner als Tiles
     img.setDepth(2);  // über Strukturen (1), unter Charakteren (3)
+    // Für Pickup-Click: Item-ID und Tile-Koordinaten am Sprite hinterlegen
+    img._itemId = item.id;
+    img._tileX = item.x;
+    img._tileY = item.y;
     this.itemSprites[item.id] = img;
+  }
+
+  // Findet das (oberste) Ground-Item auf dem gegebenen Tile, oder null.
+  _findGroundItemAt(tx, ty) {
+    for (const id of Object.keys(this.itemSprites)) {
+      const s = this.itemSprites[id];
+      if (s._tileX === tx && s._tileY === ty) return s;
+    }
+    return null;
   }
 
   removeItemSprite(itemId) {
@@ -4062,12 +4238,15 @@ class WorldScene extends Phaser.Scene {
     return {
       container, body, shadow, label: null, tween: null,
       facing: 'down', walkFrame: 0, walkTimer: 0, moving: false,
+      isPlayer: true,
     };
   }
 
   // Welle 40: Walk-Animation update — vom Pixel-Movement aufgerufen
   _updateWalkFrame(entry, vx, vy, delta) {
     if (!entry || !entry.body) return;
+    // NPCs (Spinne, Wolf, Händler, …) haben eigene Sprites — Player-Walk-Frames NICHT überschreiben
+    if (!entry.isPlayer) return;
     // Reset hängengebliebene Transformations-States
     entry.body.flipX = false;
     entry.body.setRotation(0);
@@ -4193,19 +4372,21 @@ class WorldScene extends Phaser.Scene {
         this.researchOpen || this.questsOpen) return;
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
 
-    // Eingabe-Richtung
+    // Eingabe-Richtung (Keyboard + Touch-Joystick)
     let vx = 0, vy = 0;
     if (this.wasd.left.isDown  || this.cursors.left.isDown)  vx = -1;
     else if (this.wasd.right.isDown || this.cursors.right.isDown) vx = 1;
     if (this.wasd.up.isDown    || this.cursors.up.isDown)    vy = -1;
     else if (this.wasd.down.isDown  || this.cursors.down.isDown)  vy = 1;
+    if (window.touchInput && (window.touchInput.x !== 0 || window.touchInput.y !== 0)) {
+      vx = window.touchInput.x;
+      vy = window.touchInput.y;
+    }
     if (vx === 0 && vy === 0) return;
 
-    // Diagonal normalisieren (sonst √2× schneller diagonal)
-    if (vx !== 0 && vy !== 0) {
-      const inv = 1 / Math.SQRT2;
-      vx *= inv; vy *= inv;
-    }
+    // Magnitude clampen auf 1 (Keyboard diagonal & Touch-Joystick beides korrekt)
+    const _mag = Math.sqrt(vx * vx + vy * vy);
+    if (_mag > 1) { vx /= _mag; vy /= _mag; }
 
     // Delta clampen gegen Lag-Spikes (max 100ms pro Frame)
     const dt = Math.min(0.1, (delta || 16) / 1000);
@@ -4277,11 +4458,554 @@ const config = {
   scene:           [WorldScene],
 };
 
-const game = new Phaser.Game(config);
-// Resize-Handling für Browser-Fenster
-window.addEventListener('resize', () => {
-  game.scale.resize(window.innerWidth, window.innerHeight);
-});
+// Auth-Check vor Game-Start. Bei 401 → Login. Sonst MY_ID setzen und Phaser starten.
+(async () => {
+  try {
+    const r = await fetch('/auth/me');
+    if (!r.ok) {
+      window.location.href = '/login';
+      return;
+    }
+    const me = await r.json();
+    MY_ID = me.username;
+    MY_ROLE = me.role;
+  } catch (e) {
+    window.location.href = '/login';
+    return;
+  }
+
+  if (MY_ROLE === 'admin') {
+    const adminLink = document.createElement('a');
+    adminLink.href = '/admin';
+    adminLink.textContent = '🛠️ Admin';
+    adminLink.style.cssText =
+      'position:fixed;top:12px;right:150px;color:#c8b88a;z-index:100;' +
+      'text-decoration:none;font-size:12px;text-shadow:1px 1px 3px #000;';
+    document.body.appendChild(adminLink);
+  }
+
+  const logoutLink = document.createElement('a');
+  logoutLink.href = '#';
+  logoutLink.textContent = '🚪 Logout';
+  logoutLink.style.cssText =
+    'position:fixed;top:12px;right:80px;color:#c8b88a;z-index:100;' +
+    'text-decoration:none;font-size:12px;text-shadow:1px 1px 3px #000;';
+  logoutLink.addEventListener('click', async (ev) => {
+    ev.preventDefault();
+    await fetch('/auth/logout', { method: 'POST' });
+    window.location.href = '/login';
+  });
+  document.body.appendChild(logoutLink);
+
+  setupChatConsole(MY_ROLE);
+
+  const game = new Phaser.Game(config);
+  window._gameInstance = game;
+  window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+  });
+  setupTouchControls();
+})();
+
+// ─── Floating Chat Console ────────────────────────────────────────────────────
+// Verschiebbares Chat-Fenster mit Player-Chat (broadcast über game-WS) und
+// Dev-Mode (admin-only, Bridge zu Claude CLI auf dem Host).
+function setupChatConsole(myRole) {
+  const isAdmin = myRole === 'admin';
+
+  const css = `
+    #chat-console {
+      position: fixed; top: 100px; right: 20px;
+      width: 380px; height: 480px;
+      background: rgba(15,15,22,0.95);
+      border: 1px solid #444;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+      z-index: 200; display: flex; flex-direction: column;
+      font-family: monospace; color: #c8b88a; font-size: 12px;
+    }
+    #chat-header {
+      padding: 8px 10px; background: #1a1a25;
+      border-bottom: 1px solid #444; cursor: move;
+      display: flex; align-items: center; gap: 8px; user-select: none;
+    }
+    #chat-header .title { flex: 1; font-weight: bold; }
+    #chat-header button {
+      background: transparent; color: #c8b88a; border: 1px solid #444;
+      padding: 2px 8px; cursor: pointer; font-family: monospace; font-size: 11px;
+    }
+    #chat-tabs { display: flex; border-bottom: 1px solid #2a2a35; }
+    #chat-tabs button {
+      flex: 1; padding: 8px; background: transparent;
+      color: #888; border: none; border-bottom: 2px solid transparent;
+      cursor: pointer; font-family: monospace; font-size: 12px;
+    }
+    #chat-tabs button.active { color: #c8b88a; border-bottom-color: #c8b88a; }
+    #chat-messages { flex: 1; overflow-y: auto; padding: 10px; }
+    .chat-msg { margin-bottom: 8px; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
+    .chat-msg .from { color: #7aad6a; font-weight: bold; margin-right: 4px; }
+    .chat-msg.system .from { color: #888; }
+    .chat-msg.system { color: #888; font-style: italic; }
+    .chat-msg.error { color: #e85040; }
+    .chat-msg.claude .from { color: #c8a8e8; }
+    .chat-msg.claude .body { display: block; margin-top: 2px; }
+    #chat-input-row {
+      border-top: 1px solid #2a2a35;
+      display: flex; padding: 6px; gap: 4px;
+    }
+    #chat-input {
+      flex: 1; background: #0a0a0f; border: 1px solid #2a2a35;
+      color: #c8b88a; padding: 6px 8px; font-family: monospace; font-size: 12px;
+    }
+    #chat-input:focus { outline: none; border-color: #c8b88a; }
+    #chat-send {
+      padding: 6px 14px; background: #c8b88a; color: #0a0a0f;
+      border: none; cursor: pointer; font-family: monospace; font-weight: bold;
+    }
+    #chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+    .chat-mini {
+      position: fixed; top: 12px; right: 230px; z-index: 200;
+      background: rgba(15,15,22,0.95); border: 1px solid #444;
+      color: #c8b88a; padding: 6px 12px;
+      font-family: monospace; font-size: 12px; cursor: pointer;
+    }
+    @media (max-width: 720px) {
+      #chat-console {
+        top: auto !important; right: 0 !important; left: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 50vh;
+        max-height: 50vh;
+        border-left: none; border-right: none; border-bottom: none;
+      }
+      #chat-header { cursor: default; padding: 10px; }
+      #chat-tabs button { padding: 12px; font-size: 13px; }
+      .chat-mini {
+        right: 12px !important; top: auto !important; bottom: 80px;
+        padding: 10px 16px;
+      }
+      #chat-input-row { padding: 8px; }
+      #chat-input { font-size: 16px; padding: 10px; }  /* font-size:16px verhindert iOS-Autozoom */
+      #chat-send { padding: 10px 18px; }
+    }
+  `;
+  const styleEl = document.createElement('style');
+  styleEl.textContent = css;
+  document.head.appendChild(styleEl);
+
+  let activeMode = 'player';
+  let devWs = null;
+  let devBusy = false;
+
+  const root = document.createElement('div');
+  root.id = 'chat-console';
+  root.innerHTML = `
+    <div id="chat-header">
+      <span class="title">💬 Chat</span>
+      <button id="chat-min">_</button>
+    </div>
+    <div id="chat-tabs">
+      <button data-mode="player" class="active">🎮 Player</button>
+      ${isAdmin ? '<button data-mode="dev">🛠️ Dev (Claude)</button>' : ''}
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input-row">
+      <input id="chat-input" type="text" placeholder="An alle Spieler…" maxlength="500" />
+      <button id="chat-send">↩</button>
+    </div>
+  `;
+  document.body.appendChild(root);
+
+  const miniBtn = document.createElement('div');
+  miniBtn.className = 'chat-mini';
+  miniBtn.textContent = '💬 Chat öffnen';
+  miniBtn.style.display = 'none';
+  document.body.appendChild(miniBtn);
+
+  // === Drag ===
+  const header = root.querySelector('#chat-header');
+  let dragStart = null;
+  header.addEventListener('mousedown', (ev) => {
+    if (ev.target.tagName === 'BUTTON') return;
+    const rect = root.getBoundingClientRect();
+    dragStart = { dx: ev.clientX - rect.left, dy: ev.clientY - rect.top };
+  });
+  document.addEventListener('mousemove', (ev) => {
+    if (!dragStart) return;
+    root.style.left = Math.max(0, Math.min(window.innerWidth - 100, ev.clientX - dragStart.dx)) + 'px';
+    root.style.top  = Math.max(0, Math.min(window.innerHeight - 50, ev.clientY - dragStart.dy)) + 'px';
+    root.style.right = 'auto';
+  });
+  document.addEventListener('mouseup', () => { dragStart = null; });
+
+  // === Minimize ===
+  root.querySelector('#chat-min').addEventListener('click', () => {
+    root.style.display = 'none';
+    miniBtn.style.display = 'block';
+  });
+  miniBtn.addEventListener('click', () => {
+    root.style.display = 'flex';
+    miniBtn.style.display = 'none';
+  });
+
+  // === Tabs ===
+  const inputEl = root.querySelector('#chat-input');
+  const sendBtn = root.querySelector('#chat-send');
+  root.querySelectorAll('#chat-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      activeMode = mode;
+      root.querySelectorAll('#chat-tabs button').forEach(b => b.classList.toggle('active', b === btn));
+      inputEl.placeholder = (mode === 'dev') ? 'Frag Claude (Repo: liege)…' : 'An alle Spieler…';
+      if (mode === 'dev' && (!devWs || devWs.readyState > 1)) connectDevWs();
+      updateSendDisabled();
+    });
+  });
+
+  // === Messages ===
+  const msgsEl = root.querySelector('#chat-messages');
+  function addMessage(kind, from, text) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + (kind || '');
+    if (from) {
+      const f = document.createElement('span');
+      f.className = 'from';
+      f.textContent = from + ':';
+      div.appendChild(f);
+    }
+    const body = document.createElement('span');
+    body.className = 'body';
+    body.textContent = text;
+    div.appendChild(body);
+    msgsEl.appendChild(div);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  // === Send ===
+  function updateSendDisabled() {
+    sendBtn.disabled = (activeMode === 'dev' && devBusy);
+  }
+  function send() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    if (activeMode === 'player') {
+      if (window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
+        window.GAME_WS.send(JSON.stringify({ type: 'chat', text }));
+      } else {
+        addMessage('error', null, '⚠️ Game-Verbindung nicht offen');
+      }
+    } else if (activeMode === 'dev') {
+      if (devBusy) return;
+      if (devWs && devWs.readyState === WebSocket.OPEN) {
+        addMessage('', MY_ID, text);
+        devWs.send(JSON.stringify({ type: 'message', message: text }));
+        devBusy = true;
+        updateSendDisabled();
+      } else {
+        addMessage('error', null, '⚠️ Dev-Verbindung nicht offen — Tab wechseln und zurück');
+      }
+    }
+    inputEl.value = '';
+  }
+  sendBtn.addEventListener('click', send);
+  inputEl.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' && !ev.shiftKey) {
+      ev.preventDefault();
+      send();
+    }
+  });
+
+  // === Dev WS ===
+  function connectDevWs() {
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    devWs = new WebSocket(`${proto}//${window.location.host}/ws/dev-chat`);
+    devWs.onopen = () => addMessage('system', null, '✓ Dev-Chat verbunden');
+    devWs.onclose = (ev) => {
+      addMessage('system', null, '✗ Dev-Chat getrennt (' + ev.code + ')');
+      devWs = null;
+      devBusy = false;
+      updateSendDisabled();
+    };
+    devWs.onerror = () => addMessage('error', null, 'Dev-WS Fehler');
+    devWs.onmessage = (ev) => {
+      const data = JSON.parse(ev.data);
+      if (data.type === 'ready') {
+        // ok
+      } else if (data.type === 'thinking') {
+        addMessage('system', null, '… Claude arbeitet (kann 30+ Sek dauern)');
+      } else if (data.type === 'reply') {
+        devBusy = false;
+        updateSendDisabled();
+        if (data.ok) {
+          addMessage('claude', 'Claude', data.response || '(leere Antwort)');
+        } else {
+          addMessage('error', 'Claude', 'Fehler: ' + (data.stderr || 'unbekannt'));
+        }
+      } else if (data.type === 'error') {
+        addMessage('error', null, data.error || 'Fehler');
+      }
+    };
+  }
+
+  // Hook für Game-Scene (eingehende Player-Chats über die Game-WS)
+  window.chatConsole = { addMessage };
+
+  addMessage('system', null, isAdmin
+    ? 'Bereit. Tab wechseln zu Dev für Claude-Bridge.'
+    : 'Bereit. Schreib was an die anderen Spieler.');
+
+  // VisualViewport-API: Chat über die Soft-Keyboard hochschieben damit Input sichtbar bleibt.
+  // Ohne das versteckt iOS Safari (und teils Chrome Android) die fixed-bottom-Elements hinter der Tastatur.
+  if (window.visualViewport) {
+    const adjustForKeyboard = () => {
+      const vv = window.visualViewport;
+      const keyboardHeight = window.innerHeight - vv.height - vv.offsetTop;
+      if (keyboardHeight > 80) {
+        root.style.bottom = keyboardHeight + 'px';
+        // Höhe gegen verfügbaren Raum begrenzen damit alles sichtbar bleibt
+        root.style.maxHeight = (vv.height - 20) + 'px';
+      } else {
+        root.style.bottom = '';
+        root.style.maxHeight = '';
+      }
+    };
+    window.visualViewport.addEventListener('resize', adjustForKeyboard);
+    window.visualViewport.addEventListener('scroll', adjustForKeyboard);
+  }
+}
+
+// ─── Touch Controls ──────────────────────────────────────────────────────────
+// Virtual Joystick links unten (Movement) + Action-Buttons rechts unten (Menüs).
+// Wird nur initialisiert wenn Touch-Device. Schreibt window.touchInput = {x,y}
+// das die Game-update-Loop liest.
+function setupTouchControls() {
+  const isTouch =
+    ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0) ||
+    window.matchMedia('(pointer: coarse)').matches;
+  if (!isTouch) return;
+
+  const css = `
+    /* Floating-Joystick: erscheint dort wo der Daumen in der linken Hälfte landet.
+       Anfangs versteckt, opacity-Transition für sanften Auftritt. */
+    #touch-joystick {
+      position: fixed; left: 0; top: 0;
+      width: 140px; height: 140px;
+      background: rgba(15,15,22,0.45);
+      border: 2px solid rgba(200,184,138,0.55);
+      border-radius: 50%;
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;        /* gefangen wird über zone */
+      transform: translate(-9999px, -9999px);
+      transition: opacity 0.12s linear;
+    }
+    #touch-joystick.active { opacity: 1; }
+    #touch-joystick-thumb {
+      position: absolute; left: 50%; top: 50%;
+      width: 60px; height: 60px; margin: -30px 0 0 -30px;
+      background: rgba(200,184,138,0.7);
+      border: 2px solid #c8b88a;
+      border-radius: 50%;
+      pointer-events: none;
+      will-change: transform;
+    }
+    /* Joystick-Zone (unsichtbar): linke untere Hälfte, fängt touchstart ab. */
+    #touch-joystick-zone {
+      position: fixed; left: 0; bottom: 0;
+      width: 50vw; height: 70vh;
+      z-index: 140;
+      touch-action: none;
+      -webkit-user-select: none; user-select: none;
+      /* Kein pointer-events: none — wir wollen touchstart abfangen */
+    }
+    #touch-actions {
+      position: fixed; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
+      display: grid; grid-template-columns: 60px 60px; gap: 10px;
+      z-index: 150;
+    }
+    .touch-btn {
+      width: 60px; height: 60px;
+      background: rgba(15,15,22,0.55);
+      border: 2px solid rgba(200,184,138,0.5);
+      color: #c8b88a; font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      touch-action: manipulation;
+      -webkit-user-select: none; user-select: none;
+      cursor: pointer;
+    }
+    .touch-btn:active { background: rgba(200,184,138,0.25); }
+    .touch-btn.toggled { background: rgba(200,184,138,0.3); border-color: #c8b88a; }
+    @media (orientation: landscape) and (max-height: 500px) {
+      /* In Landscape mit wenig Höhe: Action-Buttons als 1 Spalte (Minimap-Konflikt) */
+      #touch-actions { grid-template-columns: 60px; right: 8px; bottom: 8px; }
+      #touch-joystick-zone { height: 90vh; }
+    }
+    /* Orientation-Warnung wenn Portrait + sehr schmal */
+    #orient-warning {
+      position: fixed; inset: 0; background: #0a0a0f;
+      color: #c8b88a; z-index: 9000;
+      display: none;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 20px;
+      font-family: monospace; padding: 30px; text-align: center;
+    }
+    #orient-warning .icon { font-size: 56px; animation: rot 2s ease-in-out infinite; }
+    @keyframes rot { 0%,100% { transform: rotate(-15deg); } 50% { transform: rotate(75deg); } }
+    @media (max-width: 600px) and (orientation: portrait) {
+      #orient-warning { display: flex; }
+    }
+  `;
+  const styleEl = document.createElement('style');
+  styleEl.textContent = css;
+  document.head.appendChild(styleEl);
+
+  // ── Floating Joystick ──
+  // Joystick existiert immer im DOM, ist aber unsichtbar bis ein Touch in der
+  // Joystick-Zone (linke untere Bildschirmhälfte) landet. Spawnt dort, folgt dem
+  // Finger im MAX_R-Radius, verschwindet bei touchend.
+  const joystick = document.createElement('div');
+  joystick.id = 'touch-joystick';
+  joystick.innerHTML = '<div id="touch-joystick-thumb"></div>';
+  document.body.appendChild(joystick);
+  const thumb = joystick.querySelector('#touch-joystick-thumb');
+
+  const zone = document.createElement('div');
+  zone.id = 'touch-joystick-zone';
+  document.body.appendChild(zone);
+
+  window.touchInput = { x: 0, y: 0 };
+  let activeId = null;
+  let originX = 0, originY = 0;
+  const MAX_R = 55;             // Max Thumb-Displacement (px)
+  const DEAD_ZONE = MAX_R * 0.15;  // 15% des Radius (Cassino-Recommendation)
+
+  function placeJoystickAt(x, y) {
+    // Joystick zentriert auf (x,y) positionieren
+    const halfSize = 70; // halbe Joystick-Breite (140/2)
+    joystick.style.transform = `translate(${x - halfSize}px, ${y - halfSize}px)`;
+    joystick.classList.add('active');
+    originX = x;
+    originY = y;
+    setThumb(0, 0);
+  }
+  function hideJoystick() {
+    joystick.classList.remove('active');
+    joystick.style.transform = 'translate(-9999px, -9999px)';
+  }
+  function setThumb(dx, dy) {
+    thumb.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+  function resetJoy() {
+    setThumb(0, 0);
+    window.touchInput.x = 0;
+    window.touchInput.y = 0;
+    activeId = null;
+    hideJoystick();
+  }
+
+  zone.addEventListener('touchstart', (ev) => {
+    ev.preventDefault();
+    if (activeId !== null) return;
+    const t = ev.changedTouches[0];
+    activeId = t.identifier;
+    placeJoystickAt(t.clientX, t.clientY);
+  }, { passive: false });
+
+  // touchmove auf document, damit Finger über die Zone hinaus gleiten darf
+  document.addEventListener('touchmove', (ev) => {
+    if (activeId === null) return;
+    let touch = null;
+    for (let i = 0; i < ev.touches.length; i++) {
+      if (ev.touches[i].identifier === activeId) { touch = ev.touches[i]; break; }
+    }
+    if (!touch) return;
+    ev.preventDefault();
+    let dx = touch.clientX - originX;
+    let dy = touch.clientY - originY;
+    const dist = Math.hypot(dx, dy);
+    if (dist < DEAD_ZONE) {
+      setThumb(0, 0);
+      window.touchInput.x = 0;
+      window.touchInput.y = 0;
+      return;
+    }
+    if (dist > MAX_R) {
+      dx = dx / dist * MAX_R;
+      dy = dy / dist * MAX_R;
+    }
+    setThumb(dx, dy);
+    window.touchInput.x = dx / MAX_R;
+    window.touchInput.y = dy / MAX_R;
+  }, { passive: false });
+
+  function handleEnd(ev) {
+    if (activeId === null) return;
+    for (let i = 0; i < ev.changedTouches.length; i++) {
+      if (ev.changedTouches[i].identifier === activeId) { resetJoy(); break; }
+    }
+  }
+  document.addEventListener('touchend', handleEnd, { passive: true });
+  document.addEventListener('touchcancel', handleEnd, { passive: true });
+
+  // ── Action Buttons ──
+  // Greift direkt auf die WorldScene zu. Falls Scene noch nicht da: kurzer Retry.
+  function getScene() {
+    if (!window._gameInstance) return null;
+    return window._gameInstance.scene.getScene('WorldScene') || null;
+  }
+  function callScene(method) {
+    const sc = getScene();
+    if (sc && typeof sc[method] === 'function') sc[method]();
+  }
+
+  const actions = document.createElement('div');
+  actions.id = 'touch-actions';
+  const BUTTONS = [
+    { label: '🎒', method: 'toggleInventory', title: 'Inventar' },
+    { label: '📜', method: 'toggleQuests',    title: 'Quests' },
+    { label: '⚒️', method: 'toggleBuildMode', title: 'Bauen' },
+    { label: '🌱', method: 'toggleSkills',    title: 'Skills' },
+    { label: '🔬', method: 'toggleResearch',  title: 'Forschung' },
+    { label: '⭐', method: 'toggleTalents',   title: 'Talente' },
+  ];
+  BUTTONS.forEach((b) => {
+    const btn = document.createElement('div');
+    btn.className = 'touch-btn';
+    btn.textContent = b.label;
+    btn.title = b.title;
+    btn.addEventListener('touchstart', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      callScene(b.method);
+    }, { passive: false });
+    // Fallback für Hybrid-Geräte (Maus + Touch)
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      callScene(b.method);
+    });
+    actions.appendChild(btn);
+  });
+  document.body.appendChild(actions);
+
+  // Orientation-Warnung — wird per CSS-Media-Query angezeigt wenn Portrait + schmal
+  const orient = document.createElement('div');
+  orient.id = 'orient-warning';
+  orient.innerHTML = `
+    <div class="icon">📱</div>
+    <div>Bitte dreh dein Gerät quer</div>
+    <div style="font-size:11px;color:#888;">Liege spielt sich am besten im Landscape-Modus.</div>
+  `;
+  document.body.appendChild(orient);
+
+  // Bei aktivem Dialog/Overlay: Joystick zurücksetzen damit Player nicht weiterläuft
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) resetJoy();
+  });
+
+  // Wenn der Browser ins Background geht → Joystick reset + Phaser-Pause
+  window.addEventListener('blur', () => resetJoy());
+}
 
 // Fade-Animation für Events
 const style = document.createElement('style');
