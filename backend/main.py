@@ -1389,6 +1389,14 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type": "inventory_add", "item": transferred,
                     })
 
+            elif mtype == "open_hand_crafting":
+                # Inventar-getriebenes Hand-Crafting: keine Werkbank nötig.
+                await websocket.send_json({
+                    "type":    "crafting_open",
+                    "station": "hand",
+                    "recipes": recipes.get_recipes("hand"),
+                })
+
             elif mtype == "craft":
                 station = str(data.get("station", ""))
                 recipe_id = str(data.get("recipe_id", ""))

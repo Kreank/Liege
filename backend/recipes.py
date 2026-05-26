@@ -6,6 +6,25 @@ das entsprechende material-spezifische Sprite (z.B. sword_1h_iron.png).
 """
 
 RECIPES = {
+    # Hand-Crafting — überall ohne Werkbank möglich. Basis-Werkzeuge die
+    # man am Anfang braucht, plus Faser→Stoff-Verarbeitung.
+    "hand": [
+        {"id": "wooden_axe",     "name": "Holzaxt",       "output": "axe",
+         "material": "wood",
+         "inputs": [("wood", 2), ("stone", 1)]},
+        {"id": "wooden_pickaxe", "name": "Holzspitzhacke","output": "pickaxe",
+         "inputs": [("wood", 2), ("stone", 2)]},
+        {"id": "wooden_hammer",  "name": "Holzhammer",    "output": "hammer",
+         "inputs": [("wood", 3), ("stone", 1)]},
+        {"id": "wooden_sickle",  "name": "Holzsichel",    "output": "sickle",
+         "inputs": [("wood", 2), ("stone", 1)]},
+        # Faser → Stoff
+        {"id": "weave_cloth",    "name": "Stoff weben",   "output": "cloth",
+         "inputs": [("plant_fiber", 3)]},
+        # Knochenamulett auch ohne Werkbank
+        {"id": "bone_amulet_hand","name": "Knochenamulett","output": "amulet",
+         "inputs": [("bone", 2), ("plant_fiber", 2)]},
+    ],
     "workbench": [
         {"id": "wooden_sword",  "name": "Holzschwert",  "output": "sword",
          "material": "wood",

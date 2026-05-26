@@ -581,6 +581,12 @@
       display: flex; justify-content: space-between; align-items: center;
       color: #e8d870; font-weight: bold;
     }
+    #hand-craft-btn {
+      background: rgba(60,90,40,0.5); border: 1px solid #80c060;
+      color: #d0e8a0; padding: 4px 8px; cursor: pointer; margin-right: 6px;
+      font-family: monospace; font-size: 11px;
+    }
+    #hand-craft-btn:hover { background: rgba(80,120,50,0.6); }
     #inventory-close {
       background: none; border: 1px solid #555; color: #c8b88a;
       padding: 2px 8px; cursor: pointer; font-family: monospace;
@@ -1045,7 +1051,10 @@
   <div id="inventory-box">
     <div id="inventory-header">
       <span>🎒 Inventar</span>
-      <button id="inventory-close" type="button">I / Esc</button>
+      <span>
+        <button id="hand-craft-btn" type="button" title="Werkzeuge & Stoff ohne Werkbank">🛠 Handwerken</button>
+        <button id="inventory-close" type="button">I / Esc</button>
+      </span>
     </div>
     <div class="inv-section-title">Ausrüstung</div>
     <div id="inventory-slots"></div>
@@ -1475,6 +1484,7 @@ const ITEM = {
   crystal:       { name: 'Kristall',    sprite: 'item_crystal',       category: 'resource',                       path: '/assets/resources/crystal.png' },
   bone:          { name: 'Knochen',     sprite: 'item_bone',          category: 'resource',                       path: '/assets/resources/bone.png' },
   cloth:         { name: 'Stoff',       sprite: 'item_cloth',         category: 'resource',                       path: '/assets/resources/cloth.png' },
+  plant_fiber:   { name: 'Pflanzenfaser',sprite: 'item_plant_fiber',  category: 'resource',                       path: '/assets/resources/cloth.png' },
   leather:       { name: 'Leder',       sprite: 'item_leather',       category: 'resource',                       path: '/assets/resources/leather.png' },
   copper_coin:   { name: 'Kupfermünze', sprite: 'item_copper_coin',   category: 'resource',                       path: '/assets/currency/coin_copper.png' },
   silver_coin:   { name: 'Silbermünze', sprite: 'item_silver_coin',   category: 'resource',                       path: '/assets/currency/coin_silver.png' },
@@ -2001,6 +2011,11 @@ class WorldScene extends Phaser.Scene {
       else if (e.key.toLowerCase() === 'c' && this.attributesOpen) this.toggleAttributes();
     });
     document.getElementById('inventory-close').addEventListener('click', () => this.toggleInventory());
+    document.getElementById('hand-craft-btn').addEventListener('click', () => {
+      // Inventar zu, dann Hand-Crafting öffnen
+      if (this.inventoryOpen) this.toggleInventory();
+      this.ws.send(JSON.stringify({ type: 'open_hand_crafting' }));
+    });
     document.getElementById('chest-close').addEventListener('click', () => this.closeChest());
     document.getElementById('crafting-close').addEventListener('click', () => this.closeCrafting());
     document.getElementById('trade-close').addEventListener('click', () => this.closeTrade());
@@ -3372,7 +3387,7 @@ class WorldScene extends Phaser.Scene {
     if (this.activeDialog || this.inventoryOpen || this.activeChest) return;
     this.activeCrafting = { station, recipes: recipeList };
     if (!this.bills) this.bills = [];     // initial leer; Server schickt bills_update
-    const labels = { workbench: 'Werkbank', furnace: 'Schmelze', anvil: 'Amboss' };
+    const labels = { workbench: 'Werkbank', furnace: 'Schmelze', anvil: 'Amboss', hand: '🛠 Handwerken' };
     document.getElementById('crafting-station-label').textContent = labels[station] || station;
     document.getElementById('crafting-overlay').classList.add('active');
     this.input.keyboard.enabled = false;
