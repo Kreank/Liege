@@ -1,0 +1,189 @@
+{
+  "asset_type": "professional_stackable_weather_overlays",
+  "format": "768x512 transparent PNG frames + sprite sheets + GIF previews",
+  "blend_mode_recommendation": {
+    "rain": "alpha blend plus optional screen highlights",
+    "snow": "alpha blend",
+    "fog_mist": "alpha blend, render above terrain below characters for ground fog or above all for atmospheric veil",
+    "heat_haze": "use as distortion/noise alpha guide or subtle screen overlay",
+    "storm": "alpha blend + brief screen flash"
+  },
+  "stacking": "Use light/medium/heavy/downpour or snow levels as additive intensity tiers; overlays are loopable camera-space fullscreen overlays.",
+  "weather": [
+    {
+      "id": "rain_light_overlay",
+      "folder": "assets/animations/professional/weather_overlays/rain_light_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 60,
+      "sheet": "assets/animations/professional/weather_overlays/rain_light_overlay/rain_light_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/rain_light_overlay/rain_light_overlay_preview.gif"
+    },
+    {
+      "id": "rain_medium_overlay",
+      "folder": "assets/animations/professional/weather_overlays/rain_medium_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 60,
+      "sheet": "assets/animations/professional/weather_overlays/rain_medium_overlay/rain_medium_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/rain_medium_overlay/rain_medium_overlay_preview.gif"
+    },
+    {
+      "id": "rain_heavy_overlay",
+      "folder": "assets/animations/professional/weather_overlays/rain_heavy_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 50,
+      "sheet": "assets/animations/professional/weather_overlays/rain_heavy_overlay/rain_heavy_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/rain_heavy_overlay/rain_heavy_overlay_preview.gif"
+    },
+    {
+      "id": "rain_downpour_overlay",
+      "folder": "assets/animations/professional/weather_overlays/rain_downpour_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 50,
+      "sheet": "assets/animations/professional/weather_overlays/rain_downpour_overlay/rain_downpour_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/rain_downpour_overlay/rain_downpour_overlay_preview.gif"
+    },
+    {
+      "id": "snow_light_overlay",
+      "folder": "assets/animations/professional/weather_overlays/snow_light_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather_overlays/snow_light_overlay/snow_light_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/snow_light_overlay/snow_light_overlay_preview.gif"
+    },
+    {
+      "id": "snow_medium_overlay",
+      "folder": "assets/animations/professional/weather_overlays/snow_medium_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather_overlays/snow_medium_overlay/snow_medium_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/snow_medium_overlay/snow_medium_overlay_preview.gif"
+    },
+    {
+      "id": "snow_heavy_overlay",
+      "folder": "assets/animations/professional/weather_overlays/snow_heavy_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather_overlays/snow_heavy_overlay/snow_heavy_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/snow_heavy_overlay/snow_heavy_overlay_preview.gif"
+    },
+    {
+      "id": "snow_blizzard_overlay",
+      "folder": "assets/animations/professional/weather_overlays/snow_blizzard_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather_overlays/snow_blizzard_overlay/snow_blizzard_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/snow_blizzard_overlay/snow_blizzard_overlay_preview.gif"
+    },
+    {
+      "id": "fog_light_overlay",
+      "folder": "assets/animations/professional/weather_overlays/fog_light_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 95,
+      "sheet": "assets/animations/professional/weather_overlays/fog_light_overlay/fog_light_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/fog_light_overlay/fog_light_overlay_preview.gif"
+    },
+    {
+      "id": "fog_dense_overlay",
+      "folder": "assets/animations/professional/weather_overlays/fog_dense_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 95,
+      "sheet": "assets/animations/professional/weather_overlays/fog_dense_overlay/fog_dense_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/fog_dense_overlay/fog_dense_overlay_preview.gif"
+    },
+    {
+      "id": "swamp_mist_overlay",
+      "folder": "assets/animations/professional/weather_overlays/swamp_mist_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 95,
+      "sheet": "assets/animations/professional/weather_overlays/swamp_mist_overlay/swamp_mist_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/swamp_mist_overlay/swamp_mist_overlay_preview.gif"
+    },
+    {
+      "id": "jungle_humidity_overlay",
+      "folder": "assets/animations/professional/weather_overlays/jungle_humidity_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 95,
+      "sheet": "assets/animations/professional/weather_overlays/jungle_humidity_overlay/jungle_humidity_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/jungle_humidity_overlay/jungle_humidity_overlay_preview.gif"
+    },
+    {
+      "id": "desert_heat_haze_overlay",
+      "folder": "assets/animations/professional/weather_overlays/desert_heat_haze_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 70,
+      "sheet": "assets/animations/professional/weather_overlays/desert_heat_haze_overlay/desert_heat_haze_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/desert_heat_haze_overlay/desert_heat_haze_overlay_preview.gif"
+    },
+    {
+      "id": "storm_cell_overlay",
+      "folder": "assets/animations/professional/weather_overlays/storm_cell_overlay",
+      "frame_count": 16,
+      "frame_size": [
+        768,
+        512
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/weather_overlays/storm_cell_overlay/storm_cell_overlay_sheet.png",
+      "preview_gif": "assets/animations/professional/weather_overlays/storm_cell_overlay/storm_cell_overlay_preview.gif"
+    }
+  ],
+  "contacts": {
+    "overview_frames": "assets/animations/professional/weather_overlays/weather_overlay_frames_contact.jpg",
+    "preview_contact": "assets/animations/professional/weather_overlays/weather_overlay_preview_contact.jpg",
+    "rain_stack": "assets/animations/professional/weather_overlays/rain_stack_contact.jpg",
+    "snow_stack": "assets/animations/professional/weather_overlays/snow_stack_contact.jpg",
+    "atmosphere_stack": "assets/animations/professional/weather_overlays/atmosphere_stack_contact.jpg"
+  }
+}

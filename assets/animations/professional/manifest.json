@@ -1,0 +1,311 @@
+{
+  "asset_type": "professional_animation_effects",
+  "format": "png frame sequences + sprite sheets + gif previews",
+  "note": "Weather levels are designed to be stackable by intensity; use alpha blending/additive blending depending on effect.",
+  "weather": [
+    {
+      "id": "rain_light",
+      "folder": "assets/animations/professional/weather/rain_light",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/weather/rain_light/rain_light_sheet.png",
+      "preview": "assets/animations/professional/weather/rain_light/rain_light_preview.gif"
+    },
+    {
+      "id": "rain_medium",
+      "folder": "assets/animations/professional/weather/rain_medium",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/weather/rain_medium/rain_medium_sheet.png",
+      "preview": "assets/animations/professional/weather/rain_medium/rain_medium_preview.gif"
+    },
+    {
+      "id": "rain_heavy",
+      "folder": "assets/animations/professional/weather/rain_heavy",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/weather/rain_heavy/rain_heavy_sheet.png",
+      "preview": "assets/animations/professional/weather/rain_heavy/rain_heavy_preview.gif"
+    },
+    {
+      "id": "rain_downpour",
+      "folder": "assets/animations/professional/weather/rain_downpour",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/weather/rain_downpour/rain_downpour_sheet.png",
+      "preview": "assets/animations/professional/weather/rain_downpour/rain_downpour_preview.gif"
+    },
+    {
+      "id": "snow_light",
+      "folder": "assets/animations/professional/weather/snow_light",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather/snow_light/snow_light_sheet.png",
+      "preview": "assets/animations/professional/weather/snow_light/snow_light_preview.gif"
+    },
+    {
+      "id": "snow_medium",
+      "folder": "assets/animations/professional/weather/snow_medium",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather/snow_medium/snow_medium_sheet.png",
+      "preview": "assets/animations/professional/weather/snow_medium/snow_medium_preview.gif"
+    },
+    {
+      "id": "snow_heavy",
+      "folder": "assets/animations/professional/weather/snow_heavy",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather/snow_heavy/snow_heavy_sheet.png",
+      "preview": "assets/animations/professional/weather/snow_heavy/snow_heavy_preview.gif"
+    },
+    {
+      "id": "snow_blizzard",
+      "folder": "assets/animations/professional/weather/snow_blizzard",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/weather/snow_blizzard/snow_blizzard_sheet.png",
+      "preview": "assets/animations/professional/weather/snow_blizzard/snow_blizzard_preview.gif"
+    },
+    {
+      "id": "fog_light",
+      "folder": "assets/animations/professional/weather/fog_light",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 100,
+      "sheet": "assets/animations/professional/weather/fog_light/fog_light_sheet.png",
+      "preview": "assets/animations/professional/weather/fog_light/fog_light_preview.gif"
+    },
+    {
+      "id": "fog_dense",
+      "folder": "assets/animations/professional/weather/fog_dense",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 100,
+      "sheet": "assets/animations/professional/weather/fog_dense/fog_dense_sheet.png",
+      "preview": "assets/animations/professional/weather/fog_dense/fog_dense_preview.gif"
+    },
+    {
+      "id": "storm_lightning",
+      "folder": "assets/animations/professional/weather/storm_lightning",
+      "frame_count": 8,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 70,
+      "sheet": "assets/animations/professional/weather/storm_lightning/storm_lightning_sheet.png",
+      "preview": "assets/animations/professional/weather/storm_lightning/storm_lightning_preview.gif"
+    }
+  ],
+  "biomes": [
+    {
+      "id": "desert_heat_haze",
+      "folder": "assets/animations/professional/biomes/desert_heat_haze",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 75,
+      "sheet": "assets/animations/professional/biomes/desert_heat_haze/desert_heat_haze_sheet.png",
+      "preview": "assets/animations/professional/biomes/desert_heat_haze/desert_heat_haze_preview.gif"
+    },
+    {
+      "id": "desert_dust",
+      "folder": "assets/animations/professional/biomes/desert_dust",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 80,
+      "sheet": "assets/animations/professional/biomes/desert_dust/desert_dust_sheet.png",
+      "preview": "assets/animations/professional/biomes/desert_dust/desert_dust_preview.gif"
+    },
+    {
+      "id": "jungle_humidity_motes",
+      "folder": "assets/animations/professional/biomes/jungle_humidity_motes",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 90,
+      "sheet": "assets/animations/professional/biomes/jungle_humidity_motes/jungle_humidity_motes_sheet.png",
+      "preview": "assets/animations/professional/biomes/jungle_humidity_motes/jungle_humidity_motes_preview.gif"
+    },
+    {
+      "id": "jungle_leaf_drift",
+      "folder": "assets/animations/professional/biomes/jungle_leaf_drift",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 110,
+      "sheet": "assets/animations/professional/biomes/jungle_leaf_drift/jungle_leaf_drift_sheet.png",
+      "preview": "assets/animations/professional/biomes/jungle_leaf_drift/jungle_leaf_drift_preview.gif"
+    },
+    {
+      "id": "swamp_mist",
+      "folder": "assets/animations/professional/biomes/swamp_mist",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 105,
+      "sheet": "assets/animations/professional/biomes/swamp_mist/swamp_mist_sheet.png",
+      "preview": "assets/animations/professional/biomes/swamp_mist/swamp_mist_preview.gif"
+    },
+    {
+      "id": "volcanic_ash",
+      "folder": "assets/animations/professional/biomes/volcanic_ash",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 80,
+      "sheet": "assets/animations/professional/biomes/volcanic_ash/volcanic_ash_sheet.png",
+      "preview": "assets/animations/professional/biomes/volcanic_ash/volcanic_ash_preview.gif"
+    }
+  ],
+  "combat_magic": [
+    {
+      "id": "fireball_explosion",
+      "folder": "assets/animations/professional/combat_magic/fireball_explosion",
+      "frame_count": 12,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/combat_magic/fireball_explosion/fireball_explosion_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/fireball_explosion/fireball_explosion_preview.gif"
+    },
+    {
+      "id": "ice_impact",
+      "folder": "assets/animations/professional/combat_magic/ice_impact",
+      "frame_count": 12,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 65,
+      "sheet": "assets/animations/professional/combat_magic/ice_impact/ice_impact_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/ice_impact/ice_impact_preview.gif"
+    },
+    {
+      "id": "heal_pulse",
+      "folder": "assets/animations/professional/combat_magic/heal_pulse",
+      "frame_count": 12,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 90,
+      "sheet": "assets/animations/professional/combat_magic/heal_pulse/heal_pulse_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/heal_pulse/heal_pulse_preview.gif"
+    },
+    {
+      "id": "magic_circle",
+      "folder": "assets/animations/professional/combat_magic/magic_circle",
+      "frame_count": 12,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 90,
+      "sheet": "assets/animations/professional/combat_magic/magic_circle/magic_circle_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/magic_circle/magic_circle_preview.gif"
+    },
+    {
+      "id": "sword_slash_arc",
+      "folder": "assets/animations/professional/combat_magic/sword_slash_arc",
+      "frame_count": 12,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 45,
+      "sheet": "assets/animations/professional/combat_magic/sword_slash_arc/sword_slash_arc_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/sword_slash_arc/sword_slash_arc_preview.gif"
+    },
+    {
+      "id": "hit_spark",
+      "folder": "assets/animations/professional/combat_magic/hit_spark",
+      "frame_count": 12,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 45,
+      "sheet": "assets/animations/professional/combat_magic/hit_spark/hit_spark_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/hit_spark/hit_spark_preview.gif"
+    },
+    {
+      "id": "lightning_strike",
+      "folder": "assets/animations/professional/combat_magic/lightning_strike",
+      "frame_count": 8,
+      "frame_size": [
+        256,
+        256
+      ],
+      "frame_ms": 55,
+      "sheet": "assets/animations/professional/combat_magic/lightning_strike/lightning_strike_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/lightning_strike/lightning_strike_preview.gif"
+    },
+    {
+      "id": "poison_cloud",
+      "folder": "assets/animations/professional/combat_magic/poison_cloud",
+      "frame_count": 12,
+      "frame_size": [
+        512,
+        512
+      ],
+      "frame_ms": 100,
+      "sheet": "assets/animations/professional/combat_magic/poison_cloud/poison_cloud_sheet.png",
+      "preview": "assets/animations/professional/combat_magic/poison_cloud/poison_cloud_preview.gif"
+    }
+  ]
+}
