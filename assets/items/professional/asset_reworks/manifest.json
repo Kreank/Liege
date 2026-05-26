@@ -1,0 +1,276 @@
+{
+  "asset_type": "professional_item_reworks_and_water_tools",
+  "count": 30,
+  "assets": [
+    {
+      "id": "cabbage",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/cabbage.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/cabbage.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/cabbage.png",
+      "targets": [
+        "assets/food/cabbage.png"
+      ]
+    },
+    {
+      "id": "carrot",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/carrot.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/carrot.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/carrot.png",
+      "targets": [
+        "assets/food/carrot.png"
+      ]
+    },
+    {
+      "id": "cherry",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/cherry.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/cherry.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/cherry.png",
+      "targets": [
+        "assets/food/cherry.png"
+      ]
+    },
+    {
+      "id": "corn",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/corn.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/corn.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/corn.png",
+      "targets": [
+        "assets/food/corn.png"
+      ]
+    },
+    {
+      "id": "cucumber",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/cucumber.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/cucumber.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/cucumber.png",
+      "targets": [
+        "assets/food/cucumber.png"
+      ]
+    },
+    {
+      "id": "garlic",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/garlic.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/garlic.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/garlic.png",
+      "targets": [
+        "assets/food/garlic.png"
+      ]
+    },
+    {
+      "id": "green_grapes",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/green_grapes.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/green_grapes.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/green_grapes.png",
+      "targets": [
+        "assets/food/grapes_green.png"
+      ]
+    },
+    {
+      "id": "blue_grapes",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/blue_grapes.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/blue_grapes.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/blue_grapes.png",
+      "targets": [
+        "assets/food/grapes_blue.png"
+      ]
+    },
+    {
+      "id": "potato",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/potato.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/potato.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/potato.png",
+      "targets": [
+        "assets/food/potato.png"
+      ]
+    },
+    {
+      "id": "pumpkin",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/pumpkin.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/pumpkin.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/pumpkin.png",
+      "targets": [
+        "assets/food/pumpkin.png"
+      ]
+    },
+    {
+      "id": "raspberry",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/raspberry.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/raspberry.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/raspberry.png",
+      "targets": [
+        "assets/food/raspberry.png"
+      ]
+    },
+    {
+      "id": "strawberry",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/strawberry.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/strawberry.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/strawberry.png",
+      "targets": [
+        "assets/food/strawberry.png"
+      ]
+    },
+    {
+      "id": "tomato",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/tomato.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/tomato.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/tomato.png",
+      "targets": [
+        "assets/food/tomato.png"
+      ]
+    },
+    {
+      "id": "cloth_green",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/cloth_green.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/cloth_green.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/cloth_green.png",
+      "targets": [
+        "assets/resources/cloth_green.png"
+      ]
+    },
+    {
+      "id": "leather",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/leather.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/leather.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/leather.png",
+      "targets": [
+        "assets/resources/leather.png"
+      ]
+    },
+    {
+      "id": "crystal",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/crystal.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/crystal.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/crystal.png",
+      "targets": [
+        "assets/resources/crystal.png"
+      ]
+    },
+    {
+      "id": "gold_ingot",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/gold_ingot.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/gold_ingot.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/gold_ingot.png",
+      "targets": [
+        "assets/resources/gold_ingot.png"
+      ]
+    },
+    {
+      "id": "silver_ingot",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/silver_ingot.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/silver_ingot.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/silver_ingot.png",
+      "targets": [
+        "assets/resources/silver_ingot.png"
+      ]
+    },
+    {
+      "id": "mithril_ingot",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/mithril_ingot.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/mithril_ingot.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/mithril_ingot.png",
+      "targets": [
+        "assets/resources/mithril_ingot.png"
+      ]
+    },
+    {
+      "id": "platinum_ingot",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/platinum_ingot.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/platinum_ingot.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/platinum_ingot.png",
+      "targets": [
+        "assets/resources/platinum_ingot.png"
+      ]
+    },
+    {
+      "id": "steel_ingot",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/steel_ingot.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/steel_ingot.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/steel_ingot.png",
+      "targets": [
+        "assets/resources/steel_ingot.png"
+      ]
+    },
+    {
+      "id": "stone_blocks",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/stone_blocks.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/stone_blocks.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/stone_blocks.png",
+      "targets": [
+        "assets/resources/stone.png"
+      ]
+    },
+    {
+      "id": "coin_copper",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/coin_copper.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/coin_copper.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/coin_copper.png",
+      "targets": [
+        "assets/currency/coin_copper.png"
+      ]
+    },
+    {
+      "id": "coin_gold",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/coin_gold.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/coin_gold.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/coin_gold.png",
+      "targets": [
+        "assets/currency/coin_gold.png"
+      ]
+    },
+    {
+      "id": "coin_silver",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/coin_silver.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/coin_silver.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/coin_silver.png",
+      "targets": [
+        "assets/currency/coin_silver.png"
+      ]
+    },
+    {
+      "id": "wooden_bucket",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/wooden_bucket.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/wooden_bucket.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/wooden_bucket.png",
+      "targets": [
+        "assets/tools/wooden_bucket.png"
+      ]
+    },
+    {
+      "id": "iron_bucket",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/iron_bucket.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/iron_bucket.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/iron_bucket.png",
+      "targets": [
+        "assets/tools/iron_bucket.png"
+      ]
+    },
+    {
+      "id": "wooden_watering_can",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/wooden_watering_can.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/wooden_watering_can.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/wooden_watering_can.png",
+      "targets": [
+        "assets/tools/wooden_watering_can.png"
+      ]
+    },
+    {
+      "id": "iron_watering_can",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/iron_watering_can.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/iron_watering_can.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/iron_watering_can.png",
+      "targets": [
+        "assets/tools/iron_watering_can.png"
+      ]
+    },
+    {
+      "id": "leather_waterskin",
+      "master_256": "assets/items/professional/asset_reworks/masters_256/leather_waterskin.png",
+      "icon_128": "assets/items/professional/asset_reworks/icons_128/leather_waterskin.png",
+      "icon_64": "assets/items/professional/asset_reworks/icons_64/leather_waterskin.png",
+      "targets": [
+        "assets/tools/leather_waterskin.png"
+      ]
+    }
+  ]
+}
