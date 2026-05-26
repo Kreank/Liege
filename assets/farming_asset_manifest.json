@@ -1,0 +1,36 @@
+{
+  "canvas": {
+    "width": 64,
+    "height": 64,
+    "format": "RGBA"
+  },
+  "paths": {
+    "plants": "assets/props/crops/<crop>_plant.png or <berry>_bush.png",
+    "orchard": "assets/props/orchard/<fruit>_tree.png",
+    "produce": "assets/food/<produce>.png",
+    "seeds": "assets/seeds/<crop>_seeds.png"
+  },
+  "berries": [
+    "strawberry",
+    "blueberry",
+    "blackberry",
+    "raspberry"
+  ],
+  "orchard_fruits": [
+    "apple",
+    "pear",
+    "plum",
+    "cherry"
+  ],
+  "field_crops": [
+    "carrot",
+    "potato",
+    "cucumber",
+    "tomato",
+    "onion",
+    "cabbage",
+    "pumpkin",
+    "corn"
+  ],
+  "note": "Farming assets use separate plant/produce/seed sprites for harvest loops."
+}
