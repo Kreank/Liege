@@ -1,0 +1,125 @@
+{
+  "asset_type": "monster_portrait_master",
+  "count": 17,
+  "assets": [
+    {
+      "id": "rockshell_colossus",
+      "file": "assets/monsters/professional/portraits_768/rockshell_colossus_portrait.png",
+      "source_template": "Vorlagen/4011087181246390.jpeg",
+      "description": "Stone-armored colossus for mountain biomes",
+      "resolution": "768x768"
+    },
+    {
+      "id": "mantis_chimera",
+      "file": "assets/monsters/professional/portraits_768/mantis_chimera_portrait.png",
+      "source_template": "Vorlagen/474777985740696770.jpeg",
+      "description": "Winged mantis horror",
+      "resolution": "768x768"
+    },
+    {
+      "id": "spined_abyss_larva",
+      "file": "assets/monsters/professional/portraits_768/spined_abyss_larva_portrait.png",
+      "source_template": "Vorlagen/56787645304723209.jpeg",
+      "description": "Barbed crawler for caves",
+      "resolution": "768x768"
+    },
+    {
+      "id": "void_eye_brute",
+      "file": "assets/monsters/professional/portraits_768/void_eye_brute_portrait.png",
+      "source_template": "Vorlagen/7.jpeg",
+      "description": "One-eyed void brute",
+      "resolution": "768x768"
+    },
+    {
+      "id": "serpent_oracle",
+      "file": "assets/monsters/professional/portraits_768/serpent_oracle_portrait.png",
+      "source_template": "Vorlagen/88594317665110945.jpeg",
+      "description": "Coiled serpent oracle",
+      "resolution": "768x768"
+    },
+    {
+      "id": "mossback_warden",
+      "file": "assets/monsters/professional/portraits_768/mossback_warden_portrait.png",
+      "source_template": "Vorlagen/937382109957851223.jpeg",
+      "description": "Mossback forest guardian",
+      "resolution": "768x768"
+    },
+    {
+      "id": "iron_spider",
+      "file": "assets/monsters/professional/portraits_768/iron_spider_portrait.png",
+      "source_template": "Vorlagen/Alex Cipriano (@alexcipriano) on X.jpeg",
+      "description": "Iron spider construct",
+      "resolution": "768x768"
+    },
+    {
+      "id": "dendroid_guardian",
+      "file": "assets/monsters/professional/portraits_768/dendroid_guardian_portrait.png",
+      "source_template": "Vorlagen/Dendroid Guard \ud83d\udd04 Subscribe for daily fantasy inspiration!.jpeg",
+      "description": "Dendroid guardian",
+      "resolution": "768x768"
+    },
+    {
+      "id": "frost_rune_boar_prime",
+      "file": "assets/monsters/professional/portraits_768/frost_rune_boar_prime_portrait.png",
+      "source_template": "Vorlagen/Frostbound Rune Boar \u2013 Dark Fantasy Creature Design.jpeg",
+      "description": "Frost rune boar alpha",
+      "resolution": "768x768"
+    },
+    {
+      "id": "kaiju_thornback",
+      "file": "assets/monsters/professional/portraits_768/kaiju_thornback_portrait.png",
+      "source_template": "Vorlagen/Kaiju Expanzilla.jpeg",
+      "description": "Spined kaiju hunter",
+      "resolution": "768x768"
+    },
+    {
+      "id": "magma_shell_devourer",
+      "file": "assets/monsters/professional/portraits_768/magma_shell_devourer_portrait.png",
+      "source_template": "Vorlagen/M-349.jpeg",
+      "description": "Magma shell devourer",
+      "resolution": "768x768"
+    },
+    {
+      "id": "reed_walker",
+      "file": "assets/monsters/professional/portraits_768/reed_walker_portrait.png",
+      "source_template": "Vorlagen/Mad Driver.jpeg",
+      "description": "Long-limbed reed walker",
+      "resolution": "768x768"
+    },
+    {
+      "id": "redland_scavenger",
+      "file": "assets/monsters/professional/portraits_768/redland_scavenger_portrait.png",
+      "source_template": "Vorlagen/Red lands, guillaume NORMAND.jpeg",
+      "description": "Redland low scavenger",
+      "resolution": "768x768"
+    },
+    {
+      "id": "urtikus_eye_fiend",
+      "file": "assets/monsters/professional/portraits_768/urtikus_eye_fiend_portrait.png",
+      "source_template": "Vorlagen/Urtikus.jpeg",
+      "description": "Multi-limbed eye fiend",
+      "resolution": "768x768"
+    },
+    {
+      "id": "blood_antler_drake",
+      "file": "assets/monsters/professional/portraits_768/blood_antler_drake_portrait.png",
+      "source_template": "Vorlagen/Veado Sanguinario.jpeg",
+      "description": "Blood antler drake",
+      "resolution": "768x768"
+    },
+    {
+      "id": "grave_wraith",
+      "file": "assets/monsters/professional/portraits_768/grave_wraith_portrait.png",
+      "source_template": "Vorlagen/Wraith \ud83d\udd04 Subscribe for daily fantasy inspiration!.jpeg",
+      "description": "Hooded grave wraith",
+      "resolution": "768x768"
+    },
+    {
+      "id": "razorback_vermin",
+      "file": "assets/monsters/professional/portraits_768/razorback_vermin_portrait.png",
+      "source_template": "Vorlagen/monster.jpeg",
+      "description": "Small razorback fantasy vermin",
+      "resolution": "768x768"
+    }
+  ]
+}

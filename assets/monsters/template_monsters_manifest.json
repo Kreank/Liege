@@ -1,0 +1,43 @@
+{
+  "canvas": {
+    "width": 64,
+    "height": 64,
+    "format": "RGBA"
+  },
+  "source_folder": "Monster Vorlagen",
+  "note": "Sprites are original stylized 64x64 top-down monsters inspired by broad motifs from the provided templates, not direct crops/traces.",
+  "monsters": [
+    "bone_reaver",
+    "abyss_maw",
+    "shardback_golem",
+    "mantis_horror",
+    "void_leecher",
+    "cyclops_brute",
+    "horned_specter",
+    "dendroid_guard",
+    "frost_rune_boar",
+    "kaiju_stalker",
+    "ember_drake",
+    "green_stalker",
+    "blood_stag",
+    "skitter_husk",
+    "eye_bloom"
+  ],
+  "paths": [
+    "assets/monsters/bone_reaver.png",
+    "assets/monsters/abyss_maw.png",
+    "assets/monsters/shardback_golem.png",
+    "assets/monsters/mantis_horror.png",
+    "assets/monsters/void_leecher.png",
+    "assets/monsters/cyclops_brute.png",
+    "assets/monsters/horned_specter.png",
+    "assets/monsters/dendroid_guard.png",
+    "assets/monsters/frost_rune_boar.png",
+    "assets/monsters/kaiju_stalker.png",
+    "assets/monsters/ember_drake.png",
+    "assets/monsters/green_stalker.png",
+    "assets/monsters/blood_stag.png",
+    "assets/monsters/skitter_husk.png",
+    "assets/monsters/eye_bloom.png"
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "asset_type": "monster_master_art",
+  "resolution": "512x512 png with alpha",
+  "count": 17,
+  "assets": [
+    {
+      "id": "rockshell_colossus",
+      "source_template": "Vorlagen/4011087181246390.jpeg",
+      "file": "assets/monsters/professional/reference_based/rockshell_colossus.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/rockshell_colossus.png",
+      "description": "stone/earth guardian, heavy claws",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "mantis_chimera",
+      "source_template": "Vorlagen/474777985740696770.jpeg",
+      "file": "assets/monsters/professional/reference_based/mantis_chimera.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/mantis_chimera.png",
+      "description": "winged insectoid demon",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "spined_abyss_larva",
+      "source_template": "Vorlagen/56787645304723209.jpeg",
+      "file": "assets/monsters/professional/reference_based/spined_abyss_larva.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/spined_abyss_larva.png",
+      "description": "spined larval crawler",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "void_eye_brute",
+      "source_template": "Vorlagen/7.jpeg",
+      "file": "assets/monsters/professional/reference_based/void_eye_brute.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/void_eye_brute.png",
+      "description": "one-eyed purple brute",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "serpent_oracle",
+      "source_template": "Vorlagen/88594317665110945.jpeg",
+      "file": "assets/monsters/professional/reference_based/serpent_oracle.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/serpent_oracle.png",
+      "description": "coiled serpent oracle",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "mossback_warden",
+      "source_template": "Vorlagen/937382109957851223.jpeg",
+      "file": "assets/monsters/professional/reference_based/mossback_warden.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/mossback_warden.png",
+      "description": "moss covered forest guardian",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "iron_spider",
+      "source_template": "Vorlagen/Alex Cipriano (@alexcipriano) on X.jpeg",
+      "file": "assets/monsters/professional/reference_based/iron_spider.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/iron_spider.png",
+      "description": "mechanical spider horror",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "dendroid_guardian",
+      "source_template": "Vorlagen/Dendroid Guard \ud83d\udd04 Subscribe for daily fantasy inspiration!.jpeg",
+      "file": "assets/monsters/professional/reference_based/dendroid_guardian.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/dendroid_guardian.png",
+      "description": "tree guardian",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "frost_rune_boar_prime",
+      "source_template": "Vorlagen/Frostbound Rune Boar \u2013 Dark Fantasy Creature Design.jpeg",
+      "file": "assets/monsters/professional/reference_based/frost_rune_boar_prime.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/frost_rune_boar_prime.png",
+      "description": "ice rune boar",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "kaiju_thornback",
+      "source_template": "Vorlagen/Kaiju Expanzilla.jpeg",
+      "file": "assets/monsters/professional/reference_based/kaiju_thornback.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/kaiju_thornback.png",
+      "description": "spiked kaiju beast",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "magma_shell_devourer",
+      "source_template": "Vorlagen/M-349.jpeg",
+      "file": "assets/monsters/professional/reference_based/magma_shell_devourer.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/magma_shell_devourer.png",
+      "description": "lava shelled demon",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "reed_walker",
+      "source_template": "Vorlagen/Mad Driver.jpeg",
+      "file": "assets/monsters/professional/reference_based/reed_walker.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/reed_walker.png",
+      "description": "thin swamp stalker",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "redland_scavenger",
+      "source_template": "Vorlagen/Red lands, guillaume NORMAND.jpeg",
+      "file": "assets/monsters/professional/reference_based/redland_scavenger.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/redland_scavenger.png",
+      "description": "low redland predator",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "urtikus_eye_fiend",
+      "source_template": "Vorlagen/Urtikus.jpeg",
+      "file": "assets/monsters/professional/reference_based/urtikus_eye_fiend.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/urtikus_eye_fiend.png",
+      "description": "many-limbed eye fiend",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "blood_antler_drake",
+      "source_template": "Vorlagen/Veado Sanguinario.jpeg",
+      "file": "assets/monsters/professional/reference_based/blood_antler_drake.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/blood_antler_drake.png",
+      "description": "antlered red drake",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "grave_wraith",
+      "source_template": "Vorlagen/Wraith \ud83d\udd04 Subscribe for daily fantasy inspiration!.jpeg",
+      "file": "assets/monsters/professional/reference_based/grave_wraith.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/grave_wraith.png",
+      "description": "hooded claw wraith",
+      "status": "reference-derived polished master asset"
+    },
+    {
+      "id": "razorback_vermin",
+      "source_template": "Vorlagen/monster.jpeg",
+      "file": "assets/monsters/professional/reference_based/razorback_vermin.png",
+      "thumb_128": "assets/monsters/professional/reference_based/thumbs_128/razorback_vermin.png",
+      "description": "small fantasy vermin",
+      "status": "reference-derived polished master asset"
+    }
+  ]
+}
