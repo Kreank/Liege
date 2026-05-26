@@ -2220,6 +2220,8 @@ class WorldScene extends Phaser.Scene {
   showItemTooltip(item, ev) {
     const tt = document.getElementById('item-tooltip');
     if (!tt) return;
+    // Pinned-Tooltip nicht überschreiben (sonst löscht hover-tooltip die Action-Buttons)
+    if (tt.classList.contains('pinned')) return;
     const cfg = ITEM[item.kind] || { name: item.kind };
     const Q_COLOR = { rough: '#888', normal: '#ccc', fine: '#80c0ff',
                        masterwork: '#c0a0ff', legendary: '#ffd060' };
