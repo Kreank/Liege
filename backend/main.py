@@ -559,17 +559,28 @@ async def websocket_endpoint(websocket: WebSocket):
                         picked = await items.pickup(it["id"], player_id)
                         if picked is None:
                             continue
+                        # item_id muss die ORIGINAL ground-item-id sein, damit das
+                        # Frontend das richtige Sprite zerstört. Bei Stack-Merge ist
+                        # picked["id"] der existing Inventar-Stack — nicht das Sprite.
                         await manager.broadcast({
                             "type":    "item_picked_up",
-                            "item_id": picked["id"],
+                            "item_id": it["id"],
                             "x":       x,
                             "y":       y,
                             "by":      player_id,
                         })
-                        await websocket.send_json({
-                            "type": "inventory_add",
-                            "item": picked,
-                        })
+                        # Stack-Merge → inventory_update; sonst neue Row → inventory_add
+                        if picked["id"] != it["id"]:
+                            await websocket.send_json({
+                                "type": "inventory_update",
+                                "item_id": picked["id"],
+                                "quantity": int(picked.get("quantity", 1)),
+                            })
+                        else:
+                            await websocket.send_json({
+                                "type": "inventory_add",
+                                "item": picked,
+                            })
                         # Quest-Hook: Item-Collect (fetch-Quests + multi-stage)
                         try:
                             updated_q = await quests.on_item_collected(player_id, picked["kind"], 1)
