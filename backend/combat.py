@@ -74,6 +74,13 @@ NPC_HP_BY_KIND = {
     "healer":      45,
     "quest_giver": 50,
     "blacksmith":  65,
+    # Asset-Drop 2026-05-26
+    "miner":         55,
+    "village_elder": 40,
+    "watchman":      75,
+    "cat":           8,
+    "dog":           15,
+    "child":         20,
 }
 
 # Default-Schaden eines Spielers ohne Waffe (Faust)

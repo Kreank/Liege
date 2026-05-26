@@ -1310,6 +1310,13 @@ const NPC_SPRITE = {
   healer:      { sprite: 'npc_healer',       tint: 0xffffff, label: 'Heiler' },
   blacksmith:  { sprite: 'npc_blacksmith',   tint: 0xffffff, label: 'Schmied' },
   quest_giver: { sprite: 'npc_quest_giver',  tint: 0xffffff, label: 'Auftraggeber' },
+  // Asset-Drop 2026-05-26
+  miner:         { sprite: 'npc_miner',         tint: 0xffffff, label: 'Bergmann' },
+  village_elder: { sprite: 'npc_village_elder', tint: 0xffffff, label: 'Dorfältester' },
+  watchman:      { sprite: 'npc_watchman_lantern', tint: 0xffffff, label: 'Wächter' },
+  cat:           { sprite: 'npc_cat',           tint: 0xffffff, label: 'Katze' },
+  dog:           { sprite: 'npc_dog',           tint: 0xffffff, label: 'Hund' },
+  child:         { sprite: 'npc_child',         tint: 0xffffff, label: 'Kind' },
   // Creatures — eigenes Sprite, kein Tint
   goblin:   { sprite: 'monster_goblin',   tint: 0xffffff, label: 'Goblin' },
   wolf:     { sprite: 'monster_wolf',     tint: 0xffffff, label: 'Wolf' },
@@ -1773,10 +1780,19 @@ class WorldScene extends Phaser.Scene {
     this.load.image('fx_arrow_projectile', '/assets/animations/attacks/arrow_projectile.png');
     this.load.image('fx_arrow_hit', '/assets/animations/attacks/arrow_hit.png');
 
-    // Friendly-NPC-Sprites (Welle 21)
+    // Friendly-NPC-Sprites
     for (const n of ['mage', 'farmer', 'villager', 'guard', 'merchant',
-                     'healer', 'quest_giver', 'blacksmith']) {
+                     'healer', 'quest_giver', 'blacksmith',
+                     // Asset-Drop 2026-05-26
+                     'miner', 'village_elder', 'cat', 'dog', 'child']) {
       this.load.image(`npc_${n}`, `/assets/characters/npcs/${n}.png`);
+    }
+    // NPC-Varianten (Waffen/Rollen) — werden vom backend pro NPC zugewiesen
+    for (const v of ['bandit_axe','bandit_bow','bandit_dagger','bandit_spear',
+                     'miner_pickaxe',
+                     'soldier_axe','soldier_spear','soldier_sword_shield',
+                     'watchman_crossbow','watchman_lantern']) {
+      this.load.image(`npc_${v}`, `/assets/characters/npcs/variants/${v}.png`);
     }
 
     // Items (Waffen, Rüstung, Schmuck, Consumables, Resources)
@@ -4310,6 +4326,17 @@ class WorldScene extends Phaser.Scene {
     for (const npc of npcList) this.spawnNPCSprite(npc);
   }
 
+  // Resolver: Sprite-Key für einen NPC — variant überschreibt den kind-default,
+  // fällt zurück auf cfg.sprite wenn die variant-texture nicht geladen ist.
+  _npcSpriteKey(npc) {
+    const cfg = NPC_SPRITE[npc.kind] || NPC_SPRITE.wanderer;
+    if (npc.sprite_variant) {
+      const key = `npc_${npc.sprite_variant}`;
+      if (this.textures.exists(key)) return key;
+    }
+    return cfg.sprite;
+  }
+
   spawnNPCSprite(npc) {
     if (this.npcs[npc.id]) return;
     const cfg = NPC_SPRITE[npc.kind] || NPC_SPRITE.wanderer;
@@ -4320,7 +4347,7 @@ class WorldScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setAlpha(0.55);
 
-    const body = this.add.image(0, 0, cfg.sprite).setOrigin(0.5, 0.55);
+    const body = this.add.image(0, 0, this._npcSpriteKey(npc)).setOrigin(0.5, 0.55);
     body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
     body.setTint(cfg.tint);
 

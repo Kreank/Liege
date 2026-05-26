@@ -168,6 +168,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS structures_x_y_layer_idx ON structures (x, y, 
 -- Bestehende Rows auf 'normal' setzen.
 UPDATE items SET quality = 'normal' WHERE category = 'resource' AND quality <> 'normal';
 
+-- NPC sprite-Variant (z.B. bandit_axe, soldier_spear) — pro Spawn random aus
+-- dem Pool, persistiert damit derselbe NPC nach Reconnect dasselbe Sprite hat.
+ALTER TABLE npcs ADD COLUMN IF NOT EXISTS sprite_variant TEXT;
+
 -- Research-Progression
 CREATE TABLE IF NOT EXISTS research_progress (
     player_name TEXT NOT NULL,

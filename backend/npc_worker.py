@@ -16,6 +16,17 @@ INITIAL_NPC_COUNT = int(os.environ.get("INITIAL_NPC_COUNT", "20"))
 MIN_CREATURE_COUNT = int(os.environ.get("MIN_CREATURE_COUNT", "30"))
 CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "45"))
 
+# Sprite-Varianten pro Kind (Waffen/Rollen-Bilder). Beim Spawn wird zufällig
+# eine Variante gepickt und in npcs.sprite_variant gespeichert, damit der
+# selbe NPC nach Reconnect/Reload dasselbe Sprite zeigt.
+SPRITE_VARIANTS_BY_KIND = {
+    "bandit":   ["bandit_axe", "bandit_bow", "bandit_dagger", "bandit_spear"],
+    "soldier":  ["soldier_axe", "soldier_spear", "soldier_sword_shield"],
+    "miner":    ["miner_pickaxe"],
+    "watchman": ["watchman_crossbow", "watchman_lantern"],
+}
+
+
 # Pro Creature-Kind: typische Gruppengröße + bevorzugte Biome.
 # biomes=None bedeutet "überall walkable". Group-Size (min, max) inklusiv.
 CREATURE_SPAWN_PROFILE = {
@@ -79,7 +90,10 @@ CREATURE_SPAWN_PROFILE = {
 }
 FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier",
                   "mage", "farmer", "villager", "guard", "healer",
-                  "quest_giver", "blacksmith"]
+                  "quest_giver", "blacksmith",
+                  # Asset-Drop 2026-05-26: weitere Rollen + Tiere/Kinder
+                  "miner", "village_elder", "watchman",
+                  "cat", "dog", "child"]
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",
@@ -119,6 +133,13 @@ NPC_MOVE_CHANCE = {
     "healer":      0.08,
     "quest_giver": 0.05,  # bleibt am Platz
     "blacksmith":  0.05,  # bleibt an der Schmiede
+    # Asset-Drop 2026-05-26
+    "miner":        0.20,  # gräbt in einer Region
+    "village_elder":0.05,  # bleibt fast immer
+    "watchman":     0.18,  # patrouilliert
+    "cat":          0.40,  # streunt
+    "dog":          0.30,
+    "child":        0.35,  # spielt, läuft viel
     "goblin":    0.30,  # nervös
     "wolf":      0.35,
     "skeleton":  0.15,
@@ -277,7 +298,11 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
         max_hp = power_budget.kalibrate_mob_hp(base_hp, player_lvl)
     except Exception:
         max_hp = base_hp
-    npc = await npc_manager.create(name, kind, x, y, backstory, max_hp=max_hp)
+    # Sprite-Variante pro spawn random aus dem Pool (bandit_axe, soldier_spear, …).
+    variant_pool = SPRITE_VARIANTS_BY_KIND.get(kind)
+    sprite_variant = random.choice(variant_pool) if variant_pool else None
+    npc = await npc_manager.create(name, kind, x, y, backstory,
+                                   max_hp=max_hp, sprite_variant=sprite_variant)
     if mood != "neutral":
         npc["mood"] = mood  # nur in-memory, mood-update in DB können wir später wenn nötig
     await connection_manager.broadcast({"type": "npc_spawned", "npc": npc})

@@ -20,6 +20,12 @@ def _row_to_dict(row) -> dict:
         d["mental_state"] = row["mental_state"]
     except (KeyError, IndexError):
         d["mental_state"] = "normal"
+    # Sprite-Variant (NPC-Asset-Drop 2026-05-26)
+    try:
+        if row["sprite_variant"]:
+            d["sprite_variant"] = row["sprite_variant"]
+    except (KeyError, IndexError):
+        pass
     return d
 
 
@@ -30,7 +36,7 @@ class NPCManager:
     async def load(self) -> None:
         rows = await db.pool().fetch(
             "SELECT id, name, kind, x, y, backstory, mood, mental_state, hp, max_hp, "
-            "home_x, home_y, created_at, last_moved FROM npcs"
+            "home_x, home_y, created_at, last_moved, sprite_variant FROM npcs"
         )
         self._by_id = {}
         for r in rows:
@@ -52,14 +58,14 @@ class NPCManager:
         return len(self._by_id)
 
     async def create(self, name: str, kind: str, x: int, y: int, backstory: str,
-                     max_hp: int = 50) -> dict:
+                     max_hp: int = 50, sprite_variant: str | None = None) -> dict:
         # Spawn-Position wird Home-Position
         row = await db.pool().fetchrow(
-            "INSERT INTO npcs (name, kind, x, y, backstory, hp, max_hp, home_x, home_y) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $6, $3, $4) "
+            "INSERT INTO npcs (name, kind, x, y, backstory, hp, max_hp, home_x, home_y, sprite_variant) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $6, $3, $4, $7) "
             "RETURNING id, name, kind, x, y, backstory, mood, mental_state, hp, max_hp, "
-            "created_at, last_moved",
-            name, kind, x, y, backstory, max_hp,
+            "created_at, last_moved, sprite_variant",
+            name, kind, x, y, backstory, max_hp, sprite_variant,
         )
         npc = _row_to_dict(row)
         npc["home_x"] = x
