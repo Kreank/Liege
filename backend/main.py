@@ -1259,7 +1259,10 @@ async def websocket_endpoint(websocket: WebSocket):
                         and q in ("masterwork", "fine")
                         and __import__('random').random() < talent_craft["crafting_legendary_chance"]):
                     q = "legendary"
-                created = await items.create_for_player(recipe["output"], player_id, quality_kind=q)
+                created = await items.create_for_player(
+                    recipe["output"], player_id, quality_kind=q,
+                    material=recipe.get("material"),
+                )
                 # Affix-Roll bei fine+ Items
                 if created and q in ("fine", "masterwork", "legendary"):
                     rolled_affixes = affixes.roll_affixes(recipe["output"], q)

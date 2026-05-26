@@ -154,6 +154,9 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS torso_health INTEGER NOT NULL DEFAU
 ALTER TABLE players ADD COLUMN IF NOT EXISTS password_hash TEXT;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS role          TEXT NOT NULL DEFAULT 'user';
 
+-- Material (für equipment-Sprite-Resolver: sword_1h_iron.png etc.)
+ALTER TABLE items ADD COLUMN IF NOT EXISTS material TEXT;
+
 -- Research-Progression
 CREATE TABLE IF NOT EXISTS research_progress (
     player_name TEXT NOT NULL,

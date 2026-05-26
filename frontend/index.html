@@ -1354,7 +1354,16 @@ const ITEM = {
   gold_ore:      { name: 'Golderz',     sprite: 'item_gold_ore',      category: 'resource',                       path: '/assets/resources/gold_ore.png' },
   silver_ore:    { name: 'Silbererz',   sprite: 'item_silver_ore',    category: 'resource',                       path: '/assets/resources/silver_ore.png' },
   mythril_ore:   { name: 'Mythril',     sprite: 'item_mythril_ore',   category: 'resource',                       path: '/assets/resources/mythril_ore.png' },
-  steel_ingot:   { name: 'Stahlbarren', sprite: 'item_steel_ingot',   category: 'resource',                       path: '/assets/resources/steel_ingot.png' },
+  steel_ingot:    { name: 'Stahlbarren',   sprite: 'item_steel_ingot',    category: 'resource',                       path: '/assets/resources/steel_ingot.png' },
+  iron_ingot:     { name: 'Eisenbarren',   sprite: 'item_iron_ingot',     category: 'resource',                       path: '/assets/resources/iron_ingot.png' },
+  copper_ingot:   { name: 'Kupferbarren',  sprite: 'item_copper_ingot',   category: 'resource',                       path: '/assets/resources/copper_ingot.png' },
+  silver_ingot:   { name: 'Silberbarren',  sprite: 'item_silver_ingot',   category: 'resource',                       path: '/assets/resources/silver_ingot.png' },
+  gold_ingot:     { name: 'Goldbarren',    sprite: 'item_gold_ingot',     category: 'resource',                       path: '/assets/resources/gold_ingot.png' },
+  mithril_ingot:  { name: 'Mithrilbarren', sprite: 'item_mithril_ingot',  category: 'resource',                       path: '/assets/resources/mithril_ingot.png' },
+  adamant_ingot:  { name: 'Adamantbarren', sprite: 'item_adamant_ingot',  category: 'resource',                       path: '/assets/resources/adamant_ingot.png' },
+  platinum_ingot: { name: 'Platinbarren',  sprite: 'item_platinum_ingot', category: 'resource',                       path: '/assets/resources/platinum_ingot.png' },
+  tungsten_ingot: { name: 'Wolframbarren', sprite: 'item_tungsten_ingot', category: 'resource',                       path: '/assets/resources/tungsten_ingot.png' },
+  crystal_ingot:  { name: 'Kristallbarren',sprite: 'item_crystal_ingot',  category: 'resource',                       path: '/assets/resources/crystal_ingot.png' },
   crystal:       { name: 'Kristall',    sprite: 'item_crystal',       category: 'resource',                       path: '/assets/resources/crystal.png' },
   bone:          { name: 'Knochen',     sprite: 'item_bone',          category: 'resource',                       path: '/assets/resources/bone.png' },
   cloth:         { name: 'Stoff',       sprite: 'item_cloth',         category: 'resource',                       path: '/assets/resources/cloth.png' },
@@ -1370,6 +1379,63 @@ const EQUIP_SLOTS = [
   { key: 'amulet',     label: 'Amulett' },
   { key: 'tool',       label: 'Werkzeug' },
 ];
+
+// ─── Equipment-Sprite-Resolver ─────────────────────────────────────────────
+// Mapping: item-kind → Asset-Basename. Greatsword nutzt sword_2h, scythe axe_2h.
+const EQUIP_BASE = {
+  sword:          'sword_1h',
+  greatsword:     'sword_2h',
+  axe:            'axe_1h',
+  bow:            'bow_long',
+  crossbow:       'crossbow',
+  dagger:         'dagger',
+  throwing_knife: 'dagger',
+  mace:           'mace',
+  spear:          'spear',
+  staff:          'staff',
+  wand:           'wand',
+  scythe:         'axe_2h',
+  helmet:         'helmet',
+  chestplate:     'chestplate',
+  shield:         'shield',
+  boots:          'boots',
+};
+const WEAPON_MATERIALS = ['wood','copper','iron','steel','silver','gold',
+                          'mithril','adamant','platinum','tungsten','crystal'];
+const ARMOR_MATERIALS  = ['cloth','leather','fur','copper','iron','silver',
+                          'gold','mithril','adamant','platinum','tungsten','crystal'];
+
+function _equipDir(category) {
+  if (category === 'weapon')  return 'weapons';
+  if (category === 'armor')   return 'armor';
+  if (category === 'jewelry') return 'jewelry';
+  return null;
+}
+
+// Liefert den Asset-URL-Pfad. Item kann Inventory-Object oder kind-String sein.
+function itemAssetPath(item, materialOpt) {
+  const kind = (typeof item === 'string') ? item : item?.kind;
+  const material = (typeof item === 'string') ? materialOpt : item?.material;
+  const cfg = ITEM[kind];
+  if (!cfg) return '';
+  if (!material) return cfg.path || '';
+  const base = EQUIP_BASE[kind];
+  const dir  = _equipDir(cfg.category);
+  if (!base || !dir) return cfg.path || '';
+  return `/assets/equipment/${dir}/${base}_${material}.png`;
+}
+
+// Phaser-Texture-Key — fällt auf Base-Sprite zurück wenn material-Variante nicht geladen.
+function itemSpriteKey(scene, item) {
+  const kind = (typeof item === 'string') ? item : item?.kind;
+  const material = (typeof item === 'string') ? null : item?.material;
+  const cfg = ITEM[kind];
+  if (!cfg) return null;
+  if (!material) return cfg.sprite;
+  const key = `item_${kind}_${material}`;
+  if (scene && scene.textures && scene.textures.exists(key)) return key;
+  return cfg.sprite;
+}
 
 // ─── Material-Auswahl für Wände/Böden ─────────────────────────────────────────
 const MATERIALS = ['stone', 'wood', 'straw'];
@@ -1582,6 +1648,20 @@ class WorldScene extends Phaser.Scene {
     // Items (Waffen, Rüstung, Schmuck, Consumables, Resources)
     for (const [kind, cfg] of Object.entries(ITEM)) {
       this.load.image(cfg.sprite, cfg.path);
+    }
+    // Equipment-Material-Varianten (sword_1h_iron, boots_leather, …)
+    for (const [kind, base] of Object.entries(EQUIP_BASE)) {
+      const cfg = ITEM[kind];
+      if (!cfg) continue;
+      const dir = _equipDir(cfg.category);
+      if (!dir) continue;
+      const mats = cfg.category === 'weapon' ? WEAPON_MATERIALS
+                 : cfg.category === 'armor'  ? ARMOR_MATERIALS
+                 : [];
+      for (const mat of mats) {
+        this.load.image(`item_${kind}_${mat}`,
+                        `/assets/equipment/${dir}/${base}_${mat}.png`);
+      }
     }
 
     // Wand- und Boden-Sprites pro Material (3 × 10 walls + 3 floors)
@@ -1885,7 +1965,9 @@ class WorldScene extends Phaser.Scene {
         );
         if (isEquipped) slot.style.boxShadow = '0 0 8px rgba(120,200,80,0.7)';
         const img = document.createElement('img');
-        img.src = cfg.path || '';
+        // Falls equipped: nutze item.material für material-spezifisches Sprite
+        const equippedItem = (this.inventory || []).find(it => it.kind === kind && it.equipped_slot);
+        img.src = itemAssetPath(equippedItem || kind);
         if (cnt === 0 && !isEquipped) slot.classList.add('hotbar-empty');
         slot.appendChild(img);
         if (cnt > 1) {
@@ -2758,7 +2840,7 @@ class WorldScene extends Phaser.Scene {
       const cfg = ITEM[it.kind] || {};
       const row = document.createElement('div');
       row.className = 'trade-row';
-      const img = document.createElement('img'); img.src = cfg.path || ''; row.appendChild(img);
+      const img = document.createElement('img'); img.src = itemAssetPath(it); row.appendChild(img);
       const name = document.createElement('div');
       const nm = document.createElement('div');
       nm.className = 'name';
@@ -2878,7 +2960,7 @@ class WorldScene extends Phaser.Scene {
       const cfg = ITEM[item.kind] || {};
       const row = document.createElement('div');
       row.className = 'chest-item-row';
-      const img = document.createElement('img'); img.src = cfg.path || ''; row.appendChild(img);
+      const img = document.createElement('img'); img.src = itemAssetPath(item); row.appendChild(img);
       const name = document.createElement('span'); name.className = 'name';
       name.textContent = item.name; row.appendChild(name);
       const btn = document.createElement('button'); btn.textContent = btnLabel;
@@ -3789,7 +3871,7 @@ class WorldScene extends Phaser.Scene {
     if (this.itemSprites[item.id]) return;
     const cx = item.x * TILE_SIZE + TILE_SIZE / 2;
     const cy = item.y * TILE_SIZE + TILE_SIZE / 2;
-    const img = this.add.image(cx, cy, cfg.sprite).setOrigin(0.5);
+    const img = this.add.image(cx, cy, itemSpriteKey(this, item)).setOrigin(0.5);
     img.setDisplaySize(TILE_SIZE * 0.5, TILE_SIZE * 0.5);  // Items kleiner als Tiles
     img.setDepth(2);  // über Strukturen (1), unter Charakteren (3)
     // Für Pickup-Click: Item-ID und Tile-Koordinaten am Sprite hinterlegen
@@ -3843,7 +3925,7 @@ class WorldScene extends Phaser.Scene {
       if (equipped) {
         const cfg = ITEM[equipped.kind] || {};
         const img = document.createElement('img');
-        img.src = cfg.path || '';
+        img.src = itemAssetPath(equipped);
         div.appendChild(img);
         const lbl = document.createElement('div');
         lbl.className = 'slot-label';
@@ -3885,7 +3967,7 @@ class WorldScene extends Phaser.Scene {
       const cfg = ITEM[item.kind] || {};
       if (item.quality && item.quality !== 'normal') slot.classList.add(item.quality);
       const img = document.createElement('img');
-      img.src = cfg.path || '';
+      img.src = itemAssetPath(item);
       slot.appendChild(img);
       // Quality-Icon top-left
       if (QUALITY_ICONS[item.quality]) {

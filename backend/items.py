@@ -54,7 +54,17 @@ ITEM_KINDS = {
     "gold_ore":     {"category": "resource", "name": "Golderz",       "sprite": "/assets/resources/gold_ore.png"},
     "silver_ore":   {"category": "resource", "name": "Silbererz",     "sprite": "/assets/resources/silver_ore.png"},
     "mythril_ore":  {"category": "resource", "name": "Mythril",       "sprite": "/assets/resources/mythril_ore.png"},
-    "steel_ingot":  {"category": "resource", "name": "Stahlbarren",   "sprite": "/assets/resources/steel_ingot.png"},
+    # Ingots — Outputs vom Furnace, Inputs für Anvil-Rezepte
+    "steel_ingot":   {"category": "resource", "name": "Stahlbarren",   "sprite": "/assets/resources/steel_ingot.png"},
+    "iron_ingot":    {"category": "resource", "name": "Eisenbarren",   "sprite": "/assets/resources/iron_ingot.png"},
+    "copper_ingot":  {"category": "resource", "name": "Kupferbarren",  "sprite": "/assets/resources/copper_ingot.png"},
+    "silver_ingot":  {"category": "resource", "name": "Silberbarren",  "sprite": "/assets/resources/silver_ingot.png"},
+    "gold_ingot":    {"category": "resource", "name": "Goldbarren",    "sprite": "/assets/resources/gold_ingot.png"},
+    "mithril_ingot": {"category": "resource", "name": "Mithrilbarren", "sprite": "/assets/resources/mithril_ingot.png"},
+    "adamant_ingot": {"category": "resource", "name": "Adamantbarren", "sprite": "/assets/resources/adamant_ingot.png"},
+    "platinum_ingot":{"category": "resource", "name": "Platinbarren",  "sprite": "/assets/resources/platinum_ingot.png"},
+    "tungsten_ingot":{"category": "resource", "name": "Wolframbarren", "sprite": "/assets/resources/tungsten_ingot.png"},
+    "crystal_ingot": {"category": "resource", "name": "Kristallbarren","sprite": "/assets/resources/crystal_ingot.png"},
     "crystal":      {"category": "resource", "name": "Kristall",      "sprite": "/assets/resources/crystal.png"},
     "bone":         {"category": "resource", "name": "Knochen",       "sprite": "/assets/resources/bone.png"},
     "cloth":        {"category": "resource", "name": "Stoff",         "sprite": "/assets/resources/cloth.png"},
@@ -114,32 +124,39 @@ def _row_to_dict(row) -> dict:
             out["flavor"] = row["flavor"]
     except (KeyError, IndexError, TypeError):
         pass
+    # Material-Feld (für sprite-resolution im Frontend)
+    try:
+        if "material" in row.keys() and row["material"]:
+            out["material"] = row["material"]
+    except (KeyError, IndexError):
+        pass
     return out
 
 
 class ItemManager:
-    async def spawn_on_ground(self, kind: str, x: int, y: int) -> dict | None:
+    async def spawn_on_ground(self, kind: str, x: int, y: int,
+                              material: str | None = None) -> dict | None:
         cfg = ITEM_KINDS.get(kind)
         if cfg is None:
             return None
         row = await db.pool().fetchrow(
-            "INSERT INTO items (kind, name, category, x, y) "
-            "VALUES ($1, $2, $3, $4, $5) "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
-            kind, cfg["name"], cfg["category"], x, y,
+            "INSERT INTO items (kind, name, category, x, y, material) "
+            "VALUES ($1, $2, $3, $4, $5, $6) "
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            kind, cfg["name"], cfg["category"], x, y, material,
         )
         return _row_to_dict(row)
 
     async def get_on_ground(self) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
             "FROM items WHERE owner IS NULL"
         )
         return [_row_to_dict(r) for r in rows]
 
     async def get_at(self, x: int, y: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
             "FROM items WHERE x = $1 AND y = $2 AND owner IS NULL",
             x, y,
         )
@@ -147,7 +164,7 @@ class ItemManager:
 
     async def get_inventory(self, player_name: str) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
             "FROM items WHERE owner = $1 ORDER BY id",
             player_name,
         )
@@ -172,7 +189,7 @@ class ItemManager:
                 "  AND quantity + $3 <= $4 "
                 "  ORDER BY id LIMIT 1) "
                 "RETURNING id, kind, name, category, quality, x, y, owner, "
-                "equipped_slot, created_at, affixes, unique_name, flavor, quantity",
+                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material",
                 player_name, ground["kind"], int(ground["quantity"] or 1), limit,
             )
             if existing:
@@ -184,7 +201,7 @@ class ItemManager:
             "UPDATE items SET x = NULL, y = NULL, owner = $2 "
             "WHERE id = $1 AND owner IS NULL "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity",
+            "created_at, affixes, unique_name, flavor, quantity, material",
             item_id, player_name,
         )
         return _row_to_dict(row) if row else None
@@ -193,7 +210,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = NULL, equipped_slot = NULL, x = $3, y = $4 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
             item_id, player_name, x, y,
         )
         return _row_to_dict(row) if row else None
@@ -219,7 +236,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET equipped_slot = $3 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
             item_id, player_name, slot,
         )
         return _row_to_dict(row) if row else None
@@ -228,7 +245,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET equipped_slot = NULL "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
             item_id, player_name,
         )
         return _row_to_dict(row) if row else None
@@ -245,7 +262,7 @@ class ItemManager:
             "AND category IN ('consumable', 'food') "
             "AND quantity > 1 "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity",
+            "created_at, affixes, unique_name, flavor, quantity, material",
             item_id, player_name,
         )
         if row:
@@ -257,7 +274,7 @@ class ItemManager:
             "DELETE FROM items WHERE id = $1 AND owner = $2 "
             "AND category IN ('consumable', 'food') "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor",
+            "created_at, affixes, unique_name, flavor, material",
             item_id, player_name,
         )
         if row:
@@ -270,7 +287,7 @@ class ItemManager:
 
     async def get_chest_contents(self, chest_id: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
             "FROM items WHERE owner = $1 ORDER BY id",
             f"chest:{chest_id}",
         )
@@ -280,7 +297,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = $3, equipped_slot = NULL "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
             item_id, player_name, f"chest:{chest_id}",
         )
         return _row_to_dict(row) if row else None
@@ -289,7 +306,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = $3 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
             item_id, f"chest:{chest_id}", player_name,
         )
         return _row_to_dict(row) if row else None
@@ -329,11 +346,13 @@ class ItemManager:
         return row is not None
 
     async def create_for_player(self, kind: str, player_name: str,
-                                quality_kind: str = "normal") -> dict | None:
+                                quality_kind: str = "normal",
+                                material: str | None = None) -> dict | None:
         cfg = ITEM_KINDS.get(kind)
         if cfg is None:
             return None
         # Welle 36: Wenn stackable und Quality=normal → in existing stack mergen
+        # (Resources/Food/Consumables haben kein material — stack-merge unverändert)
         if is_stackable(cfg["category"]) and quality_kind == "normal":
             limit = stack_limit_for(cfg["category"])
             existing = await db.pool().fetchrow(
@@ -344,16 +363,16 @@ class ItemManager:
                 "  AND quantity < $3 "
                 "  ORDER BY id LIMIT 1) "
                 "RETURNING id, kind, name, category, quality, x, y, owner, "
-                "equipped_slot, created_at, affixes, unique_name, flavor, quantity",
+                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material",
                 player_name, kind, limit,
             )
             if existing:
                 return _row_to_dict(existing)
         row = await db.pool().fetchrow(
-            "INSERT INTO items (kind, name, category, owner, quality, quantity) "
-            "VALUES ($1, $2, $3, $4, $5, 1) "
+            "INSERT INTO items (kind, name, category, owner, quality, quantity, material) "
+            "VALUES ($1, $2, $3, $4, $5, 1, $6) "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity",
-            kind, cfg["name"], cfg["category"], player_name, quality_kind,
+            "created_at, affixes, unique_name, flavor, quantity, material",
+            kind, cfg["name"], cfg["category"], player_name, quality_kind, material,
         )
         return _row_to_dict(row)
