@@ -617,6 +617,13 @@
     }
     .inv-slot:hover { border-color: #c8b88a; background: rgba(60,48,28,0.8); }
     .inv-slot img { width: 80%; height: 80%; object-fit: contain; image-rendering: pixelated; }
+    /* Drag-and-Drop visual feedback */
+    .inv-slot.drag-over, .hotbar-slot.drag-over {
+      background: rgba(120,200,80,0.35) !important;
+      border-color: #80c080 !important;
+    }
+    .inv-slot[draggable="true"], .hotbar-slot[draggable="true"] { cursor: grab; }
+    .inv-slot[draggable="true"]:active, .hotbar-slot[draggable="true"]:active { cursor: grabbing; }
     .inv-slot-count {
       position: absolute; bottom: 2px; right: 4px;
       color: #fff; font-size: 11px; font-weight: bold; font-family: monospace;
@@ -2127,6 +2134,64 @@ class WorldScene extends Phaser.Scene {
     this._saveHotbar();
     this.refreshHotbar();
   }
+
+  // — Drag-and-Drop Helpers ——————————————————————————————————————————————————
+  _dndAttach(el, opts) {
+    // opts: { dragData? () => object|null, accept? (data) => bool, onDrop (data) }
+    if (opts.dragData) {
+      el.draggable = true;
+      el.addEventListener('dragstart', (ev) => {
+        const data = opts.dragData();
+        if (!data) { ev.preventDefault(); return; }
+        ev.dataTransfer.setData('application/json', JSON.stringify(data));
+        ev.dataTransfer.effectAllowed = 'move';
+      });
+    }
+    if (opts.onDrop) {
+      el.addEventListener('dragover', (ev) => {
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = 'move';
+        el.classList.add('drag-over');
+      });
+      el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+      el.addEventListener('drop', (ev) => {
+        ev.preventDefault();
+        el.classList.remove('drag-over');
+        try {
+          const raw = ev.dataTransfer.getData('application/json');
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          if (opts.accept && !opts.accept(data)) return;
+          opts.onDrop(data);
+        } catch (e) { /* invalid payload */ }
+      });
+    }
+  }
+
+  // Zentrale Drop-Logik: src = {from, slot|item_id, kind}, dst = {to, slot|item_id}
+  _handleDndDrop(src, dst) {
+    // Hotbar → Hotbar: swap
+    if (src.from === 'hotbar' && dst.to === 'hotbar') {
+      if (src.slot === dst.slot) return;
+      const tmp = this.hotbar[src.slot];
+      this.hotbar[src.slot] = this.hotbar[dst.slot];
+      this.hotbar[dst.slot] = tmp;
+      this._saveHotbar();
+      this.refreshHotbar();
+      return;
+    }
+    // Inventory → Hotbar: zuweisen
+    if (src.from === 'inventory' && dst.to === 'hotbar') {
+      this.assignToHotbar(dst.slot, src.kind);
+      return;
+    }
+    // Hotbar → Inventory: Slot leeren
+    if (src.from === 'hotbar' && dst.to === 'inventory') {
+      this.assignToHotbar(src.slot, null);
+      return;
+    }
+    // Inventory → Inventory: keine Reorder-Persistenz vorgesehen
+  }
   refreshHotbar() {
     const root = document.getElementById('hotbar');
     if (!root) return;
@@ -2148,6 +2213,12 @@ class WorldScene extends Phaser.Scene {
       key.textContent = (i + 1);
       slot.appendChild(key);
       const kind = this.hotbar[i];
+      // Drag-and-Drop: jeder Hotbar-Slot ist Drop-Target; besetzte sind auch
+      // Drag-Source. Inventar→Hotbar = zuweisen, Hotbar→Hotbar = swap.
+      this._dndAttach(slot, {
+        dragData: kind ? () => ({ from: 'hotbar', slot: i, kind }) : null,
+        onDrop:   (src) => this._handleDndDrop(src, { to: 'hotbar', slot: i }),
+      });
       if (kind && ITEM[kind]) {
         const cfg = ITEM[kind];
         const cnt = counts[kind] || 0;
@@ -4243,9 +4314,18 @@ class WorldScene extends Phaser.Scene {
       const item = unequipped[i];
       if (!item) {
         slot.classList.add('inv-slot-empty');
+        // Leerer Slot ist trotzdem Drop-Target für Hotbar→Inventar (= Slot leeren)
+        this._dndAttach(slot, {
+          onDrop: (src) => this._handleDndDrop(src, { to: 'inventory', slot: i }),
+        });
         listDiv.appendChild(slot);
         continue;
       }
+      // Besetzter Slot: Drag-Source (kind nach Hotbar ziehen) + Drop-Target
+      this._dndAttach(slot, {
+        dragData: () => ({ from: 'inventory', item_id: item.id, kind: item.kind }),
+        onDrop:   (src) => this._handleDndDrop(src, { to: 'inventory', slot: i }),
+      });
       const cfg = ITEM[item.kind] || {};
       if (item.quality && item.quality !== 'normal') slot.classList.add(item.quality);
       const img = document.createElement('img');
