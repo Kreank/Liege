@@ -634,10 +634,12 @@
       text-shadow: 1px 1px 1px #000;
     }
     .inv-slot-empty { opacity: 0.3; pointer-events: none; }
-    .inv-slot.legendary  { border-color: #ffd060; }
-    .inv-slot.masterwork { border-color: #c0a0ff; }
-    .inv-slot.fine       { border-color: #80c0ff; }
-    .inv-slot.rough      { border-color: #888; }
+    /* Rarity-Border-Farben — synchron mit assets/.../rarity_weapon_manifest.json */
+    .inv-slot.rough      { border-color: #888e91; }  /* poor */
+    /* normal/common = #4fab58 (Standard-Border bleibt) */
+    .inv-slot.fine       { border-color: #4581e0; }  /* rare = blau */
+    .inv-slot.masterwork { border-color: #e7c44b; }  /* very_rare = gelb */
+    .inv-slot.legendary  { border-color: #ee772b; }  /* legendary = orange */
     .item-cat { color: #888; font-size: 10px; margin-right: 8px; text-transform: uppercase; }
     .item-actions { display: flex; gap: 4px; }
     .item-actions button {
@@ -1505,8 +1507,14 @@ function _equipDir(category) {
 function itemAssetPath(item, materialOpt) {
   const kind = (typeof item === 'string') ? item : item?.kind;
   const material = (typeof item === 'string') ? materialOpt : item?.material;
+  const quality = (typeof item === 'string') ? null : item?.quality;
   const cfg = ITEM[kind];
   if (!cfg) return '';
+  // Rarity-Pfad für Weapons (Asset-Drop 2026-05-26) — visueller Hauptindikator
+  if (RARITY_WEAPONS.has(kind)) {
+    const r = QUALITY_TO_RARITY[quality || 'normal'];
+    if (r) return `/assets/equipment/weapons/rarity/${r}/${kind}.png`;
+  }
   if (!material) return cfg.path || '';
   const base = EQUIP_BASE[kind];
   const dir  = _equipDir(cfg.category);
@@ -1557,13 +1565,28 @@ function itemGroundScale(item) {
 function itemSpriteKey(scene, item) {
   const kind = (typeof item === 'string') ? item : item?.kind;
   const material = (typeof item === 'string') ? null : item?.material;
+  const quality = (typeof item === 'string') ? null : item?.quality;
   const cfg = ITEM[kind];
   if (!cfg) return null;
+  // Rarity-Sprite für Weapons hat Vorrang über Material (paralleles Asset-Set)
+  if (RARITY_WEAPONS.has(kind)) {
+    const r = QUALITY_TO_RARITY[quality || 'normal'];
+    const rkey = `weapon_rarity_${r}_${kind}`;
+    if (scene && scene.textures && scene.textures.exists(rkey)) return rkey;
+  }
   if (!material) return cfg.sprite;
   const key = `item_${kind}_${material}`;
   if (scene && scene.textures && scene.textures.exists(key)) return key;
   return cfg.sprite;
 }
+
+// Quality → Rarity-Mapping (semantisch identische 5 Stufen)
+const QUALITY_TO_RARITY = {
+  rough: 'poor', normal: 'common', fine: 'rare',
+  masterwork: 'very_rare', legendary: 'legendary',
+};
+const RARITY_WEAPONS = new Set(['sword','greatsword','axe','spear','bow','crossbow',
+                                 'dagger','mace','staff','scythe']);
 
 // ─── Material-Auswahl für Wände/Böden ─────────────────────────────────────────
 const MATERIALS = ['stone', 'wood', 'straw'];
@@ -1806,6 +1829,14 @@ class WorldScene extends Phaser.Scene {
     // Items (Waffen, Rüstung, Schmuck, Consumables, Resources)
     for (const [kind, cfg] of Object.entries(ITEM)) {
       this.load.image(cfg.sprite, cfg.path);
+    }
+    // Rarity-Weapon-Variants (poor/common/rare/very_rare/legendary × 10 weapons)
+    for (const r of ['poor','common','rare','very_rare','legendary']) {
+      for (const w of ['sword','greatsword','axe','spear','bow','crossbow',
+                       'dagger','mace','staff','scythe']) {
+        this.load.image(`weapon_rarity_${r}_${w}`,
+                        `/assets/equipment/weapons/rarity/${r}/${w}.png`);
+      }
     }
     // Equipment-Material-Varianten (sword_1h_iron, boots_leather, …)
     for (const [kind, base] of Object.entries(EQUIP_BASE)) {
@@ -2318,8 +2349,8 @@ class WorldScene extends Phaser.Scene {
     // Pinned-Tooltip nicht überschreiben (sonst löscht hover-tooltip die Action-Buttons)
     if (tt.classList.contains('pinned')) return;
     const cfg = ITEM[item.kind] || { name: item.kind };
-    const Q_COLOR = { rough: '#888', normal: '#ccc', fine: '#80c0ff',
-                       masterwork: '#c0a0ff', legendary: '#ffd060' };
+    const Q_COLOR = { rough: '#888e91', normal: '#4fab58', fine: '#4581e0',
+                       masterwork: '#e7c44b', legendary: '#ee772b' };
     const qIcon = QUALITY_ICONS[item.quality] || '';
     const name = item.unique_name || cfg.name;
     const qcol = Q_COLOR[item.quality] || '#ccc';
@@ -2393,8 +2424,8 @@ class WorldScene extends Phaser.Scene {
     if (!tt) return;
     const cfg = ITEM[item.kind] || {};
     // Stats wie im normalen Tooltip aufbauen
-    const Q_COLOR = { rough: '#888', normal: '#ccc', fine: '#80c0ff',
-                       masterwork: '#c0a0ff', legendary: '#ffd060' };
+    const Q_COLOR = { rough: '#888e91', normal: '#4fab58', fine: '#4581e0',
+                       masterwork: '#e7c44b', legendary: '#ee772b' };
     const qIcon = QUALITY_ICONS[item.quality] || '';
     const name = item.unique_name || cfg.name || item.kind;
     const qcol = Q_COLOR[item.quality] || '#ccc';
@@ -4616,6 +4647,15 @@ class WorldScene extends Phaser.Scene {
         this.updateFenceOrientation(s.x, s.y - 1);
         this.updateFenceOrientation(s.x, s.y + 1);
       }
+    } else if (isDoor || s.type.startsWith('garden_gate_')) {
+      // Türen/Tore zählen als Wall-Connector — Nachbarn neu ausrichten damit
+      // angrenzende Mauer-Ecken/Endungen korrekt bleiben.
+      if (refreshNeighbors) {
+        this.updateWallOrientation(s.x - 1, s.y);
+        this.updateWallOrientation(s.x + 1, s.y);
+        this.updateWallOrientation(s.x, s.y - 1);
+        this.updateWallOrientation(s.x, s.y + 1);
+      }
     }
   }
 
@@ -4667,11 +4707,16 @@ class WorldScene extends Phaser.Scene {
     const img = this.structSprites[`${x},${y}`];
     if (!img) return;
 
+    // Türen und Tore zählen als Wand-Nachbarn, damit Ecken neben einer Tür
+    // korrekt als corner_* (nicht als end_*) gerendert bleiben.
+    const isConnector = (t) => t === 'wall'
+                            || (t && t.startsWith('door_'))
+                            || (t && t.startsWith('garden_gate_'));
     let mask = 0;
-    if (this.structures[`${x},${y - 1}`]?.type === 'wall') mask |= 1;  // N
-    if (this.structures[`${x + 1},${y}`]?.type === 'wall') mask |= 2;  // E
-    if (this.structures[`${x},${y + 1}`]?.type === 'wall') mask |= 4;  // S
-    if (this.structures[`${x - 1},${y}`]?.type === 'wall') mask |= 8;  // W
+    if (isConnector(this.structures[`${x},${y - 1}`]?.type)) mask |= 1;  // N
+    if (isConnector(this.structures[`${x + 1},${y}`]?.type)) mask |= 2;  // E
+    if (isConnector(this.structures[`${x},${y + 1}`]?.type)) mask |= 4;  // S
+    if (isConnector(this.structures[`${x - 1},${y}`]?.type)) mask |= 8;  // W
 
     const material = s.material || 'stone';
     img.setTexture(this.pickWallSprite(material, mask));
