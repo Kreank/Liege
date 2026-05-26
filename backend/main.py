@@ -695,6 +695,43 @@ async def websocket_endpoint(websocket: WebSocket):
                             )
                         )
 
+            elif mtype == "toggle_door":
+                x, y = int(data.get("x", 0)), int(data.get("y", 0))
+                # Reichweite: 1 Tile (orthogonal benachbart oder gleiches Tile)
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                    continue
+                struct = structures.object_at(x, y)
+                if struct is None:
+                    continue
+                t = struct["type"]
+                # Map closed ↔ open
+                DOOR_TOGGLE = {
+                    "door_wood":      "door_wood_open",
+                    "door_wood_open": "door_wood",
+                    "door_iron":      "door_iron_open",
+                    "door_iron_open": "door_iron",
+                    "door_stone":     "door_stone_open",
+                    "door_stone_open":"door_stone",
+                    "garden_gate_ew_closed": "garden_gate_ew_open",
+                    "garden_gate_ew_open":   "garden_gate_ew_closed",
+                    "garden_gate_ns_closed": "garden_gate_ns_open",
+                    "garden_gate_ns_open":   "garden_gate_ns_closed",
+                }
+                new_type = DOOR_TOGGLE.get(t)
+                if new_type is None:
+                    continue
+                await db.pool().execute(
+                    "UPDATE structures SET type = $1 WHERE id = $2", new_type, struct["id"],
+                )
+                struct["type"] = new_type
+                await manager.broadcast({
+                    "type": "structure_replaced",
+                    "x": x, "y": y, "structure": struct,
+                })
+
             elif mtype == "remove_structure":
                 x, y = data["x"], data["y"]
                 # Client kann optional einen Layer angeben, sonst object zuerst

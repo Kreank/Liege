@@ -1146,16 +1146,16 @@ const STRUCTURE = {
   sack:        { key: '', name: 'Sack',          icon: '🧺', blocking: false, sprite: 'prop_sack' },
   fence:       { key: '', name: 'Zaun',          icon: '🚧', blocking: true,  sprite: 'fence_straight_ns' },
   garden_gate_ew_closed: { key: '', name: 'Gartentor ↔', icon: '🚪', blocking: true,  sprite: 'garden_gate_ew_closed' },
-  garden_gate_ew_open:   { key: '', name: 'Gartentor ↔', icon: '🚪', blocking: false, sprite: 'garden_gate_ew_open' },
+  garden_gate_ew_open:   { key: '', name: 'Gartentor ↔', icon: '🚪', blocking: false, sprite: 'garden_gate_ew_open',  notBuildable: true },
   garden_gate_ns_closed: { key: '', name: 'Gartentor ↕', icon: '🚪', blocking: true,  sprite: 'garden_gate_ns_closed' },
-  garden_gate_ns_open:   { key: '', name: 'Gartentor ↕', icon: '🚪', blocking: false, sprite: 'garden_gate_ns_open' },
-  // Türen
+  garden_gate_ns_open:   { key: '', name: 'Gartentor ↕', icon: '🚪', blocking: false, sprite: 'garden_gate_ns_open',  notBuildable: true },
+  // Türen — closed-Varianten sind baubar, _open-Varianten sind nur Render-States
   door_wood:        { key: '', name: 'Holztür',         icon: '🚪', blocking: true,  sprite: 'door_wood' },
-  door_wood_open:   { key: '', name: 'Holztür offen',   icon: '🚪', blocking: false, sprite: 'door_wood_open' },
+  door_wood_open:   { key: '', name: 'Holztür offen',   icon: '🚪', blocking: false, sprite: 'door_wood_open',  notBuildable: true },
   door_iron:        { key: '', name: 'Eisentür',        icon: '🚪', blocking: true,  sprite: 'door_iron' },
-  door_iron_open:   { key: '', name: 'Eisentür offen',  icon: '🚪', blocking: false, sprite: 'door_iron_open' },
+  door_iron_open:   { key: '', name: 'Eisentür offen',  icon: '🚪', blocking: false, sprite: 'door_iron_open',  notBuildable: true },
   door_stone:       { key: '', name: 'Steintür',        icon: '🚪', blocking: true,  sprite: 'door_stone' },
-  door_stone_open:  { key: '', name: 'Steintür offen',  icon: '🚪', blocking: false, sprite: 'door_stone_open' },
+  door_stone_open:  { key: '', name: 'Steintür offen',  icon: '🚪', blocking: false, sprite: 'door_stone_open', notBuildable: true },
   door_reinforced:  { key: '', name: 'Verstärkte Tür',  icon: '🚪', blocking: true,  sprite: 'door_reinforced' },
   // Treppen
   stairs_wood_up:    { key: '', name: 'Holztreppe hoch',  icon: '🪜', blocking: false, sprite: 'stairs_wood_up' },
@@ -1624,6 +1624,7 @@ class WorldScene extends Phaser.Scene {
     this.structures     = {};          // key: "x,y" → Object-Layer-Struct
     this.floorSprites   = {};          // key: "x,y" → Phaser.Image (Floor-Layer)
     this.floors         = {};          // key: "x,y" → Floor-Layer-Struct
+    this.doorFrameSprites = {};        // key: "x,y" → Wall-Rahmen-Sprite hinter Tür
     this.npcs           = {};          // key: npc_id → sprite + state
     this.activeDialog   = null;        // { npc_id, waiting: bool }
     this.selectedMaterial = 'stone';   // für Bauen: stone | wood | straw
@@ -1991,6 +1992,8 @@ class WorldScene extends Phaser.Scene {
     for (const [type, cfg] of Object.entries(STRUCTURE)) {
       // Natürliche Welt-Deko (Bäume, Felsen, Gras) ist nicht baubar — wird harvested
       if (NATURAL_STRUCTURE_TYPES.has(type)) continue;
+      // Render-only state-variants (offene Türen, offene Tore) sind nicht baubar
+      if (cfg.notBuildable) continue;
       const btn = document.createElement('button');
       btn.className = 'palette-btn';
       btn.dataset.type = type;
@@ -2103,9 +2106,14 @@ class WorldScene extends Phaser.Scene {
       const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
       if (dist > 1) {
         this.showEvent('🤚 Zu weit weg');
-      } else {
-        this.ws.send(JSON.stringify({ type: 'use_structure', x: tx, y: ty }));
+        return;
       }
+      // Tür/Tor: Klick togglet open/closed
+      if (s.type.startsWith('door_') || s.type.startsWith('garden_gate_')) {
+        this.ws.send(JSON.stringify({ type: 'toggle_door', x: tx, y: ty }));
+        return;
+      }
+      this.ws.send(JSON.stringify({ type: 'use_structure', x: tx, y: ty }));
     }
   }
 
@@ -2745,6 +2753,21 @@ class WorldScene extends Phaser.Scene {
         const s = msg.structure;
         const target = (s.layer === 'floor') ? this.floors : this.structures;
         target[`${s.x},${s.y}`] = s;
+        this.addStructureSprite(s);
+        break;
+      }
+
+      case 'structure_replaced': {
+        // Type-Change am gleichen Tile (z.B. Tür auf/zu). Sprite neu zeichnen.
+        const s = msg.structure;
+        const key = `${s.x},${s.y}`;
+        const target = (s.layer === 'floor') ? this.floors : this.structures;
+        target[key] = s;
+        // Altes Sprite entfernen, neues setzen
+        if (this.structSprites[key]) { this.structSprites[key].destroy(); delete this.structSprites[key]; }
+        if (this.doorFrameSprites && this.doorFrameSprites[key]) {
+          this.doorFrameSprites[key].destroy(); delete this.doorFrameSprites[key];
+        }
         this.addStructureSprite(s);
         break;
       }
@@ -4504,8 +4527,10 @@ class WorldScene extends Phaser.Scene {
     // Full-redraw: alle bestehenden Sprites entfernen, dann neu zeichnen
     for (const s of Object.values(this.floorSprites))  s.destroy();
     for (const s of Object.values(this.structSprites)) s.destroy();
+    for (const s of Object.values(this.doorFrameSprites || {})) s.destroy();
     this.floorSprites = {};
     this.structSprites = {};
+    this.doorFrameSprites = {};
     // Floors zuerst (depth 0), dann Objects (depth 1) → Objects oben drauf
     for (const s of Object.values(this.floors))     this.addStructureSprite(s, false);
     for (const s of Object.values(this.structures)) this.addStructureSprite(s, false);
@@ -4532,6 +4557,29 @@ class WorldScene extends Phaser.Scene {
         ? `floor_${material}` : cfg.sprite;
     } else {
       initialKey = cfg.sprite;
+    }
+
+    // Tür-Rahmen: bei doors zuerst ein Wall-Sprite hinten dran, damit die
+    // Tür sichtbar in der Wand sitzt. Orientation aus Nachbar-Wänden.
+    const isDoor = s.type.startsWith('door_');
+    if (isDoor) {
+      const wallMat = s.material || 'wood';
+      // Mask wie bei updateWallOrientation
+      const isWallish = (t) => t === 'wall'
+                            || (t && (t.startsWith('door_') || t.startsWith('garden_gate_')));
+      let mask = 0;
+      if (isWallish(this.structures[`${s.x},${s.y - 1}`]?.type)) mask |= 1;
+      if (isWallish(this.structures[`${s.x + 1},${s.y}`]?.type)) mask |= 2;
+      if (isWallish(this.structures[`${s.x},${s.y + 1}`]?.type)) mask |= 4;
+      if (isWallish(this.structures[`${s.x - 1},${s.y}`]?.type)) mask |= 8;
+      const variant = WALL_MASK_TO_VARIANT[mask] || 'straight_ns';
+      const wallKey = this.textures.exists(`wall_${wallMat}_${variant}`)
+        ? `wall_${wallMat}_${variant}`
+        : `wall_stone_${variant}`;
+      const frame = this.add.image(cx, cy, wallKey).setOrigin(0.5);
+      frame.setDisplaySize(TILE_SIZE, TILE_SIZE);
+      frame.setDepth(0.9);   // unter dem Tür-Sprite (1.0), über Floor (0.5)
+      this.doorFrameSprites[`${s.x},${s.y}`] = frame;
     }
 
     const img = this.add.image(cx, cy, initialKey).setOrigin(0.5);
@@ -4577,6 +4625,10 @@ class WorldScene extends Phaser.Scene {
     if (this.structSprites[key]) {
       this.structSprites[key].destroy();
       delete this.structSprites[key];
+    }
+    if (this.doorFrameSprites && this.doorFrameSprites[key]) {
+      this.doorFrameSprites[key].destroy();
+      delete this.doorFrameSprites[key];
     }
     // Nachbar-Wände/Fences neu ausrichten, jetzt wo diese weg ist
     this.updateWallOrientation(x - 1, y);
