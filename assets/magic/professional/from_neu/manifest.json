@@ -1,0 +1,507 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_final",
+  "category": "magic",
+  "assets": [
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_01",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0335,
+        "strong_coverage": 0.0335,
+        "bbox": [
+          105,
+          126
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_01.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_01.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_01.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_01.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_02",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0379,
+        "strong_coverage": 0.0379,
+        "bbox": [
+          140,
+          102
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_02.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_02.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_02.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_02.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_03",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0504,
+        "strong_coverage": 0.0504,
+        "bbox": [
+          192,
+          214
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_03.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_03.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_03.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_03.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_04",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0227,
+        "strong_coverage": 0.0227,
+        "bbox": [
+          152,
+          99
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_04.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_04.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_04.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_04.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_06",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0269,
+        "strong_coverage": 0.0269,
+        "bbox": [
+          115,
+          99
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_06.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_06.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_06.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_06.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_07",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0192,
+        "strong_coverage": 0.0192,
+        "bbox": [
+          108,
+          93
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_07.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_07.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_07.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_07.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_08",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0399,
+        "strong_coverage": 0.0399,
+        "bbox": [
+          120,
+          204
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_08.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_08.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_08.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_08.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_09",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.042,
+        "strong_coverage": 0.042,
+        "bbox": [
+          142,
+          150
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_09.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_09.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_09.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_09.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_10",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0384,
+        "strong_coverage": 0.0384,
+        "bbox": [
+          124,
+          128
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_10.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_10.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_10.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_10.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_11",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.1358,
+        "strong_coverage": 0.1358,
+        "bbox": [
+          242,
+          286
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_11.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_11.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_11.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_11.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_12",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0383,
+        "strong_coverage": 0.0383,
+        "bbox": [
+          148,
+          154
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_12.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_12.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_12.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_12.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_13",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0535,
+        "strong_coverage": 0.0535,
+        "bbox": [
+          235,
+          148
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_13.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_13.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_13.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_13.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_14",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0495,
+        "strong_coverage": 0.0495,
+        "bbox": [
+          148,
+          197
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_14.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_14.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_14.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_14.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_15",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0474,
+        "strong_coverage": 0.0474,
+        "bbox": [
+          133,
+          214
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_15.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_15.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_15.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_15.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_16",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0607,
+        "strong_coverage": 0.0606,
+        "bbox": [
+          115,
+          342
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_16.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_16.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_16.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_16.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_17",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0342,
+        "strong_coverage": 0.0342,
+        "bbox": [
+          102,
+          182
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_17.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_17.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_17.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_17.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_18",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0548,
+        "strong_coverage": 0.0548,
+        "bbox": [
+          190,
+          223
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_18.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_18.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_18.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_18.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_20",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0488,
+        "strong_coverage": 0.0488,
+        "bbox": [
+          156,
+          162
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_20.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_20.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_20.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_20.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_21",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0375,
+        "strong_coverage": 0.0375,
+        "bbox": [
+          143,
+          145
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_21.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_21.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_21.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_21.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_22",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0967,
+        "strong_coverage": 0.0967,
+        "bbox": [
+          213,
+          276
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_22.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_22.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_22.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_22.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_23",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0657,
+        "strong_coverage": 0.0657,
+        "bbox": [
+          225,
+          169
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_23.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_23.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_23.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_23.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_24",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0721,
+        "strong_coverage": 0.0721,
+        "bbox": [
+          247,
+          147
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_24.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_24.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_24.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_24.png"
+      }
+    },
+    {
+      "slug": "green_themed_fantasy_magic_items_stickers_25",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Green themed fantasy magic items stickers.jpeg",
+      "source_name": "Green themed fantasy magic items stickers.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0401,
+        "strong_coverage": 0.0401,
+        "bbox": [
+          142,
+          138
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/green_themed_fantasy_magic_items_stickers_25.png",
+        "256": "assets/magic/professional/from_neu/icons_256/green_themed_fantasy_magic_items_stickers_25.png",
+        "128": "assets/magic/professional/from_neu/icons_128/green_themed_fantasy_magic_items_stickers_25.png",
+        "64": "assets/magic/professional/from_neu/icons_64/green_themed_fantasy_magic_items_stickers_25.png"
+      }
+    },
+    {
+      "slug": "photoshop_magic",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Photoshop Magic.jpeg",
+      "source_name": "Photoshop Magic.jpeg",
+      "quality_metrics": {
+        "coverage": 0.7053,
+        "strong_coverage": 0.7053,
+        "bbox": [
+          430,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/photoshop_magic.png",
+        "256": "assets/magic/professional/from_neu/icons_256/photoshop_magic.png",
+        "128": "assets/magic/professional/from_neu/icons_128/photoshop_magic.png",
+        "64": "assets/magic/professional/from_neu/icons_64/photoshop_magic.png"
+      }
+    },
+    {
+      "slug": "spells_spellbooks",
+      "category": "magic",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Spells & Spellbooks.jpeg",
+      "source_name": "Spells & Spellbooks.jpeg",
+      "quality_metrics": {
+        "coverage": 0.4549,
+        "strong_coverage": 0.4502,
+        "bbox": [
+          287,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/magic/professional/from_neu/masters_512/spells_spellbooks.png",
+        "256": "assets/magic/professional/from_neu/icons_256/spells_spellbooks.png",
+        "128": "assets/magic/professional/from_neu/icons_128/spells_spellbooks.png",
+        "64": "assets/magic/professional/from_neu/icons_64/spells_spellbooks.png"
+      }
+    }
+  ]
+}

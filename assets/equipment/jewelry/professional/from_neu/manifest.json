@@ -1,0 +1,127 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_final",
+  "category": "jewelry",
+  "assets": [
+    {
+      "slug": "amulets_magic_fantasy_stylized_textures_game",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Amulets, magic, fantasy, stylized textures, game props, concept, ART (1).jpeg",
+      "source_name": "Amulets, magic, fantasy, stylized textures, game props, concept, ART (1).jpeg",
+      "quality_metrics": {
+        "coverage": 0.4708,
+        "strong_coverage": 0.4708,
+        "bbox": [
+          287,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/amulets_magic_fantasy_stylized_textures_game.png",
+        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/amulets_magic_fantasy_stylized_textures_game.png",
+        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/amulets_magic_fantasy_stylized_textures_game.png",
+        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/amulets_magic_fantasy_stylized_textures_game.png"
+      }
+    },
+    {
+      "slug": "amulets_magic_fantasy_stylized_textures_game_02",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Amulets, magic, fantasy, stylized textures, game props, concept, ART.jpeg",
+      "source_name": "Amulets, magic, fantasy, stylized textures, game props, concept, ART.jpeg",
+      "quality_metrics": {
+        "coverage": 0.4708,
+        "strong_coverage": 0.4708,
+        "bbox": [
+          287,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/amulets_magic_fantasy_stylized_textures_game_02.png",
+        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/amulets_magic_fantasy_stylized_textures_game_02.png",
+        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/amulets_magic_fantasy_stylized_textures_game_02.png",
+        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/amulets_magic_fantasy_stylized_textures_game_02.png"
+      }
+    },
+    {
+      "slug": "dark_fantasy_ring_relic_epic_rpg_artifact_co",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Dark Fantasy Ring Relic - Epic RPG Artifact Concept Sheet.jpeg",
+      "source_name": "Dark Fantasy Ring Relic - Epic RPG Artifact Concept Sheet.jpeg",
+      "quality_metrics": {
+        "coverage": 0.7043,
+        "strong_coverage": 0.7026,
+        "bbox": [
+          430,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/dark_fantasy_ring_relic_epic_rpg_artifact_co.png"
+      }
+    },
+    {
+      "slug": "insignias_de_roblox_png_dibujos_insignia_her_01",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Insignias De Roblox PNG ,dibujos  Insignia, Hermosa Insignia, Insignia Dorada PNG Imagen para Descarga Gratuita _ Pngtree.jpeg",
+      "source_name": "Insignias De Roblox PNG ,dibujos  Insignia, Hermosa Insignia, Insignia Dorada PNG Imagen para Descarga Gratuita _ Pngtree.jpeg",
+      "quality_metrics": {
+        "coverage": 0.3207,
+        "strong_coverage": 0.3129,
+        "bbox": [
+          363,
+          428
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/insignias_de_roblox_png_dibujos_insignia_her_01.png",
+        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/insignias_de_roblox_png_dibujos_insignia_her_01.png",
+        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/insignias_de_roblox_png_dibujos_insignia_her_01.png",
+        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/insignias_de_roblox_png_dibujos_insignia_her_01.png"
+      }
+    },
+    {
+      "slug": "mi_libra",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "quality_metrics": {
+        "coverage": 0.397,
+        "strong_coverage": 0.397,
+        "bbox": [
+          242,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/mi_libra.png",
+        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/mi_libra.png",
+        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/mi_libra.png",
+        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/mi_libra.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "quality_metrics": {
+        "coverage": 0.7053,
+        "strong_coverage": 0.7053,
+        "bbox": [
+          430,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/wealth_precious_stone_gold.png",
+        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/wealth_precious_stone_gold.png",
+        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/wealth_precious_stone_gold.png",
+        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/wealth_precious_stone_gold.png"
+      }
+    }
+  ]
+}

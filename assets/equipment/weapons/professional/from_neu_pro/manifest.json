@@ -1,0 +1,535 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_pro",
+  "category": "weapons",
+  "assets": [
+    {
+      "slug": "a_demons_scarred_sword_helluva_boss_x_male_r",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/A Demons Scarred Sword (Helluva Boss x Male Reader).jpeg",
+      "source_name": "A Demons Scarred Sword (Helluva Boss x Male Reader).jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/a_demons_scarred_sword_helluva_boss_x_male_r.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/a_demons_scarred_sword_helluva_boss_x_male_r.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/a_demons_scarred_sword_helluva_boss_x_male_r.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/a_demons_scarred_sword_helluva_boss_x_male_r.png"
+      }
+    },
+    {
+      "slug": "black_knight_wespon",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Black Knight Wespon.jpeg",
+      "source_name": "Black Knight Wespon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/black_knight_wespon.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/black_knight_wespon.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/black_knight_wespon.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/black_knight_wespon.png"
+      }
+    },
+    {
+      "slug": "dwarven_miner_s_pickaxe",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Dwarven Miner’s Pickaxe.jpeg",
+      "source_name": "Dwarven Miner’s Pickaxe.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/dwarven_miner_s_pickaxe.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/dwarven_miner_s_pickaxe.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/dwarven_miner_s_pickaxe.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/dwarven_miner_s_pickaxe.png"
+      }
+    },
+    {
+      "slug": "excalibur_fate",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Excalibur (Fate).jpeg",
+      "source_name": "Excalibur (Fate).jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/excalibur_fate.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/excalibur_fate.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/excalibur_fate.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/excalibur_fate.png"
+      }
+    },
+    {
+      "slug": "fantasy_ev_ganin_sword_dark_souls_inspired",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/💛 fantasy • ev ganin • Sword, Dark Souls Inspired.jpeg",
+      "source_name": "💛 fantasy • ev ganin • Sword, Dark Souls Inspired.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/fantasy_ev_ganin_sword_dark_souls_inspired.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/fantasy_ev_ganin_sword_dark_souls_inspired.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/fantasy_ev_ganin_sword_dark_souls_inspired.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/fantasy_ev_ganin_sword_dark_souls_inspired.png"
+      }
+    },
+    {
+      "slug": "futuristic_scythe_with_glowing_energy_blade",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Futuristic Scythe with Glowing Energy Blade.jpeg",
+      "source_name": "Futuristic Scythe with Glowing Energy Blade.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/futuristic_scythe_with_glowing_energy_blade.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/futuristic_scythe_with_glowing_energy_blade.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/futuristic_scythe_with_glowing_energy_blade.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/futuristic_scythe_with_glowing_energy_blade.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_01",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_01.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_01.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_01.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_01.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_02",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_02.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_02.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_02.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_02.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_03",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_03.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_03.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_03.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_03.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_04",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_04.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_04.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_04.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_04.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_05",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_05.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_05.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_05.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_05.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_06",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_06.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_06.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_06.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_06.png"
+      }
+    },
+    {
+      "slug": "some_dragon_swords_07",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/some dragon swords.jpeg",
+      "source_name": "some dragon swords.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/some_dragon_swords_07.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/some_dragon_swords_07.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/some_dragon_swords_07.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/some_dragon_swords_07.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_01",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_01.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_01.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_01.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_01.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_02",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_02.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_02.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_02.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_02.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_03",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_03.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_03.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_03.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_03.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_04",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_04.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_04.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_04.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_04.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_05",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_05.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_05.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_05.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_05.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_06",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_06.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_06.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_06.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_06.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_07",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_07.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_07.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_07.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_07.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_08",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_08.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_08.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_08.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_08.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_09",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_09.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_09.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_09.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_09.png"
+      }
+    },
+    {
+      "slug": "stylized_blades_arthur_malagon_10",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Stylized blades, Arthur Malagon.jpeg",
+      "source_name": "Stylized blades, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/stylized_blades_arthur_malagon_10.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/stylized_blades_arthur_malagon_10.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/stylized_blades_arthur_malagon_10.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/stylized_blades_arthur_malagon_10.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_01",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_01.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_01.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_01.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_01.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_03",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_03.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_03.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_03.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_03.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_09",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_09.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_09.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_09.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_09.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_10",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_10.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_10.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_10.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_10.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_15",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_15.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_15.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_15.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_15.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_16",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_16.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_16.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_16.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_16.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_17",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_17.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_17.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_17.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_17.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_18",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_18.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_18.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_18.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_18.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_19",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_19.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_19.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_19.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_19.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_20",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_20.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_20.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_20.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_20.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_21",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_21.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_21.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_21.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_21.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_22",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_22.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_22.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_22.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_22.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_23",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_23.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_23.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_23.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_23.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_24",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_24.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_24.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_24.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_24.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_25",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_25.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_25.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_25.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_25.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_26",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_26.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_26.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_26.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_26.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_27",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_27.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_27.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_27.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_27.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_28",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_28.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_28.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_28.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_28.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_29",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_29.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_29.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_29.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_29.png"
+      }
+    },
+    {
+      "slug": "swordtember_final_five_arthur_malagon_30",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Swordtember Final Five, Arthur Malagon.jpeg",
+      "source_name": "Swordtember Final Five, Arthur Malagon.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/swordtember_final_five_arthur_malagon_30.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/swordtember_final_five_arthur_malagon_30.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/swordtember_final_five_arthur_malagon_30.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/swordtember_final_five_arthur_malagon_30.png"
+      }
+    },
+    {
+      "slug": "vers_o_foice_da_varinha_do_viniih0748",
+      "category": "weapons",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/versão foice da varinha do viniih0748.jpeg",
+      "source_name": "versão foice da varinha do viniih0748.jpeg",
+      "files": {
+        "512": "assets/equipment/weapons/professional/from_neu_pro/masters_512/vers_o_foice_da_varinha_do_viniih0748.png",
+        "256": "assets/equipment/weapons/professional/from_neu_pro/icons_256/vers_o_foice_da_varinha_do_viniih0748.png",
+        "128": "assets/equipment/weapons/professional/from_neu_pro/icons_128/vers_o_foice_da_varinha_do_viniih0748.png",
+        "64": "assets/equipment/weapons/professional/from_neu_pro/icons_64/vers_o_foice_da_varinha_do_viniih0748.png"
+      }
+    }
+  ]
+}

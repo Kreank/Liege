@@ -1,0 +1,167 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_final",
+  "category": "props",
+  "assets": [
+    {
+      "slug": "greece_mythic_props_by_ev_ganin",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Greece Mythic Props _ by Ev Ganin.jpeg",
+      "source_name": "Greece Mythic Props _ by Ev Ganin.jpeg",
+      "quality_metrics": {
+        "coverage": 0.4084,
+        "strong_coverage": 0.4084,
+        "bbox": [
+          249,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/greece_mythic_props_by_ev_ganin.png",
+        "256": "assets/props/professional/from_neu/icons_256/greece_mythic_props_by_ev_ganin.png",
+        "128": "assets/props/professional/from_neu/icons_128/greece_mythic_props_by_ev_ganin.png",
+        "64": "assets/props/professional/from_neu/icons_64/greece_mythic_props_by_ev_ganin.png"
+      }
+    },
+    {
+      "slug": "stylized_candles",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/stylized candles.jpeg",
+      "source_name": "stylized candles.jpeg",
+      "quality_metrics": {
+        "coverage": 0.4084,
+        "strong_coverage": 0.4084,
+        "bbox": [
+          249,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/stylized_candles.png",
+        "256": "assets/props/professional/from_neu/icons_256/stylized_candles.png",
+        "128": "assets/props/professional/from_neu/icons_128/stylized_candles.png",
+        "64": "assets/props/professional/from_neu/icons_64/stylized_candles.png"
+      }
+    },
+    {
+      "slug": "welcome_to_home_01",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Welcome to home 🕷️👠🕸️.jpeg",
+      "source_name": "Welcome to home 🕷️👠🕸️.jpeg",
+      "quality_metrics": {
+        "coverage": 0.1673,
+        "strong_coverage": 0.1673,
+        "bbox": [
+          236,
+          360
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/welcome_to_home_01.png",
+        "256": "assets/props/professional/from_neu/icons_256/welcome_to_home_01.png",
+        "128": "assets/props/professional/from_neu/icons_128/welcome_to_home_01.png",
+        "64": "assets/props/professional/from_neu/icons_64/welcome_to_home_01.png"
+      }
+    },
+    {
+      "slug": "welcome_to_home_02",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Welcome to home 🕷️👠🕸️.jpeg",
+      "source_name": "Welcome to home 🕷️👠🕸️.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0103,
+        "strong_coverage": 0.0103,
+        "bbox": [
+          146,
+          100
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/welcome_to_home_02.png",
+        "256": "assets/props/professional/from_neu/icons_256/welcome_to_home_02.png",
+        "128": "assets/props/professional/from_neu/icons_128/welcome_to_home_02.png",
+        "64": "assets/props/professional/from_neu/icons_64/welcome_to_home_02.png"
+      }
+    },
+    {
+      "slug": "welcome_to_home_04",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Welcome to home 🕷️👠🕸️.jpeg",
+      "source_name": "Welcome to home 🕷️👠🕸️.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0726,
+        "strong_coverage": 0.0726,
+        "bbox": [
+          147,
+          197
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/welcome_to_home_04.png",
+        "256": "assets/props/professional/from_neu/icons_256/welcome_to_home_04.png",
+        "128": "assets/props/professional/from_neu/icons_128/welcome_to_home_04.png",
+        "64": "assets/props/professional/from_neu/icons_64/welcome_to_home_04.png"
+      }
+    },
+    {
+      "slug": "welcome_to_home_05",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Welcome to home 🕷️👠🕸️.jpeg",
+      "source_name": "Welcome to home 🕷️👠🕸️.jpeg",
+      "quality_metrics": {
+        "coverage": 0.1114,
+        "strong_coverage": 0.088,
+        "bbox": [
+          192,
+          429
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/welcome_to_home_05.png",
+        "256": "assets/props/professional/from_neu/icons_256/welcome_to_home_05.png",
+        "128": "assets/props/professional/from_neu/icons_128/welcome_to_home_05.png",
+        "64": "assets/props/professional/from_neu/icons_64/welcome_to_home_05.png"
+      }
+    },
+    {
+      "slug": "welcome_to_home_06",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Welcome to home 🕷️👠🕸️.jpeg",
+      "source_name": "Welcome to home 🕷️👠🕸️.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0231,
+        "strong_coverage": 0.0231,
+        "bbox": [
+          113,
+          199
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/welcome_to_home_06.png",
+        "256": "assets/props/professional/from_neu/icons_256/welcome_to_home_06.png",
+        "128": "assets/props/professional/from_neu/icons_128/welcome_to_home_06.png",
+        "64": "assets/props/professional/from_neu/icons_64/welcome_to_home_06.png"
+      }
+    },
+    {
+      "slug": "welcome_to_home_07",
+      "category": "props",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Welcome to home 🕷️👠🕸️.jpeg",
+      "source_name": "Welcome to home 🕷️👠🕸️.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0224,
+        "strong_coverage": 0.0224,
+        "bbox": [
+          124,
+          190
+        ]
+      },
+      "files": {
+        "512": "assets/props/professional/from_neu/masters_512/welcome_to_home_07.png",
+        "256": "assets/props/professional/from_neu/icons_256/welcome_to_home_07.png",
+        "128": "assets/props/professional/from_neu/icons_128/welcome_to_home_07.png",
+        "64": "assets/props/professional/from_neu/icons_64/welcome_to_home_07.png"
+      }
+    }
+  ]
+}

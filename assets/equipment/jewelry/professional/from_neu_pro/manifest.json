@@ -1,0 +1,427 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_pro",
+  "category": "jewelry",
+  "assets": [
+    {
+      "slug": "amulets_magic_fantasy_stylized_textures_game",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Amulets, magic, fantasy, stylized textures, game props, concept, ART (1).jpeg",
+      "source_name": "Amulets, magic, fantasy, stylized textures, game props, concept, ART (1).jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/amulets_magic_fantasy_stylized_textures_game.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/amulets_magic_fantasy_stylized_textures_game.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/amulets_magic_fantasy_stylized_textures_game.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/amulets_magic_fantasy_stylized_textures_game.png"
+      }
+    },
+    {
+      "slug": "amulets_magic_fantasy_stylized_textures_game_02",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Amulets, magic, fantasy, stylized textures, game props, concept, ART.jpeg",
+      "source_name": "Amulets, magic, fantasy, stylized textures, game props, concept, ART.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/amulets_magic_fantasy_stylized_textures_game_02.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/amulets_magic_fantasy_stylized_textures_game_02.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/amulets_magic_fantasy_stylized_textures_game_02.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/amulets_magic_fantasy_stylized_textures_game_02.png"
+      }
+    },
+    {
+      "slug": "dark_fantasy_ring_relic_epic_rpg_artifact_co",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Dark Fantasy Ring Relic - Epic RPG Artifact Concept Sheet.jpeg",
+      "source_name": "Dark Fantasy Ring Relic - Epic RPG Artifact Concept Sheet.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/dark_fantasy_ring_relic_epic_rpg_artifact_co.png"
+      }
+    },
+    {
+      "slug": "insignias_de_roblox_png_dibujos_insignia_her",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Insignias De Roblox PNG ,dibujos  Insignia, Hermosa Insignia, Insignia Dorada PNG Imagen para Descarga Gratuita _ Pngtree.jpeg",
+      "source_name": "Insignias De Roblox PNG ,dibujos  Insignia, Hermosa Insignia, Insignia Dorada PNG Imagen para Descarga Gratuita _ Pngtree.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/insignias_de_roblox_png_dibujos_insignia_her.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/insignias_de_roblox_png_dibujos_insignia_her.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/insignias_de_roblox_png_dibujos_insignia_her.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/insignias_de_roblox_png_dibujos_insignia_her.png"
+      }
+    },
+    {
+      "slug": "mi_libra_01",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_01.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_01.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_01.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_01.png"
+      }
+    },
+    {
+      "slug": "mi_libra_02",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_02.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_02.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_02.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_02.png"
+      }
+    },
+    {
+      "slug": "mi_libra_03",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_03.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_03.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_03.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_03.png"
+      }
+    },
+    {
+      "slug": "mi_libra_04",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_04.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_04.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_04.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_04.png"
+      }
+    },
+    {
+      "slug": "mi_libra_05",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_05.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_05.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_05.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_05.png"
+      }
+    },
+    {
+      "slug": "mi_libra_06",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_06.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_06.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_06.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_06.png"
+      }
+    },
+    {
+      "slug": "mi_libra_08",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_08.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_08.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_08.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_08.png"
+      }
+    },
+    {
+      "slug": "mi_libra_09",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_09.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_09.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_09.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_09.png"
+      }
+    },
+    {
+      "slug": "mi_libra_10",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
+      "source_name": "mi libra.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/mi_libra_10.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/mi_libra_10.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/mi_libra_10.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/mi_libra_10.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_01",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_01.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_01.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_01.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_01.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_02",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_02.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_02.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_02.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_02.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_04",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_04.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_04.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_04.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_04.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_05",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_05.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_05.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_05.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_05.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_06",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_06.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_06.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_06.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_06.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_08",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_08.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_08.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_08.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_08.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_09",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_09.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_09.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_09.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_09.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_10",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_10.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_10.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_10.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_10.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_11",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_11.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_11.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_11.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_11.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_12",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_12.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_12.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_12.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_12.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_13",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_13.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_13.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_13.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_13.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_14",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_14.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_14.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_14.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_14.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_15",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_15.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_15.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_15.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_15.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_16",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_16.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_16.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_16.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_16.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_17",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_17.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_17.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_17.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_17.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_18",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_18.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_18.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_18.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_18.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_19",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_19.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_19.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_19.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_19.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_20",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_20.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_20.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_20.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_20.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_21",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_21.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_21.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_21.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_21.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_22",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_22.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_22.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_22.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_22.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_23",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_23.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_23.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_23.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_23.png"
+      }
+    },
+    {
+      "slug": "wealth_precious_stone_gold_24",
+      "category": "jewelry",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/wealth precious stone gold.jpeg",
+      "source_name": "wealth precious stone gold.jpeg",
+      "files": {
+        "512": "assets/equipment/jewelry/professional/from_neu_pro/masters_512/wealth_precious_stone_gold_24.png",
+        "256": "assets/equipment/jewelry/professional/from_neu_pro/icons_256/wealth_precious_stone_gold_24.png",
+        "128": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/wealth_precious_stone_gold_24.png",
+        "64": "assets/equipment/jewelry/professional/from_neu_pro/icons_64/wealth_precious_stone_gold_24.png"
+      }
+    }
+  ]
+}

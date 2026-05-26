@@ -1,0 +1,91 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_pro",
+  "category": "potions",
+  "assets": [
+    {
+      "slug": "a_magic_potion_from_fantasy_games",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/A magic potion from fantasy games.jpeg",
+      "source_name": "A magic potion from fantasy games.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/a_magic_potion_from_fantasy_games.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/a_magic_potion_from_fantasy_games.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/a_magic_potion_from_fantasy_games.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/a_magic_potion_from_fantasy_games.png"
+      }
+    },
+    {
+      "slug": "asset_03",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Зелье изумрудного ядра — фэнтези, арт, иллюстрация, акварель.jpeg",
+      "source_name": "Зелье изумрудного ядра — фэнтези, арт, иллюстрация, акварель.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/asset_03.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/asset_03.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/asset_03.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/asset_03.png"
+      }
+    },
+    {
+      "slug": "blasphemous_vial_created_by_ev_ganin",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Blasphemous Vial • created by Ev Ganin.jpeg",
+      "source_name": "Blasphemous Vial • created by Ev Ganin.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/blasphemous_vial_created_by_ev_ganin.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/blasphemous_vial_created_by_ev_ganin.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/blasphemous_vial_created_by_ev_ganin.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/blasphemous_vial_created_by_ev_ganin.png"
+      }
+    },
+    {
+      "slug": "props_bottle_01",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Props bottle.jpeg",
+      "source_name": "Props bottle.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/props_bottle_01.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/props_bottle_01.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/props_bottle_01.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/props_bottle_01.png"
+      }
+    },
+    {
+      "slug": "props_bottle_02",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Props bottle.jpeg",
+      "source_name": "Props bottle.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/props_bottle_02.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/props_bottle_02.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/props_bottle_02.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/props_bottle_02.png"
+      }
+    },
+    {
+      "slug": "props_bottle_03",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Props bottle.jpeg",
+      "source_name": "Props bottle.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/props_bottle_03.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/props_bottle_03.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/props_bottle_03.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/props_bottle_03.png"
+      }
+    },
+    {
+      "slug": "props_bottle_04",
+      "category": "potions",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Props bottle.jpeg",
+      "source_name": "Props bottle.jpeg",
+      "files": {
+        "512": "assets/consumables/potions/professional/from_neu_pro/masters_512/props_bottle_04.png",
+        "256": "assets/consumables/potions/professional/from_neu_pro/icons_256/props_bottle_04.png",
+        "128": "assets/consumables/potions/professional/from_neu_pro/icons_128/props_bottle_04.png",
+        "64": "assets/consumables/potions/professional/from_neu_pro/icons_64/props_bottle_04.png"
+      }
+    }
+  ]
+}

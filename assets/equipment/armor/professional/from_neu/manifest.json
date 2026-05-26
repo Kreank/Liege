@@ -1,0 +1,267 @@
+{
+  "generated": "2026-05-26",
+  "source_pack": "assets/professional/reference_pack_neu_final",
+  "category": "armor",
+  "assets": [
+    {
+      "slug": "cloak_of_mists",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Cloak of Mists.jpeg",
+      "source_name": "Cloak of Mists.jpeg",
+      "quality_metrics": {
+        "coverage": 0.3199,
+        "strong_coverage": 0.3114,
+        "bbox": [
+          429,
+          407
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/cloak_of_mists.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/cloak_of_mists.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/cloak_of_mists.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/cloak_of_mists.png"
+      }
+    },
+    {
+      "slug": "fantasy_ev_ganin_barbarian",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/💛 fantasy • ev ganin • Barbarian.jpeg",
+      "source_name": "💛 fantasy • ev ganin • Barbarian.jpeg",
+      "quality_metrics": {
+        "coverage": 0.3732,
+        "strong_coverage": 0.3437,
+        "bbox": [
+          287,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/fantasy_ev_ganin_barbarian.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/fantasy_ev_ganin_barbarian.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/fantasy_ev_ganin_barbarian.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/fantasy_ev_ganin_barbarian.png"
+      }
+    },
+    {
+      "slug": "fantasy_ev_ganin_folder_armory_showcase_bark",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/🩵 fantasy • ev ganin • Folder 🎽 Armory Showcase _ Bark Armor.jpeg",
+      "source_name": "🩵 fantasy • ev ganin • Folder 🎽 Armory Showcase _ Bark Armor.jpeg",
+      "quality_metrics": {
+        "coverage": 0.4395,
+        "strong_coverage": 0.4302,
+        "bbox": [
+          311,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/fantasy_ev_ganin_folder_armory_showcase_bark.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/fantasy_ev_ganin_folder_armory_showcase_bark.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/fantasy_ev_ganin_folder_armory_showcase_bark.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/fantasy_ev_ganin_folder_armory_showcase_bark.png"
+      }
+    },
+    {
+      "slug": "fantasy_ev_ganin_mask",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/💜 fantasy • ev ganin • Mask.jpeg",
+      "source_name": "💜 fantasy • ev ganin • Mask.jpeg",
+      "quality_metrics": {
+        "coverage": 0.4665,
+        "strong_coverage": 0.4596,
+        "bbox": [
+          287,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/fantasy_ev_ganin_mask.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/fantasy_ev_ganin_mask.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/fantasy_ev_ganin_mask.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/fantasy_ev_ganin_mask.png"
+      }
+    },
+    {
+      "slug": "fantasy_ev_ganin_zombie_armor",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/💛 fantasy • ev ganin • 🥉Zombie Armor.jpeg",
+      "source_name": "💛 fantasy • ev ganin • 🥉Zombie Armor.jpeg",
+      "quality_metrics": {
+        "coverage": 0.3365,
+        "strong_coverage": 0.3305,
+        "bbox": [
+          294,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/fantasy_ev_ganin_zombie_armor.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/fantasy_ev_ganin_zombie_armor.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/fantasy_ev_ganin_zombie_armor.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/fantasy_ev_ganin_zombie_armor.png"
+      }
+    },
+    {
+      "slug": "plate_mail_cavalier_set_homm5_concept_art_01",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "quality_metrics": {
+        "coverage": 0.2588,
+        "strong_coverage": 0.237,
+        "bbox": [
+          268,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/plate_mail_cavalier_set_homm5_concept_art_01.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/plate_mail_cavalier_set_homm5_concept_art_01.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/plate_mail_cavalier_set_homm5_concept_art_01.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/plate_mail_cavalier_set_homm5_concept_art_01.png"
+      }
+    },
+    {
+      "slug": "plate_mail_cavalier_set_homm5_concept_art_02",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "quality_metrics": {
+        "coverage": 0.1199,
+        "strong_coverage": 0.1199,
+        "bbox": [
+          273,
+          379
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/plate_mail_cavalier_set_homm5_concept_art_02.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/plate_mail_cavalier_set_homm5_concept_art_02.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/plate_mail_cavalier_set_homm5_concept_art_02.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/plate_mail_cavalier_set_homm5_concept_art_02.png"
+      }
+    },
+    {
+      "slug": "plate_mail_cavalier_set_homm5_concept_art_03",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "quality_metrics": {
+        "coverage": 0.1428,
+        "strong_coverage": 0.1302,
+        "bbox": [
+          183,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/plate_mail_cavalier_set_homm5_concept_art_03.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/plate_mail_cavalier_set_homm5_concept_art_03.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/plate_mail_cavalier_set_homm5_concept_art_03.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/plate_mail_cavalier_set_homm5_concept_art_03.png"
+      }
+    },
+    {
+      "slug": "plate_mail_cavalier_set_homm5_concept_art_04",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0169,
+        "strong_coverage": 0.0169,
+        "bbox": [
+          127,
+          135
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/plate_mail_cavalier_set_homm5_concept_art_04.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/plate_mail_cavalier_set_homm5_concept_art_04.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/plate_mail_cavalier_set_homm5_concept_art_04.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/plate_mail_cavalier_set_homm5_concept_art_04.png"
+      }
+    },
+    {
+      "slug": "plate_mail_cavalier_set_homm5_concept_art_05",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
+      "quality_metrics": {
+        "coverage": 0.0255,
+        "strong_coverage": 0.0255,
+        "bbox": [
+          142,
+          142
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/plate_mail_cavalier_set_homm5_concept_art_05.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/plate_mail_cavalier_set_homm5_concept_art_05.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/plate_mail_cavalier_set_homm5_concept_art_05.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/plate_mail_cavalier_set_homm5_concept_art_05.png"
+      }
+    },
+    {
+      "slug": "spiked_crown_horned_demon_set_hom_m5_01",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",
+      "source_name": "Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",
+      "quality_metrics": {
+        "coverage": 0.0226,
+        "strong_coverage": 0.0226,
+        "bbox": [
+          220,
+          107
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/spiked_crown_horned_demon_set_hom_m5_01.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/spiked_crown_horned_demon_set_hom_m5_01.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/spiked_crown_horned_demon_set_hom_m5_01.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/spiked_crown_horned_demon_set_hom_m5_01.png"
+      }
+    },
+    {
+      "slug": "spiked_crown_horned_demon_set_hom_m5_02",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",
+      "source_name": "Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",
+      "quality_metrics": {
+        "coverage": 0.306,
+        "strong_coverage": 0.2849,
+        "bbox": [
+          407,
+          430
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/spiked_crown_horned_demon_set_hom_m5_02.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/spiked_crown_horned_demon_set_hom_m5_02.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/spiked_crown_horned_demon_set_hom_m5_02.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/spiked_crown_horned_demon_set_hom_m5_02.png"
+      }
+    },
+    {
+      "slug": "spiked_crown_horned_demon_set_hom_m5_03",
+      "category": "armor",
+      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",
+      "source_name": "Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",
+      "quality_metrics": {
+        "coverage": 0.3387,
+        "strong_coverage": 0.3295,
+        "bbox": [
+          430,
+          389
+        ]
+      },
+      "files": {
+        "512": "assets/equipment/armor/professional/from_neu/masters_512/spiked_crown_horned_demon_set_hom_m5_03.png",
+        "256": "assets/equipment/armor/professional/from_neu/icons_256/spiked_crown_horned_demon_set_hom_m5_03.png",
+        "128": "assets/equipment/armor/professional/from_neu/icons_128/spiked_crown_horned_demon_set_hom_m5_03.png",
+        "64": "assets/equipment/armor/professional/from_neu/icons_64/spiked_crown_horned_demon_set_hom_m5_03.png"
+      }
+    }
+  ]
+}
