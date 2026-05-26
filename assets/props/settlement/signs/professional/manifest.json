@@ -1,0 +1,444 @@
+{
+  "generated": "2026-05-26",
+  "style": "professional fantasy guild/building signs: freestanding wooden post, wrought iron bracket, readable emblem instead of text",
+  "sizes": [
+    512,
+    256,
+    128,
+    64
+  ],
+  "assets": [
+    {
+      "slug": "schmiede",
+      "label": "Schmiede",
+      "building_type": "blacksmith workshop",
+      "icon": "anvil",
+      "files": {
+        "512": "masters_512/schmiede_sign.png",
+        "256": "icons_256/schmiede_sign.png",
+        "128": "icons_128/schmiede_sign.png",
+        "64": "icons_64/schmiede_sign.png"
+      }
+    },
+    {
+      "slug": "gasthaus",
+      "label": "Gasthaus",
+      "building_type": "inn lodging",
+      "icon": "mug",
+      "files": {
+        "512": "masters_512/gasthaus_sign.png",
+        "256": "icons_256/gasthaus_sign.png",
+        "128": "icons_128/gasthaus_sign.png",
+        "64": "icons_64/gasthaus_sign.png"
+      }
+    },
+    {
+      "slug": "wohnhaus",
+      "label": "Wohnhaus",
+      "building_type": "residential house",
+      "icon": "house",
+      "files": {
+        "512": "masters_512/wohnhaus_sign.png",
+        "256": "icons_256/wohnhaus_sign.png",
+        "128": "icons_128/wohnhaus_sign.png",
+        "64": "icons_64/wohnhaus_sign.png"
+      }
+    },
+    {
+      "slug": "baeckerei",
+      "label": "Baeckerei",
+      "building_type": "bakery",
+      "icon": "bread",
+      "files": {
+        "512": "masters_512/baeckerei_sign.png",
+        "256": "icons_256/baeckerei_sign.png",
+        "128": "icons_128/baeckerei_sign.png",
+        "64": "icons_64/baeckerei_sign.png"
+      }
+    },
+    {
+      "slug": "marktstand",
+      "label": "Marktstand",
+      "building_type": "market trader",
+      "icon": "scales",
+      "files": {
+        "512": "masters_512/marktstand_sign.png",
+        "256": "icons_256/marktstand_sign.png",
+        "128": "icons_128/marktstand_sign.png",
+        "64": "icons_64/marktstand_sign.png"
+      }
+    },
+    {
+      "slug": "lagerhaus",
+      "label": "Lagerhaus",
+      "building_type": "warehouse storage",
+      "icon": "crate",
+      "files": {
+        "512": "masters_512/lagerhaus_sign.png",
+        "256": "icons_256/lagerhaus_sign.png",
+        "128": "icons_128/lagerhaus_sign.png",
+        "64": "icons_64/lagerhaus_sign.png"
+      }
+    },
+    {
+      "slug": "apotheke_heiler",
+      "label": "Apotheke/Heiler",
+      "building_type": "healer apothecary",
+      "icon": "mortar",
+      "files": {
+        "512": "masters_512/apotheke_heiler_sign.png",
+        "256": "icons_256/apotheke_heiler_sign.png",
+        "128": "icons_128/apotheke_heiler_sign.png",
+        "64": "icons_64/apotheke_heiler_sign.png"
+      }
+    },
+    {
+      "slug": "stall",
+      "label": "Stall",
+      "building_type": "stable",
+      "icon": "horseshoe",
+      "files": {
+        "512": "masters_512/stall_sign.png",
+        "256": "icons_256/stall_sign.png",
+        "128": "icons_128/stall_sign.png",
+        "64": "icons_64/stall_sign.png"
+      }
+    },
+    {
+      "slug": "wache",
+      "label": "Wache",
+      "building_type": "guard post",
+      "icon": "shield",
+      "files": {
+        "512": "masters_512/wache_sign.png",
+        "256": "icons_256/wache_sign.png",
+        "128": "icons_128/wache_sign.png",
+        "64": "icons_64/wache_sign.png"
+      }
+    },
+    {
+      "slug": "kaserne",
+      "label": "Kaserne",
+      "building_type": "barracks",
+      "icon": "spear_shield",
+      "files": {
+        "512": "masters_512/kaserne_sign.png",
+        "256": "icons_256/kaserne_sign.png",
+        "128": "icons_128/kaserne_sign.png",
+        "64": "icons_64/kaserne_sign.png"
+      }
+    },
+    {
+      "slug": "rathaus",
+      "label": "Rathaus",
+      "building_type": "village hall",
+      "icon": "crown_hall",
+      "files": {
+        "512": "masters_512/rathaus_sign.png",
+        "256": "icons_256/rathaus_sign.png",
+        "128": "icons_128/rathaus_sign.png",
+        "64": "icons_64/rathaus_sign.png"
+      }
+    },
+    {
+      "slug": "bergwerk",
+      "label": "Bergwerk",
+      "building_type": "mine",
+      "icon": "pickaxe",
+      "files": {
+        "512": "masters_512/bergwerk_sign.png",
+        "256": "icons_256/bergwerk_sign.png",
+        "128": "icons_128/bergwerk_sign.png",
+        "64": "icons_64/bergwerk_sign.png"
+      }
+    },
+    {
+      "slug": "saegewerk",
+      "label": "Saegewerk",
+      "building_type": "sawmill",
+      "icon": "saw",
+      "files": {
+        "512": "masters_512/saegewerk_sign.png",
+        "256": "icons_256/saegewerk_sign.png",
+        "128": "icons_128/saegewerk_sign.png",
+        "64": "icons_64/saegewerk_sign.png"
+      }
+    },
+    {
+      "slug": "holzfaeller",
+      "label": "Holzfaeller",
+      "building_type": "woodcutter hut",
+      "icon": "axe_log",
+      "files": {
+        "512": "masters_512/holzfaeller_sign.png",
+        "256": "icons_256/holzfaeller_sign.png",
+        "128": "icons_128/holzfaeller_sign.png",
+        "64": "icons_64/holzfaeller_sign.png"
+      }
+    },
+    {
+      "slug": "bauernhof",
+      "label": "Bauernhof",
+      "building_type": "farm",
+      "icon": "wheat",
+      "files": {
+        "512": "masters_512/bauernhof_sign.png",
+        "256": "icons_256/bauernhof_sign.png",
+        "128": "icons_128/bauernhof_sign.png",
+        "64": "icons_64/bauernhof_sign.png"
+      }
+    },
+    {
+      "slug": "muehle",
+      "label": "Muehle",
+      "building_type": "mill",
+      "icon": "mill",
+      "files": {
+        "512": "masters_512/muehle_sign.png",
+        "256": "icons_256/muehle_sign.png",
+        "128": "icons_128/muehle_sign.png",
+        "64": "icons_64/muehle_sign.png"
+      }
+    },
+    {
+      "slug": "fischerhuette",
+      "label": "Fischerhuette",
+      "building_type": "fisher hut",
+      "icon": "fish",
+      "files": {
+        "512": "masters_512/fischerhuette_sign.png",
+        "256": "icons_256/fischerhuette_sign.png",
+        "128": "icons_128/fischerhuette_sign.png",
+        "64": "icons_64/fischerhuette_sign.png"
+      }
+    },
+    {
+      "slug": "taverne_brauerei",
+      "label": "Taverne/Brauerei",
+      "building_type": "tavern brewery",
+      "icon": "barrel",
+      "files": {
+        "512": "masters_512/taverne_brauerei_sign.png",
+        "256": "icons_256/taverne_brauerei_sign.png",
+        "128": "icons_128/taverne_brauerei_sign.png",
+        "64": "icons_64/taverne_brauerei_sign.png"
+      }
+    },
+    {
+      "slug": "schneiderei",
+      "label": "Schneiderei",
+      "building_type": "tailor",
+      "icon": "needle_thread",
+      "files": {
+        "512": "masters_512/schneiderei_sign.png",
+        "256": "icons_256/schneiderei_sign.png",
+        "128": "icons_128/schneiderei_sign.png",
+        "64": "icons_64/schneiderei_sign.png"
+      }
+    },
+    {
+      "slug": "gerberei",
+      "label": "Gerberei",
+      "building_type": "tannery",
+      "icon": "hide",
+      "files": {
+        "512": "masters_512/gerberei_sign.png",
+        "256": "icons_256/gerberei_sign.png",
+        "128": "icons_128/gerberei_sign.png",
+        "64": "icons_64/gerberei_sign.png"
+      }
+    },
+    {
+      "slug": "jaegerhuette",
+      "label": "Jaegerhuette",
+      "building_type": "hunter lodge",
+      "icon": "bow",
+      "files": {
+        "512": "masters_512/jaegerhuette_sign.png",
+        "256": "icons_256/jaegerhuette_sign.png",
+        "128": "icons_128/jaegerhuette_sign.png",
+        "64": "icons_64/jaegerhuette_sign.png"
+      }
+    },
+    {
+      "slug": "alchemie",
+      "label": "Alchemie",
+      "building_type": "alchemy lab",
+      "icon": "flask",
+      "files": {
+        "512": "masters_512/alchemie_sign.png",
+        "256": "icons_256/alchemie_sign.png",
+        "128": "icons_128/alchemie_sign.png",
+        "64": "icons_64/alchemie_sign.png"
+      }
+    },
+    {
+      "slug": "magierturm",
+      "label": "Magierturm",
+      "building_type": "mage tower",
+      "icon": "star_staff",
+      "files": {
+        "512": "masters_512/magierturm_sign.png",
+        "256": "icons_256/magierturm_sign.png",
+        "128": "icons_128/magierturm_sign.png",
+        "64": "icons_64/magierturm_sign.png"
+      }
+    },
+    {
+      "slug": "kapelle",
+      "label": "Kapelle",
+      "building_type": "chapel",
+      "icon": "chapel",
+      "files": {
+        "512": "masters_512/kapelle_sign.png",
+        "256": "icons_256/kapelle_sign.png",
+        "128": "icons_128/kapelle_sign.png",
+        "64": "icons_64/kapelle_sign.png"
+      }
+    },
+    {
+      "slug": "friedhof",
+      "label": "Friedhof",
+      "building_type": "graveyard",
+      "icon": "grave",
+      "files": {
+        "512": "masters_512/friedhof_sign.png",
+        "256": "icons_256/friedhof_sign.png",
+        "128": "icons_128/friedhof_sign.png",
+        "64": "icons_64/friedhof_sign.png"
+      }
+    },
+    {
+      "slug": "bibliothek",
+      "label": "Bibliothek",
+      "building_type": "library",
+      "icon": "book",
+      "files": {
+        "512": "masters_512/bibliothek_sign.png",
+        "256": "icons_256/bibliothek_sign.png",
+        "128": "icons_128/bibliothek_sign.png",
+        "64": "icons_64/bibliothek_sign.png"
+      }
+    },
+    {
+      "slug": "schule",
+      "label": "Schule",
+      "building_type": "school",
+      "icon": "slate",
+      "files": {
+        "512": "masters_512/schule_sign.png",
+        "256": "icons_256/schule_sign.png",
+        "128": "icons_128/schule_sign.png",
+        "64": "icons_64/schule_sign.png"
+      }
+    },
+    {
+      "slug": "goldschmied",
+      "label": "Goldschmied",
+      "building_type": "jeweler",
+      "icon": "gem_ring",
+      "files": {
+        "512": "masters_512/goldschmied_sign.png",
+        "256": "icons_256/goldschmied_sign.png",
+        "128": "icons_128/goldschmied_sign.png",
+        "64": "icons_64/goldschmied_sign.png"
+      }
+    },
+    {
+      "slug": "waffenladen",
+      "label": "Waffenladen",
+      "building_type": "weapon shop",
+      "icon": "crossed_swords",
+      "files": {
+        "512": "masters_512/waffenladen_sign.png",
+        "256": "icons_256/waffenladen_sign.png",
+        "128": "icons_128/waffenladen_sign.png",
+        "64": "icons_64/waffenladen_sign.png"
+      }
+    },
+    {
+      "slug": "ruestungsschmied",
+      "label": "Ruestungsschmied",
+      "building_type": "armorer",
+      "icon": "helmet",
+      "files": {
+        "512": "masters_512/ruestungsschmied_sign.png",
+        "256": "icons_256/ruestungsschmied_sign.png",
+        "128": "icons_128/ruestungsschmied_sign.png",
+        "64": "icons_64/ruestungsschmied_sign.png"
+      }
+    },
+    {
+      "slug": "hafen",
+      "label": "Hafen",
+      "building_type": "dock harbor",
+      "icon": "anchor",
+      "files": {
+        "512": "masters_512/hafen_sign.png",
+        "256": "icons_256/hafen_sign.png",
+        "128": "icons_128/hafen_sign.png",
+        "64": "icons_64/hafen_sign.png"
+      }
+    },
+    {
+      "slug": "brunnen",
+      "label": "Brunnen",
+      "building_type": "well water point",
+      "icon": "well",
+      "files": {
+        "512": "masters_512/brunnen_sign.png",
+        "256": "icons_256/brunnen_sign.png",
+        "128": "icons_128/brunnen_sign.png",
+        "64": "icons_64/brunnen_sign.png"
+      }
+    },
+    {
+      "slug": "ritualplatz",
+      "label": "Ritualplatz",
+      "building_type": "ritual site",
+      "icon": "rune_circle",
+      "files": {
+        "512": "masters_512/ritualplatz_sign.png",
+        "256": "icons_256/ritualplatz_sign.png",
+        "128": "icons_128/ritualplatz_sign.png",
+        "64": "icons_64/ritualplatz_sign.png"
+      }
+    },
+    {
+      "slug": "portalraum",
+      "label": "Portalraum",
+      "building_type": "portal room",
+      "icon": "portal",
+      "files": {
+        "512": "masters_512/portalraum_sign.png",
+        "256": "icons_256/portalraum_sign.png",
+        "128": "icons_128/portalraum_sign.png",
+        "64": "icons_64/portalraum_sign.png"
+      }
+    },
+    {
+      "slug": "verzauberer",
+      "label": "Verzauberer",
+      "building_type": "enchanter",
+      "icon": "enchanted_gem",
+      "files": {
+        "512": "masters_512/verzauberer_sign.png",
+        "256": "icons_256/verzauberer_sign.png",
+        "128": "icons_128/verzauberer_sign.png",
+        "64": "icons_64/verzauberer_sign.png"
+      }
+    },
+    {
+      "slug": "drachenstall",
+      "label": "Drachenstall",
+      "building_type": "dragon stable",
+      "icon": "dragon_head",
+      "files": {
+        "512": "masters_512/drachenstall_sign.png",
+        "256": "icons_256/drachenstall_sign.png",
+        "128": "icons_128/drachenstall_sign.png",
+        "64": "icons_64/drachenstall_sign.png"
+      }
+    }
+  ]
+}
