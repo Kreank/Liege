@@ -651,10 +651,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 material = data.get("material", "stone")
                 if not await world.is_walkable(x, y):
                     continue
-                # Spezial: Türen ersetzen eine vorhandene Wand am Ziel-Tile
+                # Spezial: Türen ersetzen eine vorhandene Wand am Ziel-Tile.
+                # Material wird von der Wand übernommen — sonst passt der Wand-Rahmen
+                # hinter der Tür nicht zur restlichen Mauer.
                 if type_.startswith("door_"):
                     obj_here = structures.object_at(x, y)
                     if obj_here is not None and obj_here["type"] == "wall":
+                        material = obj_here.get("material") or material
                         await structures.remove(x, y, layer="object")
                         await manager.broadcast({
                             "type": "structure_removed",

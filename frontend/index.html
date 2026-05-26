@@ -4562,9 +4562,9 @@ class WorldScene extends Phaser.Scene {
     // Tür-Rahmen: bei doors zuerst ein Wall-Sprite hinten dran, damit die
     // Tür sichtbar in der Wand sitzt. Orientation aus Nachbar-Wänden.
     const isDoor = s.type.startsWith('door_');
+    let doorRotation = 0;  // wird unten am Tür-Sprite angewandt
     if (isDoor) {
       const wallMat = s.material || 'wood';
-      // Mask wie bei updateWallOrientation
       const isWallish = (t) => t === 'wall'
                             || (t && (t.startsWith('door_') || t.startsWith('garden_gate_')));
       let mask = 0;
@@ -4580,10 +4580,16 @@ class WorldScene extends Phaser.Scene {
       frame.setDisplaySize(TILE_SIZE, TILE_SIZE);
       frame.setDepth(0.9);   // unter dem Tür-Sprite (1.0), über Floor (0.5)
       this.doorFrameSprites[`${s.x},${s.y}`] = frame;
+      // Tür-Sprites sind für vertikale Wände (N-S) gezeichnet — bei horizontalen
+      // Wänden (E-W) Sprite um 90° drehen, damit das Türblatt zur Wand passt.
+      const isHorizontalWall = variant === 'straight_ew'
+                            || variant === 'end_e' || variant === 'end_w';
+      if (isHorizontalWall) doorRotation = 90;
     }
 
     const img = this.add.image(cx, cy, initialKey).setOrigin(0.5);
     img.setDisplaySize(TILE_SIZE, TILE_SIZE);
+    if (doorRotation) img.setAngle(doorRotation);
     // Floor liegt UNTER Objects (zwei separate Sprite-Maps + Depth-Levels)
     const isFloor = (s.layer === 'floor') || (s.type === 'floor');
     if (isFloor) {
