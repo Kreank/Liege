@@ -1195,7 +1195,17 @@ async def websocket_endpoint(websocket: WebSocket):
                         damage_amount += int(talent_effects_h.get("mining_extra_damage", 0))
                     elif skill_name == "woodcutting":
                         damage_amount += int(talent_effects_h.get("woodcutting_extra_damage", 0))
-                    drops = harvest.roll_hit_yield(s["type"])
+                    # Biome + mountain-adjacency steuern welche Erze fallen können
+                    target_tile = await world.tile_at(s["x"], s["y"])
+                    mountain_adj = False
+                    for ddx, ddy in ((-1, 0), (1, 0), (0, -1), (0, 1),
+                                     (-1, -1), (1, 1), (-1, 1), (1, -1)):
+                        if await world.tile_at(s["x"] + ddx, s["y"] + ddy) == 4:  # MOUNTAIN
+                            mountain_adj = True
+                            break
+                    drops = harvest.roll_hit_yield(
+                        s["type"], biome=target_tile, mountain_adjacent=mountain_adj,
+                    )
                     # Pro Skill-Level Chance auf zusätzlichen Drop
                     import random as _r
                     if drops and yield_bonus > 1.0 and _r.random() < (yield_bonus - 1.0):

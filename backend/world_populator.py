@@ -158,6 +158,38 @@ def _pick_for_tile(world, x: int, y: int, tile_id: int) -> str | None:
     return None
 
 
+# Pflanzen/Gras-Filler die als Ambient auch außerhalb von Sites Sinn ergeben.
+# Trees/Rocks/Ruinen kommen NUR über Encounter-Templates — die sollen nicht
+# einzeln im Nirgendwo stehen.
+AMBIENT_PROPS_BY_BIOME = {
+    GRASS:  [("tall_grass", 0.025), ("flowers", 0.010), ("bush", 0.008)],
+    FOREST: [("tall_grass", 0.030), ("bush", 0.012), ("flowers", 0.008)],
+    DESERT: [("dry_bush", 0.010), ("desert_skull", 0.002)],
+    JUNGLE: [("tall_grass", 0.030), ("jungle_flower", 0.015),
+             ("jungle_vines", 0.012)],
+    SWAMP:  [("reeds", 0.025), ("lily_pads", 0.012), ("tall_grass", 0.015)],
+    SNOW:   [("frozen_bush", 0.010)],
+    SAND:   [],  # plus WATERSIDE für küsten-Sand
+}
+
+
+def _pick_ambient(world, x: int, y: int, tile_id: int) -> str | None:
+    """Sparsamer Ambient-Roll: nur Gras/Blumen/Sträucher als einzelne Tiles.
+    Bäume, Felsen und größere Strukturen werden ausschließlich über
+    Encounter-Templates platziert."""
+    fertility = world.fertility(x, y)
+    for prop_type, base in AMBIENT_PROPS_BY_BIOME.get(tile_id, []):
+        if random.random() < base * (0.6 + fertility * 0.6):
+            return prop_type
+    # Wasser-Adjacent Sand bekommt seltene Coast-Props auch außerhalb von Sites
+    if tile_id == SAND and _is_water_adjacent(world, x, y):
+        for prop_type, chance, density_kind in WATERSIDE_SCATTER:
+            density = world.resource_density(x, y, density_kind)
+            if random.random() < chance * _density_mod(density) * 0.4:
+                return prop_type
+    return None
+
+
 def _pick_for_water(world, x: int, y: int) -> str | None:
     """Picks aus WATER_SCATTER (Schiffswrack, Boot, Seerosen)."""
     for prop_type, chance, density_kind in WATER_SCATTER:
@@ -167,12 +199,223 @@ def _pick_for_water(world, x: int, y: int) -> str | None:
     return None
 
 
+# ─── Encounter-Templates ──────────────────────────────────────────────────────
+# "Sites" sind kohärente Sets von Strukturen die zusammen Sinn ergeben:
+# Bäume in Gruppen, Zelt mit Lagerfeuer, Ruinen-Komplex, etc.
+#   placements: liste von (dx, dy, prop_type)
+#   biomes:     erlaubte Tile-IDs für den Ankerpunkt
+#   weight:     Auswahl-Gewicht beim Roll
+#   spread:     Radius für Filler-Props um den Anker
+#   fillers:    Liste (prop_type, chance) für zufällige extra-Props im spread
+ENCOUNTER_TEMPLATES = {
+    # Wäldchen: dichter Baumcluster mit Unterwuchs
+    "forest_grove": {
+        "biomes": {GRASS, FOREST, JUNGLE},
+        "weight": 6,
+        "spread": 4,
+        "placements": [
+            (0, 0, "tree_oak"),
+            (1, 0, "tree_oak"),
+            (-1, 0, "tree_pine"),
+            (0, 1, "tree_pine"),
+            (2, 1, "tree_oak"),
+            (-1, 2, "tree_dead"),
+            (1, -2, "tree_oak"),
+        ],
+        "fillers": [("bush", 0.25), ("mushrooms", 0.15), ("tall_grass", 0.20),
+                    ("flowers", 0.10), ("rock_mossy", 0.05)],
+    },
+    # Pilz-Hain
+    "mushroom_patch": {
+        "biomes": {FOREST, SWAMP, JUNGLE},
+        "weight": 3,
+        "spread": 3,
+        "placements": [
+            (0, 0, "mushrooms"),
+            (1, 0, "mushrooms"),
+            (0, 1, "mushrooms"),
+            (-1, 1, "mushrooms"),
+        ],
+        "fillers": [("mushrooms", 0.25), ("bush", 0.10), ("tall_grass", 0.15)],
+    },
+    # Steinhaufen — basis für Erz-Abbau
+    "rock_outcrop": {
+        "biomes": {GRASS, DESERT, SNOW, FOREST},
+        "weight": 4,
+        "spread": 3,
+        "placements": [
+            (0, 0, "rock_large"),
+            (1, 0, "rock_small"),
+            (-1, 0, "rock_small"),
+            (0, 1, "rock_small"),
+        ],
+        "fillers": [("rock_small", 0.20), ("rubble", 0.10)],
+    },
+    # Verlassenes Camp — Zelt + Lagerfeuer + Versorgung
+    "abandoned_camp": {
+        "biomes": {GRASS, FOREST, DESERT, SNOW},
+        "weight": 1,
+        "spread": 3,
+        "placements": [
+            (0, 0, "camp_tent"),
+            (1, 0, "campfire"),       # Lagerfeuer direkt neben Zelt
+            (-1, 0, "cooking_pot"),
+            (2, 1, "barrel"),
+            (-1, -1, "crate"),
+        ],
+        "fillers": [("sack", 0.15), ("driftwood", 0.10)],
+    },
+    # Ruinen-Komplex
+    "ancient_ruin": {
+        "biomes": {GRASS, DESERT, SNOW},
+        "weight": 2,
+        "spread": 4,
+        "placements": [
+            (0, 0, "statue_broken"),
+            (2, 0, "ruin_pillar"),
+            (-2, 0, "ruin_pillar"),
+            (0, 2, "ruin_pillar"),
+            (1, 1, "rubble"),
+            (-1, 1, "rubble"),
+            (0, -2, "gravestone"),
+        ],
+        "fillers": [("rubble", 0.25), ("bones_scatter", 0.10)],
+    },
+    # Friedhof
+    "graveyard": {
+        "biomes": {SWAMP, DESERT, GRASS},
+        "weight": 1,
+        "spread": 3,
+        "placements": [
+            (0, 0, "gravestone"),
+            (1, 0, "gravestone"),
+            (-1, 0, "gravestone"),
+            (0, 1, "gravestone"),
+            (1, 1, "rubble"),
+        ],
+        "fillers": [("gravestone", 0.20), ("bones_scatter", 0.20),
+                    ("ruin_pillar", 0.08)],
+    },
+    # Wüsten-Knochenfund
+    "bone_field": {
+        "biomes": {DESERT},
+        "weight": 2,
+        "spread": 3,
+        "placements": [
+            (0, 0, "bones_scatter"),
+            (1, 0, "desert_skull"),
+            (-1, 0, "bones_scatter"),
+            (0, 1, "dry_bush"),
+        ],
+        "fillers": [("bones_scatter", 0.25), ("dry_bush", 0.20)],
+    },
+    # Sumpf-Cluster
+    "swamp_thicket": {
+        "biomes": {SWAMP},
+        "weight": 3,
+        "spread": 3,
+        "placements": [
+            (0, 0, "swamp_log"),
+            (1, 0, "reeds"),
+            (-1, 0, "reeds"),
+            (0, 1, "mushrooms"),
+            (1, 1, "swamp_bubbles"),
+        ],
+        "fillers": [("reeds", 0.30), ("lily_pads", 0.15)],
+    },
+    # Kakteen-Hain in Wüste
+    "cactus_grove": {
+        "biomes": {DESERT},
+        "weight": 3,
+        "spread": 3,
+        "placements": [
+            (0, 0, "cactus"),
+            (1, 0, "cactus"),
+            (-1, 0, "dry_bush"),
+            (0, 1, "cactus"),
+        ],
+        "fillers": [("cactus", 0.15), ("dry_bush", 0.20)],
+    },
+}
+
+
+def _pick_template_for_biome(tile_id: int) -> str | None:
+    """Gewichteter Pick eines Templates das in diesem Biome erlaubt ist."""
+    candidates = [(tid, t["weight"]) for tid, t in ENCOUNTER_TEMPLATES.items()
+                  if tile_id in t["biomes"]]
+    if not candidates:
+        return None
+    total = sum(w for _, w in candidates)
+    r = random.uniform(0, total)
+    acc = 0.0
+    for tid, w in candidates:
+        acc += w
+        if r <= acc:
+            return tid
+    return candidates[-1][0]
+
+
+async def _place_template(template_id: str, world, structure_manager,
+                          anchor_x: int, anchor_y: int) -> list[dict]:
+    """Platziert ein Template am Anker. Nicht-walkable / belegte tiles werden
+    übersprungen statt das ganze Template fehlschlagen zu lassen."""
+    tmpl = ENCOUNTER_TEMPLATES[template_id]
+    placed: list[dict] = []
+    # Fixe placements
+    for dx, dy, prop in tmpl["placements"]:
+        x, y = anchor_x + dx, anchor_y + dy
+        if not _can_place_at(world, structure_manager, x, y):
+            continue
+        dur = harvest_module.initial_durability(prop)
+        s = await structure_manager.place(x, y, prop, "system",
+                                          material="stone", durability=dur)
+        if s is not None:
+            placed.append(s)
+    # Filler im spread-Radius
+    spread = tmpl.get("spread", 3)
+    fillers = tmpl.get("fillers", [])
+    if fillers and spread > 0:
+        for dy in range(-spread, spread + 1):
+            for dx in range(-spread, spread + 1):
+                # Skip die fixen placements
+                if any(dx == fdx and dy == fdy
+                       for fdx, fdy, _ in tmpl["placements"]):
+                    continue
+                x, y = anchor_x + dx, anchor_y + dy
+                if not _can_place_at(world, structure_manager, x, y):
+                    continue
+                for prop, chance in fillers:
+                    if random.random() < chance:
+                        dur = harvest_module.initial_durability(prop)
+                        s = await structure_manager.place(x, y, prop, "system",
+                                                          material="stone",
+                                                          durability=dur)
+                        if s is not None:
+                            placed.append(s)
+                        break  # höchstens 1 filler pro tile
+    return placed
+
+
+def _can_place_at(world, structure_manager, x: int, y: int) -> bool:
+    tile = world.tile_at_sync(x, y)
+    if tile in (WATER, MOUNTAIN, LAVA):
+        return False
+    if world.is_settlement_area(x, y):
+        return False
+    if structure_manager.at(x, y) is not None:
+        return False
+    return True
+
+
 async def populate_chunk_if_needed(world, structure_manager, connection_manager,
                                     cx: int, cy: int, npc_manager=None) -> int:
     """Populiert einen Chunk wenn populated=False. Setzt Flag in DB.
 
-    Wenn npc_manager mitgegeben wird, kann das Befüllen auch Dörfer/Räuber-Lager
-    auslösen (Welle 8)."""
+    Zwei-Pass-System:
+      Pass A: Encounter-Sites (Bäume in Gruppen, Camps mit Lagerfeuer, …)
+      Pass B: Spärliche Ambient-Props auf den restlichen Tiles
+    Wasser-Tiles bekommen separates Scattering (Wracks, Boote, Seerosen).
+    """
     row = await db.pool().fetchrow(
         "SELECT populated FROM world_chunks WHERE world_seed = $1 "
         "AND chunk_x = $2 AND chunk_y = $3",
@@ -182,40 +425,78 @@ async def populate_chunk_if_needed(world, structure_manager, connection_manager,
         return 0
     chunk = await world.get_chunk(cx, cy)
     placed_list = []
+
+    # ── Pass A: 0-3 Encounter-Sites pro Chunk ──────────────────────────────
+    # Pro Chunk wird gewürfelt wie viele Sites; jeder Site bekommt einen
+    # Anker auf einem random walkable Tile, dann passendes Template gewählt.
+    site_count = random.choices([0, 1, 2, 3], weights=[10, 50, 30, 10], k=1)[0]
+    site_anchors_taken: list[tuple[int, int]] = []
+    for _ in range(site_count):
+        # Anker-Tile suchen (max 30 Versuche)
+        anchor = None
+        for _try in range(30):
+            lx = random.randint(2, CHUNK_SIZE - 3)
+            ly = random.randint(2, CHUNK_SIZE - 3)
+            wx = cx * CHUNK_SIZE + lx
+            wy = cy * CHUNK_SIZE + ly
+            tile = chunk[ly][lx]
+            if tile in (WATER, MOUNTAIN, LAVA):
+                continue
+            if world.is_settlement_area(wx, wy):
+                continue
+            # Mindestabstand zu bereits platzierten Sites
+            if any(abs(wx - ax) < 6 and abs(wy - ay) < 6
+                   for ax, ay in site_anchors_taken):
+                continue
+            anchor = (wx, wy, tile)
+            break
+        if anchor is None:
+            continue
+        ax, ay, atile = anchor
+        template_id = _pick_template_for_biome(atile)
+        if template_id is None:
+            continue
+        site_anchors_taken.append((ax, ay))
+        placed = await _place_template(template_id, world, structure_manager, ax, ay)
+        placed_list.extend(placed)
+        log.info("Site '%s' @(%d,%d): %d structures",
+                 template_id, ax, ay, len(placed))
+
+    # ── Pass B: Ambient + Water/Coast — sehr sparsam ───────────────────────
     for ly in range(CHUNK_SIZE):
         for lx in range(CHUNK_SIZE):
             wx = cx * CHUNK_SIZE + lx
             wy = cy * CHUNK_SIZE + ly
             tile = chunk[ly][lx]
-            # MOUNTAIN und LAVA sind komplett strukturlos
             if tile in (MOUNTAIN, LAVA):
                 continue
-            # Settlement-Area: garantiert frei für Bauen
             if world.is_settlement_area(wx, wy):
                 continue
             if structure_manager.at(wx, wy) is not None:
                 continue
-            # WATER bekommt eigene Scatter-Logik (Schiffswrack, Boot, Lily-Pads)
+            # Wasser bleibt im alten Scatter (Wracks, Boote, Seerosen)
             if tile == WATER:
                 chosen = _pick_for_water(world, wx, wy)
                 if chosen is None:
                     continue
                 dur = harvest_module.initial_durability(chosen)
-                placed_struct = await structure_manager.place(
+                ps = await structure_manager.place(
                     wx, wy, chosen, "system", material="wood", durability=dur,
                 )
-                if placed_struct is not None:
-                    placed_list.append(placed_struct)
+                if ps is not None:
+                    placed_list.append(ps)
                 continue
-            chosen = _pick_for_tile(world, wx, wy, tile)
+            # Land: nur noch ambient mit ~30% der Original-Chance, sodass
+            # die Welt zwischen Sites nicht zu kahl wirkt aber Sites dominieren.
+            chosen = _pick_ambient(world, wx, wy, tile)
             if chosen is None:
                 continue
             dur = harvest_module.initial_durability(chosen)
-            placed_struct = await structure_manager.place(
-                wx, wy, chosen, "system", material="stone", durability=dur
+            ps = await structure_manager.place(
+                wx, wy, chosen, "system", material="stone", durability=dur,
             )
-            if placed_struct is not None:
-                placed_list.append(placed_struct)
+            if ps is not None:
+                placed_list.append(ps)
     # Broadcast nur wenn jemand connected ist (sonst zu viel Traffic für niemanden)
     if placed_list and connection_manager.get_players():
         for s in placed_list:

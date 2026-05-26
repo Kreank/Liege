@@ -224,27 +224,33 @@ def _identity_prompt(kind: str) -> str:
 
 
 async def _find_spawn_position(world, connection_manager=None,
-                               biomes: set[int] | None = None) -> tuple[int, int]:
-    """Findet ein walkbares Tile in der Nähe eines aktiven Spielers (sonst nahe Welt-Mitte).
-    Wenn `biomes` gegeben: bevorzugt Tiles dieser Biome; fällt nach Versuchen auf
-    irgendein walkbares Tile zurück."""
+                               biomes: set[int] | None = None,
+                               strict: bool = True) -> tuple[int, int] | None:
+    """Findet ein walkbares Tile in der Nähe eines aktiven Spielers.
+    Wenn `biomes` gegeben und `strict`: NUR Tiles dieser Biome (kein
+    Fallback auf irgendwelches walkable — sonst landen Schweine in der
+    Wüste oder Drachen im Wald).
+    Bei strict + Fehlschlag → None (Spawn überspringen).
+    Ohne biome-filter / strict=False: jedes walkbare Tile."""
     center_x, center_y = 60, 40
     if connection_manager is not None:
         players = connection_manager.get_players()
         if players:
             p = random.choice(list(players.values()))
             center_x, center_y = p["x"], p["y"]
-    # Erst Versuch mit Biome-Match
     if biomes:
-        for _ in range(160):
+        # Strikter Versuch — wirklich nur passende Biome
+        for _ in range(400):
             angle = random.random() * 6.283
-            dist = random.randint(8, 30)
+            dist = random.randint(8, 35)
             x = center_x + int(math.cos(angle) * dist)
             y = center_y + int(math.sin(angle) * dist)
             tile = await world.tile_at(x, y)
             if tile in biomes:
                 return x, y
-    # Fallback: irgendein walkbares Tile
+        if strict:
+            return None  # Kein passendes Biome erreichbar → kein Spawn
+    # Ohne biome-filter / non-strict: irgendein walkbares Tile
     for _ in range(200):
         angle = random.random() * 6.283
         dist = random.randint(8, 25)
@@ -253,7 +259,7 @@ async def _find_spawn_position(world, connection_manager=None,
         if await world.is_walkable(x, y):
             return x, y
     s = await world.find_spawn(center_x, center_y)
-    return s["x"], s["y"]
+    return (s["x"], s["y"])
 
 
 async def _find_nearby_walkable(world, cx: int, cy: int, radius: int = 3) -> tuple[int, int]:
@@ -286,7 +292,11 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
         x, y = at
     else:
         biomes = (CREATURE_SPAWN_PROFILE.get(kind) or {}).get("biomes")
-        x, y = await _find_spawn_position(world, connection_manager, biomes=biomes)
+        pos = await _find_spawn_position(world, connection_manager, biomes=biomes, strict=True)
+        if pos is None:
+            log.info("Spawn-Skip: kein passendes Biome für %s erreichbar", kind)
+            return None
+        x, y = pos
     base_hp = combat.NPC_HP_BY_KIND.get(kind, 40)
     # Welle 30: Power-Budget — Mob-HP skaliert mit nahem Player-Level
     try:
@@ -328,8 +338,12 @@ async def respawn_loop(world, npc_manager, connection_manager) -> None:
             group_min, group_max = profile["group"]
             group_size = min(random.randint(group_min, group_max), deficit)
             biomes = profile["biomes"]
-            # Center für Gruppe finden (biome-präferiert), dann Gruppen-Mitglieder in radius
-            cx, cy = await _find_spawn_position(world, connection_manager, biomes=biomes)
+            # Center für Gruppe finden (strict biome) — kein Spawn wenn nichts passt
+            pos = await _find_spawn_position(world, connection_manager, biomes=biomes, strict=True)
+            if pos is None:
+                log.info("Gruppen-Respawn-Skip: kein passendes Biome für %s", kind)
+                continue
+            cx, cy = pos
             log.info("Gruppen-Respawn: %d × %s @(%d,%d) biome=%s (deficit=%d)",
                      group_size, kind, cx, cy, biomes, deficit)
             await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(cx, cy))

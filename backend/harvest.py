@@ -2,9 +2,18 @@
 
 Jede natürliche Struktur hat eine `durability` (Anzahl Schläge bis zerstört).
 Pro Schlag wird ein kleinerer `yield` ausgewürfelt (1-2 Items typisch).
-Später wird Werkzeug-Equip die Schläge reduzieren und/oder Yield erhöhen."""
+
+Biome-aware yields: rare ores sind an Biome / Mountain-Nähe gekoppelt.
+- Mountain-adjacent rocks → iron_ore + mythril chance
+- Desert rocks → bone, gold_ore
+- Snow rocks → crystal, silver_ore
+- Plain grass rocks → nur stone + tiny iron chance"""
 
 import random
+
+# Tile-IDs (synchron mit world.py)
+WATER, SAND, GRASS, FOREST, MOUNTAIN = 0, 1, 2, 3, 4
+DESERT, JUNGLE, LAVA, SNOW, SWAMP = 5, 6, 7, 8, 9
 
 # Durability (Anzahl Schläge bis Struktur weg). Default 1 wenn nicht hier gelistet.
 DURABILITY = {
@@ -71,9 +80,12 @@ YIELD_PER_HIT = {
     "tree_dead":     [("wood", 1, 1, 100)],
     "tree_stump":    [("wood", 1, 1, 100)],
     "fallen_log":    [("wood", 1, 2, 100)],
-    "rock_small":    [("stone", 1, 2, 100), ("iron_ore", 0, 1, 10)],
-    "rock_large":    [("stone", 1, 2, 100), ("iron_ore", 0, 1, 15), ("silver_ore", 0, 1, 5)],
-    "rock_mossy":    [("stone", 1, 1, 100), ("crystal", 0, 1, 8),  ("herb", 0, 1, 20)],
+    # Erze hier NICHT als Default — kommen via BONUS_YIELDS_BY_BIOME /
+    # MOUNTAIN_ADJACENT_BONUS, sodass Mithril & Co. nur in passenden Gebieten
+    # auftauchen und nicht irgendwo auf der Wiese.
+    "rock_small":    [("stone", 1, 2, 100)],
+    "rock_large":    [("stone", 1, 2, 100)],
+    "rock_mossy":    [("stone", 1, 1, 100), ("herb", 0, 1, 20)],
     "bush":          [("herb", 0, 1, 50), ("cloth", 0, 1, 30), ("berries", 0, 1, 45)],
     "tall_grass":    [("cloth", 1, 1, 80), ("herb", 0, 1, 20), ("wheat", 0, 1, 15)],
     "flowers":       [("herb", 1, 1, 100)],
@@ -108,15 +120,53 @@ YIELD_PER_HIT = {
     "jungle_flower":  [("herb", 1, 2, 100)],
     "jungle_vines":   [("cloth", 1, 2, 100), ("herb", 0, 1, 30)],
     "palm_tree":      [("wood", 2, 3, 100), ("apple", 0, 1, 20)],
-    "lava_rock":      [("stone", 1, 2, 100), ("crystal", 0, 1, 25), ("iron_ore", 0, 1, 30)],
+    "lava_rock":      [("stone", 1, 2, 100), ("crystal", 0, 1, 25)],
     "frozen_bush":    [("herb", 0, 1, 50), ("cloth", 0, 1, 30)],
     "ice_crystal":    [("crystal", 1, 2, 100)],
-    "snow_rock":      [("stone", 1, 2, 100), ("crystal", 0, 1, 15)],
+    "snow_rock":      [("stone", 1, 2, 100)],
     "swamp_bubbles":  [("herb", 0, 1, 60)],
     "swamp_log":      [("wood", 1, 2, 100), ("mushroom_food", 0, 1, 30)],
 }
 
 HARVESTABLE_TYPES = set(YIELD_PER_HIT.keys())
+
+
+# Bonus-Yields die NUR in bestimmten Biomes greifen (additiv zum default).
+# Pattern: (biome_id, structure_type) → [(kind, min, max, chance_pct), …]
+BONUS_YIELDS_BY_BIOME = {
+    # Wüste: Knochen + selten Gold
+    (DESERT, "rock_small"): [("bone", 0, 1, 15)],
+    (DESERT, "rock_large"): [("bone", 0, 1, 30), ("gold_ore", 0, 1, 4)],
+    (DESERT, "statue_broken"): [("bone", 0, 1, 25), ("gold_ore", 0, 1, 8)],
+    (DESERT, "gravestone"): [("bone", 0, 1, 40)],
+    (DESERT, "bones_scatter"): [("bone", 1, 2, 60)],
+    # Schnee: Kristall + Silber
+    (SNOW, "rock_small"): [("crystal", 0, 1, 8)],
+    (SNOW, "rock_large"): [("crystal", 0, 1, 15), ("silver_ore", 0, 1, 8)],
+    (SNOW, "ice_crystal"): [("crystal", 1, 2, 50)],
+    (SNOW, "snow_rock"): [("crystal", 0, 1, 20), ("silver_ore", 0, 1, 5)],
+    # Wald-Moos: extra Kräuter / Pilze
+    (FOREST, "rock_mossy"): [("herb", 0, 1, 25), ("mushroom_food", 0, 1, 15)],
+    (FOREST, "bush"): [("berries", 0, 1, 35)],
+    # Jungle: extra Kräuter / Vines
+    (JUNGLE, "rock_mossy"): [("herb", 0, 1, 30)],
+    (JUNGLE, "jungle_flower"): [("herb", 1, 2, 80)],
+    # Sumpf: Pilze + Knochen
+    (SWAMP, "swamp_log"): [("mushroom_food", 0, 1, 25)],
+    (SWAMP, "bones_scatter"): [("bone", 1, 2, 50)],
+}
+
+# Mountain-adjacent (= mindestens 1 Nachbar-Tile ist MOUNTAIN) — gibt Zugang
+# zu Eisen und sehr selten Mithril. Das macht "in den Bergen Erze suchen"
+# zum echten Spielmechanik-Reward statt "irgendwo auf der Wiese random ore".
+MOUNTAIN_ADJACENT_BONUS = {
+    "rock_small": [("iron_ore", 0, 1, 18)],
+    "rock_large": [("iron_ore", 0, 1, 30), ("mythril_ore", 0, 1, 4)],
+    "rock_mossy": [("iron_ore", 0, 1, 12)],
+    "snow_rock":  [("iron_ore", 0, 1, 25), ("silver_ore", 0, 1, 10)],
+    "lava_rock":  [("iron_ore", 0, 1, 35), ("mythril_ore", 0, 1, 8),
+                   ("crystal", 0, 1, 20)],
+}
 
 
 def is_harvestable(structure_type: str) -> bool:
@@ -127,9 +177,16 @@ def initial_durability(structure_type: str) -> int:
     return DURABILITY.get(structure_type, 1)
 
 
-def roll_hit_yield(structure_type: str) -> list[str]:
-    """Returnt die Items eines einzelnen Schlags. Kann leer sein."""
-    entries = YIELD_PER_HIT.get(structure_type)
+def roll_hit_yield(structure_type: str, biome: int | None = None,
+                   mountain_adjacent: bool = False) -> list[str]:
+    """Returnt die Items eines einzelnen Schlags. Kann leer sein.
+    Optional biome (tile-id) + mountain_adjacent flag fügen biome-spezifische
+    Bonus-Drops hinzu."""
+    entries = list(YIELD_PER_HIT.get(structure_type, []))
+    if biome is not None:
+        entries.extend(BONUS_YIELDS_BY_BIOME.get((biome, structure_type), []))
+    if mountain_adjacent:
+        entries.extend(MOUNTAIN_ADJACENT_BONUS.get(structure_type, []))
     if not entries:
         return []
     out: list[str] = []
