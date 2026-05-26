@@ -1606,8 +1606,10 @@ class WorldScene extends Phaser.Scene {
     this.tileSprites    = {};          // key: "x,y" → Phaser.Image für Welt-Tiles
     this.chunks         = {};          // key: "cx,cy" → 2D-Array (CHUNK_SIZE × CHUNK_SIZE)
     this.worldData      = { width: 0, height: 0 };  // Legacy, wird nicht mehr genutzt
-    this.structSprites  = {};          // key: "x,y" → Phaser.Image
-    this.structures     = {};          // key: "x,y" → { id, x, y, type, owner }
+    this.structSprites  = {};          // key: "x,y" → Phaser.Image (Object-Layer)
+    this.structures     = {};          // key: "x,y" → Object-Layer-Struct
+    this.floorSprites   = {};          // key: "x,y" → Phaser.Image (Floor-Layer)
+    this.floors         = {};          // key: "x,y" → Floor-Layer-Struct
     this.npcs           = {};          // key: npc_id → sprite + state
     this.activeDialog   = null;        // { npc_id, waiting: bool }
     this.selectedMaterial = 'stone';   // für Bauen: stone | wood | straw
@@ -1940,9 +1942,12 @@ class WorldScene extends Phaser.Scene {
     });
     document.addEventListener('click', (e) => {
       const tt = document.getElementById('item-tooltip');
-      if (tt && tt.classList.contains('pinned') && !tt.contains(e.target)) {
-        this.unpinItemTooltip();
-      }
+      if (!tt || !tt.classList.contains('pinned')) return;
+      // Schutz: gerade frisch gepinnt? Dann ignoriere — sonst schließt der
+      // synthetic-click direkt nach contextmenu/long-press das Menü sofort wieder.
+      const pinnedAt = parseInt(tt.dataset.pinnedAt || '0', 10);
+      if (Date.now() - pinnedAt < 300) return;
+      if (!tt.contains(e.target)) this.unpinItemTooltip();
     });
 
     this.connectWS();
@@ -2341,6 +2346,7 @@ class WorldScene extends Phaser.Scene {
     html += actionsHtml;
     tt.innerHTML = html;
     tt.classList.add('active', 'pinned');
+    tt.dataset.pinnedAt = String(Date.now());
     // Position
     const x = (ev && ev.clientX) ? ev.clientX + 14 : 100;
     const y = (ev && ev.clientY) ? ev.clientY - 8 : 100;
@@ -2539,10 +2545,12 @@ class WorldScene extends Phaser.Scene {
         }
         this.drawWorld();
         this.drawMinimap();
-        // Strukturen aus Init laden
+        // Strukturen aus Init laden — Floor und Object getrennt
         this.structures = {};
+        this.floors = {};
         for (const s of (msg.structures || [])) {
-          this.structures[`${s.x},${s.y}`] = s;
+          const target = (s.layer === 'floor') ? this.floors : this.structures;
+          target[`${s.x},${s.y}`] = s;
         }
         this.drawStructures();
         // Chronik mit vergangenen Events füllen
@@ -2627,15 +2635,25 @@ class WorldScene extends Phaser.Scene {
         }
         break;
 
-      case 'structure_placed':
-        this.structures[`${msg.structure.x},${msg.structure.y}`] = msg.structure;
-        this.addStructureSprite(msg.structure);
+      case 'structure_placed': {
+        const s = msg.structure;
+        const target = (s.layer === 'floor') ? this.floors : this.structures;
+        target[`${s.x},${s.y}`] = s;
+        this.addStructureSprite(s);
         break;
+      }
 
-      case 'structure_removed':
-        delete this.structures[`${msg.x},${msg.y}`];
-        this.removeStructureSprite(msg.x, msg.y);
+      case 'structure_removed': {
+        const layer = msg.layer || 'object';
+        const key = `${msg.x},${msg.y}`;
+        if (layer === 'floor') {
+          delete this.floors[key];
+        } else {
+          delete this.structures[key];
+        }
+        this.removeStructureSprite(msg.x, msg.y, layer);
         break;
+      }
 
       case 'structure_damaged':
         this.shakeStructure(msg.x, msg.y);
@@ -4234,6 +4252,7 @@ class WorldScene extends Phaser.Scene {
       // Rechtsklick: persistenter Tooltip mit Beschreibung + Aktions-Menü
       slot.addEventListener('contextmenu', (ev) => {
         ev.preventDefault();
+        ev.stopPropagation();
         this.pinItemTooltip(item, ev);
       });
       // Shift+Klick: Drop
@@ -4356,11 +4375,15 @@ class WorldScene extends Phaser.Scene {
   }
 
   drawStructures() {
-    // Full-redraw: alle bestehenden Struktur-Sprites entfernen, dann neu zeichnen
+    // Full-redraw: alle bestehenden Sprites entfernen, dann neu zeichnen
+    for (const s of Object.values(this.floorSprites))  s.destroy();
     for (const s of Object.values(this.structSprites)) s.destroy();
+    this.floorSprites = {};
     this.structSprites = {};
+    // Floors zuerst (depth 0), dann Objects (depth 1) → Objects oben drauf
+    for (const s of Object.values(this.floors))     this.addStructureSprite(s, false);
     for (const s of Object.values(this.structures)) this.addStructureSprite(s, false);
-    // Nach dem Setzen aller Sprites Wand-/Fence-Orientierungen ausrichten
+    // Wand-/Fence-Orientierungen ausrichten
     for (const s of Object.values(this.structures)) {
       if (s.type === 'wall')  this.updateWallOrientation(s.x, s.y);
       if (s.type === 'fence') this.updateFenceOrientation(s.x, s.y);
@@ -4387,8 +4410,15 @@ class WorldScene extends Phaser.Scene {
 
     const img = this.add.image(cx, cy, initialKey).setOrigin(0.5);
     img.setDisplaySize(TILE_SIZE, TILE_SIZE);
-    img.setDepth(1);  // über Tiles, unter Charakteren
-    this.structSprites[`${s.x},${s.y}`] = img;
+    // Floor liegt UNTER Objects (zwei separate Sprite-Maps + Depth-Levels)
+    const isFloor = (s.layer === 'floor') || (s.type === 'floor');
+    if (isFloor) {
+      img.setDepth(0.5);    // über Tiles (0), unter Objects (1)
+      this.floorSprites[`${s.x},${s.y}`] = img;
+    } else {
+      img.setDepth(1);      // über Floors, unter Charakteren (3)
+      this.structSprites[`${s.x},${s.y}`] = img;
+    }
 
     if (s.type === 'wall') {
       this.updateWallOrientation(s.x, s.y);
@@ -4409,8 +4439,15 @@ class WorldScene extends Phaser.Scene {
     }
   }
 
-  removeStructureSprite(x, y) {
+  removeStructureSprite(x, y, layer = 'object') {
     const key = `${x},${y}`;
+    if (layer === 'floor') {
+      if (this.floorSprites[key]) {
+        this.floorSprites[key].destroy();
+        delete this.floorSprites[key];
+      }
+      return;
+    }
     if (this.structSprites[key]) {
       this.structSprites[key].destroy();
       delete this.structSprites[key];

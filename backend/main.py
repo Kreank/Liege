@@ -651,6 +651,27 @@ async def websocket_endpoint(websocket: WebSocket):
                 material = data.get("material", "stone")
                 if not await world.is_walkable(x, y):
                     continue
+                # Spezial: Türen ersetzen eine vorhandene Wand am Ziel-Tile
+                if type_.startswith("door_"):
+                    obj_here = structures.object_at(x, y)
+                    if obj_here is not None and obj_here["type"] == "wall":
+                        await structures.remove(x, y, layer="object")
+                        await manager.broadcast({
+                            "type": "structure_removed",
+                            "x": x, "y": y, "layer": "object",
+                        })
+                    elif obj_here is not None:
+                        await websocket.send_json({
+                            "type": "toast",
+                            "text": "🚪 Türen passen nur in Wände",
+                        })
+                        continue
+                    else:
+                        await websocket.send_json({
+                            "type": "toast",
+                            "text": "🚪 Türen brauchen eine Wand zum Einsetzen",
+                        })
+                        continue
                 placed = await structures.place(x, y, type_, player_id, material=material)
                 if placed is not None:
                     await manager.broadcast({
@@ -676,12 +697,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif mtype == "remove_structure":
                 x, y = data["x"], data["y"]
-                removed = await structures.remove(x, y)
+                # Client kann optional einen Layer angeben, sonst object zuerst
+                layer_pref = data.get("layer")
+                removed = await structures.remove(x, y, layer=layer_pref)
                 if removed is not None:
                     await manager.broadcast({
                         "type": "structure_removed",
-                        "x": x,
-                        "y": y,
+                        "x": x, "y": y,
+                        "layer": removed["layer"],
                     })
 
             elif mtype == "equip_item":
@@ -1152,12 +1175,17 @@ async def websocket_endpoint(websocket: WebSocket):
                         "x": s["x"], "y": s["y"],
                     })
                     # Damage applied — structure bleibt oder geht weg
-                    remaining = await structures.damage_structure(s["x"], s["y"], amount=damage_amount)
+                    # Damage zielt auf den Layer, den at() liefert (Object > Floor)
+                    damage_layer = s.get("layer", "object")
+                    remaining = await structures.damage_structure(
+                        s["x"], s["y"], amount=damage_amount, layer=damage_layer,
+                    )
                     if remaining is None:
                         # Zerstört
                         await manager.broadcast({
                             "type": "structure_removed",
                             "x": s["x"], "y": s["y"],
+                            "layer": damage_layer,
                         })
                     else:
                         # Noch da — Update broadcast für HP-Bar

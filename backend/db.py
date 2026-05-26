@@ -157,6 +157,13 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS role          TEXT NOT NULL DEFAULT
 -- Material (für equipment-Sprite-Resolver: sword_1h_iron.png etc.)
 ALTER TABLE items ADD COLUMN IF NOT EXISTS material TEXT;
 
+-- Structures Layer-System: 'floor' und 'object' können auf demselben Tile koexistieren
+-- (z.B. Truhe auf Holzboden). Bestehende Floors → layer='floor', alles andere object.
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS layer TEXT NOT NULL DEFAULT 'object';
+UPDATE structures SET layer = 'floor' WHERE type = 'floor' AND layer <> 'floor';
+ALTER TABLE structures DROP CONSTRAINT IF EXISTS structures_x_y_key;
+CREATE UNIQUE INDEX IF NOT EXISTS structures_x_y_layer_idx ON structures (x, y, layer);
+
 -- Research-Progression
 CREATE TABLE IF NOT EXISTS research_progress (
     player_name TEXT NOT NULL,
