@@ -30,9 +30,9 @@
       touch-action: none;
       -webkit-user-select: none; user-select: none;
       -webkit-tap-highlight-color: transparent;
-      /* Phaser RESIZE setzt das per JS; explizit damit kein Letterbox bleibt */
-      width: 100% !important; height: 100% !important;
-      position: absolute; top: 0; left: 0;
+      /* Phaser RESIZE kümmert sich selbst um width/height. Hier KEIN
+         !important — sonst weicht Display-Size von Render-Resolution ab
+         und das Bild wirkt verschoben/verzerrt. */
     }
     #ui {
       position: fixed; top: 12px; left: 12px; z-index: 10;
