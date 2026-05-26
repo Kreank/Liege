@@ -2965,11 +2965,17 @@ class WorldScene extends Phaser.Scene {
         this.setWeather(msg.phase, msg.intensity);
         break;
 
-      case 'inventory_add':
-        this.inventory.push(msg.item);
+      case 'inventory_add': {
+        // Upsert: bei Stack-Merge gibt create_for_player die existing-stack-id
+        // zurück — wenn die schon im Inventar ist, updaten statt zusätzlich
+        // pushen (sonst gibt's doppelte Slots mit identischer id).
+        const idx = this.inventory.findIndex(it => it.id === msg.item.id);
+        if (idx >= 0) this.inventory[idx] = msg.item;
+        else          this.inventory.push(msg.item);
         this.refreshInventoryUI();
         this.showEvent(`🎒 ${msg.item.name} aufgehoben`);
         break;
+      }
 
       case 'inventory_update':
         // Format A: voll {item: {...}} — z.B. equipped_slot Change
