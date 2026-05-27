@@ -695,7 +695,7 @@ const CREATURE_KINDS = new Set([
 // neuem Front-View aus /npcs/), neue Rollen (baker, bard, ...) ohne Animation.
 const ANIMATED_NPC_KINDS = [
   'bandit', 'blacksmith', 'guard', 'healer',
-  'mage', 'quest_giver', 'villager',
+  'mage', 'quest_giver', 'soldier', 'villager',
 ];
 const ANIMATED_MONSTER_KINDS = [
   // bandit raus — nutzt characters/bandit/ via ANIMATED_NPC_KINDS für Stil-Konsistenz
@@ -713,47 +713,51 @@ const ANIMATED_MONSTER_KINDS = [
 ];
 
 // ─── Items ───────────────────────────────────────────────────────────────────
+// Default-Icons aus original_pack_2026_05_27 — hand-painted 128×128 Inventar-
+// Sprites. Pro-Rarity-Varianten (Welle 19) bleiben via PRO_WEAPON_MAP/
+// PRO_ARMOR_MAP separat ansprechbar.
+const OP = '/assets/professional/original_pack_2026_05_27/icons_128';
 const ITEM = {
-  sword:         { name: 'Schwert',       sprite: 'item_sword',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/black_guard_longsword.png' },
-  axe:           { name: 'Axt',           sprite: 'item_axe',           category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/old_execution_axe.png' },
-  bow:           { name: 'Bogen',         sprite: 'item_bow',           category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/ashwood_recurve_bow.png' },
-  staff:         { name: 'Stab',          sprite: 'item_staff',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/red_oak_staff.png' },
-  wand:          { name: 'Zauberstab',    sprite: 'item_wand',          category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/red_oak_staff.png' },
-  greatsword:    { name: 'Großschwert',   sprite: 'item_greatsword',    category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/cleaver_greatsword.png' },
-  spear:         { name: 'Speer',         sprite: 'item_spear',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png' },
-  crossbow:      { name: 'Armbrust',      sprite: 'item_crossbow',      category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/stormbow.png' },
-  throwing_knife:{ name: 'Wurfmesser',    sprite: 'item_throwing_knife',category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/bloodtalon_throwers.png' },
-  mace:          { name: 'Streitkolben',  sprite: 'item_mace',          category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/iron_hatchet.png' },
-  scythe:        { name: 'Sense',         sprite: 'item_scythe',        category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/graveyard_scythe.png' },
-  dagger:        { name: 'Dolch',         sprite: 'item_dagger',        category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/hooked_ritual_dagger.png' },
-  helmet:        { name: 'Helm',        sprite: 'item_helmet',        category: 'armor',      slot: 'helmet',     path: '/assets/equipment/armor/professional/reference_based/by_rarity/rare/crested_hoplite_helm.png' },
-  chestplate:    { name: 'Brustpanzer', sprite: 'item_chestplate',    category: 'armor',      slot: 'chestplate', path: '/assets/equipment/armor/professional/reference_based/by_rarity/common/wandering_knight_armor.png' },
-  gloves:        { name: 'Handschuhe',  sprite: 'item_gloves',        category: 'armor',      slot: 'gloves',     path: '/assets/equipment/armor/professional/reference_based/by_rarity/common/thief_buckled_gloves.png' },
-  shield:        { name: 'Schild',      sprite: 'item_shield',        category: 'armor',      slot: 'shield',     path: '/assets/equipment/armor/professional/reference_based/by_rarity/very_rare/ornate_guard_shield.png' },
-  boots:         { name: 'Stiefel',     sprite: 'item_boots',         category: 'armor',      slot: 'boots',      path: '/assets/equipment/armor/professional/reference_based/by_rarity/common/dwarven_field_boots.png' },
+  sword:         { name: 'Schwert',       sprite: 'item_sword',         category: 'weapon', slot: 'weapon', path: `${OP}/black_guard_longsword.png` },
+  axe:           { name: 'Axt',           sprite: 'item_axe',           category: 'weapon', slot: 'weapon', path: `${OP}/old_execution_axe.png` },
+  bow:           { name: 'Bogen',         sprite: 'item_bow',           category: 'weapon', slot: 'weapon', path: `${OP}/ashwood_recurve_bow.png` },
+  staff:         { name: 'Stab',          sprite: 'item_staff',         category: 'weapon', slot: 'weapon', path: `${OP}/red_oak_staff.png` },
+  wand:          { name: 'Zauberstab',    sprite: 'item_wand',          category: 'weapon', slot: 'weapon', path: `${OP}/red_oak_staff.png` },
+  greatsword:    { name: 'Großschwert',   sprite: 'item_greatsword',    category: 'weapon', slot: 'weapon', path: `${OP}/cleaver_greatsword.png` },
+  spear:         { name: 'Speer',         sprite: 'item_spear',         category: 'weapon', slot: 'weapon', path: `${OP}/plain_war_spear.png` },
+  crossbow:      { name: 'Armbrust',      sprite: 'item_crossbow',      category: 'weapon', slot: 'weapon', path: `${OP}/stormbow_crossbow.png` },
+  throwing_knife:{ name: 'Wurfmesser',    sprite: 'item_throwing_knife',category: 'weapon', slot: 'weapon', path: `${OP}/hooked_ritual_dagger.png` },
+  mace:          { name: 'Streitkolben',  sprite: 'item_mace',          category: 'weapon', slot: 'weapon', path: `${OP}/iron_mace.png` },
+  scythe:        { name: 'Sense',         sprite: 'item_scythe',        category: 'weapon', slot: 'weapon', path: `${OP}/graveyard_scythe.png` },
+  dagger:        { name: 'Dolch',         sprite: 'item_dagger',        category: 'weapon', slot: 'weapon', path: `${OP}/hooked_ritual_dagger.png` },
+  helmet:        { name: 'Helm',          sprite: 'item_helmet',        category: 'armor',  slot: 'helmet',     path: `${OP}/crested_hoplite_helm.png` },
+  chestplate:    { name: 'Brustpanzer',   sprite: 'item_chestplate',    category: 'armor',  slot: 'chestplate', path: `${OP}/wandering_knight_armor.png` },
+  gloves:        { name: 'Handschuhe',    sprite: 'item_gloves',        category: 'armor',  slot: 'gloves',     path: `${OP}/thief_buckled_gloves.png` },
+  shield:        { name: 'Schild',        sprite: 'item_shield',        category: 'armor',  slot: 'shield',     path: `${OP}/ornate_guard_shield.png` },
+  boots:         { name: 'Stiefel',       sprite: 'item_boots',         category: 'armor',  slot: 'boots',      path: `${OP}/dwarven_field_boots.png` },
   ring:          { name: 'Ring',        sprite: 'item_ring',          category: 'jewelry',    slot: 'ring',       path: '/assets/equipment/jewelry/ring.png' },
   amulet:        { name: 'Amulett',     sprite: 'item_amulet',        category: 'jewelry',    slot: 'amulet',     path: '/assets/equipment/jewelry/amulet.png' },
-  health_potion:         { name: 'Heiltrank',          sprite: 'item_health_potion',         category: 'consumable', path: '/assets/consumables/health_potion.png' },
-  mana_potion:           { name: 'Manatrank',          sprite: 'item_mana_potion',           category: 'consumable', path: '/assets/consumables/mana_potion.png' },
+  health_potion:         { name: 'Heiltrank',          sprite: 'item_health_potion',         category: 'consumable', path: `${OP}/health_potion.png` },
+  mana_potion:           { name: 'Manatrank',          sprite: 'item_mana_potion',           category: 'consumable', path: `${OP}/mana_potion.png` },
   greater_health_potion: { name: 'Großer Heiltrank',   sprite: 'item_greater_health_potion', category: 'consumable', path: '/assets/consumables/potions/greater_health_potion.png' },
   greater_mana_potion:   { name: 'Großer Manatrank',   sprite: 'item_greater_mana_potion',   category: 'consumable', path: '/assets/consumables/potions/greater_mana_potion.png' },
-  antidote_potion:       { name: 'Gegengift',          sprite: 'item_antidote_potion',       category: 'consumable', path: '/assets/consumables/potions/antidote_potion.png' },
-  fire_resist_potion:    { name: 'Feuerwiderstand',    sprite: 'item_fire_resist_potion',    category: 'consumable', path: '/assets/consumables/potions/fire_resist_potion.png' },
+  antidote_potion:       { name: 'Gegengift',          sprite: 'item_antidote_potion',       category: 'consumable', path: `${OP}/antidote_potion.png` },
+  fire_resist_potion:    { name: 'Feuerwiderstand',    sprite: 'item_fire_resist_potion',    category: 'consumable', path: `${OP}/fire_resist_potion.png` },
   frost_resist_potion:   { name: 'Frostwiderstand',    sprite: 'item_frost_resist_potion',   category: 'consumable', path: '/assets/consumables/potions/frost_resist_potion.png' },
   invisibility_potion:   { name: 'Unsichtbarkeit',     sprite: 'item_invisibility_potion',   category: 'consumable', path: '/assets/consumables/potions/invisibility_potion.png' },
   poison_potion:         { name: 'Gifttrank',          sprite: 'item_poison_potion',         category: 'consumable', path: '/assets/consumables/potions/poison_potion.png' },
   speed_potion:          { name: 'Geschwindigkeit',    sprite: 'item_speed_potion',          category: 'consumable', path: '/assets/consumables/potions/speed_potion.png' },
-  stamina_potion:        { name: 'Ausdauer',           sprite: 'item_stamina_potion',        category: 'consumable', path: '/assets/consumables/potions/stamina_potion.png' },
+  stamina_potion:        { name: 'Ausdauer',           sprite: 'item_stamina_potion',        category: 'consumable', path: `${OP}/stamina_potion.png` },
   strength_potion:       { name: 'Stärke',             sprite: 'item_strength_potion',       category: 'consumable', path: '/assets/consumables/potions/strength_potion.png' },
-  herb:          { name: 'Kraut',       sprite: 'item_herb',          category: 'consumable',                     path: '/assets/consumables/herb.png' },
-  torch:         { name: 'Fackel',      sprite: 'item_torch',         category: 'consumable',                     path: '/assets/consumables/torch.png' },
+  herb:          { name: 'Kraut',       sprite: 'item_herb',          category: 'consumable',                     path: `${OP}/herb_bundle.png` },
+  torch:         { name: 'Fackel',      sprite: 'item_torch',         category: 'consumable',                     path: `${OP}/torch.png` },
   food_ration:   { name: 'Proviant',    sprite: 'item_food_ration',   category: 'food',                           path: '/assets/consumables/food_ration.png' },
   apple:         { name: 'Apfel',       sprite: 'item_apple',         category: 'food',                           path: '/assets/food/apple.png' },
   berries:       { name: 'Beeren',      sprite: 'item_berries',       category: 'food',                           path: '/assets/food/berries.png' },
   wheat:         { name: 'Weizen',      sprite: 'item_wheat',         category: 'food',                           path: '/assets/food/wheat.png' },
-  bread:         { name: 'Brot',        sprite: 'item_bread',         category: 'food',                           path: '/assets/food/bread.png' },
+  bread:         { name: 'Brot',        sprite: 'item_bread',         category: 'food',                           path: `${OP}/bread_loaf.png` },
   raw_meat:      { name: 'Rohes Fleisch',sprite:'item_raw_meat',      category: 'food',                           path: '/assets/food/raw_meat.png' },
-  cooked_meat:   { name: 'Gebratenes Fleisch',sprite:'item_cooked_meat',category:'food',                          path: '/assets/food/cooked_meat.png' },
+  cooked_meat:   { name: 'Gebratenes Fleisch',sprite:'item_cooked_meat',category:'food',                          path: `${OP}/cooked_meat.png` },
   fish:          { name: 'Fisch',       sprite: 'item_fish',          category: 'food',                           path: '/assets/food/fish.png' },
   mushroom_food: { name: 'Pilz-Mahl',   sprite: 'item_mushroom_food', category: 'food',                           path: '/assets/food/mushroom_food.png' },
   // Farming-Drop 2026-05-26
@@ -804,10 +808,10 @@ const ITEM = {
   wooden_watering_can: { name: 'Holz-Gießkanne', sprite: 'item_wooden_watering_can', category: 'tool', slot: 'tool', path: '/assets/tools/wooden_watering_can.png' },
   iron_watering_can:   { name: 'Eisen-Gießkanne',sprite: 'item_iron_watering_can',   category: 'tool', slot: 'tool', path: '/assets/tools/iron_watering_can.png' },
   leather_waterskin:   { name: 'Wasserschlauch', sprite: 'item_leather_waterskin',   category: 'tool', slot: 'tool', path: '/assets/tools/leather_waterskin.png' },
-  wood:          { name: 'Holz',        sprite: 'item_wood',          category: 'resource',                       path: '/assets/resources/wood.png' },
-  stone:         { name: 'Stein',       sprite: 'item_stone',         category: 'resource',                       path: '/assets/resources/stone.png' },
-  iron_ore:      { name: 'Eisenerz',    sprite: 'item_iron_ore',      category: 'resource',                       path: '/assets/resources/iron_ore.png' },
-  gold_ore:      { name: 'Golderz',     sprite: 'item_gold_ore',      category: 'resource',                       path: '/assets/resources/gold_ore.png' },
+  wood:          { name: 'Holz',        sprite: 'item_wood',          category: 'resource',                       path: `${OP}/wood_logs.png` },
+  stone:         { name: 'Stein',       sprite: 'item_stone',         category: 'resource',                       path: `${OP}/rough_stone.png` },
+  iron_ore:      { name: 'Eisenerz',    sprite: 'item_iron_ore',      category: 'resource',                       path: `${OP}/iron_ore.png` },
+  gold_ore:      { name: 'Golderz',     sprite: 'item_gold_ore',      category: 'resource',                       path: `${OP}/gold_ore.png` },
   silver_ore:    { name: 'Silbererz',   sprite: 'item_silver_ore',    category: 'resource',                       path: '/assets/resources/silver_ore.png' },
   mythril_ore:   { name: 'Mythril',     sprite: 'item_mythril_ore',   category: 'resource',                       path: '/assets/resources/mythril_ore.png' },
   steel_ingot:    { name: 'Stahlbarren',   sprite: 'item_steel_ingot',    category: 'resource',                       path: '/assets/resources/steel_ingot.png' },
@@ -820,12 +824,12 @@ const ITEM = {
   platinum_ingot: { name: 'Platinbarren',  sprite: 'item_platinum_ingot', category: 'resource',                       path: '/assets/resources/platinum_ingot.png' },
   tungsten_ingot: { name: 'Wolframbarren', sprite: 'item_tungsten_ingot', category: 'resource',                       path: '/assets/resources/tungsten_ingot.png' },
   crystal_ingot:  { name: 'Kristallbarren',sprite: 'item_crystal_ingot',  category: 'resource',                       path: '/assets/resources/crystal_ingot.png' },
-  crystal:       { name: 'Kristall',    sprite: 'item_crystal',       category: 'resource',                       path: '/assets/resources/crystal.png' },
-  bone:          { name: 'Knochen',     sprite: 'item_bone',          category: 'resource',                       path: '/assets/resources/bone.png' },
-  cloth:         { name: 'Stoff',       sprite: 'item_cloth',         category: 'resource',                       path: '/assets/resources/cloth.png' },
+  crystal:       { name: 'Kristall',    sprite: 'item_crystal',       category: 'resource',                       path: `${OP}/blue_crystal.png` },
+  bone:          { name: 'Knochen',     sprite: 'item_bone',          category: 'resource',                       path: `${OP}/bone_fragments.png` },
+  cloth:         { name: 'Stoff',       sprite: 'item_cloth',         category: 'resource',                       path: `${OP}/cloth_bolt.png` },
   cloth_green:   { name: 'Grüner Stoff',sprite: 'item_cloth_green',   category: 'resource',                       path: '/assets/resources/cloth_green.png' },
   plant_fiber:   { name: 'Pflanzenfaser',sprite: 'item_plant_fiber',  category: 'resource',                       path: '/assets/resources/cloth.png' },
-  leather:       { name: 'Leder',       sprite: 'item_leather',       category: 'resource',                       path: '/assets/resources/leather.png' },
+  leather:       { name: 'Leder',       sprite: 'item_leather',       category: 'resource',                       path: `${OP}/leather_roll.png` },
   copper_coin:   { name: 'Kupfermünze', sprite: 'item_copper_coin',   category: 'resource',                       path: '/assets/currency/coin_copper.png' },
   silver_coin:   { name: 'Silbermünze', sprite: 'item_silver_coin',   category: 'resource',                       path: '/assets/currency/coin_silver.png' },
   gold_coin:     { name: 'Goldmünze',   sprite: 'item_gold_coin',     category: 'resource',                       path: '/assets/currency/coin_gold.png' },
@@ -1343,7 +1347,7 @@ class WorldScene extends Phaser.Scene {
     this.load.image('struct_poison_trap', '/assets/traps/poison_trap.png');
     this.load.image('struct_stairs_down', '/assets/dungeons/stairs_down.png');
 
-    // Deko-Props
+    // Deko-Props — Default-Pfade aus /assets/props/<cat>/.
     for (const p of ['tree_oak','tree_pine','tree_dead','tree_stump','fallen_log',
                      'bush','tall_grass','flowers','mushrooms',
                      'rock_small','rock_large','rock_mossy']) {
@@ -1355,6 +1359,22 @@ class WorldScene extends Phaser.Scene {
     for (const p of ['broken_cart','barrel','crate','sack','fence','camp_tent','cooking_pot']) {
       this.load.image(`prop_${p}`, `/assets/props/settlement/${p}.png`);
     }
+    // Override mit hochwertigen original_pack-Versionen wo verfügbar (128×128
+    // hand-painted statt der älteren 64×64 props).
+    const OP_PROPS = {
+      tree_oak:    'oak_tree',     tree_pine:   'pine_tree',
+      tree_dead:   'dead_tree',    rock_mossy:  'mossy_rock',
+      bush:        'bush',         tall_grass:  'tall_grass_tuft',
+      mushrooms:   'mushroom_cluster',
+      broken_cart: 'broken_cart',  barrel:      'barrel',
+    };
+    for (const [key, slug] of Object.entries(OP_PROPS)) {
+      this.load.image(`prop_${key}`,
+        `/assets/professional/original_pack_2026_05_27/icons_128/${slug}.png`);
+    }
+    // Neuer Struktur-Typ aus original_pack — Rune-Altar für Forschungs-/Ritual-Sites.
+    this.load.image('prop_rune_altar',
+      '/assets/professional/original_pack_2026_05_27/icons_128/rune_altar.png');
     for (const p of ['ruin_pillar','rubble','statue_broken','bones_scatter','gravestone']) {
       this.load.image(`prop_${p}`, `/assets/props/ruins/${p}.png`);
     }
