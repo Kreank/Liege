@@ -219,17 +219,35 @@ def _row_to_dict(row) -> dict:
     return out
 
 
+# Welle 23: Modul-globaler Pointer auf die zentrale ItemManager-Instanz,
+# damit Module wie village_spawner (die kein item_manager als Parameter
+# bekommen) Chests befüllen können. Wird von main.py beim Boot gesetzt.
+_global_item_manager: "ItemManager | None" = None
+
+def set_global_item_manager(mgr: "ItemManager") -> None:
+    global _global_item_manager
+    _global_item_manager = mgr
+
+
 class ItemManager:
     async def spawn_on_ground(self, kind: str, x: int, y: int,
-                              material: str | None = None) -> dict | None:
+                              material: str | None = None,
+                              quality_kind: str = "normal") -> dict | None:
         cfg = ITEM_KINDS.get(kind)
         if cfg is None:
             return None
+        # Welle 23: Per-Instance Stats für Equipment-Ground-Drops (Boss-Drops).
+        # Resources/Consumables/Food bekommen kein rolled_stats.
+        import item_stats as _istats
+        import json as _json
+        rolled = _istats.roll_base_stats(kind, quality_kind)
+        rolled_json = _json.dumps(rolled) if rolled else None
         row = await db.pool().fetchrow(
-            "INSERT INTO items (kind, name, category, x, y, material) "
-            "VALUES ($1, $2, $3, $4, $5, $6) "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
-            kind, cfg["name"], cfg["category"], x, y, material,
+            "INSERT INTO items (kind, name, category, x, y, material, quality, rolled_stats) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb) "
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
+            "created_at, affixes, unique_name, flavor, material, rolled_stats",
+            kind, cfg["name"], cfg["category"], x, y, material, quality_kind, rolled_json,
         )
         return _row_to_dict(row)
 
@@ -485,6 +503,52 @@ class ItemManager:
             item_id, player_name, f"chest:{chest_id}",
         )
         return _row_to_dict(row) if row else None
+
+    async def populate_chest(self, chest_id: int, chest_type: str = "world") -> int:
+        """Welle 23: Befüllt eine bestehende chest-Structure mit Loot.
+        Returns Anzahl gespawnter Items. Idempotent: macht NICHTS wenn der
+        Chest schon Inhalte hat (avoid double-population).
+        """
+        import chest_loot, item_stats, json as _json
+        existing = await db.pool().fetchval(
+            "SELECT COUNT(*) FROM items WHERE owner = $1",
+            f"chest:{chest_id}",
+        )
+        if existing and existing > 0:
+            return 0
+        rolls = chest_loot.roll_chest_loot(chest_type)
+        owner = f"chest:{chest_id}"
+        count = 0
+        for r in rolls:
+            kind = r["kind"]
+            quality_k = r["quality"]
+            qty = max(1, int(r.get("quantity", 1)))
+            cfg = ITEM_KINDS.get(kind)
+            if cfg is None:
+                continue
+            # Resources/Consumables/Currency: stack-merge falls möglich
+            if is_stackable(cfg["category"]) and quality_k == "normal":
+                # Existing stack im chest? UPDATE quantity
+                merged = await db.pool().fetchrow(
+                    "UPDATE items SET quantity = quantity + $3 "
+                    "WHERE id = (SELECT id FROM items WHERE owner = $1 AND kind = $2 "
+                    "  AND quality = 'normal' AND quantity < $4 LIMIT 1) "
+                    "RETURNING id",
+                    owner, kind, qty, stack_limit_for(cfg["category"]),
+                )
+                if merged:
+                    count += 1
+                    continue
+            # Equipment: rolled_stats per-instance
+            rolled = item_stats.roll_base_stats(kind, quality_k)
+            rolled_json = _json.dumps(rolled) if rolled else None
+            await db.pool().execute(
+                "INSERT INTO items (kind, name, category, owner, quality, quantity, rolled_stats) "
+                "VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)",
+                kind, cfg["name"], cfg["category"], owner, quality_k, qty, rolled_json,
+            )
+            count += 1
+        return count
 
     async def transfer_from_chest(self, item_id: int, chest_id: int, player_name: str) -> dict | None:
         row = await db.pool().fetchrow(

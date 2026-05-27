@@ -600,4 +600,55 @@ async def populate_chunk_if_needed(world, structure_manager, connection_manager,
             )
         except Exception:
             log.exception("village_spawner schlug fehl bei (%d,%d)", cx, cy)
+
+    # Welle 23: ~6% Chance pro Chunk auf eine versteckte Welt-Truhe.
+    # Bevorzugt Tiles in der Nähe von Ruinen, Bäumen oder isolierten Spots.
+    if random.random() < 0.06:
+        try:
+            chest = await _try_place_world_chest(world, structure_manager,
+                                                  connection_manager, cx, cy, chunk)
+            if chest is not None:
+                placed_list.append(chest)
+                log.info("Welt-Chest gespawnt @(%d,%d) chunk=(%d,%d)",
+                         chest["x"], chest["y"], cx, cy)
+        except Exception:
+            log.exception("Welt-Chest-Spawn fehlgeschlagen bei (%d,%d)", cx, cy)
     return len(placed_list)
+
+
+async def _try_place_world_chest(world, structure_manager, connection_manager,
+                                  cx: int, cy: int, chunk) -> dict | None:
+    """Sucht ein passendes walkable Tile im Chunk, platziert einen Chest
+    und befüllt ihn mit chest_type='world' Loot."""
+    # Bevorzugte Biome (kein Wasser/Lava/Berg) — Wald/Wiese/Wüste/Schnee
+    PREFERRED = (GRASS, FOREST, DESERT, JUNGLE, SWAMP, SNOW, SAND)
+    for _try in range(30):
+        lx = random.randint(2, CHUNK_SIZE - 3)
+        ly = random.randint(2, CHUNK_SIZE - 3)
+        wx = cx * CHUNK_SIZE + lx
+        wy = cy * CHUNK_SIZE + ly
+        tile = chunk[ly][lx]
+        if tile not in PREFERRED:
+            continue
+        if not await world.is_walkable(wx, wy):
+            continue
+        if structure_manager.at(wx, wy) is not None:
+            continue
+        chest = await structure_manager.place(wx, wy, "chest", "system",
+                                               material="wood", durability=3)
+        if chest is None:
+            continue
+        # Befüllen mit world-loot
+        try:
+            import items as _items_mod
+            mgr = _items_mod._global_item_manager
+            if mgr is not None:
+                await mgr.populate_chest(chest["id"], "world")
+        except Exception:
+            log.exception("populate_chest schlug fehl für world-chest")
+        if connection_manager.get_players():
+            await connection_manager.broadcast({
+                "type": "structure_placed", "structure": chest,
+            })
+        return chest
+    return None

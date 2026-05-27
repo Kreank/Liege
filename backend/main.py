@@ -63,6 +63,10 @@ structures = StructureManager()
 events = EventManager()
 npcs = NPCManager()
 items = ItemManager()
+# Welle 23: globaler Ref damit village_spawner/world_populator Chests befüllen
+# können, ohne den item_manager als Parameter durchreichen zu müssen.
+import items as _items_module
+_items_module.set_global_item_manager(items)
 world: World | None = None
 
 
@@ -1147,6 +1151,19 @@ async def websocket_endpoint(websocket: WebSocket):
                             await manager.broadcast({
                                 "type": "item_spawned", "item": dropped,
                             })
+                    # Welle 23: Boss-Garantie-Equipment-Drop (high quality)
+                    import npc_worker as _nw
+                    if npc["kind"] in _nw.BOSS_KINDS:
+                        boss_eq = loot.roll_boss_equipment()
+                        if boss_eq:
+                            eq_kind, eq_q = boss_eq
+                            dropped = await items.spawn_on_ground(
+                                eq_kind, drop_x, drop_y, quality_kind=eq_q,
+                            )
+                            if dropped is not None:
+                                await manager.broadcast({
+                                    "type": "item_spawned", "item": dropped,
+                                })
                     await manager.broadcast({
                         "type":   "npc_died",
                         "npc_id": npc_id,
@@ -1280,6 +1297,19 @@ async def websocket_endpoint(websocket: WebSocket):
                                             await manager.broadcast({
                                                 "type": "item_spawned", "item": dropped,
                                             })
+                                    # Welle 23: Boss-Garantie-Equipment auch via Spell-Kill
+                                    import npc_worker as _nw2
+                                    if t["kind"] in _nw2.BOSS_KINDS:
+                                        boss_eq2 = loot.roll_boss_equipment()
+                                        if boss_eq2:
+                                            eq_kind2, eq_q2 = boss_eq2
+                                            dropped = await items.spawn_on_ground(
+                                                eq_kind2, drop_x, drop_y, quality_kind=eq_q2,
+                                            )
+                                            if dropped:
+                                                await manager.broadcast({
+                                                    "type": "item_spawned", "item": dropped,
+                                                })
                                     await manager.broadcast({
                                         "type": "npc_died", "npc_id": t["id"],
                                         "killed_by": player_id, "name": t["name"],

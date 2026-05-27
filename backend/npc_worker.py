@@ -424,14 +424,19 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
             return None
         x, y = pos
     base_hp = combat.NPC_HP_BY_KIND.get(kind, 40)
-    # Welle 30: Power-Budget — Mob-HP skaliert mit nahem Player-Level
+    # Welle 23 (2026-05-27): ESO-Style Tier-Baseline-Skalierung. Normale Mobs
+    # (T1-T3) folgen dem Player-Level. Bosse (T4) haben Floor + Bonus.
+    # Friendly NPCs (kein Tier-Eintrag) behalten ihr base_hp.
     try:
         import power_budget, skills as _skills
         player_lvl = 0
         for pname in connection_manager.get_players().keys():
             sk = await _skills.get_skills(pname)
             player_lvl = max(player_lvl, power_budget.player_level_estimate(sk))
-        max_hp = power_budget.kalibrate_mob_hp(base_hp, player_lvl)
+        if kind in combat.CREATURE_KINDS:
+            max_hp = combat.kalibrated_npc_hp(kind, player_lvl)
+        else:
+            max_hp = base_hp   # friendly NPCs: fixed
     except Exception:
         max_hp = base_hp
     # Sprite-Variante pro spawn random aus dem Pool (bandit_axe, soldier_spear, …).
@@ -523,15 +528,14 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         if not _has_attack_los(npc, nearest_data["x"], nearest_data["y"],
                                 world, structures_mgr):
             return False
-        dmg = combat.creature_damage(npc["kind"])
-        # Power-Budget: Damage skaliert mit Player-Level
+        # Welle 23: ESO-Style — DMG folgt Player-Level + Tier + per-kind Flavor.
         try:
             import power_budget, skills as _skills
             sk = await _skills.get_skills(nearest_name)
             plvl = power_budget.player_level_estimate(sk)
-            dmg = power_budget.kalibrate_mob_damage(dmg, plvl)
+            dmg = combat.kalibrated_creature_damage(npc["kind"], plvl)
         except Exception:
-            pass
+            dmg = combat.creature_damage(npc["kind"])
         # Welle 15: themed-Mobs verursachen typed damage (fire/ice/...)
         _dmg_type = combat.creature_stats(npc["kind"]).get("damage_type", "physical")
         await damage_cb(nearest_name, dmg, npc["id"], _dmg_type)

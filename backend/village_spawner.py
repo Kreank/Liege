@@ -585,6 +585,26 @@ async def try_spawn_bandit_camp(world, structure_manager, npc_manager,
                                                 material="wood", durability=dur)
             if s: placed.append(s)
 
+    # Welle 23: Bandit-Camp-Truhe mit bandit-loot
+    chest_offsets = [(2, 0), (-2, 0), (0, 2), (0, -2)]
+    random.shuffle(chest_offsets)
+    for dx, dy in chest_offsets:
+        x, y = cx_tile + dx, cy_tile + dy
+        if await _can_place(structure_manager, world, x, y):
+            chest = await structure_manager.place(x, y, "chest", "system",
+                                                    material="wood", durability=3)
+            if chest:
+                placed.append(chest)
+                try:
+                    import items as _items_mod
+                    # ItemManager-Instanz aus globalem Modul holen
+                    if hasattr(_items_mod, "_global_item_manager"):
+                        mgr = _items_mod._global_item_manager
+                        await mgr.populate_chest(chest["id"], "bandit")
+                except Exception:
+                    log.exception("Bandit-Camp Chest populate fehlgeschlagen")
+            break
+
     # 2-4 Banditen verteilt
     bandit_count = random.randint(2, 4)
     spawn_offsets = [(-3, 0), (3, 0), (0, -3), (0, 3), (-3, -3), (3, 3), (-3, 3), (3, -3)]

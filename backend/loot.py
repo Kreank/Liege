@@ -175,6 +175,23 @@ BANDIT_EQUIPMENT = [
     ("helmet", 8), ("boots", 8), ("health_potion", 15),
 ]
 
+# Welle 23: Boss-Garantie-Equipment-Pool. Wenn ein Boss stirbt, bekommt der
+# Spieler GARANTIERT ein Equipment aus diesem Pool zusätzlich zum normalen
+# LOOT_TABLE-Roll. Welche Quality? siehe BOSS_EQUIPMENT_QUALITY.
+BOSS_EQUIPMENT_POOL = [
+    # Waffen (50% Gewicht total)
+    ("sword", 10), ("axe", 8), ("greatsword", 6), ("bow", 8), ("crossbow", 6),
+    ("staff", 6), ("dagger", 8), ("mace", 8), ("spear", 6), ("scythe", 4),
+    # Rüstung (35%)
+    ("chestplate", 8), ("helmet", 8), ("shield", 6), ("gloves", 5), ("boots", 5),
+    # Schmuck (15%)
+    ("ring", 7), ("amulet", 7),
+]
+# Quality-Distribution für Boss-Equipment (deutlich besser als Mob-Tables)
+BOSS_EQUIPMENT_QUALITY = [
+    ("normal", 10), ("fine", 40), ("masterwork", 35), ("legendary", 15),
+]
+
 
 def _pick_weighted(items: list[tuple[str, int]]) -> str | None:
     """Pickt einen kind aus [(kind, weight), …]. None wenn leer/keine Treffer."""
@@ -204,7 +221,14 @@ def _roll_drop_count(tier: int = 2) -> int:
 
 def roll_loot(kind: str) -> list[str]:
     """Returnt 0-4 Item-Kinds die dieses Creature droppt (ohne Duplikate
-    aus der Standard-Tabelle). Anzahl skaliert mit Monster-Tier."""
+    aus der Standard-Tabelle). Anzahl skaliert mit Monster-Tier.
+
+    Welle 23: kein Equipment mehr aus normalen Mob-Tables (siehe loot-design-doc).
+    Equipment kommt nur noch via:
+      - Bandit/Robber/Thief Special-Loot (BANDIT_EQUIPMENT, 40% Chance)
+      - Boss-Garantie-Drop (siehe roll_boss_equipment)
+      - Chests (chest_loot.py)
+    """
     table = LOOT_TABLE.get(kind, [])
     # Tier aus den Combat-Stats holen (Default 2 wenn unbekannt)
     try:
@@ -224,15 +248,28 @@ def roll_loot(kind: str) -> list[str]:
             drops.append(picked)
             pool = [(k, w) for k, w in pool if k != picked]
 
-    # Bandit-Special: garantierte Münze + ggf. equipped Item
-    if kind == "bandit":
+    # Bandit/Robber/Thief-Special: garantierte Münze + ggf. equipped Item
+    if kind in ("bandit", "robber", "thief"):
         coin = _pick_weighted(BANDIT_COIN_WEIGHTS)
         if coin:
             drops.append(coin)
-        # 40% Chance dass er zusätzlich was Equipped-mäßiges droppt
-        if random.random() < 0.40:
+        # Chance auf ein Equipment (Räuber tragen ihre Waffe bei sich)
+        eq_chance = {"bandit": 0.40, "robber": 0.35, "thief": 0.30}.get(kind, 0.40)
+        if random.random() < eq_chance:
             extra = _pick_weighted([(k, w) for k, w in BANDIT_EQUIPMENT if w > 0])
             if extra:
                 drops.append(extra)
 
     return drops
+
+
+def roll_boss_equipment() -> tuple[str, str] | None:
+    """Welle 23: zusätzlicher garantierter Equipment-Drop für Boss-Kills.
+    Returns (item_kind, quality_kind). Wird vom main.py beim Tod eines
+    Boss-Mobs (BOSS_KINDS) zusätzlich zu roll_loot() aufgerufen.
+    """
+    kind = _pick_weighted(BOSS_EQUIPMENT_POOL)
+    quality_k = _pick_weighted(BOSS_EQUIPMENT_QUALITY)
+    if not kind or not quality_k:
+        return None
+    return kind, quality_k
