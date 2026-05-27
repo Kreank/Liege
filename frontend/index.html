@@ -249,6 +249,26 @@
   </div>
 </div>
 
+<!-- Welle 23: Character-Creation-Modal — beim ersten Login -->
+<div id="char-create-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,10,5,0.85);z-index:300;align-items:center;justify-content:center;overflow:auto">
+  <div id="char-create-box" style="background:#1a1410;border:2px solid #c8a868;border-radius:6px;padding:18px 22px;max-width:840px;width:92%;color:#e8d870;font-family:monospace;max-height:92vh;overflow:auto">
+    <div style="text-align:center;font-size:18px;color:#ffd060;margin-bottom:8px">⚔ Erschaffe deinen Charakter</div>
+    <div style="font-size:11px;color:#a0907a;margin-bottom:14px;text-align:center">
+      Wähle einen Charakter und verteile 20 Punkte auf deine Attribute (max 5 pro Attribut).
+    </div>
+    <div style="font-weight:bold;margin-bottom:6px">1. Charakter wählen</div>
+    <div id="char-create-presets" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:14px"></div>
+    <div style="font-weight:bold;margin-bottom:4px">2. Stat-Punkte verteilen
+      <span id="char-create-pool" style="float:right;color:#9fc890">20 Punkte übrig</span>
+    </div>
+    <div id="char-create-attrs" style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;margin-bottom:14px"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button id="char-create-reset" style="background:#3a2818;border:1px solid #807060;color:#c8b878;padding:6px 14px;cursor:pointer;border-radius:3px">Zurücksetzen</button>
+      <button id="char-create-confirm" disabled style="background:#5a4828;border:1px solid #c8a868;color:#ffd060;padding:6px 18px;cursor:pointer;border-radius:3px;font-weight:bold">Charakter erschaffen</button>
+    </div>
+  </div>
+</div>
+
 <div id="dialog-overlay">
   <div id="dialog-box">
     <div id="dialog-header">

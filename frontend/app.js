@@ -1736,6 +1736,11 @@ class WorldScene extends Phaser.Scene {
     this.load.image('fx_heal_glow',    '/assets/effects/heal_glow.png');
     this.load.image('fx_poison_cloud', '/assets/effects/poison_cloud.png');
     this.load.image('char_player',     '/assets/characters/player.png');
+    // Welle 23 — Player-Presets (Character-Creation)
+    for (const p of ['ember_mage', 'iron_delver', 'knife_runner',
+                      'shieldbearer', 'wanderer_cloak', 'wild_ranger']) {
+      this.load.image(`preset_${p}`, `/assets/characters/player_presets/${p}.png`);
+    }
     this.load.image('fx_shadow',       '/assets/effects/shadow.png');
 
     // Pro-Set (Welle 14): hochwertige world-Sprites unter world_sprites/reference_based/.
@@ -3013,6 +3018,131 @@ class WorldScene extends Phaser.Scene {
     this.input.keyboard.enabled = true;
   }
 
+  // ─── Welle 23: Character-Creation ──────────────────────────────────────
+  _showCharacterCreation() {
+    const overlay = document.getElementById('char-create-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    this._ccState = {
+      preset: null,
+      alloc: {},
+      pool: 20,
+    };
+    const PRESETS = [
+      { id: 'wanderer_cloak', name: 'Wanderer',   desc: 'Ausgewogen, fĂĽr Anfänger. Reiseerfahrung, leichte Verteidigung.', tags: '⚖ Balance' },
+      { id: 'iron_delver',    name: 'Eisengräber', desc: 'Kräftiger Bergmann. Stark, ausdauernd, gut im Mining.',          tags: '⛏ Stärke / Ausdauer' },
+      { id: 'shieldbearer',   name: 'Schildträger',desc: 'Tank-Klasse mit hoher Verteidigung. Beschützer.',                tags: '🛡 Verteidigung / Ausdauer' },
+      { id: 'wild_ranger',    name: 'Wildläufer', desc: 'Jäger mit Bogen. Flink, geschickt, gute Ausweichquote.',          tags: '🏹 Geschick / Ausweichen' },
+      { id: 'knife_runner',   name: 'Klingengänger', desc: 'Leichtfüßiger Dieb. Schleichen, kritische Treffer.',           tags: '🗡 Geschick / Schleichen' },
+      { id: 'ember_mage',     name: 'Glutmagier',  desc: 'Feuermagier. Intelligenz und Energie für Magieschaden.',          tags: '🔮 Intelligenz / Energie' },
+    ];
+    const ATTRS = [
+      { key: 'stärke',        label: 'Stärke',         icon: '💪' },
+      { key: 'ausdauer',      label: 'Ausdauer',       icon: '🛡️' },
+      { key: 'energie',       label: 'Energie (Mana)', icon: '✨' },
+      { key: 'intelligenz',   label: 'Intelligenz',    icon: '📖' },
+      { key: 'weisheit',      label: 'Weisheit',       icon: '🌿' },
+      { key: 'geschick',      label: 'Geschick',       icon: '🤚' },
+      { key: 'ausweichen',    label: 'Ausweichen',     icon: '💨' },
+      { key: 'verteidigung',  label: 'Verteidigung',   icon: '🛡' },
+      { key: 'charisma',      label: 'Charisma',       icon: '💬' },
+      { key: 'krit_rate',     label: 'Krit-Rate',      icon: '🎯' },
+      { key: 'krit_schaden',  label: 'Krit-Schaden',   icon: '💥' },
+      { key: 'schleichen',    label: 'Schleichen',     icon: '🌑' },
+    ];
+
+    // Preset-Karten rendern
+    const presetEl = document.getElementById('char-create-presets');
+    presetEl.innerHTML = '';
+    for (const p of PRESETS) {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#2a2018;border:2px solid #5a4828;border-radius:5px;padding:6px;cursor:pointer;text-align:center;transition:border-color 0.15s';
+      card.dataset.preset = p.id;
+      card.innerHTML = `
+        <img src="/assets/characters/player_presets/${p.id}.png" style="width:80px;height:80px;image-rendering:pixelated;background:#1a1410;border-radius:3px"><br>
+        <div style="font-weight:bold;font-size:12px;color:#ffd060;margin-top:3px">${p.name}</div>
+        <div style="font-size:9px;color:#a08e72;margin-top:2px">${p.tags}</div>
+        <div style="font-size:9px;color:#807060;margin-top:3px;line-height:1.3">${p.desc}</div>`;
+      card.addEventListener('click', () => {
+        this._ccState.preset = p.id;
+        presetEl.querySelectorAll('div[data-preset]').forEach(d =>
+          d.style.borderColor = d.dataset.preset === p.id ? '#ffd060' : '#5a4828');
+        this._updateCharCreateUI();
+      });
+      presetEl.appendChild(card);
+    }
+
+    // Attribute-Spalten rendern
+    const attrsEl = document.getElementById('char-create-attrs');
+    attrsEl.innerHTML = '';
+    for (const a of ATTRS) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;background:#221a14;border-radius:3px;padding:4px 8px';
+      row.innerHTML = `
+        <span style="width:18px">${a.icon}</span>
+        <span style="flex:1;font-size:11px">${a.label}</span>
+        <button data-act="minus" data-attr="${a.key}" style="width:24px;height:22px;background:#3a2818;border:1px solid #807060;color:#c8b878;cursor:pointer;border-radius:2px">−</button>
+        <span data-val="${a.key}" style="display:inline-block;min-width:24px;text-align:center;color:#ffd060;font-weight:bold">0</span>
+        <button data-act="plus" data-attr="${a.key}" style="width:24px;height:22px;background:#3a2818;border:1px solid #807060;color:#c8b878;cursor:pointer;border-radius:2px">+</button>`;
+      row.querySelector('[data-act="minus"]').addEventListener('click', () => {
+        const cur = this._ccState.alloc[a.key] || 0;
+        if (cur > 0) {
+          this._ccState.alloc[a.key] = cur - 1;
+          this._ccState.pool += 1;
+          this._updateCharCreateUI();
+        }
+      });
+      row.querySelector('[data-act="plus"]').addEventListener('click', () => {
+        const cur = this._ccState.alloc[a.key] || 0;
+        if (cur < 5 && this._ccState.pool > 0) {
+          this._ccState.alloc[a.key] = cur + 1;
+          this._ccState.pool -= 1;
+          this._updateCharCreateUI();
+        }
+      });
+      attrsEl.appendChild(row);
+    }
+    this._updateCharCreateUI();
+
+    document.getElementById('char-create-reset').onclick = () => {
+      this._ccState.alloc = {};
+      this._ccState.pool = 20;
+      this._updateCharCreateUI();
+    };
+    document.getElementById('char-create-confirm').onclick = () => {
+      if (!this._ccState.preset) return;
+      this.ws.send(JSON.stringify({
+        type: 'character_create',
+        preset: this._ccState.preset,
+        allocated: this._ccState.alloc,
+      }));
+    };
+  }
+
+  _updateCharCreateUI() {
+    if (!this._ccState) return;
+    document.getElementById('char-create-pool').textContent =
+      `${this._ccState.pool} Punkte ĂĽbrig`;
+    for (const [k, v] of Object.entries(this._ccState.alloc)) {
+      const el = document.querySelector(`[data-val="${k}"]`);
+      if (el) el.textContent = v;
+    }
+    // Reset others to 0
+    document.querySelectorAll('[data-val]').forEach(el => {
+      const k = el.dataset.val;
+      if (!(k in this._ccState.alloc)) el.textContent = '0';
+    });
+    // Confirm-Button aktiv wenn preset gewählt und alle 20 Punkte verteilt
+    const btn = document.getElementById('char-create-confirm');
+    btn.disabled = !this._ccState.preset || this._ccState.pool > 0;
+    btn.style.opacity = btn.disabled ? '0.5' : '1';
+  }
+
+  _hideCharacterCreation() {
+    const overlay = document.getElementById('char-create-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
   _refreshDialogQuestSection(npcId) {
     const section = document.getElementById('dialog-quest-section');
     if (!section) return;
@@ -3271,6 +3401,12 @@ class WorldScene extends Phaser.Scene {
       case 'init':
         this.worldData.width = 999999;
         this.worldData.height = 999999;
+        // Welle 23: Player-Preset speichern für Sprite-Resolution
+        this.myPreset = msg.preset || null;
+        // Welle 23: Character-Creation-Flow wenn nötig
+        if (msg.needs_character_creation) {
+          this._showCharacterCreation();
+        }
         // Chunks aus init aufnehmen
         for (const c of (msg.chunks || [])) {
           this.chunks[`${c.cx},${c.cy}`] = c.tiles;
@@ -3784,6 +3920,22 @@ class WorldScene extends Phaser.Scene {
         this.myReputation = msg.reputation || {};
         if (this.questsOpen) this.refreshQuestsUI();
         break;
+
+      case 'character_created': {
+        // Welle 23: Character-Creation abgeschlossen — Modal schließen + Sprite-Update
+        this.myPreset = msg.preset;
+        this._hideCharacterCreation();
+        // Player-Sprite umschalten auf preset
+        if (this.mySprite && this.mySprite.body) {
+          const key = `preset_${msg.preset}`;
+          if (this.textures.exists(key)) {
+            this.mySprite.body.setTexture(key);
+            this.mySprite.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+          }
+        }
+        this.showEvent(`⚔ Charakter erschaffen: ${msg.preset}`);
+        break;
+      }
 
       case 'quest_board_open': {
         // Welle 23: Quest-Board zeigt verfügbare Welt-Quests via Quest-Dialog
@@ -6442,8 +6594,14 @@ class WorldScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setAlpha(0.55);
 
-    // Welle 40: Walk-Animation — Default-Frame walk_down_1
-    const startKey = this.textures.exists('player_walk_down_1') ? 'player_walk_down_1' : 'char_player';
+    // Welle 23: Wenn Player ein Preset gewählt hat → preset-sprite,
+    // sonst Walk-Animation, sonst char_player Fallback.
+    let startKey = 'char_player';
+    if (isMe && this.myPreset && this.textures.exists(`preset_${this.myPreset}`)) {
+      startKey = `preset_${this.myPreset}`;
+    } else if (this.textures.exists('player_walk_down_1')) {
+      startKey = 'player_walk_down_1';
+    }
     const body = this.add.image(0, 0, startKey).setOrigin(0.5, 0.55);
     body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
 
@@ -6470,8 +6628,9 @@ class WorldScene extends Phaser.Scene {
     //   NPC kind  → 'cha_<kind>' wenn /animations/characters/<kind>/ existiert
     //   Monster   → 'mob_<kind>' wenn /animations/monsters/<kind>/ existiert
     // Wenn Variant (z.B. bandit_axe) → keine Animation (Variant ist statisch).
+    // Welle 23: Player mit Preset → keine Animation, Preset-Sprite bleibt.
     let prefix = null;
-    if (entry.isPlayer) {
+    if (entry.isPlayer && !this.myPreset) {
       prefix = 'player';
     } else if (entry.npc && !entry.npc.sprite_variant) {
       const k = entry.npc.kind;

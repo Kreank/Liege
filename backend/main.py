@@ -537,9 +537,19 @@ async def websocket_endpoint(websocket: WebSocket):
     nearby_items = [it for it in await items.get_on_ground() if near(it["x"], it["y"])]
     nearby_npcs = [n for n in npcs.all() if near(n["x"], n["y"])]
 
+    # Welle 23: Character-Creation-Flag aus DB lesen
+    char_row = await db.pool().fetchrow(
+        "SELECT preset, character_created FROM players WHERE name = $1",
+        player_id,
+    )
+    needs_creation = not (char_row and char_row["character_created"])
+    preset = char_row["preset"] if char_row else None
+
     await websocket.send_json({
         "type": "init",
         "player_id": player_id,
+        "needs_character_creation": needs_creation,
+        "preset": preset,
         "chunks": chunks,
         "chunk_size": 32,
         "world_seed": world.seed,
@@ -2419,6 +2429,67 @@ async def websocket_endpoint(websocket: WebSocket):
             elif mtype == "list_attributes":
                 attrs = await _compute_attributes(player_id)
                 await websocket.send_json({"type": "attributes_update", **attrs})
+
+            elif mtype == "character_create":
+                # Welle 23: Spieler wählt Preset + verteilt 20 Startpunkte
+                # auf seine Attribute. Wird nur akzeptiert wenn character_created
+                # noch FALSE ist (kein erneutes Char-Creation für gleichen Account).
+                preset = str(data.get("preset", "")).strip()[:32]
+                allocated_in = data.get("allocated") or {}
+                # Validate preset
+                VALID_PRESETS = {"ember_mage", "iron_delver", "knife_runner",
+                                  "shieldbearer", "wanderer_cloak", "wild_ranger"}
+                if preset not in VALID_PRESETS:
+                    await websocket.send_json({"type": "toast",
+                        "text": "Ungültige Charakter-Auswahl"})
+                    continue
+                # Validate allocated: 12 valid attrs, sum <= 20, each <= 5
+                VALID_ATTRS = {"stärke", "ausdauer", "energie", "intelligenz",
+                                "weisheit", "ausweichen", "geschick", "verteidigung",
+                                "charisma", "krit_rate", "krit_schaden", "schleichen"}
+                MAX_PER_ATTR = 5
+                MAX_TOTAL = 20
+                cleaned: dict[str, int] = {}
+                total = 0
+                for k, v in allocated_in.items():
+                    if k not in VALID_ATTRS:
+                        continue
+                    iv = max(0, min(MAX_PER_ATTR, int(v)))
+                    if iv > 0:
+                        cleaned[k] = iv
+                        total += iv
+                if total > MAX_TOTAL:
+                    await websocket.send_json({"type": "toast",
+                        "text": f"Zu viele Punkte vergeben ({total}/{MAX_TOTAL})"})
+                    continue
+                # Already created? — block re-creation
+                row = await db.pool().fetchrow(
+                    "SELECT character_created FROM players WHERE name = $1",
+                    player_id,
+                )
+                if row and row["character_created"]:
+                    await websocket.send_json({"type": "toast",
+                        "text": "Charakter ist bereits erstellt"})
+                    continue
+                # Persist preset + allocated_attrs + flag set
+                import json as _json
+                remaining_points = MAX_TOTAL - total
+                await db.pool().execute(
+                    "UPDATE players SET preset = $2, "
+                    "  allocated_attrs = $3::jsonb, "
+                    "  unspent_attr_points = $4, "
+                    "  character_created = TRUE "
+                    "WHERE name = $1",
+                    player_id, preset, _json.dumps(cleaned), remaining_points,
+                )
+                log.info("Character created: %s preset=%s alloc=%s",
+                         player_id, preset, cleaned)
+                await websocket.send_json({
+                    "type": "character_created",
+                    "preset": preset,
+                    "allocated": cleaned,
+                    "unspent": remaining_points,
+                })
 
             elif mtype == "list_talents":
                 sk = await skills.get_skills(player_id)

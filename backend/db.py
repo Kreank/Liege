@@ -438,6 +438,10 @@ CREATE TABLE IF NOT EXISTS quests (
 -- Welle 23: Template-basiertes Quest-System
 ALTER TABLE quests ADD COLUMN IF NOT EXISTS template_id TEXT NULL;
 ALTER TABLE quests ADD COLUMN IF NOT EXISTS tier        INTEGER NULL;
+
+-- Welle 23: Character-Creation — Player wählt Preset + verteilt Stat-Punkte beim ersten Login
+ALTER TABLE players ADD COLUMN IF NOT EXISTS preset            TEXT NULL;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS character_created BOOLEAN NOT NULL DEFAULT FALSE;
 CREATE INDEX IF NOT EXISTS quests_player_status_idx ON quests (player_name, status);
 CREATE INDEX IF NOT EXISTS quests_player_template_idx ON quests (player_name, template_id);
 
