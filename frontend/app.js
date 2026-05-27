@@ -2445,10 +2445,18 @@ class WorldScene extends Phaser.Scene {
       const hasHammer = !!(this.inventory || []).find(
         it => it.equipped_slot === 'tool' && it.kind === 'hammer'
       );
+      const isMineForUpgrade = (s.owner === MY_ID);
       // Repair-Mode: Hammer + beschädigt → reparieren (höchste Priorität)
       if (hasHammer && damaged && isCombatStruct) {
         if (dist > 1) { this.showEvent('🤚 Zu weit weg zum Reparieren'); return; }
         this.ws.send(JSON.stringify({ type: 'repair_structure', x: tx, y: ty }));
+        return;
+      }
+      // Welle 25: Upgrade-Mode — Hammer + eigene heile Wand + nicht-top-Material
+      if (hasHammer && isCombatStruct && isMineForUpgrade && !damaged
+          && s.material && s.material !== 'stone') {
+        if (dist > 1) { this.showEvent('🤚 Zu weit weg zum Aufwerten'); return; }
+        this.ws.send(JSON.stringify({ type: 'upgrade_structure', x: tx, y: ty }));
         return;
       }
       // Türen togglen
@@ -2605,9 +2613,20 @@ class WorldScene extends Phaser.Scene {
         );
         if (isEquipped) slot.style.boxShadow = '0 0 8px rgba(120,200,80,0.7)';
         const img = document.createElement('img');
-        // Falls equipped: nutze item.material für material-spezifisches Sprite
+        // Welle 23: Sprite passend zur tatsächlichen Item-Quality wählen,
+        // damit Hotbar und Inventar konsistent sind. Equipped hat Vorrang,
+        // sonst das Item mit höchster Quality dieses Kinds.
+        const QR = { rough: 0, normal: 1, fine: 2, masterwork: 3, legendary: 4 };
         const equippedItem = (this.inventory || []).find(it => it.kind === kind && it.equipped_slot);
-        img.src = itemAssetPath(equippedItem || kind);
+        let displayItem = equippedItem;
+        if (!displayItem) {
+          const stack = (this.inventory || []).filter(it => it.kind === kind && !it.equipped_slot);
+          if (stack.length) {
+            stack.sort((a, b) => (QR[b.quality || 'normal'] || 0) - (QR[a.quality || 'normal'] || 0));
+            displayItem = stack[0];
+          }
+        }
+        img.src = itemAssetPath(displayItem || kind);
         if (cnt === 0 && !isEquipped) slot.classList.add('hotbar-empty');
         slot.appendChild(img);
         if (cnt > 1) {
@@ -3435,6 +3454,27 @@ class WorldScene extends Phaser.Scene {
           s.durability = msg.durability;
           if (msg.max_durability != null) s.max_durability = msg.max_durability;
           this._refreshStructureHpVisual(s);
+        }
+        break;
+      }
+
+      case 'structure_upgraded': {
+        // Welle 25: Material geändert → Sprite neu rendern. Wir entfernen
+        // den alten Sprite und addStructureSprite() pickt das neue material-key.
+        const key = `${msg.x},${msg.y}`;
+        const s = this.structures[key] || this.floors[key];
+        if (s) {
+          const layer = s.layer || 'object';
+          s.material       = msg.material;
+          s.durability     = msg.durability;
+          s.max_durability = msg.max_durability;
+          this._removeStructureHpBar(msg.x, msg.y);
+          this.removeStructureSprite(msg.x, msg.y, layer);
+          this.addStructureSprite(s, /*refreshNeighbors=*/ true);
+          // Kleiner Upgrade-Effekt (gelber Schimmer)
+          const cx = msg.x * TILE_SIZE + TILE_SIZE / 2;
+          const cy = msg.y * TILE_SIZE + TILE_SIZE / 2;
+          this._floatingDamage(cx, cy, '⬆️', { color: '#ffe070' });
         }
         break;
       }
