@@ -113,6 +113,8 @@ NPC_KIND_FACTIONS = {
     "zombie":      "undead_cult",
     "necromancer": "undead_cult",
     "bandit":      "bandits",
+    "robber":      "bandits",
+    "thief":       "bandits",
     "slime":       None,
     "ogre":        None,
     "dragon_whelp":None,

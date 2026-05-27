@@ -572,31 +572,47 @@ function findEquippedInSlot(inventory, slot) {
 }
 
 const NPC_SPRITE = {
-  // Friendly — eigene NPC-Sprites wenn vorhanden, sonst Player+Tint
-  wanderer:    { sprite: 'npc_villager',     tint: 0xffffff, label: 'Wanderer' },
-  villager:    { sprite: 'npc_villager',     tint: 0xffffff, label: 'Dorfbewohner' },
-  merchant:    { sprite: 'npc_merchant',     tint: 0xffffff, label: 'Händler' },
-  // hermit/bard nutzen Friendly-Sprites mit Charakter-Tint statt char_player,
-  // damit die Player/Friendly/Hostile-Trennung sauber bleibt. Dedizierte
-  // npc_hermit.png / npc_bard.png stehen in docu/missing_assets.md.
-  hermit:      { sprite: 'npc_village_elder', tint: 0xb0e0d0, label: 'Einsiedler' },
-  bard:        { sprite: 'npc_villager',      tint: 0xf0a0d0, label: 'Barde' },
-  scholar:     { sprite: 'npc_mage',         tint: 0xffffff, label: 'Gelehrter' },
-  soldier:     { sprite: 'npc_guard',        tint: 0xffffff, label: 'Soldat' },
-  // Welle 21 — neue NPC-Kinds mit eigenen Sprites
-  mage:        { sprite: 'npc_mage',         tint: 0xffffff, label: 'Magier' },
-  farmer:      { sprite: 'npc_farmer',       tint: 0xffffff, label: 'Bauer' },
-  guard:       { sprite: 'npc_guard',        tint: 0xffffff, label: 'Wache' },
-  healer:      { sprite: 'npc_healer',       tint: 0xffffff, label: 'Heiler' },
-  blacksmith:  { sprite: 'npc_blacksmith',   tint: 0xffffff, label: 'Schmied' },
-  quest_giver: { sprite: 'npc_quest_giver',  tint: 0xffffff, label: 'Auftraggeber' },
-  // Asset-Drop 2026-05-26
-  miner:         { sprite: 'npc_miner',         tint: 0xffffff, label: 'Bergmann' },
-  village_elder: { sprite: 'npc_village_elder', tint: 0xffffff, label: 'Dorfältester' },
+  // ─── Friendly NPCs ──────────────────────────────────────────────────────
+  // Jeder Friendly-Kind nutzt sein eigenes npc_<kind>-Sprite aus
+  // /assets/characters/npcs/. Recycling nur für Backend-Kinds ohne eigenes
+  // Asset (wanderer, soldier) — als Übergangslösung mit Tint.
+  wanderer:    { sprite: 'npc_villager',         tint: 0xffffff, label: 'Wanderer' },
+  villager:    { sprite: 'npc_villager',         tint: 0xffffff, label: 'Dorfbewohner' },
+  merchant:    { sprite: 'npc_merchant',         tint: 0xffffff, label: 'Händler' },
+  hermit:      { sprite: 'npc_hermit',           tint: 0xffffff, label: 'Einsiedler' },
+  bard:        { sprite: 'npc_bard',             tint: 0xffffff, label: 'Barde' },
+  scholar:     { sprite: 'npc_scholar',          tint: 0xffffff, label: 'Gelehrter' },
+  soldier:     { sprite: 'npc_guard',            tint: 0xffffff, label: 'Soldat' },
+  mage:        { sprite: 'npc_mage',             tint: 0xffffff, label: 'Magier' },
+  farmer:      { sprite: 'npc_farmer',           tint: 0xffffff, label: 'Bauer' },
+  guard:       { sprite: 'npc_guard',            tint: 0xffffff, label: 'Wache' },
+  healer:      { sprite: 'npc_healer',           tint: 0xffffff, label: 'Heiler' },
+  blacksmith:  { sprite: 'npc_blacksmith',       tint: 0xffffff, label: 'Schmied' },
+  quest_giver: { sprite: 'npc_quest_giver',      tint: 0xffffff, label: 'Auftraggeber' },
+  miner:         { sprite: 'npc_miner',          tint: 0xffffff, label: 'Bergmann' },
+  village_elder: { sprite: 'npc_village_elder',  tint: 0xffffff, label: 'Dorfältester' },
   watchman:      { sprite: 'npc_watchman_lantern', tint: 0xffffff, label: 'Wächter' },
-  cat:           { sprite: 'npc_cat',           tint: 0xffffff, label: 'Katze' },
-  dog:           { sprite: 'npc_dog',           tint: 0xffffff, label: 'Hund' },
-  child:         { sprite: 'npc_child',         tint: 0xffffff, label: 'Kind' },
+  cat:           { sprite: 'npc_cat',            tint: 0xffffff, label: 'Katze' },
+  dog:           { sprite: 'npc_dog',            tint: 0xffffff, label: 'Hund' },
+  child:         { sprite: 'npc_child',          tint: 0xffffff, label: 'Kind' },
+  // Asset-Drop 2026-05-27: neue Handwerks-/Dorf-Rollen
+  baker:       { sprite: 'npc_baker',            tint: 0xffffff, label: 'Bäcker' },
+  carpenter:   { sprite: 'npc_carpenter',        tint: 0xffffff, label: 'Zimmermann' },
+  fisher:      { sprite: 'npc_fisher',           tint: 0xffffff, label: 'Fischer' },
+  hunter:      { sprite: 'npc_hunter',           tint: 0xffffff, label: 'Jäger' },
+  innkeeper:   { sprite: 'npc_innkeeper',        tint: 0xffffff, label: 'Wirt' },
+  peasant:     { sprite: 'npc_peasant',          tint: 0xffffff, label: 'Landarbeiter' },
+  priest:      { sprite: 'npc_priest',           tint: 0xffffff, label: 'Priester' },
+  scribe:      { sprite: 'npc_scribe',           tint: 0xffffff, label: 'Schreiber' },
+  tailor:      { sprite: 'npc_tailor',           tint: 0xffffff, label: 'Schneider' },
+  woodcutter:  { sprite: 'npc_woodcutter',       tint: 0xffffff, label: 'Holzfäller' },
+  // ─── Hostile Humans (Räuber-Typen) ─────────────────────────────────────
+  // Nutzen Character-Sprites aus /assets/characters/npcs/ (nicht monster_*),
+  // weil es Menschen sind. variant kann Waffen-Variante (bandit_axe etc.)
+  // überschreiben für visuelle Diversität.
+  bandit:    { sprite: 'npc_bandit',  tint: 0xffffff, label: 'Bandit' },
+  robber:    { sprite: 'npc_robber',  tint: 0xffffff, label: 'Räuber' },
+  thief:     { sprite: 'npc_thief',   tint: 0xffffff, label: 'Dieb' },
   // Creatures — eigenes Sprite, kein Tint
   goblin:   { sprite: 'monster_goblin',   tint: 0xffffff, label: 'Goblin' },
   wolf:     { sprite: 'monster_wolf',     tint: 0xffffff, label: 'Wolf' },
@@ -607,7 +623,6 @@ const NPC_SPRITE = {
   rat:      { sprite: 'monster_rat',      tint: 0xffffff, label: 'Ratte' },
   bat:      { sprite: 'monster_bat',      tint: 0xffffff, label: 'Fledermaus' },
   zombie:   { sprite: 'monster_zombie',   tint: 0xffffff, label: 'Zombie' },
-  bandit:   { sprite: 'monster_bandit',   tint: 0xffffff, label: 'Bandit' },
   boar:     { sprite: 'monster_boar',     tint: 0xffffff, label: 'Wildschwein' },
   bear:     { sprite: 'monster_bear',     tint: 0xffffff, label: 'Bär' },
   // Bosse — größere Sprites, eigene Optik
@@ -654,7 +669,7 @@ const NPC_SPRITE = {
 };
 const CREATURE_KINDS = new Set([
   'goblin','wolf','skeleton','spider','slime',
-  'rat','bat','zombie','bandit','boar','bear',
+  'rat','bat','zombie','bandit','robber','thief','boar','bear',
   'ogre','necromancer','dragon_whelp',
   // Welle 13
   'stag','lynx','cougar','wolverine','dire_wolf','wolf_alpha',
@@ -671,6 +686,31 @@ const CREATURE_KINDS = new Set([
   'kaiju_thornback','void_eye_brute','frost_rune_boar_prime',
   'magma_shell_devourer','rockshell_colossus',
 ]);
+
+// ─── Walk-Cycle-Animations (Asset-Drop /assets/animations/) ─────────────────
+// NPCs/Monsters in dieser Liste haben in /assets/animations/<characters|monsters>/<kind>/
+// einen vollständigen 10-Frame-Pool (idle_1/2, walk_<down|up|left|right>_1/2).
+// `_updateWalkFrame` swappt die Texture basierend auf Bewegungsrichtung.
+// Nicht enthalten: farmer + merchant (alter Top-Down-Stil, nicht kompatibel mit
+// neuem Front-View aus /npcs/), neue Rollen (baker, bard, ...) ohne Animation.
+const ANIMATED_NPC_KINDS = [
+  'bandit', 'blacksmith', 'guard', 'healer',
+  'mage', 'quest_giver', 'villager',
+];
+const ANIMATED_MONSTER_KINDS = [
+  // bandit raus — nutzt characters/bandit/ via ANIMATED_NPC_KINDS für Stil-Konsistenz
+  'basilisk','bat','bear','boar','bone_crawler',
+  'cave_bear','chimera','cobra','cougar','crocodile',
+  'crystal_beetle','crystal_golem','crystal_tick',
+  'dire_wolf','dragon_whelp','ember_newt','ember_rat',
+  'fae_mite','fire_imp','frost_sprite','gargoyle',
+  'giant_spider','gloom_moth','goblin','griffin','harpy',
+  'hydra','lynx','manticore','minotaur','mushroom_imp',
+  'necromancer','ogre','polar_bear','rat','shadow_bat',
+  'skeleton','slime','slimelet','spider','stag',
+  'stone_golem','thornling','thorn_scarab','treant',
+  'wolf','wolf_alpha','wolverine','zombie',
+];
 
 // ─── Items ───────────────────────────────────────────────────────────────────
 const ITEM = {
@@ -1367,9 +1407,11 @@ class WorldScene extends Phaser.Scene {
     // (idle_1.png als static-Sprite). Jede Kreatur bekommt damit ihr eigenes
     // Aussehen statt monster_unknown-Fallback. Hostile-only: friendly NPCs
     // werden weiterhin aus /assets/characters/npcs/ geladen (siehe unten).
+    // bandit/robber/thief sind Menschen → bekommen Character-Sprites (oben geladen),
+    // nicht in dieser Monster-Liste.
     const LEGACY_MONSTERS = [
       'goblin','wolf','skeleton','spider','slime',
-      'rat','bat','zombie','bandit','boar','bear',
+      'rat','bat','zombie','boar','bear',
       'ogre','necromancer','dragon_whelp',
       'stag','lynx','cougar','wolverine','dire_wolf','wolf_alpha',
       'cave_bear','polar_bear','crocodile','cobra',
@@ -1390,6 +1432,30 @@ class WorldScene extends Phaser.Scene {
     for (const dir of ['down','up','left','right']) {
       for (const f of [1, 2]) {
         this.load.image(`player_walk_${dir}_${f}`, `/assets/animations/player/walk_${dir}_${f}.png`);
+      }
+    }
+    // Walk-Cycle für animierte Friendly-NPCs (Welle 23 — 7 Kinds × 10 Frames).
+    // Prefix `cha_` für /assets/animations/characters/, `mob_` für /monsters/.
+    // `_updateWalkFrame` wählt den Prefix anhand des NPC-Kinds.
+    for (const kind of ANIMATED_NPC_KINDS) {
+      for (const f of [1, 2]) {
+        this.load.image(`cha_${kind}_idle_${f}`,
+          `/assets/animations/characters/${kind}/idle_${f}.png`);
+        for (const dir of ['down','up','left','right']) {
+          this.load.image(`cha_${kind}_walk_${dir}_${f}`,
+            `/assets/animations/characters/${kind}/walk_${dir}_${f}.png`);
+        }
+      }
+    }
+    // Walk-Cycle für animierte Monster (49 Kinds × 10 Frames).
+    for (const kind of ANIMATED_MONSTER_KINDS) {
+      for (const f of [1, 2]) {
+        this.load.image(`mob_${kind}_idle_${f}`,
+          `/assets/animations/monsters/${kind}/idle_${f}.png`);
+        for (const dir of ['down','up','left','right']) {
+          this.load.image(`mob_${kind}_walk_${dir}_${f}`,
+            `/assets/animations/monsters/${kind}/walk_${dir}_${f}.png`);
+        }
       }
     }
     // Spell-Animationen (Welle 40)
@@ -1415,14 +1481,20 @@ class WorldScene extends Phaser.Scene {
     this.load.image('fx_arrow_projectile', '/assets/animations/attacks/arrow_projectile.png');
     this.load.image('fx_arrow_hit', '/assets/animations/attacks/arrow_hit.png');
 
-    // Friendly-NPC-Sprites — alle Files unter /assets/characters/npcs/.
-    // Backend `SPRITE_VARIANTS_BY_KIND` kann Gender-/Stil-Varianten zuweisen
-    // (farmer_female), `_npcSpriteKey` fällt sonst auf den kind-default zurück.
-    for (const n of ['mage', 'farmer', 'farmer_female', 'villager',
-                     'guard', 'merchant', 'healer', 'quest_giver',
-                     'blacksmith',
-                     // Asset-Drop 2026-05-26
-                     'miner', 'village_elder', 'cat', 'dog', 'child']) {
+    // Character-Sprites — alle Files unter /assets/characters/npcs/.
+    // Quelle: assets/characters/character_roster_manifest.json (npc_core-Liste).
+    // Enthält Friendly (Handwerker, Dorf-Rollen, Tiere, Kind) UND hostile Humans
+    // (bandit, robber, thief). _npcSpriteKey kann via sprite_variant den Default
+    // pro Kind überschreiben (z.B. bandit_axe statt bandit).
+    for (const n of [
+      // Asset-Drop 2026-05-27: vollständiger Roster
+      'baker', 'bandit', 'bard', 'blacksmith', 'carpenter',
+      'cat', 'child', 'dog', 'farmer', 'farmer_female',
+      'fisher', 'guard', 'healer', 'hermit', 'hunter',
+      'innkeeper', 'mage', 'merchant', 'miner', 'peasant',
+      'priest', 'quest_giver', 'robber', 'scholar', 'scribe',
+      'tailor', 'thief', 'village_elder', 'villager', 'woodcutter',
+    ]) {
       this.load.image(`npc_${n}`, `/assets/characters/npcs/${n}.png`);
     }
     // NPC-Varianten (Waffen/Rollen) — werden vom backend pro NPC zugewiesen
@@ -5034,10 +5106,18 @@ class WorldScene extends Phaser.Scene {
   // entfernt wurde (commit 1fb41c5).
   _npcSpriteKey(npc) {
     const cfg = NPC_SPRITE[npc.kind] || NPC_SPRITE.wanderer;
+    // sprite_variant (z.B. bandit_axe) hat Vorrang — keine Animation für Variants.
     if (npc.sprite_variant) {
       const key = `npc_${npc.sprite_variant}`;
       if (this.textures.exists(key)) return key;
     }
+    // Welle 23: wenn Walk-Cycle-Animation existiert, start mit anim-idle.
+    // _updateWalkFrame swappt dann durch walk_<dir>_<frame> bei Bewegung.
+    const chaKey = `cha_${npc.kind}_idle_1`;
+    if (this.textures.exists(chaKey)) return chaKey;
+    const mobKey = `mob_${npc.kind}_idle_1`;
+    if (this.textures.exists(mobKey)) return mobKey;
+    // Fallback: statisches NPC- bzw. Monster-Sprite.
     if (cfg.sprite && this.textures.exists(cfg.sprite)) return cfg.sprite;
     return 'monster_unknown';
   }
@@ -5603,16 +5683,31 @@ class WorldScene extends Phaser.Scene {
   // Welle 40: Walk-Animation update — vom Pixel-Movement aufgerufen
   _updateWalkFrame(entry, vx, vy, delta) {
     if (!entry || !entry.body) return;
-    // NPCs (Spinne, Wolf, Händler, …) haben eigene Sprites — Player-Walk-Frames NICHT überschreiben
-    if (!entry.isPlayer) return;
     // Reset hängengebliebene Transformations-States
     entry.body.flipX = false;
     entry.body.setRotation(0);
+    // Animation-Prefix wählen:
+    //   Player    → 'player' (assets/animations/player/walk_*)
+    //   NPC kind  → 'cha_<kind>' wenn /animations/characters/<kind>/ existiert
+    //   Monster   → 'mob_<kind>' wenn /animations/monsters/<kind>/ existiert
+    // Wenn Variant (z.B. bandit_axe) → keine Animation (Variant ist statisch).
+    let prefix = null;
+    if (entry.isPlayer) {
+      prefix = 'player';
+    } else if (entry.npc && !entry.npc.sprite_variant) {
+      const k = entry.npc.kind;
+      if (this.textures.exists(`cha_${k}_idle_1`)) prefix = `cha_${k}`;
+      else if (this.textures.exists(`mob_${k}_idle_1`)) prefix = `mob_${k}`;
+    }
+    if (!prefix) return;  // kein animations-fähiger Sprite — Texture unverändert
     if (vx === 0 && vy === 0) {
-      // Idle: zurück auf walk_X_1 (Stand-Frame)
+      // Idle
       entry.moving = false;
       entry.walkTimer = 0;
-      const key = `player_walk_${entry.facing || 'down'}_1`;
+      // Player: idle = walk_<dir>_1 (Stand-Frame); NPC/Monster: idle_1.
+      const key = entry.isPlayer
+        ? `player_walk_${entry.facing || 'down'}_1`
+        : `${prefix}_idle_1`;
       if (this.textures.exists(key)) {
         entry.body.setTexture(key);
         entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
@@ -5635,7 +5730,7 @@ class WorldScene extends Phaser.Scene {
       entry.walkFrame = entry.walkFrame === 1 ? 2 : 1;
     }
     const frame = entry.walkFrame || 1;
-    const key = `player_walk_${dir}_${frame}`;
+    const key = `${prefix}_walk_${dir}_${frame}`;
     if (this.textures.exists(key)) {
       entry.body.setTexture(key);
       entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);

@@ -69,6 +69,12 @@ LOOT_TABLE = {
     "bandit": [
         ("cloth", 50), ("leather", 30), ("health_potion", 8), ("herb", 10),
     ],
+    "robber": [
+        ("cloth", 60), ("leather", 35), ("copper_coin", 25), ("silver_coin", 8),
+    ],
+    "thief": [
+        ("cloth", 40), ("copper_coin", 40), ("silver_coin", 12), ("herb", 6),
+    ],
 
     # — Welle 13 — Tiere —
     "stag":      [("raw_meat", 70), ("leather", 60), ("bone", 40)],

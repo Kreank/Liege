@@ -52,6 +52,17 @@ WORK_STRUCTURE_BY_KIND = {
     "child":        None,    # spielt, wandert
     "wanderer":     None,
     "soldier":      None,
+    # Asset-Drop 2026-05-27 — neue Friendly-Rollen
+    "baker":        "furnace",       # backt am Ofen
+    "carpenter":    "workbench",
+    "fisher":       None,            # geht ans Wasser (kein eigener struct-type)
+    "hunter":       None,            # streift im Wald
+    "innkeeper":    "campfire",      # bleibt am Herd
+    "peasant":      "farm_plot",
+    "priest":       "bed",           # heilt am Krankenbett
+    "scribe":       "workbench",
+    "tailor":       "workbench",
+    "woodcutter":   None,            # geht zum Wald (kein struct-type)
 }
 
 # Goal-Wechsel-Cooldown: nach Erreichen wird X Sekunden gewartet bevor neues Goal

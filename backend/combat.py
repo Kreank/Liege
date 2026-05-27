@@ -19,6 +19,8 @@ NPC_HP_BY_KIND = {
     "bat":      20,
     "zombie":   60,
     "bandit":   45,
+    "robber":   55,    # robuster als bandit
+    "thief":    30,    # schwächer, fokussiert auf flinke Angriffe
     "boar":     70,
     "bear":     120,
     # Bosse — viel stärker
@@ -133,6 +135,8 @@ CREATURE_DAMAGE = {
     "bat":      4,
     "zombie":   10,
     "bandit":   14,    # bewaffnet
+    "robber":   16,    # stärkerer Hieb
+    "thief":    9,     # weniger Damage, schnell
     "boar":     11,
     "bear":     20,
     # Bosse — gefährlich
@@ -355,6 +359,8 @@ _NPC_STAT_OVERRIDES = {
     "skeleton":        {"defense": 5, "speed": 0.8, "tier": 2, "necrotic_resist": 70, "ice_resist": 30},
     "zombie":          {"defense": 4, "speed": 0.5, "tier": 2, "necrotic_resist": 60},
     "bandit":          {"defense": 6, "speed": 1.0, "tier": 2, "aggro_range": 8},
+    "robber":          {"defense": 8, "speed": 0.9, "tier": 2, "aggro_range": 7},
+    "thief":           {"defense": 3, "speed": 1.4, "tier": 1, "aggro_range": 9},
     "wolf":            {"defense": 3, "speed": 1.3, "tier": 2, "aggro_range": 7},
     "boar":            {"defense": 5, "speed": 1.1, "tier": 2, "aggro_range": 5},
     "stag":            {"defense": 4, "speed": 1.4, "tier": 2, "aggro_range": 3},

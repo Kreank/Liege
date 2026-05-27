@@ -34,6 +34,8 @@ SPRITE_VARIANTS_BY_KIND = {
 CREATURE_SPAWN_PROFILE = {
     "boar":         {"group": (3, 5),  "biomes": {GRASS, FOREST, JUNGLE}},
     "bandit":       {"group": (2, 6),  "biomes": None},
+    "robber":       {"group": (1, 3),  "biomes": None},      # kleinere Trupps
+    "thief":        {"group": (1, 2),  "biomes": None},      # Einzelgänger/Pärchen
     "goblin":       {"group": (5, 10), "biomes": None},
     "wolf":         {"group": (2, 4),  "biomes": {GRASS, FOREST, SNOW}},
     "spider":       {"group": (1, 1),  "biomes": None},        # Einzelgänger
@@ -115,11 +117,16 @@ FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier"
                   "quest_giver", "blacksmith",
                   # Asset-Drop 2026-05-26: weitere Rollen + Tiere/Kinder
                   "miner", "village_elder", "watchman",
-                  "cat", "dog", "child"]
+                  "cat", "dog", "child",
+                  # Asset-Drop 2026-05-27: Handwerks- und Dorf-Rollen
+                  "baker", "carpenter", "fisher", "hunter", "innkeeper",
+                  "peasant", "priest", "scribe", "tailor", "woodcutter"]
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",
     "rat", "bat", "zombie", "bandit", "boar", "bear",
+    # Asset-Drop 2026-05-27: hostile Humans (Räuber-Typen)
+    "robber", "thief",
     # Welle 13 — neue Tiere
     "stag", "lynx", "cougar", "wolverine", "dire_wolf", "wolf_alpha",
     "cave_bear", "polar_bear", "crocodile", "cobra",
@@ -171,6 +178,20 @@ NPC_MOVE_CHANCE = {
     "cat":          0.40,  # streunt
     "dog":          0.30,
     "child":        0.35,  # spielt, läuft viel
+    # Asset-Drop 2026-05-27 — neue Friendly-Rollen
+    "baker":        0.08,  # bleibt am Ofen
+    "carpenter":    0.10,  # arbeitet an der Werkbank
+    "fisher":       0.15,  # geht zum Ufer und zurück
+    "hunter":       0.30,  # streift durch Wald
+    "innkeeper":    0.05,  # bleibt am Schank
+    "peasant":      0.18,  # auf dem Feld
+    "priest":       0.08,  # bleibt am Krankenbett
+    "scribe":       0.07,  # konzentriert am Schreiben
+    "tailor":       0.08,  # an der Werkbank
+    "woodcutter":   0.22,  # geht zum Wald
+    # Asset-Drop 2026-05-27 — neue hostile Humans
+    "robber":    0.20,
+    "thief":     0.40,  # flink
     "goblin":    0.30,  # nervös
     "wolf":      0.35,
     "skeleton":  0.15,
