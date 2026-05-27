@@ -1,0 +1,535 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p1",
+  "count": 48,
+  "items": [
+    {
+      "id": "barn_small",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/barn_small.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "barn_large",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/barn_large.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "stable",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/stable.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "cow_shed",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/cow_shed.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheepfold",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/sheepfold.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "goat_pen",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/goat_pen.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "pigsty",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/pigsty.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "henhouse",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/henhouse.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck_pond",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/duck_pond.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose_pasture_marker",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/goose_pasture_marker.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "dovecote",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/dovecote.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "cart_shed",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/cart_shed.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "dairy_house",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/dairy_house.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "smokehouse",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/smokehouse.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "hayloft",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/hayloft.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "granary",
+      "category": "farm_structures",
+      "path": "assets/structures/farm/granary.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/farm_structures_source.png",
+      "ok": true
+    },
+    {
+      "id": "rat_black",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/rat_black.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "mouse_white",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/mouse_white.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "raven",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/raven.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "pigeon",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/pigeon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "dove",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/dove.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_dog",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/farm_dog.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "fox",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/fox.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "rabbit",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/rabbit.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "hare",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/hare.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "deer",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/deer.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "badger",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/badger.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "hedgehog",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/hedgehog.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "bee_swarm",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/bee_swarm.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "swan",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/swan.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "turkey",
+      "category": "wildlife_small",
+      "path": "assets/animals/wildlife/turkey.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "bat",
+      "category": "wildlife_small",
+      "path": "assets/animals/small/bat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/wildlife_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "sausage",
+      "category": "processed_foods",
+      "path": "assets/food/processed/sausage.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "smoked_meat",
+      "category": "processed_foods",
+      "path": "assets/food/processed/smoked_meat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "salted_meat",
+      "category": "processed_foods",
+      "path": "assets/food/processed/salted_meat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "lard_pot",
+      "category": "processed_foods",
+      "path": "assets/food/processed/lard_pot.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "honey_jar",
+      "category": "processed_foods",
+      "path": "assets/food/processed/honey_jar.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "wax_block",
+      "category": "processed_foods",
+      "path": "assets/resources/animal_products/wax_block.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "candle_bundle",
+      "category": "processed_foods",
+      "path": "assets/resources/animal_products/candle_bundle.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "flour_sack",
+      "category": "processed_foods",
+      "path": "assets/food/processed/flour_sack.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "grain_sack",
+      "category": "processed_foods",
+      "path": "assets/food/processed/grain_sack.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "oat_sack",
+      "category": "processed_foods",
+      "path": "assets/food/processed/oat_sack.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "animal_feed",
+      "category": "processed_foods",
+      "path": "assets/food/processed/animal_feed.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "salt_bag",
+      "category": "processed_foods",
+      "path": "assets/food/processed/salt_bag.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "dried_fish_bundle",
+      "category": "processed_foods",
+      "path": "assets/food/processed/dried_fish_bundle.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "cheese_crate",
+      "category": "processed_foods",
+      "path": "assets/food/processed/cheese_crate.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "wool_cloth_roll",
+      "category": "processed_foods",
+      "path": "assets/resources/animal_products/wool_cloth_roll.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    },
+    {
+      "id": "leather_bundle",
+      "category": "processed_foods",
+      "path": "assets/resources/animal_products/leather_bundle.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_2026_05_27/source_sheets/processed_foods_source.png",
+      "ok": true
+    }
+  ]
+}

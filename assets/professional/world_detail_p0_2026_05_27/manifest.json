@@ -1,0 +1,1107 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p0",
+  "count": 100,
+  "items": [
+    {
+      "id": "crossroads_signpost",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/crossroads_signpost.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_village",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_village.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_market",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_market.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_inn",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_inn.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_church",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_church.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_mill",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_mill.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_mine",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_mine.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "warning_bandits",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/warning_bandits.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_town",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_town.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_farm",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_farm.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_forest",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_forest.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_docks",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_docks.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "signpost_graveyard",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/signpost_graveyard.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "road_marker_stone",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/road_marker_stone.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "boundary_post",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/boundary_post.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "blank_weathered_signpost",
+      "category": "wayfinding",
+      "path": "assets/props/settlement/signs/wayfinding/blank_weathered_signpost.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/wayfinding_source.png",
+      "ok": true
+    },
+    {
+      "id": "bakery_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/bakery_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "blacksmith_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/blacksmith_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "tailor_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/tailor_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "inn_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/inn_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "stable_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/stable_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "market_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/market_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "apothecary_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/apothecary_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "carpenter_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/carpenter_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "miller_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/miller_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "dairy_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/dairy_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "butcher_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/butcher_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "fishmonger_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/fishmonger_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "tanner_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/tanner_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "weaver_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/weaver_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "tavern_red_lion_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/tavern_red_lion_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "scribe_sign",
+      "category": "trade",
+      "path": "assets/props/settlement/signs/trade/scribe_sign.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/trade_source.png",
+      "ok": true
+    },
+    {
+      "id": "handcart_empty",
+      "category": "transport",
+      "path": "assets/props/transport/handcart_empty.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "handcart_crates",
+      "category": "transport",
+      "path": "assets/props/transport/handcart_crates.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_empty",
+      "category": "transport",
+      "path": "assets/props/transport/farm_cart_empty.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_hay",
+      "category": "transport",
+      "path": "assets/props/transport/farm_cart_hay.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_barrels",
+      "category": "transport",
+      "path": "assets/props/transport/farm_cart_barrels.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "market_wagon_covered",
+      "category": "transport",
+      "path": "assets/props/transport/market_wagon_covered.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "merchant_wagon_closed",
+      "category": "transport",
+      "path": "assets/props/transport/merchant_wagon_closed.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_cart_single",
+      "category": "transport",
+      "path": "assets/props/transport/horse_cart_single.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_cart_pair",
+      "category": "transport",
+      "path": "assets/props/transport/horse_cart_pair.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "ox_cart",
+      "category": "transport",
+      "path": "assets/props/transport/ox_cart.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "donkey_pack_cart",
+      "category": "transport",
+      "path": "assets/props/transport/donkey_pack_cart.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "broken_wagon_large",
+      "category": "transport",
+      "path": "assets/props/transport/broken_wagon_large.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "wagon_wheel_loose",
+      "category": "transport",
+      "path": "assets/props/transport/wagon_wheel_loose.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "wagon_harness",
+      "category": "transport",
+      "path": "assets/props/transport/wagon_harness.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "hitching_post",
+      "category": "transport",
+      "path": "assets/props/transport/hitching_post.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "wheelbarrow_tools",
+      "category": "transport",
+      "path": "assets/props/transport/wheelbarrow_tools.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/transport_source.png",
+      "ok": true
+    },
+    {
+      "id": "cow",
+      "category": "livestock",
+      "path": "assets/animals/livestock/cow.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "bull",
+      "category": "livestock",
+      "path": "assets/animals/livestock/bull.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "calf",
+      "category": "livestock",
+      "path": "assets/animals/livestock/calf.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "sheep",
+      "category": "livestock",
+      "path": "assets/animals/livestock/sheep.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "ram",
+      "category": "livestock",
+      "path": "assets/animals/livestock/ram.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "lamb",
+      "category": "livestock",
+      "path": "assets/animals/livestock/lamb.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "goat",
+      "category": "livestock",
+      "path": "assets/animals/livestock/goat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "buck_goat",
+      "category": "livestock",
+      "path": "assets/animals/livestock/buck_goat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "kid_goat",
+      "category": "livestock",
+      "path": "assets/animals/livestock/kid_goat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "pig",
+      "category": "livestock",
+      "path": "assets/animals/livestock/pig.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "boar_domestic",
+      "category": "livestock",
+      "path": "assets/animals/livestock/boar_domestic.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "piglet",
+      "category": "livestock",
+      "path": "assets/animals/livestock/piglet.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "horse",
+      "category": "livestock",
+      "path": "assets/animals/livestock/horse.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "draft_horse",
+      "category": "livestock",
+      "path": "assets/animals/livestock/draft_horse.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "foal",
+      "category": "livestock",
+      "path": "assets/animals/livestock/foal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "ox",
+      "category": "livestock",
+      "path": "assets/animals/livestock/ox.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "donkey",
+      "category": "livestock",
+      "path": "assets/animals/livestock/donkey.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "mule",
+      "category": "livestock",
+      "path": "assets/animals/livestock/mule.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "sheared_sheep",
+      "category": "livestock",
+      "path": "assets/animals/livestock/sheared_sheep.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "sleeping_cow",
+      "category": "livestock",
+      "path": "assets/animals/livestock/sleeping_cow.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/livestock_source_v2.png",
+      "ok": true
+    },
+    {
+      "id": "chicken_hen",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/chicken_hen.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "rooster",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/rooster.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "chick",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/chick.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/duck.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "drake",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/drake.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "duckling",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/duckling.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/goose.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "gander",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/gander.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "gosling",
+      "category": "poultry_small",
+      "path": "assets/animals/poultry/gosling.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "mouse",
+      "category": "poultry_small",
+      "path": "assets/animals/small/mouse.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "rat_brown",
+      "category": "poultry_small",
+      "path": "assets/animals/small/rat_brown.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "frog",
+      "category": "poultry_small",
+      "path": "assets/animals/small/frog.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "toad",
+      "category": "poultry_small",
+      "path": "assets/animals/small/toad.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "sparrow",
+      "category": "poultry_small",
+      "path": "assets/animals/small/sparrow.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "crow",
+      "category": "poultry_small",
+      "path": "assets/animals/small/crow.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "cat_mouser",
+      "category": "poultry_small",
+      "path": "assets/animals/small/cat_mouser.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/poultry_small_source.png",
+      "ok": true
+    },
+    {
+      "id": "milk_bucket",
+      "category": "products",
+      "path": "assets/food/dairy/milk_bucket.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "milk_jug",
+      "category": "products",
+      "path": "assets/food/dairy/milk_jug.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "cream_bowl",
+      "category": "products",
+      "path": "assets/food/dairy/cream_bowl.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "butter_churn",
+      "category": "products",
+      "path": "assets/food/dairy/butter_churn.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "butter_pat",
+      "category": "products",
+      "path": "assets/food/dairy/butter_pat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "cheese_wheel",
+      "category": "products",
+      "path": "assets/food/dairy/cheese_wheel.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "cheese_wedge",
+      "category": "products",
+      "path": "assets/food/dairy/cheese_wedge.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "cheese_rack",
+      "category": "products",
+      "path": "assets/food/dairy/cheese_rack.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "curds_bowl",
+      "category": "products",
+      "path": "assets/food/dairy/curds_bowl.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "egg",
+      "category": "products",
+      "path": "assets/food/dairy/egg.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "egg_basket",
+      "category": "products",
+      "path": "assets/food/dairy/egg_basket.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "wool_fleece",
+      "category": "products",
+      "path": "assets/resources/animal_products/wool_fleece.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "yarn_ball",
+      "category": "products",
+      "path": "assets/resources/animal_products/yarn_ball.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "feathers",
+      "category": "products",
+      "path": "assets/resources/animal_products/feathers.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "hide_raw",
+      "category": "products",
+      "path": "assets/resources/animal_products/hide_raw.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    },
+    {
+      "id": "manure_pile",
+      "category": "products",
+      "path": "assets/resources/animal_products/manure_pile.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p0_2026_05_27/source_sheets/products_source.png",
+      "ok": true
+    }
+  ]
+}
