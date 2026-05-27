@@ -1,0 +1,69 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_asset_index",
+  "root": "assets",
+  "summary": {
+    "manifest_items": 260,
+    "png_files_referenced": 540,
+    "packs": 7
+  },
+  "packs": [
+    {
+      "manifest": "assets/professional/world_detail_p0_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p0",
+      "items": 100,
+      "pngs": 100
+    },
+    {
+      "manifest": "assets/professional/world_detail_p1_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p1",
+      "items": 48,
+      "pngs": 48
+    },
+    {
+      "manifest": "assets/professional/world_detail_p1_farm_props_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p1_farm_props",
+      "items": 16,
+      "pngs": 16
+    },
+    {
+      "manifest": "assets/professional/world_detail_p2_animal_states_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p2_animal_states",
+      "items": 16,
+      "pngs": 16
+    },
+    {
+      "manifest": "assets/professional/world_detail_p2_directional_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p2_directional",
+      "items": 40,
+      "pngs": 40
+    },
+    {
+      "manifest": "assets/professional/world_detail_p2_animal_animation_pack_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p2_animal_animations",
+      "items": 24,
+      "pngs": 192
+    },
+    {
+      "manifest": "assets/professional/world_detail_p2_transport_animation_pack_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p2_transport_animations",
+      "items": 16,
+      "pngs": 128
+    }
+  ],
+  "frontend_integration": {
+    "build_category": "farm_world",
+    "structure_texture_keys": "direct basename keys for generated sign/transport/farm props",
+    "file": "frontend/app.js"
+  },
+  "backend_integration": {
+    "registered_structure_lists": [
+      "WAYFINDING_SIGN_TYPES",
+      "TRADE_SIGN_TYPES",
+      "WORLD_TRANSPORT_TYPES",
+      "FARM_STRUCTURE_TYPES",
+      "FARM_PROP_TYPES"
+    ],
+    "file": "backend/structures.py"
+  }
+}
