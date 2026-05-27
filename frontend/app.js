@@ -2805,6 +2805,13 @@ class WorldScene extends Phaser.Scene {
     let actionsHtml = '<div class="tt-actions">';
     if (cfg.slot) {
       actionsHtml += `<button data-act="equip">${item.equipped_slot ? '↓ Ablegen' : '↑ Anlegen'}</button>`;
+      // Welle 23 — Dual-Wield: 1H-Waffe kann auch in Off-Hand
+      if (cfg.category === 'weapon' && !item.equipped_slot) {
+        const ws = WEAPON_STATS[item.kind];
+        if (ws && !ws.two_h) {
+          actionsHtml += `<button data-act="equip_offhand">⚔ Off-Hand</button>`;
+        }
+      }
     }
     if (cfg.category === 'consumable' || cfg.category === 'food') {
       actionsHtml += `<button data-act="use">${cfg.category === 'food' ? '🍖 Essen' : '🍷 Benutzen'}</button>`;
@@ -2854,6 +2861,12 @@ class WorldScene extends Phaser.Scene {
         if (act === 'equip') {
           if (item.equipped_slot) this.unequipItem(item.id);
           else this.equipItem(item.id);
+        } else if (act === 'equip_offhand') {
+          // Welle 23 — Dual-Wield in Off-Hand
+          this.ws.send(JSON.stringify({
+            type: 'equip_item', item_id: item.id, to_slot: 'shield',
+          }));
+          this.unpinItemTooltip();
         } else if (act === 'use') {
           this.useItem(item.id);
         } else if (act === 'magic') {

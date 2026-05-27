@@ -357,8 +357,14 @@ class ItemManager:
         )
         return _row_to_dict(row) if row else None
 
-    async def equip(self, item_id: int, player_name: str) -> dict | None:
-        # Welcher Slot? Aus item.kind ableiten
+    async def equip(self, item_id: int, player_name: str,
+                     to_slot: str | None = None) -> dict | None:
+        """Welle 23 — Dual-Wield: optionaler to_slot-Override.
+
+        Default: nutzt cfg.slot vom Item. Wenn to_slot='shield' UND das
+        Item ist eine 1-Hand-Waffe → Waffe geht in Off-Hand statt Schild.
+        Wenn main-Waffe two_handed wird, Off-Hand wird zuerst ausgezogen.
+        """
         item = await db.pool().fetchrow(
             "SELECT kind FROM items WHERE id = $1 AND owner = $2",
             item_id, player_name,
@@ -369,7 +375,40 @@ class ItemManager:
         if cfg is None or "slot" not in cfg:
             return None
         slot = cfg["slot"]
-        # Vorher anderen Item im gleichen Slot ausziehen
+        kind = item["kind"]
+
+        # Dual-Wield: 1H-Waffe in Off-Hand (shield-slot) wenn angefordert
+        if to_slot == "shield" and cfg.get("category") == "weapon":
+            import item_stats as _is
+            if _is.is_two_handed(kind):
+                return None  # 2H-Waffe kann nicht in Off-Hand
+            slot = "shield"
+
+        # Wenn main-weapon two_handed wird → Off-Hand ausziehen
+        if slot == "weapon":
+            import item_stats as _is
+            if _is.is_two_handed(kind):
+                await db.pool().execute(
+                    "UPDATE items SET equipped_slot = NULL "
+                    "WHERE owner = $1 AND equipped_slot = 'shield'",
+                    player_name,
+                )
+        # Wenn 1H-Waffe in Off-Hand kommt + main ist 2H → main ausziehen
+        if slot == "shield" and cfg.get("category") == "weapon":
+            import item_stats as _is
+            main_row = await db.pool().fetchrow(
+                "SELECT kind FROM items WHERE owner = $1 "
+                "AND equipped_slot = 'weapon' LIMIT 1",
+                player_name,
+            )
+            if main_row and _is.is_two_handed(main_row["kind"]):
+                await db.pool().execute(
+                    "UPDATE items SET equipped_slot = NULL "
+                    "WHERE owner = $1 AND equipped_slot = 'weapon'",
+                    player_name,
+                )
+
+        # Vorher anderen Item im Ziel-Slot ausziehen
         await db.pool().execute(
             "UPDATE items SET equipped_slot = NULL "
             "WHERE owner = $1 AND equipped_slot = $2",
@@ -378,7 +417,8 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET equipped_slot = $3 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "RETURNING id, kind, name, category, quality, x, y, owner, "
+            "equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, player_name, slot,
         )
         return _row_to_dict(row) if row else None

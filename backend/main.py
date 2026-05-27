@@ -925,10 +925,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif mtype == "equip_item":
                 item_id = int(data.get("item_id", 0))
-                item = await items.equip(item_id, player_id)
+                to_slot = data.get("to_slot")  # Welle 23 — Dual-Wield optional
+                item = await items.equip(item_id, player_id, to_slot=to_slot)
                 if item is not None:
                     await websocket.send_json({"type": "inventory_update", "item": item})
                     await _send_attrs_update(websocket, player_id)
+                else:
+                    await websocket.send_json({"type": "toast",
+                        "text": "Off-Hand: 2H-Waffe kann nicht dual-equipped werden."})
 
             elif mtype == "unequip_item":
                 item_id = int(data.get("item_id", 0))
@@ -1118,6 +1122,28 @@ async def websocket_endpoint(websocket: WebSocket):
                     rng_roll=crit_roll,
                     rolled_stats=weapon_rolled_stats,
                 )
+                # Welle 23 — Dual-Wield: zweite Waffe in offhand (shield-slot)?
+                # Zusätzlicher Hieb mit 0.6× damage, eigener crit-roll.
+                offhand_row = await db.pool().fetchrow(
+                    "SELECT kind, quality, rolled_stats FROM items WHERE owner = $1 "
+                    "AND equipped_slot = 'shield' LIMIT 1", player_id,
+                )
+                if offhand_row and offhand_row["kind"] in _is.WEAPON_STATS:
+                    oh_rs = None
+                    if offhand_row["rolled_stats"]:
+                        import json as _json
+                        oh_rs = (_json.loads(offhand_row["rolled_stats"])
+                                 if isinstance(offhand_row["rolled_stats"], str)
+                                 else offhand_row["rolled_stats"])
+                    oh_dmg, oh_crit = combat.calc_player_damage(
+                        weapon_kind=offhand_row["kind"],
+                        weapon_quality=offhand_row["quality"],
+                        combat_level=combat_level,
+                        rng_roll=_r.random(),
+                        rolled_stats=oh_rs,
+                    )
+                    # 60% damage des Hauptschlags durch Off-Hand
+                    dmg += int(round(oh_dmg * 0.6))
                 # Damage-Modifier durch Talente
                 wclass = _is.weapon_class(weapon)
                 if wclass == "ranged":
