@@ -122,7 +122,16 @@ FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier"
                   "cat", "dog", "child",
                   # Asset-Drop 2026-05-27: Handwerks- und Dorf-Rollen
                   "baker", "carpenter", "fisher", "hunter", "innkeeper",
-                  "peasant", "priest", "scribe", "tailor", "woodcutter"]
+                  "peasant", "priest", "scribe", "tailor", "woodcutter",
+                  # Asset-Drop 2026-05-27b: Nutztiere — Livestock
+                  "cow", "bull", "calf", "ox", "sheep", "ram", "lamb",
+                  "sheared_sheep", "pig", "piglet", "boar_domestic",
+                  "goat", "buck_goat", "kid_goat",
+                  "horse", "draft_horse", "foal", "donkey", "mule",
+                  # Geflügel
+                  "chicken_hen", "rooster", "chick",
+                  "duck", "drake", "duckling",
+                  "goose", "gander", "gosling"]
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",
@@ -173,6 +182,18 @@ NPC_MOVE_CHANCE = {
     "healer":      0.08,
     "quest_giver": 0.05,  # bleibt am Platz
     "blacksmith":  0.05,  # bleibt an der Schmiede
+    # Asset-Drop 2026-05-27b: Nutztiere — grasen langsam, Tiere bleiben in Pferchen
+    "cow":          0.12, "bull":         0.10, "calf":         0.22,
+    "ox":           0.08, "sheep":        0.15, "ram":          0.13,
+    "lamb":         0.25, "sheared_sheep":0.15, "pig":          0.18,
+    "piglet":       0.30, "boar_domestic":0.20, "goat":         0.22,
+    "buck_goat":    0.20, "kid_goat":     0.32, "horse":        0.18,
+    "draft_horse":  0.12, "foal":         0.30, "donkey":       0.15,
+    "mule":         0.13,
+    # Geflügel — pickt, läuft umher
+    "chicken_hen":  0.35, "rooster":      0.30, "chick":        0.45,
+    "duck":         0.30, "drake":        0.28, "duckling":     0.42,
+    "goose":        0.25, "gander":       0.22, "gosling":      0.38,
     # Asset-Drop 2026-05-26
     "miner":        0.20,  # gräbt in einer Region
     "village_elder":0.05,  # bleibt fast immer

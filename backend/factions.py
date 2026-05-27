@@ -139,6 +139,17 @@ NPC_KIND_FACTIONS = {
     "void_eye_brute":        None,
     "magma_shell_devourer":  None,
     "rockshell_colossus":    None,
+    # — Asset-Drop 2026-05-27b: Nutztiere (Livestock + Poultry) → villagers —
+    "cow":           "villagers", "bull":         "villagers", "calf":          "villagers",
+    "ox":            "villagers", "sheep":        "villagers", "ram":           "villagers",
+    "lamb":          "villagers", "sheared_sheep":"villagers", "pig":           "villagers",
+    "piglet":        "villagers", "boar_domestic":"villagers", "goat":          "villagers",
+    "buck_goat":     "villagers", "kid_goat":     "villagers", "horse":         "villagers",
+    "draft_horse":   "villagers", "foal":         "villagers", "donkey":        "villagers",
+    "mule":          "villagers",
+    "chicken_hen":   "villagers", "rooster":      "villagers", "chick":         "villagers",
+    "duck":          "villagers", "drake":        "villagers", "duckling":      "villagers",
+    "goose":         "villagers", "gander":       "villagers", "gosling":       "villagers",
 }
 
 

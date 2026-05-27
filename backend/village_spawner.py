@@ -34,8 +34,9 @@ SETTLEMENT_TILES_MIN_VILLAGE = 20
 SETTLEMENT_TILES_MIN_TOWN    = 60
 
 # Hauszahl pro Siedlung
-HOUSE_COUNT_VILLAGE = (3, 5)
-HOUSE_COUNT_TOWN    = (6, 10)
+HOUSE_COUNT_VILLAGE = (5, 8)     # Welle 23: min 5 Häuser (vorher 3) für mehr Vielfalt
+HOUSE_COUNT_TOWN    = (8, 14)
+HOUSE_COUNT_CAPITAL = (22, 30)   # Welle 23: Königreich am Welt-Spawn
 
 # NPCs pro Siedlung (pro Haus + Extra)
 NPC_PER_HOUSE_VILLAGE = (0.8, 1.4)   # multipliziert mit Hauszahl
@@ -53,17 +54,33 @@ HOUSE_SIZE_VARIANTS = [
 
 # Haus-Typen mit gewichteten Spawn-Chancen pro Siedlungs-Stufe
 HOUSE_TYPES_VILLAGE = [
-    ("house",     60),  # einfaches Wohnhaus
-    ("smithy",    15),  # Schmiede
-    ("workshop",  15),  # Werkstatt
-    ("shop",      10),  # Laden
+    ("house",     50),
+    ("smithy",    18),
+    ("workshop",  16),
+    ("shop",      10),
+    ("tavern",     6),
 ]
 HOUSE_TYPES_TOWN = [
-    ("house",     40),
-    ("smithy",    15),
-    ("workshop",  15),
-    ("shop",      20),
-    ("tavern",    10),
+    ("house",     35),
+    ("smithy",    13),
+    ("workshop",  13),
+    ("shop",      18),
+    ("tavern",    13),
+    ("mage_guild",     4),
+    ("fighters_guild", 4),
+]
+# Welle 23: Capital-Haustypen — Königreich mit allen Distrikten
+HOUSE_TYPES_CAPITAL = [
+    ("house",          25),
+    ("shop",           18),
+    ("smithy",         12),
+    ("workshop",       12),
+    ("tavern",         10),
+    ("mage_guild",      6),
+    ("fighters_guild",  6),
+    ("healers_guild",   5),
+    ("thieves_guild",   3),
+    ("temple",          3),
 ]
 
 # NPC-Pool pro Haustyp — Asset-Drop 2026-05-27 ergänzt um Handwerks-/Dorf-Rollen.
@@ -76,6 +93,12 @@ NPC_KIND_BY_HOUSE = {
     "smithy":    ["blacksmith", "carpenter"],
     "workshop":  ["scholar", "mage", "scribe", "carpenter", "tailor"],
     "tavern":    ["bard", "merchant", "villager", "innkeeper"],
+    # Welle 23: Gilden-Strukturen — Gilden-Master + ein Gilden-Mitglied
+    "mage_guild":     ["mage", "scholar"],
+    "fighters_guild": ["guard", "soldier"],
+    "healers_guild":  ["healer", "priest"],
+    "thieves_guild":  ["thief"],   # nur Diebe leben in der Diebesgilde
+    "temple":         ["priest", "healer"],
 }
 
 VILLAGER_NAMES = [
@@ -131,6 +154,32 @@ VILLAGER_BACKSTORIES = {
         "Erzählt jedem Gast die Geschichte vom Drachen im Tal.",
         "Schenkt Met und Bier aus, hört zu, lacht laut.",
         "Singt jede Nacht ein altes Lied, das niemand kennt.",
+    ],
+    # Welle 23 — Gilden-Backstories
+    "mage_guild": [
+        "Gildenmeister der Magier — kennt Sprüche, die die Wirklichkeit beugen.",
+        "Bewahrt die Schriften der alten Mysterien und unterrichtet Schüler.",
+        "Trägt einen Stab aus dunklem Holz — und Augen wie kaltes Feuer.",
+    ],
+    "fighters_guild": [
+        "Kommandant der Kriegerakademie — drillt die nächste Generation.",
+        "Hat in 100 Schlachten gestanden, will jetzt nur noch lehren.",
+        "Eine lebende Legende mit narbigen Händen und ruhigem Blick.",
+    ],
+    "healers_guild": [
+        "Erzheilerin der Gilde — kennt jede Pflanze, jede Krankheit, jede Wunde.",
+        "Lehrt junge Heiler, was kein Buch beschreiben kann.",
+        "Ihre Hände tragen Spuren von tausend gerettetem Leben.",
+    ],
+    "thieves_guild": [
+        "Meister der Schatten — hört man kaum, sieht man nie.",
+        "Verwaltet die Verbindungen, von denen keiner offen spricht.",
+        "Lächelt selten, aber wenn, dann mit einer Klinge in der Hand.",
+    ],
+    "temple": [
+        "Hoher Priester des Tempels — vermittelt zwischen Welten.",
+        "Spendet Trost, Heilung und ab und zu eine harte Wahrheit.",
+        "Trägt das Symbol der Götter und ein ruhiges Gemüt.",
     ],
 }
 
@@ -318,11 +367,51 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
         if inner_w >= 3 and inner_h >= 3:
             s = await _try_place(inner_w // 2, inner_h // 2, "campfire", 8)
             if s: placed.append(s)
+    # Welle 23 — Gilden-Strukturen: jedes Gilden-Haus hat seine charakteristische
+    # Interior-Struktur in der Mitte + ggf. Bett für den Meister.
+    elif house_type in ("mage_guild", "fighters_guild", "healers_guild",
+                         "thieves_guild", "temple"):
+        # Charakteristische Interior-Struktur
+        interior_struct = {
+            "mage_guild":     "workbench",   # Magier brauchen Werkbank/Studierzimmer
+            "fighters_guild": "anvil",        # Kriegerakademie mit Amboss
+            "healers_guild":  "bed",          # Krankenbett
+            "thieves_guild":  "chest",        # Beute-Truhe
+            "temple":         "well",         # Heiliger Brunnen
+        }.get(house_type, "chest")
+        cx_inner = max(0, min(inner_w - 1, inner_w // 2))
+        cy_inner = max(0, min(inner_h - 1, inner_h // 2))
+        s = await _try_place(cx_inner, cy_inner, interior_struct, 12)
+        if s: placed.append(s)
+        # Master-Bett am Rand
+        if inner_h >= 2:
+            s = await _try_place(0, 0, "bed", 10)
+            if s: placed.append(s)
+        # Zusätzliche Truhe (Loot drinnen — wird via populate_chest gefüllt)
+        if inner_w >= 3:
+            chest = await _try_place(inner_w - 1, 0, "chest", 10)
+            if chest:
+                placed.append(chest)
+                try:
+                    import items as _items_mod
+                    mgr = getattr(_items_mod, "_global_item_manager", None)
+                    if mgr is not None:
+                        # Gilden-Truhen: dungeon-tier Loot (höherwertig)
+                        await mgr.populate_chest(chest["id"], "dungeon")
+                except Exception:
+                    log.exception("Gilden-Chest populate fehlgeschlagen")
 
     # NPC spawnen — passend zum Haustyp
     npc_kinds = NPC_KIND_BY_HOUSE.get(house_type, ["wanderer"])
     backstories = VILLAGER_BACKSTORIES.get(house_type, VILLAGER_BACKSTORIES["house"])
-    npc_count = 2 if house_type == "tavern" else 1
+    # Tavern + Gilden bekommen 2 NPCs (Master + Gast/Mitglied)
+    if house_type == "tavern":
+        npc_count = 2
+    elif house_type in ("mage_guild", "fighters_guild", "healers_guild",
+                         "thieves_guild", "temple"):
+        npc_count = 2
+    else:
+        npc_count = 1
     for _ in range(npc_count):
         # Spawn nahe Tür (außerhalb)
         if door_side == "south":
@@ -354,15 +443,24 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
 
 
 def _layout_houses(area_x: int, area_y: int, area_w: int, area_h: int,
-                   house_count: int) -> list[tuple[int, int, int, int, str]]:
+                   house_count: int,
+                   settlement_kind: str = "village",
+                   ) -> list[tuple[int, int, int, int, str]]:
     """Sucht nicht-überlappende Haus-Positionen in einer Bounding-Box.
     Returns Liste (origin_x, origin_y, inner_w, inner_h, house_type).
+
+    settlement_kind: 'village' | 'town' | 'capital' — wählt den HOUSE_TYPES-Pool.
     """
     placed: list[tuple[int, int, int, int]] = []  # (x, y, w, h) Bounding-Boxes
     out: list[tuple[int, int, int, int, str]] = []
     max_attempts = house_count * 12
 
-    house_types_pool = HOUSE_TYPES_TOWN if house_count >= 6 else HOUSE_TYPES_VILLAGE
+    if settlement_kind == "capital":
+        house_types_pool = HOUSE_TYPES_CAPITAL
+    elif settlement_kind == "town" or house_count >= 6:
+        house_types_pool = HOUSE_TYPES_TOWN
+    else:
+        house_types_pool = HOUSE_TYPES_VILLAGE
 
     for _ in range(max_attempts):
         if len(out) >= house_count:
@@ -404,11 +502,25 @@ async def _broadcast_all(connection_manager, structures: list[dict],
 async def try_spawn_settlement(world, structure_manager, npc_manager,
                                 connection_manager, cx: int, cy: int) -> int:
     """Versucht eine Stadt oder ein Dorf zu platzieren — Größe ergibt sich
-    aus verfügbarer Settlement-Area. Returns # placed structures."""
+    aus verfügbarer Settlement-Area. Returns # placed structures.
+
+    Welle 23: Capital-Detection — der Welt-Spawn-Chunk wird IMMER zum
+    Königreich (capital), garantiert mit großer Gebäudezahl + allen
+    Distrikten (Gilden, Tempel, Quest-Board).
+    """
     tiles = await _collect_settlement_tiles(world, cx, cy)
     if len(tiles) < SETTLEMENT_TILES_MIN_VILLAGE:
         return 0
-    if random.random() >= SETTLEMENT_BASE_CHANCE:
+    # Welt-Spawn-Chunk = Königreich. Lokales chunk-koord aus WORLD_SPAWN.
+    from world import CHUNK_SIZE as _CS
+    try:
+        import region_difficulty as _rd
+        spawn_cx, spawn_cy = _rd.WORLD_SPAWN_X // _CS, _rd.WORLD_SPAWN_Y // _CS
+    except Exception:
+        spawn_cx, spawn_cy = 60 // _CS, 40 // _CS
+    is_capital = (cx == spawn_cx and cy == spawn_cy)
+    # Capital ist garantiert, normale Settlements würfeln
+    if not is_capital and random.random() >= SETTLEMENT_BASE_CHANCE:
         return 0
 
     # Bounding-Box der Settlement-Area
@@ -416,8 +528,14 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
     area_w = max_x - min_x + 1
     area_h = max_y - min_y + 1
 
-    # Stadt vs Dorf entscheiden
-    if len(tiles) >= SETTLEMENT_TILES_MIN_TOWN and area_w >= 16 and area_h >= 16:
+    # Capital → Town → Village
+    if is_capital:
+        kind = "capital"
+        house_count = random.randint(*HOUSE_COUNT_CAPITAL)
+        npc_factor = random.uniform(*NPC_PER_HOUSE_TOWN) * 1.3   # mehr Bewohner
+        log.info("CAPITAL spawn @chunk=(%d,%d): %d Gebäude geplant",
+                 cx, cy, house_count)
+    elif len(tiles) >= SETTLEMENT_TILES_MIN_TOWN and area_w >= 16 and area_h >= 16:
         kind = "town"
         house_count = random.randint(*HOUSE_COUNT_TOWN)
         npc_factor = random.uniform(*NPC_PER_HOUSE_TOWN)
@@ -427,9 +545,14 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
         npc_factor = random.uniform(*NPC_PER_HOUSE_VILLAGE)
 
     # Materialien-Mix pro Siedlung (für visuelle Variation)
-    material = random.choices(["wood", "stone", "straw"], weights=[55, 30, 15], k=1)[0]
+    # Capital nutzt mehr stone als Wood (königlich)
+    if is_capital:
+        material = random.choices(["stone", "wood"], weights=[70, 30], k=1)[0]
+    else:
+        material = random.choices(["wood", "stone", "straw"], weights=[55, 30, 15], k=1)[0]
 
-    house_layouts = _layout_houses(min_x, min_y, area_w, area_h, house_count)
+    house_layouts = _layout_houses(min_x, min_y, area_w, area_h, house_count,
+                                     settlement_kind=kind)
     if not house_layouts:
         return 0
 
@@ -450,7 +573,7 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
         all_npcs.extend(npcs)
 
     # Zentrales Feature: Stadt bekommt Brunnen + Wachen + Quest-Giver
-    if kind == "town":
+    if kind in ("town", "capital"):
         well_x = min_x + area_w // 2
         well_y = min_y + area_h // 2
         if await _can_place(structure_manager, world, well_x, well_y):
@@ -503,6 +626,60 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
                     break
                 except Exception:
                     pass
+
+    # Welle 23 — Capital-spezifische Garantien
+    if kind == "capital":
+        center_x = min_x + area_w // 2
+        center_y = min_y + area_h // 2
+        # Quest-Board am Hauptplatz
+        for dx, dy in [(2, 0), (-2, 0), (0, 2), (0, -2)]:
+            qb_x, qb_y = center_x + dx, center_y + dy
+            if await _can_place(structure_manager, world, qb_x, qb_y):
+                s = await structure_manager.place(qb_x, qb_y, "quest_board",
+                                                    "system", material="wood",
+                                                    durability=10)
+                if s:
+                    all_placed.append(s)
+                    break
+        # Zusätzliche Wachen (4 statt 2)
+        for dx, dy in [(min_x + 4, min_y + 4), (max_x - 4, min_y + 4),
+                        (min_x + 4, max_y - 4), (max_x - 4, max_y - 4)]:
+            sx, sy = dx, dy
+            if world.is_walkable_sync(sx, sy) and structure_manager.at(sx, sy) is None:
+                try:
+                    npc = await npc_manager.create(
+                        name=random.choice(VILLAGER_NAMES),
+                        kind="guard", x=sx, y=sy,
+                        backstory=random.choice(VILLAGER_BACKSTORIES["guard"]),
+                        max_hp=80,
+                    )
+                    all_npcs.append(npc)
+                except Exception:
+                    log.exception("Capital-Guard-Spawn fehlgeschlagen")
+        # Garantierter Königreich-Händler-Mix: baker + tailor (zusätzlich zu
+        # den evtl. random aus shops)
+        for npc_kind in ("baker", "tailor", "scholar", "scribe"):
+            for _try in range(6):
+                sx = random.randint(min_x, max_x)
+                sy = random.randint(min_y, max_y)
+                if not world.is_walkable_sync(sx, sy):
+                    continue
+                if structure_manager.at(sx, sy) is not None:
+                    continue
+                try:
+                    npc = await npc_manager.create(
+                        name=random.choice(VILLAGER_NAMES),
+                        kind=npc_kind, x=sx, y=sy,
+                        backstory=random.choice(VILLAGER_BACKSTORIES.get(
+                            "shop", VILLAGER_BACKSTORIES["house"])),
+                        max_hp=50,
+                    )
+                    all_npcs.append(npc)
+                    break
+                except Exception:
+                    pass
+        log.info("Capital: %d Strukturen + %d NPCs platziert",
+                 len(all_placed), len(all_npcs))
 
     # Extra wandernde NPCs (Marktbesucher / Kinder etc.)
     extra_npc_count = max(0, int(len(house_layouts) * npc_factor) - len(all_npcs))

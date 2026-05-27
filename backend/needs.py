@@ -52,6 +52,11 @@ THIRST_RESTORE: dict[str, int] = {
     # Tränke
     "health_potion":  8,    # auch ein bisschen Flüssigkeit
     "mana_potion":    8,
+    # — Asset-Drop 2026-05-27b: Dairy/Drinks (Hydration) —
+    "milk_bucket":   20,    # voller Eimer
+    "milk_jug":      15,    # Krug Milch
+    "cream_bowl":     8,
+    "curds_bowl":     5,
 }
 
 
@@ -103,6 +108,24 @@ FOOD_RESTORE: dict[str, int] = {
     "bread":         38,
     "food_ration":   35,
     "cooked_meat":   50,
+    # — Asset-Drop 2026-05-27b: Dairy & Processed Food —
+    # Dairy — moderate Sättigung, gute Hydration (siehe THIRST_RESTORE)
+    "milk_bucket":     12,
+    "milk_jug":         8,
+    "cream_bowl":      10,
+    "curds_bowl":      14,
+    "butter_pat":      10,    # konzentriert, klein aber kalorienreich
+    "cheese_wedge":    22,    # nahrhaft
+    "cheese_wheel":    45,    # ganzes Rad, riesige Mahlzeit
+    "egg":              8,
+    "egg_basket":      32,    # 4-5 Eier
+    # Processed — Vorräte, hochkalorisch
+    "lard_pot":        15,
+    "salted_meat":     40,
+    "smoked_meat":     45,
+    "sausage":         32,
+    "dried_fish":      28,
+    "honey_jar":       18,    # süß, energiereich
     # Nicht-Food (explizit 0)
     "wood": 0, "stone": 0, "iron_ore": 0, "bone": 0, "plant_fiber": 0,
 }

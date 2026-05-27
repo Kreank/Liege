@@ -179,6 +179,19 @@ const BUILD_CATEGORIES = [
     types: ['chest', 'barrel', 'crate', 'sack'] },
   { id: 'production', icon: '⚒️', label: 'Produktion',
     types: ['workbench', 'anvil', 'furnace', 'farm_plot'] },
+  // Asset-Drop 2026-05-27b: Farm-Gebäude + Farm-Props
+  { id: 'farm',       icon: '🌾', label: 'Farm',
+    subcategories: [
+      { id: 'farm_buildings', icon: '🏚', label: 'Gebäude',
+        types: ['barn_large','barn_small','stable','cow_shed','pigsty','henhouse',
+                'goat_pen','sheepfold','dovecote','dairy_house','granary','hayloft',
+                'smokehouse','cart_shed','duck_pond','goose_pasture_marker'] },
+      { id: 'farm_props',     icon: '🧺', label: 'Props',
+        types: ['feed_trough','water_trough','hay_bale','hay_stack','straw_bale',
+                'cheese_press','butter_churn','milking_stool','nesting_box_egg',
+                'cheese_rack','wooden_fence_segment','fence_gate_farm'] },
+    ],
+  },
   { id: 'stairs',     icon: '🪜', label: 'Treppen',
     types: ['stairs_down', 'stairs_wood_up', 'stairs_wood_down',
             'stairs_stone_up', 'stairs_stone_down'] },
@@ -300,6 +313,13 @@ const STRUCTURE = {
   ruin_pillar:   { key: '', name: 'Säule',       icon: '🏛️', blocking: true,  sprite: 'prop_ruin_pillar' },
   rubble:        { key: '', name: 'Trümmer',     icon: '⛏️', blocking: false, sprite: 'prop_rubble' },
   statue_broken: { key: '', name: 'Statue',      icon: '🗿', blocking: true,  sprite: 'prop_statue_broken' },
+  // Welle 23 — Gilden + Tempel + Quest-Board (Capital/Town-Distrikte)
+  mage_guild:     { key: '', name: 'Magiergilde',    icon: '🔮', blocking: true,  sprite: 'struct_mage_guild',     notBuildable: true },
+  fighters_guild: { key: '', name: 'Kriegergilde',   icon: '⚔️', blocking: true,  sprite: 'struct_fighters_guild', notBuildable: true },
+  healers_guild:  { key: '', name: 'Heilergilde',    icon: '⚕️', blocking: true,  sprite: 'struct_healers_guild',  notBuildable: true },
+  thieves_guild:  { key: '', name: 'Diebesgilde',    icon: '🗝️', blocking: true,  sprite: 'struct_thieves_guild',  notBuildable: true },
+  temple:         { key: '', name: 'Tempel',         icon: '🛐', blocking: true,  sprite: 'struct_temple',         notBuildable: true },
+  quest_board:    { key: '', name: 'Aufgabentafel',  icon: '📜', blocking: true,  sprite: 'struct_quest_board' },
   // Neue Welt-Deko (Welle 11)
   camp_tent:     { key: '', name: 'Zelt',        icon: '⛺', blocking: false, sprite: 'prop_camp_tent' },
   cooking_pot:   { key: '', name: 'Kochtopf',    icon: '🍲', blocking: false, sprite: 'prop_cooking_pot' },
@@ -329,6 +349,36 @@ const STRUCTURE = {
   corn_plant:     { key:'', name:'Maisfeld',        icon:'🌽', blocking:false, sprite:'prop_corn_plant' },
   wheat_seedling: { key:'', name:'Weizenkeimling',  icon:'🌱', blocking:false, sprite:'prop_wheat_seedling' },
   wheat_grown:    { key:'', name:'Weizenfeld',      icon:'🌾', blocking:false, sprite:'prop_wheat_grown' },
+  // — Asset-Drop 2026-05-27b: Farm-Gebäude (groß, baubar) —
+  barn_large:           { key:'', name:'Große Scheune',     icon:'🏚️', blocking:true,  sprite:'farm_barn_large' },
+  barn_small:           { key:'', name:'Kleine Scheune',    icon:'🏚️', blocking:true,  sprite:'farm_barn_small' },
+  cow_shed:             { key:'', name:'Kuhstall',          icon:'🐄', blocking:true,  sprite:'farm_cow_shed' },
+  pigsty:               { key:'', name:'Schweinestall',     icon:'🐖', blocking:true,  sprite:'farm_pigsty' },
+  henhouse:             { key:'', name:'Hühnerstall',       icon:'🐔', blocking:true,  sprite:'farm_henhouse' },
+  goat_pen:             { key:'', name:'Ziegengehege',      icon:'🐐', blocking:true,  sprite:'farm_goat_pen' },
+  sheepfold:            { key:'', name:'Schafstall',        icon:'🐑', blocking:true,  sprite:'farm_sheepfold' },
+  stable:               { key:'', name:'Pferdestall',       icon:'🐎', blocking:true,  sprite:'farm_stable' },
+  dovecote:             { key:'', name:'Taubenschlag',      icon:'🕊️', blocking:true,  sprite:'farm_dovecote' },
+  dairy_house:          { key:'', name:'Milchhaus',         icon:'🥛', blocking:true,  sprite:'farm_dairy_house' },
+  granary:              { key:'', name:'Kornspeicher',      icon:'🌾', blocking:true,  sprite:'farm_granary' },
+  hayloft:              { key:'', name:'Heuboden',          icon:'🌾', blocking:true,  sprite:'farm_hayloft' },
+  smokehouse:           { key:'', name:'Räucherhaus',       icon:'💨', blocking:true,  sprite:'farm_smokehouse' },
+  cart_shed:             { key:'', name:'Wagenschuppen',     icon:'🛒', blocking:true,  sprite:'farm_cart_shed' },
+  duck_pond:            { key:'', name:'Ententeich',        icon:'🦆', blocking:false, sprite:'farm_duck_pond' },
+  goose_pasture_marker: { key:'', name:'Gänseweide',        icon:'🪧', blocking:false, sprite:'farm_goose_pasture_marker' },
+  // Farm-Props (klein)
+  feed_trough:          { key:'', name:'Futtertrog',        icon:'🥕', blocking:true,  sprite:'farm_feed_trough' },
+  water_trough:         { key:'', name:'Wassertrog',        icon:'💧', blocking:true,  sprite:'farm_water_trough' },
+  hay_bale:             { key:'', name:'Heuballen',         icon:'🌾', blocking:true,  sprite:'farm_hay_bale' },
+  hay_stack:            { key:'', name:'Heuhaufen',         icon:'🌾', blocking:true,  sprite:'farm_hay_stack' },
+  straw_bale:           { key:'', name:'Strohballen',       icon:'🌾', blocking:true,  sprite:'farm_straw_bale' },
+  cheese_press:         { key:'', name:'Käsepresse',        icon:'🧀', blocking:true,  sprite:'farm_cheese_press' },
+  butter_churn:         { key:'', name:'Butterfass',        icon:'🧈', blocking:true,  sprite:'farm_butter_churn' },
+  milking_stool:        { key:'', name:'Melkschemel',       icon:'🪑', blocking:false, sprite:'farm_milking_stool' },
+  nesting_box_egg:      { key:'', name:'Nistkasten',        icon:'🥚', blocking:false, sprite:'farm_nesting_box_egg' },
+  cheese_rack:          { key:'', name:'Käseregal',         icon:'🧀', blocking:true,  sprite:'farm_cheese_rack' },
+  wooden_fence_segment: { key:'', name:'Holzzaun-Segment',  icon:'🚧', blocking:true,  sprite:'farm_wooden_fence_segment' },
+  fence_gate_farm:      { key:'', name:'Farm-Zauntor',      icon:'🚪', blocking:true,  sprite:'farm_fence_gate' },
 };
 // Welle 51 — Sign-Strukturen generiert aus SIGN_VARIANTS, damit die UI sie
 // als reguläre baubare Strukturen behandelt (selectStructure → place_structure).
@@ -715,6 +765,36 @@ const NPC_SPRITE = {
   scribe:      { sprite: 'npc_scribe',           tint: 0xffffff, label: 'Schreiber' },
   tailor:      { sprite: 'npc_tailor',           tint: 0xffffff, label: 'Schneider' },
   woodcutter:  { sprite: 'npc_woodcutter',       tint: 0xffffff, label: 'Holzfäller' },
+  // ─── Asset-Drop 2026-05-27b: Nutztiere (Livestock + Poultry) ───────────
+  cow:           { sprite: 'animal_cow',            tint: 0xffffff, label: 'Kuh' },
+  bull:          { sprite: 'animal_bull',           tint: 0xffffff, label: 'Stier' },
+  calf:          { sprite: 'animal_calf',           tint: 0xffffff, label: 'Kalb' },
+  ox:            { sprite: 'animal_ox',             tint: 0xffffff, label: 'Ochse' },
+  sheep:         { sprite: 'animal_sheep',          tint: 0xffffff, label: 'Schaf' },
+  ram:           { sprite: 'animal_ram',            tint: 0xffffff, label: 'Widder' },
+  lamb:          { sprite: 'animal_lamb',           tint: 0xffffff, label: 'Lamm' },
+  sheared_sheep: { sprite: 'animal_sheared_sheep',  tint: 0xffffff, label: 'Geschorenes Schaf' },
+  pig:           { sprite: 'animal_pig',            tint: 0xffffff, label: 'Schwein' },
+  piglet:        { sprite: 'animal_piglet',         tint: 0xffffff, label: 'Ferkel' },
+  boar_domestic: { sprite: 'animal_boar_domestic',  tint: 0xffffff, label: 'Eber' },
+  goat:          { sprite: 'animal_goat',           tint: 0xffffff, label: 'Ziege' },
+  buck_goat:     { sprite: 'animal_buck_goat',      tint: 0xffffff, label: 'Ziegenbock' },
+  kid_goat:      { sprite: 'animal_kid_goat',       tint: 0xffffff, label: 'Zicklein' },
+  horse:         { sprite: 'animal_horse',          tint: 0xffffff, label: 'Pferd' },
+  draft_horse:   { sprite: 'animal_draft_horse',    tint: 0xffffff, label: 'Kaltblut' },
+  foal:          { sprite: 'animal_foal',           tint: 0xffffff, label: 'Fohlen' },
+  donkey:        { sprite: 'animal_donkey',         tint: 0xffffff, label: 'Esel' },
+  mule:          { sprite: 'animal_mule',           tint: 0xffffff, label: 'Maultier' },
+  // Geflügel
+  chicken_hen:   { sprite: 'animal_chicken_hen',    tint: 0xffffff, label: 'Henne' },
+  rooster:       { sprite: 'animal_rooster',        tint: 0xffffff, label: 'Hahn' },
+  chick:         { sprite: 'animal_chick',          tint: 0xffffff, label: 'Küken' },
+  duck:          { sprite: 'animal_duck',           tint: 0xffffff, label: 'Ente' },
+  drake:         { sprite: 'animal_drake',          tint: 0xffffff, label: 'Erpel' },
+  duckling:      { sprite: 'animal_duckling',       tint: 0xffffff, label: 'Entenküken' },
+  goose:         { sprite: 'animal_goose',          tint: 0xffffff, label: 'Gans' },
+  gander:        { sprite: 'animal_gander',         tint: 0xffffff, label: 'Ganter' },
+  gosling:       { sprite: 'animal_gosling',        tint: 0xffffff, label: 'Gänseküken' },
   // ─── Hostile Humans (Räuber-Typen) ─────────────────────────────────────
   // Nutzen Character-Sprites aus /assets/characters/npcs/ (nicht monster_*),
   // weil es Menschen sind. variant kann Waffen-Variante (bandit_axe etc.)
@@ -803,8 +883,11 @@ const CREATURE_KINDS = new Set([
 // Nicht enthalten: farmer + merchant (alter Top-Down-Stil, nicht kompatibel mit
 // neuem Front-View aus /npcs/), neue Rollen (baker, bard, ...) ohne Animation.
 const ANIMATED_NPC_KINDS = [
-  'bandit', 'blacksmith', 'guard', 'healer',
-  'mage', 'quest_giver', 'soldier', 'villager',
+  // Welle 23 — alle character-Animations die Front-View sind (refreshed
+  // im upstream-Commit 4d2af6e). villager_male/_female bleiben raus,
+  // weil noch im alten Top-Down-Stil.
+  'bandit', 'blacksmith', 'farmer', 'guard', 'healer',
+  'mage', 'merchant', 'quest_giver', 'soldier', 'villager',
 ];
 const ANIMATED_MONSTER_KINDS = [
   // bandit raus — nutzt characters/bandit/ via ANIMATED_NPC_KINDS für Stil-Konsistenz
@@ -942,6 +1025,44 @@ const ITEM = {
   copper_coin:   { name: 'Kupfermünze', sprite: 'item_copper_coin',   category: 'resource',                       path: '/assets/currency/coin_copper.png' },
   silver_coin:   { name: 'Silbermünze', sprite: 'item_silver_coin',   category: 'resource',                       path: '/assets/currency/coin_silver.png' },
   gold_coin:     { name: 'Goldmünze',   sprite: 'item_gold_coin',     category: 'resource',                       path: '/assets/currency/coin_gold.png' },
+  // — Asset-Drop 2026-05-27b: Animal-Products —
+  wool_fleece:     { name: 'Wollvlies',       sprite: 'item_wool_fleece',     category: 'resource', path: '/assets/resources/animal_products/wool_fleece.png' },
+  wool_shearing:   { name: 'Schurwolle',      sprite: 'item_wool_shearing',   category: 'resource', path: '/assets/resources/animal_products/wool_shearing_bundle.png' },
+  wool_cloth_roll: { name: 'Wollstoff-Rolle', sprite: 'item_wool_cloth_roll', category: 'resource', path: '/assets/resources/animal_products/wool_cloth_roll.png' },
+  yarn_ball:       { name: 'Wollknäuel',      sprite: 'item_yarn_ball',       category: 'resource', path: '/assets/resources/animal_products/yarn_ball.png' },
+  hide_raw:        { name: 'Rohe Tierhaut',   sprite: 'item_hide_raw',        category: 'resource', path: '/assets/resources/animal_products/hide_raw.png' },
+  leather_bundle:  { name: 'Leder-Bündel',    sprite: 'item_leather_bundle',  category: 'resource', path: '/assets/resources/animal_products/leather_bundle.png' },
+  feathers:        { name: 'Federn',          sprite: 'item_feathers',        category: 'resource', path: '/assets/resources/animal_products/feathers.png' },
+  manure:          { name: 'Mist',            sprite: 'item_manure',          category: 'resource', path: '/assets/resources/animal_products/manure_pile.png' },
+  wax_block:       { name: 'Wachsblock',      sprite: 'item_wax_block',       category: 'resource', path: '/assets/resources/animal_products/wax_block.png' },
+  candle_bundle:   { name: 'Kerzen-Bündel',   sprite: 'item_candle_bundle',   category: 'resource', path: '/assets/resources/animal_products/candle_bundle.png' },
+  feed_sack:       { name: 'Futter-Sack',     sprite: 'item_feed_sack',       category: 'resource', path: '/assets/resources/animal_products/feed_sack.png' },
+  animal_bedding:  { name: 'Tierstreu',       sprite: 'item_animal_bedding',  category: 'resource', path: '/assets/resources/animal_products/animal_bedding_straw.png' },
+  // — Asset-Drop 2026-05-27b: Dairy / Processed Food —
+  milk_bucket:   { name: 'Eimer Milch',     sprite: 'item_milk_bucket',   category: 'food', path: '/assets/food/dairy/milk_bucket.png' },
+  milk_jug:      { name: 'Milch-Krug',      sprite: 'item_milk_jug',      category: 'food', path: '/assets/food/dairy/milk_jug.png' },
+  cream_bowl:    { name: 'Sahne',           sprite: 'item_cream_bowl',    category: 'food', path: '/assets/food/dairy/cream_bowl.png' },
+  curds_bowl:    { name: 'Quark',           sprite: 'item_curds_bowl',    category: 'food', path: '/assets/food/dairy/curds_bowl.png' },
+  butter_pat:    { name: 'Butter',          sprite: 'item_butter_pat',    category: 'food', path: '/assets/food/dairy/butter_pat.png' },
+  cheese_wedge:  { name: 'Käsestück',       sprite: 'item_cheese_wedge',  category: 'food', path: '/assets/food/dairy/cheese_wedge.png' },
+  cheese_wheel:  { name: 'Käserad',         sprite: 'item_cheese_wheel',  category: 'food', path: '/assets/food/dairy/cheese_wheel.png' },
+  egg:           { name: 'Ei',              sprite: 'item_egg',           category: 'food', path: '/assets/food/dairy/egg.png' },
+  egg_basket:    { name: 'Eier-Korb',       sprite: 'item_egg_basket',    category: 'food', path: '/assets/food/dairy/egg_basket.png' },
+  flour_sack:    { name: 'Mehl-Sack',       sprite: 'item_flour_sack',    category: 'resource', path: '/assets/food/processed/flour_sack.png' },
+  grain_sack:    { name: 'Getreide-Sack',   sprite: 'item_grain_sack',    category: 'resource', path: '/assets/food/processed/grain_sack.png' },
+  oat_sack:      { name: 'Hafer-Sack',      sprite: 'item_oat_sack',      category: 'resource', path: '/assets/food/processed/oat_sack.png' },
+  salt_bag:      { name: 'Salz-Beutel',     sprite: 'item_salt_bag',      category: 'resource', path: '/assets/food/processed/salt_bag.png' },
+  lard_pot:      { name: 'Schmalztopf',     sprite: 'item_lard_pot',      category: 'food',     path: '/assets/food/processed/lard_pot.png' },
+  salted_meat:   { name: 'Pökelfleisch',    sprite: 'item_salted_meat',   category: 'food',     path: '/assets/food/processed/salted_meat.png' },
+  smoked_meat:   { name: 'Räucherfleisch',  sprite: 'item_smoked_meat',   category: 'food',     path: '/assets/food/processed/smoked_meat.png' },
+  sausage:       { name: 'Wurst',           sprite: 'item_sausage',       category: 'food',     path: '/assets/food/processed/sausage.png' },
+  dried_fish:    { name: 'Trockenfisch',    sprite: 'item_dried_fish',    category: 'food',     path: '/assets/food/processed/dried_fish_bundle.png' },
+  honey_jar:     { name: 'Honigglas',       sprite: 'item_honey_jar',     category: 'food',     path: '/assets/food/processed/honey_jar.png' },
+  animal_feed:   { name: 'Tierfutter',      sprite: 'item_animal_feed',   category: 'resource', path: '/assets/food/processed/animal_feed.png' },
+  cheese_crate:  { name: 'Käse-Kiste',      sprite: 'item_cheese_crate',  category: 'resource', path: '/assets/food/processed/cheese_crate.png' },
+  // — Asset-Drop 2026-05-27b: Neue Werkzeuge —
+  pitchfork:     { name: 'Heugabel',        sprite: 'item_pitchfork',     category: 'tool', slot: 'tool', path: '/assets/tools/pitchfork.png' },
+  rope_coil:     { name: 'Seil-Rolle',      sprite: 'item_rope_coil',     category: 'resource',          path: '/assets/tools/rope_coil.png' },
 };
 const EQUIP_SLOTS = [
   { key: 'weapon',     label: 'Waffe' },
@@ -1455,6 +1576,15 @@ class WorldScene extends Phaser.Scene {
     this.load.image('struct_spike_trap',  '/assets/traps/spike_trap.png');
     this.load.image('struct_poison_trap', '/assets/traps/poison_trap.png');
     this.load.image('struct_stairs_down', '/assets/dungeons/stairs_down.png');
+    // Welle 23 — Gilden + Tempel + Quest-Board (Sprites fehlen noch in
+    // assets/, daher als Platzhalter andere Structure-Sprites recycled).
+    // Sobald echte Sprites da sind: hier Pfade auf eigene Files umstellen.
+    this.load.image('struct_mage_guild',     '/assets/structures/workbench.png');
+    this.load.image('struct_fighters_guild', '/assets/structures/anvil.png');
+    this.load.image('struct_healers_guild',  '/assets/structures/bed.png');
+    this.load.image('struct_thieves_guild',  '/assets/structures/chest.png');
+    this.load.image('struct_temple',         '/assets/structures/well.png');
+    this.load.image('struct_quest_board',    '/assets/structures/marker.png');
 
     // Deko-Props — Default-Pfade aus /assets/props/<cat>/.
     for (const p of ['tree_oak','tree_pine','tree_dead','tree_stump','fallen_log',
@@ -1510,6 +1640,19 @@ class WorldScene extends Phaser.Scene {
     for (const p of ['apple_tree','pear_tree','plum_tree','cherry_tree']) {
       this.load.image(`prop_${p}`, `/assets/props/orchard/${p}.png`);
     }
+    // Asset-Drop 2026-05-27b: Farm-Gebäude + Farm-Props (16 Gebäude + 12 Props).
+    // Sprite-Key: farm_<kind>, Pfade aus assets/structures/farm/.
+    for (const f of ['barn_large','barn_small','cow_shed','pigsty','henhouse',
+                     'goat_pen','sheepfold','stable','dovecote','dairy_house',
+                     'granary','hayloft','smokehouse','cart_shed',
+                     'duck_pond','goose_pasture_marker',
+                     'feed_trough','water_trough','hay_bale','hay_stack','straw_bale',
+                     'cheese_press','butter_churn','milking_stool','nesting_box_egg',
+                     'cheese_rack','wooden_fence_segment']) {
+      this.load.image(`farm_${f}`, `/assets/structures/farm/${f}.png`);
+    }
+    // fence_gate_farm hat einen abweichenden Filename
+    this.load.image('farm_fence_gate', '/assets/structures/farm/fence_gate_farm.png');
     for (const p of ['swamp_bubbles','swamp_log']) {
       this.load.image(`prop_${p}`, `/assets/props/biomes/swamp/${p}.png`);
     }
@@ -1642,6 +1785,19 @@ class WorldScene extends Phaser.Scene {
                      'soldier_axe','soldier_spear','soldier_sword_shield',
                      'watchman_crossbow','watchman_lantern']) {
       this.load.image(`npc_${v}`, `/assets/characters/npcs/variants/${v}.png`);
+    }
+    // Asset-Drop 2026-05-27b: Nutztiere (Livestock + Poultry).
+    // Sprite-Key: animal_<kind>, Pfade aus assets/animals/{livestock,poultry}/.
+    for (const a of ['cow','bull','calf','ox','sheep','ram','lamb','sheared_sheep',
+                     'pig','piglet','boar_domestic',
+                     'goat','buck_goat','kid_goat',
+                     'horse','draft_horse','foal','donkey','mule']) {
+      this.load.image(`animal_${a}`, `/assets/animals/livestock/${a}.png`);
+    }
+    for (const a of ['chicken_hen','rooster','chick',
+                     'duck','drake','duckling',
+                     'goose','gander','gosling']) {
+      this.load.image(`animal_${a}`, `/assets/animals/poultry/${a}.png`);
     }
 
     // Items (Waffen, Rüstung, Schmuck, Consumables, Resources)

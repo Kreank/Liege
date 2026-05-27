@@ -89,6 +89,18 @@ NPC_HP_BY_KIND = {
     "cat":           8,
     "dog":           15,
     "child":         20,
+    # Asset-Drop 2026-05-27b: Nutztiere (friendly, passiv)
+    "cow":             80, "bull":          110, "calf":          25,
+    "ox":             120, "sheep":          40, "ram":           55,
+    "lamb":            18, "sheared_sheep":  35, "pig":           60,
+    "piglet":          15, "boar_domestic":  75, "goat":          35,
+    "buck_goat":       50, "kid_goat":       15, "horse":         85,
+    "draft_horse":    110, "foal":           25, "donkey":        65,
+    "mule":            80,
+    # Geflügel — leicht
+    "chicken_hen":      8, "rooster":        12, "chick":          3,
+    "duck":            10, "drake":          12, "duckling":       3,
+    "goose":           18, "gander":         22, "gosling":        4,
     # — Welle 14 — professional monster asset-drop (2026-05-26b) —
     # Vermin / Larva (15–35 HP)
     "razorback_vermin":      20,
