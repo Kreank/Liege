@@ -483,8 +483,13 @@ async def _find_nearby_walkable(world, cx: int, cy: int, radius: int = 3) -> tup
 
 
 async def spawn_one(world, npc_manager, connection_manager, kind: str | None = None,
-                    at: tuple[int, int] | None = None) -> dict | None:
+                    at: tuple[int, int] | None = None,
+                    structure_manager=None) -> dict | None:
     kind = kind or random.choice(NPC_KINDS)
+    # Welle 23: Safe-Zone-Schutz auch für hostile creatures in spawn_one
+    # — gilt nur wenn structure_manager mitgegeben wird (initial_spawn/respawn).
+    is_hostile = kind in CREATURE_KINDS
+    pass_safe_zone = (structure_manager is not None) and is_hostile
     try:
         raw = await llm.slow_brain(_identity_prompt(kind), system=IDENTITY_SYSTEM, json_mode=True)
         data = json.loads(raw)
@@ -502,7 +507,13 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
         x, y = at
     else:
         biomes = (CREATURE_SPAWN_PROFILE.get(kind) or {}).get("biomes")
-        pos = await _find_spawn_position(world, connection_manager, biomes=biomes, strict=True)
+        # Welle 23: Safe-Zones gelten für hostile creatures. Friendly NPCs
+        # dürfen IM Dorf spawnen (das ist ja ihr Zuhause).
+        pos = await _find_spawn_position(
+            world, connection_manager, biomes=biomes, strict=True,
+            structure_manager=structure_manager if pass_safe_zone else None,
+            npc_manager=npc_manager if pass_safe_zone else None,
+        )
         if pos is None:
             log.info("Spawn-Skip: kein passendes Biome für %s erreichbar", kind)
             return None
@@ -632,13 +643,17 @@ async def respawn_loop(world, npc_manager, connection_manager,
             log.exception("Creature-Respawn-Iteration fehlgeschlagen")
 
 
-async def initial_spawn(world, npc_manager, connection_manager) -> None:
+async def initial_spawn(world, npc_manager, connection_manager,
+                          structure_manager=None) -> None:
     """Spawnt INITIAL_NPC_COUNT NPCs, falls die Welt noch keine hat.
-    Mischt friendly + creatures je ~50/50."""
+    Mischt friendly + creatures je ~50/50.
+    Welle 23: structure_manager mitgeben damit hostile creatures NICHT
+    in Settlement-Safe-Zones gespawnt werden."""
     if npc_manager.count() > 0:
         log.info("NPCs bereits vorhanden (%d) — kein Initial-Spawn", npc_manager.count())
         return
-    log.info("Spawne %d initiale NPCs …", INITIAL_NPC_COUNT)
+    log.info("Spawne %d initiale NPCs (safe_zones=%s) …",
+             INITIAL_NPC_COUNT, "on" if structure_manager else "off")
     half = max(1, INITIAL_NPC_COUNT // 2)
     kinds = (
         random.sample(FRIENDLY_KINDS, min(half, len(FRIENDLY_KINDS)))
@@ -646,7 +661,8 @@ async def initial_spawn(world, npc_manager, connection_manager) -> None:
     )
     random.shuffle(kinds)
     for kind in kinds:
-        await spawn_one(world, npc_manager, connection_manager, kind=kind)
+        await spawn_one(world, npc_manager, connection_manager, kind=kind,
+                          structure_manager=structure_manager)
     log.info("Initial-Spawn fertig.")
 
 

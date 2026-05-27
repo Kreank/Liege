@@ -127,7 +127,7 @@ async def lifespan(app: FastAPI):
                                 structures_mgr=structures)
     )
     item_task = asyncio.create_task(item_worker.run(world, items, manager))
-    spawn_task = asyncio.create_task(npc_worker.initial_spawn(world, npcs, manager))
+    spawn_task = asyncio.create_task(npc_worker.initial_spawn(world, npcs, manager, structures))
     respawn_task = asyncio.create_task(npc_worker.respawn_loop(world, npcs, manager, structures))
     farm_task = asyncio.create_task(farm_worker.run(items, manager))
     world_respawn_task = asyncio.create_task(respawn_worker.run(world, structures, manager))
