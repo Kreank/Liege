@@ -235,6 +235,52 @@ async def _can_place(structure_manager, world, x: int, y: int) -> bool:
     return True
 
 
+# Welle 24 — Settlement-Building-Spec (siehe docu/VILLAGE_LAYOUT_SPEC.md)
+SETTLEMENT_STRUCT_TYPES = {
+    "wall", "floor", "door_wood", "door_iron", "door_stone",
+    "door_wood_open", "door_iron_open", "door_stone_open",
+    "door_reinforced", "bed", "chest", "anvil", "furnace", "workbench",
+    "well", "campfire", "path", "quest_board", "cooking_pot",
+    "spike_trap", "poison_trap", "farm_plot",
+}
+
+
+def _door_kind_for(house_type: str, material: str = "wood") -> str:
+    """Welche Tür-Art für welches Haus."""
+    if house_type == "smithy":
+        return "door_iron"
+    if house_type in ("temple", "mage_guild", "healers_guild",
+                       "fighters_guild", "thieves_guild"):
+        return "door_stone"
+    return "door_wood"
+
+
+def _floor_material(material: str) -> str:
+    return "stone" if material == "stone" else "wood"
+
+
+async def _cleanup_footprint(structure_manager, x0: int, y0: int,
+                              w: int, h: int, padding: int = 1) -> int:
+    """Entfernt alle Nicht-Settlement-Strukturen im Bereich
+    (x0-padding, y0-padding) bis (x0+w+padding, y0+h+padding).
+    Returns Anzahl entfernter Structures."""
+    removed = 0
+    for dx in range(-padding, w + padding):
+        for dy in range(-padding, h + padding):
+            x, y = x0 + dx, y0 + dy
+            existing = structure_manager.at(x, y)
+            if existing is None:
+                continue
+            if existing["type"] in SETTLEMENT_STRUCT_TYPES:
+                continue   # Settlement-Struct bleibt
+            try:
+                await structure_manager.remove(x, y)
+                removed += 1
+            except Exception:
+                pass
+    return removed
+
+
 def _bounding_box(tiles: list[tuple[int, int]]) -> tuple[int, int, int, int]:
     xs = [t[0] for t in tiles]
     ys = [t[1] for t in tiles]
@@ -246,12 +292,22 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
                        house_type: str, material: str) -> tuple[list[dict], list[dict]]:
     """Platziert ein Haus an (origin_x, origin_y) als linke obere Ecke der Wand.
     Returns (placed_structures, spawned_npcs).
+
+    Welle 24 (siehe docu/VILLAGE_LAYOUT_SPEC.md):
+    1. Cleanup-Footprint (Deko entfernen)
+    2. Türposition entscheiden
+    3. Wände komplett (außer Tür)
+    4. Tür als door_<material>
+    5. Boden auf allen Innen-Tiles
+    6. Tür-Vor-Zone (innen) als occupied markieren bevor Möbel kommen
+    7. Möbel via _try_place
     """
     placed: list[dict] = []
     spawned_npcs: list[dict] = []
     width = inner_w + 2   # mit Außenwänden
     height = inner_h + 2
 
+    # Eck-Tiles dürfen NIE Tür sein — randint(1, inner_w/h) hält das ein.
     # Tür zufällig wählen (an einer der 4 Seiten) — bevorzugt Süd
     door_side = random.choices(
         ["south", "north", "east", "west"], weights=[55, 15, 15, 15],
@@ -269,7 +325,17 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
         door_dy = random.randint(1, inner_h)
         door_x, door_y = origin_x, origin_y + door_dy
 
-    # Wände + Boden
+    # 1) Cleanup vor Wand-Placement: Deko aus Hausbox + 1 Tile Clearance raus
+    try:
+        await _cleanup_footprint(structure_manager, origin_x, origin_y,
+                                   width, height, padding=1)
+    except Exception:
+        log.exception("Cleanup-Footprint fehlgeschlagen für %s", house_type)
+
+    door_kind = _door_kind_for(house_type, material)
+    floor_mat = _floor_material(material)
+
+    # 2-4) Wände + Tür + Boden
     for ly in range(height):
         for lx in range(width):
             x = origin_x + lx
@@ -277,25 +343,42 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
             is_edge = (lx == 0 or lx == width - 1 or ly == 0 or ly == height - 1)
             is_door = (x == door_x and y == door_y)
             if is_door:
-                # Tür-Öffnung: lass Floor liegen (kein Wall)
+                # Tür: door_<material>-Struct statt floor
                 if await _can_place(structure_manager, world, x, y):
-                    s = await structure_manager.place(x, y, "floor", "system",
+                    s = await structure_manager.place(x, y, door_kind, "system",
                                                        material=material, durability=15)
                     if s: placed.append(s)
                 continue
-            kind = "wall" if is_edge else "floor"
-            dur = 25 if kind == "wall" else 12
-            if not await _can_place(structure_manager, world, x, y):
-                continue
-            s = await structure_manager.place(x, y, kind, "system",
-                                               material=material, durability=dur)
-            if s: placed.append(s)
+            if is_edge:
+                # Wand
+                if not await _can_place(structure_manager, world, x, y):
+                    continue
+                s = await structure_manager.place(x, y, "wall", "system",
+                                                   material=material, durability=25)
+                if s: placed.append(s)
+            else:
+                # Innen-Tile → Boden
+                if not await _can_place(structure_manager, world, x, y):
+                    continue
+                s = await structure_manager.place(x, y, "floor", "system",
+                                                   material=floor_mat, durability=12)
+                if s: placed.append(s)
 
     # Inneneinrichtung — pro Haus-Typ
     inner_x = origin_x + 1
     inner_y = origin_y + 1
     # Schon-belegt-Tracking innerhalb des Hauses
     occupied: set[tuple[int, int]] = set()
+    # Welle 24: Tür-Vor-Zone (Innen-Tile direkt an der Tür) MUSS frei bleiben,
+    # damit NPCs durch die Tür passen. Vor _try_place als occupied markieren.
+    if door_side == "south":
+        occupied.add((door_x, door_y - 1))
+    elif door_side == "north":
+        occupied.add((door_x, door_y + 1))
+    elif door_side == "east":
+        occupied.add((door_x - 1, door_y))
+    else:  # west
+        occupied.add((door_x + 1, door_y))
 
     async def _try_place(rx: int, ry: int, kind: str, dur: int = 8):
         x, y = inner_x + rx, inner_y + ry
