@@ -1,0 +1,282 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "original_arcane_weapon_pack_inspired_2026_05_27",
+  "policy": "additive pack only; no existing assets replaced; local Vorlagen used only as non-copied inspiration for quality and magic-weapon category",
+  "source_sheet": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/source_sheets/arcane_weapon_sheet_alpha.png",
+  "source_chromakey": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/source_sheets/arcane_weapon_sheet_chromakey.png",
+  "count": 16,
+  "items": [
+    {
+      "id": "frost_crystal_staff",
+      "name": "Frost Crystal Staff",
+      "game_kind_hint": "staff",
+      "description": "icy blue crystal battle staff",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/frost_crystal_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/frost_crystal_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/frost_crystal_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/frost_crystal_staff.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "sun_reliquary_staff",
+      "name": "Sun Reliquary Staff",
+      "game_kind_hint": "staff",
+      "description": "gold sunburst reliquary staff",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/sun_reliquary_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/sun_reliquary_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/sun_reliquary_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/sun_reliquary_staff.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "pale_moon_wand",
+      "name": "Pale Moon Wand",
+      "game_kind_hint": "wand",
+      "description": "crescent moon wand with lunar orb",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/pale_moon_wand.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/pale_moon_wand.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/pale_moon_wand.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/pale_moon_wand.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "brass_oracle_scepter",
+      "name": "Brass Oracle Scepter",
+      "game_kind_hint": "wand",
+      "description": "brass ring scepter with pearl focus",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/brass_oracle_scepter.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/brass_oracle_scepter.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/brass_oracle_scepter.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/brass_oracle_scepter.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "living_thorn_staff",
+      "name": "Living Thorn Staff",
+      "game_kind_hint": "staff",
+      "description": "living thorn druid staff with green core",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/living_thorn_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/living_thorn_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/living_thorn_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/living_thorn_staff.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "dawnstar_cleric_mace",
+      "name": "Dawnstar Cleric Mace",
+      "game_kind_hint": "mace",
+      "description": "cleric mace-staff with radiant head",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/dawnstar_cleric_mace.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/dawnstar_cleric_mace.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/dawnstar_cleric_mace.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/dawnstar_cleric_mace.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "void_smoke_war_staff",
+      "name": "Void Smoke War Staff",
+      "game_kind_hint": "staff",
+      "description": "blackened staff with violet smoky focus",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/void_smoke_war_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/void_smoke_war_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/void_smoke_war_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/void_smoke_war_staff.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "turquoise_rune_staff",
+      "name": "Turquoise Rune Staff",
+      "game_kind_hint": "staff",
+      "description": "turquoise jewel staff with hanging charms",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/turquoise_rune_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/turquoise_rune_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/turquoise_rune_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/turquoise_rune_staff.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "bone_eye_necromancer_staff",
+      "name": "Bone Eye Necromancer Staff",
+      "game_kind_hint": "staff",
+      "description": "bone necromancer staff with eye focus",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/bone_eye_necromancer_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/bone_eye_necromancer_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/bone_eye_necromancer_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/bone_eye_necromancer_staff.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "amethyst_root_wand",
+      "name": "Amethyst Root Wand",
+      "game_kind_hint": "wand",
+      "description": "root wand with amethyst crystal",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/amethyst_root_wand.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/amethyst_root_wand.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/amethyst_root_wand.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/amethyst_root_wand.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "twisted_black_iron_wand",
+      "name": "Twisted Black Iron Wand",
+      "game_kind_hint": "wand",
+      "description": "twisted black iron wand with purple prism",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/twisted_black_iron_wand.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/twisted_black_iron_wand.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/twisted_black_iron_wand.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/twisted_black_iron_wand.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "violet_orb_focus_staff",
+      "name": "Violet Orb Focus Staff",
+      "game_kind_hint": "staff",
+      "description": "dark staff with violet orb focus",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/violet_orb_focus_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/violet_orb_focus_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/violet_orb_focus_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/violet_orb_focus_staff.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "antler_blossom_witch_staff",
+      "name": "Antler Blossom Witch Staff",
+      "game_kind_hint": "staff",
+      "description": "antler staff with white blossoms",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/antler_blossom_witch_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/antler_blossom_witch_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/antler_blossom_witch_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/antler_blossom_witch_staff.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 3
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "green_seedling_wand",
+      "name": "Green Seedling Wand",
+      "game_kind_hint": "wand",
+      "description": "green seedling wand with leaf guard",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/green_seedling_wand.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/green_seedling_wand.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/green_seedling_wand.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/green_seedling_wand.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 3
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "ember_priest_rod",
+      "name": "Ember Priest Rod",
+      "game_kind_hint": "wand",
+      "description": "ember priest rod with orange crystal",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/ember_priest_rod.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/ember_priest_rod.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/ember_priest_rod.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/ember_priest_rod.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 3
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "blue_arcane_axe_staff",
+      "name": "Blue Arcane Axe Staff",
+      "game_kind_hint": "staff",
+      "description": "arcane axe-staff with blue runes",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/masters_512/blue_arcane_axe_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_256/blue_arcane_axe_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_128/blue_arcane_axe_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_arcane_2026_05_27/icons_64/blue_arcane_axe_staff.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 3
+      },
+      "originality_note": "Generated as a new original design; local Vorlagen were used only as broad quality inspiration, not copied or cropped."
+    }
+  ]
+}

@@ -1,0 +1,4611 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "legacy_33_monster_world_sprites_walk8",
+  "policy": "additive pack; existing Welle-14 and legacy files left untouched; Vorlagen used only as non-copied inspiration",
+  "style_reference": "Welle-14 world_sprites/reference_based 96px tokens such as razorback_vermin",
+  "count_kinds": 35,
+  "count_items": 420,
+  "kinds": [
+    "goblin",
+    "wolf",
+    "skeleton",
+    "spider",
+    "slime",
+    "rat",
+    "bat",
+    "zombie",
+    "bandit",
+    "robber",
+    "thief",
+    "boar",
+    "bear",
+    "stag",
+    "lynx",
+    "cougar",
+    "wolverine",
+    "dire_wolf",
+    "wolf_alpha",
+    "cave_bear",
+    "polar_bear",
+    "crocodile",
+    "cobra",
+    "slimelet",
+    "fae_mite",
+    "gloom_moth",
+    "ember_newt",
+    "ember_rat",
+    "shadow_bat",
+    "thorn_scarab",
+    "crystal_beetle",
+    "crystal_tick",
+    "frost_sprite",
+    "fire_imp",
+    "mushroom_imp"
+  ],
+  "source_sheets": [
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_chromakey.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_chromakey.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_chromakey.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+    "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_chromakey.png"
+  ],
+  "contacts": [
+    "assets/monsters/world_sprites/legacy_33/contacts/legacy_33_world_sprites_contact.jpg",
+    "assets/monsters/world_sprites/legacy_33/contacts/legacy_33_walk_frames_contact.jpg"
+  ],
+  "items": [
+    {
+      "id": "goblin",
+      "kind": "goblin",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/goblin_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 0
+    },
+    {
+      "id": "goblin_icon_64",
+      "kind": "goblin",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/goblin_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "goblin_walk_01",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "goblin_walk_02",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "goblin_walk_03",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "goblin_walk_04",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "goblin_walk_05",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "goblin_walk_06",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "goblin_walk_07",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "goblin_walk_08",
+      "kind": "goblin",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "goblin_walk_sheet",
+      "kind": "goblin",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/goblin_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "goblin_walk_preview",
+      "kind": "goblin",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/goblin/goblin_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "wolf",
+      "kind": "wolf",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/wolf_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 1
+    },
+    {
+      "id": "wolf_icon_64",
+      "kind": "wolf",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/wolf_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "wolf_walk_01",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "wolf_walk_02",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "wolf_walk_03",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "wolf_walk_04",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "wolf_walk_05",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "wolf_walk_06",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "wolf_walk_07",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "wolf_walk_08",
+      "kind": "wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "wolf_walk_sheet",
+      "kind": "wolf",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/wolf_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "wolf_walk_preview",
+      "kind": "wolf",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf/wolf_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "skeleton",
+      "kind": "skeleton",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/skeleton_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 2
+    },
+    {
+      "id": "skeleton_icon_64",
+      "kind": "skeleton",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/skeleton_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "skeleton_walk_01",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "skeleton_walk_02",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "skeleton_walk_03",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "skeleton_walk_04",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "skeleton_walk_05",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "skeleton_walk_06",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "skeleton_walk_07",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "skeleton_walk_08",
+      "kind": "skeleton",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "skeleton_walk_sheet",
+      "kind": "skeleton",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/skeleton_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "skeleton_walk_preview",
+      "kind": "skeleton",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/skeleton/skeleton_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "spider",
+      "kind": "spider",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/spider_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 3
+    },
+    {
+      "id": "spider_icon_64",
+      "kind": "spider",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/spider_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "spider_walk_01",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "spider_walk_02",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "spider_walk_03",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "spider_walk_04",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "spider_walk_05",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "spider_walk_06",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "spider_walk_07",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "spider_walk_08",
+      "kind": "spider",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "spider_walk_sheet",
+      "kind": "spider",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/spider_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "spider_walk_preview",
+      "kind": "spider",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/spider/spider_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "slime",
+      "kind": "slime",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/slime_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 4
+    },
+    {
+      "id": "slime_icon_64",
+      "kind": "slime",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/slime_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "slime_walk_01",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "slime_walk_02",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "slime_walk_03",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "slime_walk_04",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "slime_walk_05",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "slime_walk_06",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "slime_walk_07",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "slime_walk_08",
+      "kind": "slime",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "slime_walk_sheet",
+      "kind": "slime",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/slime_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "slime_walk_preview",
+      "kind": "slime",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slime/slime_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "rat",
+      "kind": "rat",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/rat_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 5
+    },
+    {
+      "id": "rat_icon_64",
+      "kind": "rat",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/rat_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "rat_walk_01",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "rat_walk_02",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "rat_walk_03",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "rat_walk_04",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "rat_walk_05",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "rat_walk_06",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "rat_walk_07",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "rat_walk_08",
+      "kind": "rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "rat_walk_sheet",
+      "kind": "rat",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/rat_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "rat_walk_preview",
+      "kind": "rat",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/rat/rat_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "bat",
+      "kind": "bat",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/bat_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 6
+    },
+    {
+      "id": "bat_icon_64",
+      "kind": "bat",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/bat_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "bat_walk_01",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "bat_walk_02",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "bat_walk_03",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "bat_walk_04",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "bat_walk_05",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "bat_walk_06",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "bat_walk_07",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "bat_walk_08",
+      "kind": "bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "bat_walk_sheet",
+      "kind": "bat",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/bat_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "bat_walk_preview",
+      "kind": "bat",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bat/bat_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "zombie",
+      "kind": "zombie",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/zombie_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 7
+    },
+    {
+      "id": "zombie_icon_64",
+      "kind": "zombie",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/zombie_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "zombie_walk_01",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "zombie_walk_02",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "zombie_walk_03",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "zombie_walk_04",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "zombie_walk_05",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "zombie_walk_06",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "zombie_walk_07",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "zombie_walk_08",
+      "kind": "zombie",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "zombie_walk_sheet",
+      "kind": "zombie",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/zombie_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "zombie_walk_preview",
+      "kind": "zombie",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/zombie/zombie_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "bandit",
+      "kind": "bandit",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/bandit_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_01_alpha.png",
+      "source_cell": 8
+    },
+    {
+      "id": "bandit_icon_64",
+      "kind": "bandit",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/bandit_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "bandit_walk_01",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "bandit_walk_02",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "bandit_walk_03",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "bandit_walk_04",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "bandit_walk_05",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "bandit_walk_06",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "bandit_walk_07",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "bandit_walk_08",
+      "kind": "bandit",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "bandit_walk_sheet",
+      "kind": "bandit",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/bandit_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "bandit_walk_preview",
+      "kind": "bandit",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bandit/bandit_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "robber",
+      "kind": "robber",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/robber_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 0
+    },
+    {
+      "id": "robber_icon_64",
+      "kind": "robber",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/robber_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "robber_walk_01",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "robber_walk_02",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "robber_walk_03",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "robber_walk_04",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "robber_walk_05",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "robber_walk_06",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "robber_walk_07",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "robber_walk_08",
+      "kind": "robber",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "robber_walk_sheet",
+      "kind": "robber",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/robber_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "robber_walk_preview",
+      "kind": "robber",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/robber/robber_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "thief",
+      "kind": "thief",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/thief_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 1
+    },
+    {
+      "id": "thief_icon_64",
+      "kind": "thief",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/thief_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "thief_walk_01",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "thief_walk_02",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "thief_walk_03",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "thief_walk_04",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "thief_walk_05",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "thief_walk_06",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "thief_walk_07",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "thief_walk_08",
+      "kind": "thief",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "thief_walk_sheet",
+      "kind": "thief",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/thief_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "thief_walk_preview",
+      "kind": "thief",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thief/thief_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "boar",
+      "kind": "boar",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/boar_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 2
+    },
+    {
+      "id": "boar_icon_64",
+      "kind": "boar",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/boar_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "boar_walk_01",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "boar_walk_02",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "boar_walk_03",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "boar_walk_04",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "boar_walk_05",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "boar_walk_06",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "boar_walk_07",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "boar_walk_08",
+      "kind": "boar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "boar_walk_sheet",
+      "kind": "boar",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/boar_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "boar_walk_preview",
+      "kind": "boar",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/boar/boar_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "bear",
+      "kind": "bear",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/bear_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 3
+    },
+    {
+      "id": "bear_icon_64",
+      "kind": "bear",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/bear_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "bear_walk_01",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "bear_walk_02",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "bear_walk_03",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "bear_walk_04",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "bear_walk_05",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "bear_walk_06",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "bear_walk_07",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "bear_walk_08",
+      "kind": "bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "bear_walk_sheet",
+      "kind": "bear",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/bear_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "bear_walk_preview",
+      "kind": "bear",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/bear/bear_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "stag",
+      "kind": "stag",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/stag_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 4
+    },
+    {
+      "id": "stag_icon_64",
+      "kind": "stag",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/stag_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "stag_walk_01",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "stag_walk_02",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "stag_walk_03",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "stag_walk_04",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "stag_walk_05",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "stag_walk_06",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "stag_walk_07",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "stag_walk_08",
+      "kind": "stag",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "stag_walk_sheet",
+      "kind": "stag",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/stag_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "stag_walk_preview",
+      "kind": "stag",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/stag/stag_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "lynx",
+      "kind": "lynx",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/lynx_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 5
+    },
+    {
+      "id": "lynx_icon_64",
+      "kind": "lynx",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/lynx_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "lynx_walk_01",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "lynx_walk_02",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "lynx_walk_03",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "lynx_walk_04",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "lynx_walk_05",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "lynx_walk_06",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "lynx_walk_07",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "lynx_walk_08",
+      "kind": "lynx",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "lynx_walk_sheet",
+      "kind": "lynx",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/lynx_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "lynx_walk_preview",
+      "kind": "lynx",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/lynx/lynx_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "cougar",
+      "kind": "cougar",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/cougar_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 6
+    },
+    {
+      "id": "cougar_icon_64",
+      "kind": "cougar",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/cougar_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "cougar_walk_01",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "cougar_walk_02",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "cougar_walk_03",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "cougar_walk_04",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "cougar_walk_05",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "cougar_walk_06",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "cougar_walk_07",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "cougar_walk_08",
+      "kind": "cougar",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "cougar_walk_sheet",
+      "kind": "cougar",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/cougar_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "cougar_walk_preview",
+      "kind": "cougar",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cougar/cougar_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "wolverine",
+      "kind": "wolverine",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/wolverine_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 7
+    },
+    {
+      "id": "wolverine_icon_64",
+      "kind": "wolverine",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/wolverine_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "wolverine_walk_01",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "wolverine_walk_02",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "wolverine_walk_03",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "wolverine_walk_04",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "wolverine_walk_05",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "wolverine_walk_06",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "wolverine_walk_07",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "wolverine_walk_08",
+      "kind": "wolverine",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "wolverine_walk_sheet",
+      "kind": "wolverine",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/wolverine_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "wolverine_walk_preview",
+      "kind": "wolverine",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolverine/wolverine_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "dire_wolf",
+      "kind": "dire_wolf",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/dire_wolf_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_02_alpha.png",
+      "source_cell": 8
+    },
+    {
+      "id": "dire_wolf_icon_64",
+      "kind": "dire_wolf",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/dire_wolf_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "dire_wolf_walk_01",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "dire_wolf_walk_02",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "dire_wolf_walk_03",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "dire_wolf_walk_04",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "dire_wolf_walk_05",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "dire_wolf_walk_06",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "dire_wolf_walk_07",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "dire_wolf_walk_08",
+      "kind": "dire_wolf",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "dire_wolf_walk_sheet",
+      "kind": "dire_wolf",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/dire_wolf_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "dire_wolf_walk_preview",
+      "kind": "dire_wolf",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/dire_wolf/dire_wolf_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "wolf_alpha",
+      "kind": "wolf_alpha",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/wolf_alpha_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 0
+    },
+    {
+      "id": "wolf_alpha_icon_64",
+      "kind": "wolf_alpha",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/wolf_alpha_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "wolf_alpha_walk_01",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "wolf_alpha_walk_02",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "wolf_alpha_walk_03",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "wolf_alpha_walk_04",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "wolf_alpha_walk_05",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "wolf_alpha_walk_06",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "wolf_alpha_walk_07",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "wolf_alpha_walk_08",
+      "kind": "wolf_alpha",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "wolf_alpha_walk_sheet",
+      "kind": "wolf_alpha",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/wolf_alpha_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "wolf_alpha_walk_preview",
+      "kind": "wolf_alpha",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/wolf_alpha/wolf_alpha_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "cave_bear",
+      "kind": "cave_bear",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/cave_bear_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 1
+    },
+    {
+      "id": "cave_bear_icon_64",
+      "kind": "cave_bear",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/cave_bear_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "cave_bear_walk_01",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "cave_bear_walk_02",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "cave_bear_walk_03",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "cave_bear_walk_04",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "cave_bear_walk_05",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "cave_bear_walk_06",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "cave_bear_walk_07",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "cave_bear_walk_08",
+      "kind": "cave_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "cave_bear_walk_sheet",
+      "kind": "cave_bear",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/cave_bear_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "cave_bear_walk_preview",
+      "kind": "cave_bear",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cave_bear/cave_bear_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "polar_bear",
+      "kind": "polar_bear",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/polar_bear_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 2
+    },
+    {
+      "id": "polar_bear_icon_64",
+      "kind": "polar_bear",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/polar_bear_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "polar_bear_walk_01",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "polar_bear_walk_02",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "polar_bear_walk_03",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "polar_bear_walk_04",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "polar_bear_walk_05",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "polar_bear_walk_06",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "polar_bear_walk_07",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "polar_bear_walk_08",
+      "kind": "polar_bear",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "polar_bear_walk_sheet",
+      "kind": "polar_bear",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/polar_bear_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "polar_bear_walk_preview",
+      "kind": "polar_bear",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/polar_bear/polar_bear_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "crocodile",
+      "kind": "crocodile",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/crocodile_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 3
+    },
+    {
+      "id": "crocodile_icon_64",
+      "kind": "crocodile",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/crocodile_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "crocodile_walk_01",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "crocodile_walk_02",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "crocodile_walk_03",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "crocodile_walk_04",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "crocodile_walk_05",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "crocodile_walk_06",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "crocodile_walk_07",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "crocodile_walk_08",
+      "kind": "crocodile",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "crocodile_walk_sheet",
+      "kind": "crocodile",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/crocodile_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "crocodile_walk_preview",
+      "kind": "crocodile",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crocodile/crocodile_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "cobra",
+      "kind": "cobra",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/cobra_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 4
+    },
+    {
+      "id": "cobra_icon_64",
+      "kind": "cobra",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/cobra_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "cobra_walk_01",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "cobra_walk_02",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "cobra_walk_03",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "cobra_walk_04",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "cobra_walk_05",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "cobra_walk_06",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "cobra_walk_07",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "cobra_walk_08",
+      "kind": "cobra",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "cobra_walk_sheet",
+      "kind": "cobra",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/cobra_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "cobra_walk_preview",
+      "kind": "cobra",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/cobra/cobra_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "slimelet",
+      "kind": "slimelet",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/slimelet_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 5
+    },
+    {
+      "id": "slimelet_icon_64",
+      "kind": "slimelet",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/slimelet_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "slimelet_walk_01",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "slimelet_walk_02",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "slimelet_walk_03",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "slimelet_walk_04",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "slimelet_walk_05",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "slimelet_walk_06",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "slimelet_walk_07",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "slimelet_walk_08",
+      "kind": "slimelet",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "slimelet_walk_sheet",
+      "kind": "slimelet",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/slimelet_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "slimelet_walk_preview",
+      "kind": "slimelet",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/slimelet/slimelet_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "fae_mite",
+      "kind": "fae_mite",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/fae_mite_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 6
+    },
+    {
+      "id": "fae_mite_icon_64",
+      "kind": "fae_mite",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/fae_mite_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "fae_mite_walk_01",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "fae_mite_walk_02",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "fae_mite_walk_03",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "fae_mite_walk_04",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "fae_mite_walk_05",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "fae_mite_walk_06",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "fae_mite_walk_07",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "fae_mite_walk_08",
+      "kind": "fae_mite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "fae_mite_walk_sheet",
+      "kind": "fae_mite",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/fae_mite_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "fae_mite_walk_preview",
+      "kind": "fae_mite",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fae_mite/fae_mite_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "gloom_moth",
+      "kind": "gloom_moth",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/gloom_moth_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 7
+    },
+    {
+      "id": "gloom_moth_icon_64",
+      "kind": "gloom_moth",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/gloom_moth_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "gloom_moth_walk_01",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "gloom_moth_walk_02",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "gloom_moth_walk_03",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "gloom_moth_walk_04",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "gloom_moth_walk_05",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "gloom_moth_walk_06",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "gloom_moth_walk_07",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "gloom_moth_walk_08",
+      "kind": "gloom_moth",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "gloom_moth_walk_sheet",
+      "kind": "gloom_moth",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/gloom_moth_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "gloom_moth_walk_preview",
+      "kind": "gloom_moth",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/gloom_moth/gloom_moth_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "ember_newt",
+      "kind": "ember_newt",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/ember_newt_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_03_alpha.png",
+      "source_cell": 8
+    },
+    {
+      "id": "ember_newt_icon_64",
+      "kind": "ember_newt",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/ember_newt_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "ember_newt_walk_01",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "ember_newt_walk_02",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "ember_newt_walk_03",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "ember_newt_walk_04",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "ember_newt_walk_05",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "ember_newt_walk_06",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "ember_newt_walk_07",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "ember_newt_walk_08",
+      "kind": "ember_newt",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "ember_newt_walk_sheet",
+      "kind": "ember_newt",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/ember_newt_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "ember_newt_walk_preview",
+      "kind": "ember_newt",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_newt/ember_newt_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "ember_rat",
+      "kind": "ember_rat",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/ember_rat_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 0
+    },
+    {
+      "id": "ember_rat_icon_64",
+      "kind": "ember_rat",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/ember_rat_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "ember_rat_walk_01",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "ember_rat_walk_02",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "ember_rat_walk_03",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "ember_rat_walk_04",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "ember_rat_walk_05",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "ember_rat_walk_06",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "ember_rat_walk_07",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "ember_rat_walk_08",
+      "kind": "ember_rat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "ember_rat_walk_sheet",
+      "kind": "ember_rat",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/ember_rat_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "ember_rat_walk_preview",
+      "kind": "ember_rat",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/ember_rat/ember_rat_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "shadow_bat",
+      "kind": "shadow_bat",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/shadow_bat_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 1
+    },
+    {
+      "id": "shadow_bat_icon_64",
+      "kind": "shadow_bat",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/shadow_bat_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "shadow_bat_walk_01",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "shadow_bat_walk_02",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "shadow_bat_walk_03",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "shadow_bat_walk_04",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "shadow_bat_walk_05",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "shadow_bat_walk_06",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "shadow_bat_walk_07",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "shadow_bat_walk_08",
+      "kind": "shadow_bat",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "shadow_bat_walk_sheet",
+      "kind": "shadow_bat",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/shadow_bat_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "shadow_bat_walk_preview",
+      "kind": "shadow_bat",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/shadow_bat/shadow_bat_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "thorn_scarab",
+      "kind": "thorn_scarab",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/thorn_scarab_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 2
+    },
+    {
+      "id": "thorn_scarab_icon_64",
+      "kind": "thorn_scarab",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/thorn_scarab_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "thorn_scarab_walk_01",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "thorn_scarab_walk_02",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "thorn_scarab_walk_03",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "thorn_scarab_walk_04",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "thorn_scarab_walk_05",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "thorn_scarab_walk_06",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "thorn_scarab_walk_07",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "thorn_scarab_walk_08",
+      "kind": "thorn_scarab",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "thorn_scarab_walk_sheet",
+      "kind": "thorn_scarab",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/thorn_scarab_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "thorn_scarab_walk_preview",
+      "kind": "thorn_scarab",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/thorn_scarab/thorn_scarab_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "crystal_beetle",
+      "kind": "crystal_beetle",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/crystal_beetle_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 3
+    },
+    {
+      "id": "crystal_beetle_icon_64",
+      "kind": "crystal_beetle",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/crystal_beetle_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "crystal_beetle_walk_01",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "crystal_beetle_walk_02",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "crystal_beetle_walk_03",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "crystal_beetle_walk_04",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "crystal_beetle_walk_05",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "crystal_beetle_walk_06",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "crystal_beetle_walk_07",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "crystal_beetle_walk_08",
+      "kind": "crystal_beetle",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "crystal_beetle_walk_sheet",
+      "kind": "crystal_beetle",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/crystal_beetle_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "crystal_beetle_walk_preview",
+      "kind": "crystal_beetle",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_beetle/crystal_beetle_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "crystal_tick",
+      "kind": "crystal_tick",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/crystal_tick_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 4
+    },
+    {
+      "id": "crystal_tick_icon_64",
+      "kind": "crystal_tick",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/crystal_tick_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "crystal_tick_walk_01",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "crystal_tick_walk_02",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "crystal_tick_walk_03",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "crystal_tick_walk_04",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "crystal_tick_walk_05",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "crystal_tick_walk_06",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "crystal_tick_walk_07",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "crystal_tick_walk_08",
+      "kind": "crystal_tick",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "crystal_tick_walk_sheet",
+      "kind": "crystal_tick",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/crystal_tick_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "crystal_tick_walk_preview",
+      "kind": "crystal_tick",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/crystal_tick/crystal_tick_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "frost_sprite",
+      "kind": "frost_sprite",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/frost_sprite_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 5
+    },
+    {
+      "id": "frost_sprite_icon_64",
+      "kind": "frost_sprite",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/frost_sprite_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "frost_sprite_walk_01",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "frost_sprite_walk_02",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "frost_sprite_walk_03",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "frost_sprite_walk_04",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "frost_sprite_walk_05",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "frost_sprite_walk_06",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "frost_sprite_walk_07",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "frost_sprite_walk_08",
+      "kind": "frost_sprite",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "frost_sprite_walk_sheet",
+      "kind": "frost_sprite",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/frost_sprite_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "frost_sprite_walk_preview",
+      "kind": "frost_sprite",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/frost_sprite/frost_sprite_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "fire_imp",
+      "kind": "fire_imp",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/fire_imp_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 6
+    },
+    {
+      "id": "fire_imp_icon_64",
+      "kind": "fire_imp",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/fire_imp_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "fire_imp_walk_01",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "fire_imp_walk_02",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "fire_imp_walk_03",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "fire_imp_walk_04",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "fire_imp_walk_05",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "fire_imp_walk_06",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "fire_imp_walk_07",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "fire_imp_walk_08",
+      "kind": "fire_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "fire_imp_walk_sheet",
+      "kind": "fire_imp",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/fire_imp_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "fire_imp_walk_preview",
+      "kind": "fire_imp",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/fire_imp/fire_imp_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    },
+    {
+      "id": "mushroom_imp",
+      "kind": "mushroom_imp",
+      "category": "world_sprite_96",
+      "path": "assets/monsters/world_sprites/legacy_33/sprites_96/mushroom_imp_world_96.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/monsters/world_sprites/legacy_33/source_sheets/legacy_33_block_04_alpha.png",
+      "source_cell": 7
+    },
+    {
+      "id": "mushroom_imp_icon_64",
+      "kind": "mushroom_imp",
+      "category": "icon_64",
+      "path": "assets/monsters/world_sprites/legacy_33/icons_64/mushroom_imp_icon_64.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "mushroom_imp_walk_01",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 1
+    },
+    {
+      "id": "mushroom_imp_walk_02",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 2
+    },
+    {
+      "id": "mushroom_imp_walk_03",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 3
+    },
+    {
+      "id": "mushroom_imp_walk_04",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 4
+    },
+    {
+      "id": "mushroom_imp_walk_05",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 5
+    },
+    {
+      "id": "mushroom_imp_walk_06",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 6
+    },
+    {
+      "id": "mushroom_imp_walk_07",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_07.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 7
+    },
+    {
+      "id": "mushroom_imp_walk_08",
+      "kind": "mushroom_imp",
+      "category": "walk_frame",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/walk_08.png",
+      "size": [
+        96,
+        96
+      ],
+      "frame": 8
+    },
+    {
+      "id": "mushroom_imp_walk_sheet",
+      "kind": "mushroom_imp",
+      "category": "walk_sheet",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/mushroom_imp_walk_sheet.png",
+      "size": [
+        768,
+        96
+      ]
+    },
+    {
+      "id": "mushroom_imp_walk_preview",
+      "kind": "mushroom_imp",
+      "category": "walk_preview",
+      "path": "assets/monsters/world_sprites/legacy_33/animations/mushroom_imp/mushroom_imp_walk_preview.gif",
+      "size": [
+        96,
+        96
+      ]
+    }
+  ]
+}

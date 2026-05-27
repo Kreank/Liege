@@ -1,0 +1,694 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "spell_expansion_pack",
+  "policy": "additive spell pack; existing spell assets left untouched",
+  "count": 63,
+  "source_sheets": [
+    "assets/professional/spell_expansion_pack_2026_05_27/source_sheets/ice_spell_12_alpha.png",
+    "assets/professional/spell_expansion_pack_2026_05_27/source_sheets/ice_spell_12_chromakey.png",
+    "assets/professional/spell_expansion_pack_2026_05_27/source_sheets/wind_holy_lightning_alpha.png",
+    "assets/professional/spell_expansion_pack_2026_05_27/source_sheets/wind_holy_lightning_chromakey.png"
+  ],
+  "contact": "assets/professional/spell_expansion_pack_2026_05_27/contacts/spell_expansion_contact.jpg",
+  "items": [
+    {
+      "id": "ice_spell_01",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 1
+    },
+    {
+      "id": "ice_spell_01",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 1
+    },
+    {
+      "id": "ice_spell_02",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 2
+    },
+    {
+      "id": "ice_spell_02",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 2
+    },
+    {
+      "id": "ice_spell_03",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 3
+    },
+    {
+      "id": "ice_spell_03",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 3
+    },
+    {
+      "id": "ice_spell_04",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 4
+    },
+    {
+      "id": "ice_spell_04",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 4
+    },
+    {
+      "id": "ice_spell_05",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 5
+    },
+    {
+      "id": "ice_spell_05",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 5
+    },
+    {
+      "id": "ice_spell_06",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 6
+    },
+    {
+      "id": "ice_spell_06",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 6
+    },
+    {
+      "id": "ice_spell_07",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_07.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 7
+    },
+    {
+      "id": "ice_spell_07",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_07.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 7
+    },
+    {
+      "id": "ice_spell_08",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_08.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 8
+    },
+    {
+      "id": "ice_spell_08",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_08.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 8
+    },
+    {
+      "id": "ice_spell_09",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_09.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 9
+    },
+    {
+      "id": "ice_spell_09",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_09.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 9
+    },
+    {
+      "id": "ice_spell_10",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_10.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 10
+    },
+    {
+      "id": "ice_spell_10",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_10.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 10
+    },
+    {
+      "id": "ice_spell_11",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_11.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 11
+    },
+    {
+      "id": "ice_spell_11",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_11.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 11
+    },
+    {
+      "id": "ice_spell_12",
+      "spell": "ice_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_12.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 12
+    },
+    {
+      "id": "ice_spell_12",
+      "spell": "ice_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/ice_spell_12.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 12
+    },
+    {
+      "id": "ice_spell_impact_peak",
+      "spell": "ice_spell",
+      "category": "runtime_single",
+      "path": "assets/animations/spells/ice_spell_impact_peak.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 7
+    },
+    {
+      "id": "wind_slash_spell_01",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 1
+    },
+    {
+      "id": "wind_slash_spell_01",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 1
+    },
+    {
+      "id": "wind_slash_spell_02",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 2
+    },
+    {
+      "id": "wind_slash_spell_02",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 2
+    },
+    {
+      "id": "wind_slash_spell_03",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 3
+    },
+    {
+      "id": "wind_slash_spell_03",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 3
+    },
+    {
+      "id": "wind_slash_spell_04",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 4
+    },
+    {
+      "id": "wind_slash_spell_04",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 4
+    },
+    {
+      "id": "wind_slash_spell_05",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 5
+    },
+    {
+      "id": "wind_slash_spell_05",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 5
+    },
+    {
+      "id": "wind_slash_spell_06",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 6
+    },
+    {
+      "id": "wind_slash_spell_06",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 6
+    },
+    {
+      "id": "wind_slash_spell_07",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_07.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 7
+    },
+    {
+      "id": "wind_slash_spell_07",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_07.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 7
+    },
+    {
+      "id": "wind_slash_spell_08",
+      "spell": "wind_slash_spell",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_08.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 8
+    },
+    {
+      "id": "wind_slash_spell_08",
+      "spell": "wind_slash_spell",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/wind_slash_spell_08.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 8
+    },
+    {
+      "id": "holy_shield_aura_01",
+      "spell": "holy_shield_aura",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 1
+    },
+    {
+      "id": "holy_shield_aura_01",
+      "spell": "holy_shield_aura",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/holy_shield_aura_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 1
+    },
+    {
+      "id": "holy_shield_aura_02",
+      "spell": "holy_shield_aura",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 2
+    },
+    {
+      "id": "holy_shield_aura_02",
+      "spell": "holy_shield_aura",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/holy_shield_aura_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 2
+    },
+    {
+      "id": "holy_shield_aura_03",
+      "spell": "holy_shield_aura",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 3
+    },
+    {
+      "id": "holy_shield_aura_03",
+      "spell": "holy_shield_aura",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/holy_shield_aura_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 3
+    },
+    {
+      "id": "holy_shield_aura_04",
+      "spell": "holy_shield_aura",
+      "category": "animation_frame",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 4
+    },
+    {
+      "id": "holy_shield_aura_04",
+      "spell": "holy_shield_aura",
+      "category": "runtime_animation_frame",
+      "path": "assets/animations/spells/holy_shield_aura_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "frame": 4
+    },
+    {
+      "id": "lightning_bolt_projectile",
+      "spell": "lightning_bolt_projectile",
+      "category": "single_sprite",
+      "path": "assets/animations/professional/combat_magic/lightning_bolt_projectile/lightning_bolt_projectile.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "lightning_bolt_projectile",
+      "spell": "lightning_bolt_projectile",
+      "category": "runtime_single",
+      "path": "assets/animations/spells/lightning_bolt_projectile.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "wind_slash_icon",
+      "spell": "wind_slash_spell",
+      "category": "single_sprite",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_icon.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "wind_slash_icon",
+      "spell": "wind_slash_spell",
+      "category": "runtime_single",
+      "path": "assets/animations/spells/wind_slash_icon.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "holy_shield_icon",
+      "spell": "holy_shield_aura",
+      "category": "single_sprite",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_icon.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "holy_shield_icon",
+      "spell": "holy_shield_aura",
+      "category": "runtime_single",
+      "path": "assets/animations/spells/holy_shield_icon.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "lightning_spark_impact",
+      "spell": "lightning_bolt_projectile",
+      "category": "single_sprite",
+      "path": "assets/animations/professional/combat_magic/lightning_bolt_projectile/lightning_spark_impact.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "lightning_spark_impact",
+      "spell": "lightning_bolt_projectile",
+      "category": "runtime_single",
+      "path": "assets/animations/spells/lightning_spark_impact.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "ice_spell_sheet",
+      "spell": "ice_spell",
+      "category": "sheet",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_sheet.png",
+      "size": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "ice_spell_preview",
+      "spell": "ice_spell",
+      "category": "preview_gif",
+      "path": "assets/animations/professional/combat_magic/ice_spell/ice_spell_preview.gif",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "wind_slash_spell_sheet",
+      "spell": "wind_slash_spell",
+      "category": "sheet",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_sheet.png",
+      "size": [
+        1024,
+        512
+      ]
+    },
+    {
+      "id": "wind_slash_spell_preview",
+      "spell": "wind_slash_spell",
+      "category": "preview_gif",
+      "path": "assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_spell_preview.gif",
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "id": "holy_shield_aura_sheet",
+      "spell": "holy_shield_aura",
+      "category": "sheet",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_sheet.png",
+      "size": [
+        1024,
+        256
+      ]
+    },
+    {
+      "id": "holy_shield_aura_preview",
+      "spell": "holy_shield_aura",
+      "category": "preview_gif",
+      "path": "assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_preview.gif",
+      "size": [
+        256,
+        256
+      ]
+    }
+  ]
+}
