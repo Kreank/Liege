@@ -1,0 +1,183 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p2_animal_states",
+  "count": 16,
+  "items": [
+    {
+      "id": "cow_grazing",
+      "category": "animal_states",
+      "path": "assets/animals/states/cow_grazing.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "cow_sleeping",
+      "category": "animal_states",
+      "path": "assets/animals/states/cow_sleeping.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheep_grazing",
+      "category": "animal_states",
+      "path": "assets/animals/states/sheep_grazing.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheared_sheep_standing",
+      "category": "animal_states",
+      "path": "assets/animals/states/sheared_sheep_standing.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "goat_grazing",
+      "category": "animal_states",
+      "path": "assets/animals/states/goat_grazing.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "pig_sleeping",
+      "category": "animal_states",
+      "path": "assets/animals/states/pig_sleeping.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_grazing",
+      "category": "animal_states",
+      "path": "assets/animals/states/horse_grazing.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "ox_resting",
+      "category": "animal_states",
+      "path": "assets/animals/states/ox_resting.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "hen_nesting",
+      "category": "animal_states",
+      "path": "assets/animals/states/hen_nesting.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck_sleeping",
+      "category": "animal_states",
+      "path": "assets/animals/states/duck_sleeping.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose_guarding",
+      "category": "animal_states",
+      "path": "assets/animals/states/goose_guarding.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "nest_eggs_ready",
+      "category": "animal_states",
+      "path": "assets/resources/animal_products/nest_eggs_ready.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "small_animal_carcass",
+      "category": "animal_states",
+      "path": "assets/animals/states/small_animal_carcass.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "large_animal_carcass",
+      "category": "animal_states",
+      "path": "assets/animals/states/large_animal_carcass.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "wool_shearing_bundle",
+      "category": "animal_states",
+      "path": "assets/resources/animal_products/wool_shearing_bundle.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    },
+    {
+      "id": "milk_ready_bucket_marker",
+      "category": "animal_states",
+      "path": "assets/resources/animal_products/milk_ready_bucket_marker.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_animal_states_2026_05_27/source_sheets/animal_states_source.png",
+      "ok": true
+    }
+  ]
+}

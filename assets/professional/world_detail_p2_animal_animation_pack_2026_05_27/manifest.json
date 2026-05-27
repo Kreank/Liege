@@ -1,0 +1,271 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p2_animal_animations",
+  "count": 24,
+  "items": [
+    {
+      "id": "cow_south",
+      "animal": "cow",
+      "direction": "south",
+      "folder": "assets/animations/animals/cow/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/cow/cow_south.png",
+      "walk_sheet": "assets/animations/animals/cow/south/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/cow/south/idle_sheet.png"
+    },
+    {
+      "id": "cow_east",
+      "animal": "cow",
+      "direction": "east",
+      "folder": "assets/animations/animals/cow/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/cow/cow_east.png",
+      "walk_sheet": "assets/animations/animals/cow/east/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/cow/east/idle_sheet.png"
+    },
+    {
+      "id": "cow_north",
+      "animal": "cow",
+      "direction": "north",
+      "folder": "assets/animations/animals/cow/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/cow/cow_north.png",
+      "walk_sheet": "assets/animations/animals/cow/north/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/cow/north/idle_sheet.png"
+    },
+    {
+      "id": "cow_west",
+      "animal": "cow",
+      "direction": "west",
+      "folder": "assets/animations/animals/cow/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/cow/cow_west.png",
+      "walk_sheet": "assets/animations/animals/cow/west/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/cow/west/idle_sheet.png"
+    },
+    {
+      "id": "sheep_south",
+      "animal": "sheep",
+      "direction": "south",
+      "folder": "assets/animations/animals/sheep/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/sheep/sheep_south.png",
+      "walk_sheet": "assets/animations/animals/sheep/south/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/sheep/south/idle_sheet.png"
+    },
+    {
+      "id": "sheep_east",
+      "animal": "sheep",
+      "direction": "east",
+      "folder": "assets/animations/animals/sheep/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/sheep/sheep_east.png",
+      "walk_sheet": "assets/animations/animals/sheep/east/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/sheep/east/idle_sheet.png"
+    },
+    {
+      "id": "sheep_north",
+      "animal": "sheep",
+      "direction": "north",
+      "folder": "assets/animations/animals/sheep/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/sheep/sheep_north.png",
+      "walk_sheet": "assets/animations/animals/sheep/north/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/sheep/north/idle_sheet.png"
+    },
+    {
+      "id": "sheep_west",
+      "animal": "sheep",
+      "direction": "west",
+      "folder": "assets/animations/animals/sheep/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/sheep/sheep_west.png",
+      "walk_sheet": "assets/animations/animals/sheep/west/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/sheep/west/idle_sheet.png"
+    },
+    {
+      "id": "goat_south",
+      "animal": "goat",
+      "direction": "south",
+      "folder": "assets/animations/animals/goat/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goat/goat_south.png",
+      "walk_sheet": "assets/animations/animals/goat/south/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/goat/south/idle_sheet.png"
+    },
+    {
+      "id": "goat_east",
+      "animal": "goat",
+      "direction": "east",
+      "folder": "assets/animations/animals/goat/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goat/goat_east.png",
+      "walk_sheet": "assets/animations/animals/goat/east/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/goat/east/idle_sheet.png"
+    },
+    {
+      "id": "goat_north",
+      "animal": "goat",
+      "direction": "north",
+      "folder": "assets/animations/animals/goat/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goat/goat_north.png",
+      "walk_sheet": "assets/animations/animals/goat/north/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/goat/north/idle_sheet.png"
+    },
+    {
+      "id": "goat_west",
+      "animal": "goat",
+      "direction": "west",
+      "folder": "assets/animations/animals/goat/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goat/goat_west.png",
+      "walk_sheet": "assets/animations/animals/goat/west/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/goat/west/idle_sheet.png"
+    },
+    {
+      "id": "pig_south",
+      "animal": "pig",
+      "direction": "south",
+      "folder": "assets/animations/animals/pig/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/pig/pig_south.png",
+      "walk_sheet": "assets/animations/animals/pig/south/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/pig/south/idle_sheet.png"
+    },
+    {
+      "id": "pig_east",
+      "animal": "pig",
+      "direction": "east",
+      "folder": "assets/animations/animals/pig/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/pig/pig_east.png",
+      "walk_sheet": "assets/animations/animals/pig/east/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/pig/east/idle_sheet.png"
+    },
+    {
+      "id": "pig_north",
+      "animal": "pig",
+      "direction": "north",
+      "folder": "assets/animations/animals/pig/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/pig/pig_north.png",
+      "walk_sheet": "assets/animations/animals/pig/north/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/pig/north/idle_sheet.png"
+    },
+    {
+      "id": "pig_west",
+      "animal": "pig",
+      "direction": "west",
+      "folder": "assets/animations/animals/pig/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/pig/pig_west.png",
+      "walk_sheet": "assets/animations/animals/pig/west/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/pig/west/idle_sheet.png"
+    },
+    {
+      "id": "horse_south",
+      "animal": "horse",
+      "direction": "south",
+      "folder": "assets/animations/animals/horse/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/horse/horse_south.png",
+      "walk_sheet": "assets/animations/animals/horse/south/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/horse/south/idle_sheet.png"
+    },
+    {
+      "id": "horse_east",
+      "animal": "horse",
+      "direction": "east",
+      "folder": "assets/animations/animals/horse/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/horse/horse_east.png",
+      "walk_sheet": "assets/animations/animals/horse/east/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/horse/east/idle_sheet.png"
+    },
+    {
+      "id": "horse_north",
+      "animal": "horse",
+      "direction": "north",
+      "folder": "assets/animations/animals/horse/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/horse/horse_north.png",
+      "walk_sheet": "assets/animations/animals/horse/north/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/horse/north/idle_sheet.png"
+    },
+    {
+      "id": "horse_west",
+      "animal": "horse",
+      "direction": "west",
+      "folder": "assets/animations/animals/horse/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/horse/horse_west.png",
+      "walk_sheet": "assets/animations/animals/horse/west/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/horse/west/idle_sheet.png"
+    },
+    {
+      "id": "farm_dog_south",
+      "animal": "farm_dog",
+      "direction": "south",
+      "folder": "assets/animations/animals/farm_dog/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/farm_dog/farm_dog_south.png",
+      "walk_sheet": "assets/animations/animals/farm_dog/south/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/farm_dog/south/idle_sheet.png"
+    },
+    {
+      "id": "farm_dog_east",
+      "animal": "farm_dog",
+      "direction": "east",
+      "folder": "assets/animations/animals/farm_dog/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/farm_dog/farm_dog_east.png",
+      "walk_sheet": "assets/animations/animals/farm_dog/east/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/farm_dog/east/idle_sheet.png"
+    },
+    {
+      "id": "farm_dog_north",
+      "animal": "farm_dog",
+      "direction": "north",
+      "folder": "assets/animations/animals/farm_dog/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/farm_dog/farm_dog_north.png",
+      "walk_sheet": "assets/animations/animals/farm_dog/north/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/farm_dog/north/idle_sheet.png"
+    },
+    {
+      "id": "farm_dog_west",
+      "animal": "farm_dog",
+      "direction": "west",
+      "folder": "assets/animations/animals/farm_dog/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/farm_dog/farm_dog_west.png",
+      "walk_sheet": "assets/animations/animals/farm_dog/west/walk_sheet.png",
+      "idle_sheet": "assets/animations/animals/farm_dog/west/idle_sheet.png"
+    }
+  ]
+}

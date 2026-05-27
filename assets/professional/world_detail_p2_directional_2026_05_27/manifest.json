@@ -1,0 +1,527 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p2_directional",
+  "count": 40,
+  "items": [
+    {
+      "id": "cow_south",
+      "base": "cow",
+      "direction": "south",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/cow/cow_south.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "cow_east",
+      "base": "cow",
+      "direction": "east",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/cow/cow_east.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "cow_north",
+      "base": "cow",
+      "direction": "north",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/cow/cow_north.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "cow_west",
+      "base": "cow",
+      "direction": "west",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/cow/cow_west.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheep_south",
+      "base": "sheep",
+      "direction": "south",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/sheep/sheep_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheep_east",
+      "base": "sheep",
+      "direction": "east",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/sheep/sheep_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheep_north",
+      "base": "sheep",
+      "direction": "north",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/sheep/sheep_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "sheep_west",
+      "base": "sheep",
+      "direction": "west",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/sheep/sheep_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goat_south",
+      "base": "goat",
+      "direction": "south",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/goat/goat_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goat_east",
+      "base": "goat",
+      "direction": "east",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/goat/goat_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goat_north",
+      "base": "goat",
+      "direction": "north",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/goat/goat_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goat_west",
+      "base": "goat",
+      "direction": "west",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/goat/goat_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "pig_south",
+      "base": "pig",
+      "direction": "south",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/pig/pig_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "pig_east",
+      "base": "pig",
+      "direction": "east",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/pig/pig_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "pig_north",
+      "base": "pig",
+      "direction": "north",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/pig/pig_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "pig_west",
+      "base": "pig",
+      "direction": "west",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/pig/pig_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_south",
+      "base": "horse",
+      "direction": "south",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/horse/horse_south.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_east",
+      "base": "horse",
+      "direction": "east",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/horse/horse_east.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_north",
+      "base": "horse",
+      "direction": "north",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/horse/horse_north.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_west",
+      "base": "horse",
+      "direction": "west",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/horse/horse_west.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_dog_south",
+      "base": "farm_dog",
+      "direction": "south",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/farm_dog/farm_dog_south.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_dog_east",
+      "base": "farm_dog",
+      "direction": "east",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/farm_dog/farm_dog_east.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_dog_north",
+      "base": "farm_dog",
+      "direction": "north",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/farm_dog/farm_dog_north.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_dog_west",
+      "base": "farm_dog",
+      "direction": "west",
+      "category": "animal_directions",
+      "path": "assets/animals/directions/farm_dog/farm_dog_west.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/animal_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "handcart_empty_south",
+      "base": "handcart_empty",
+      "direction": "south",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/handcart_empty/handcart_empty_south.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "handcart_empty_east",
+      "base": "handcart_empty",
+      "direction": "east",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/handcart_empty/handcart_empty_east.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "handcart_empty_north",
+      "base": "handcart_empty",
+      "direction": "north",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/handcart_empty/handcart_empty_north.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "handcart_empty_west",
+      "base": "handcart_empty",
+      "direction": "west",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/handcart_empty/handcart_empty_west.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_hay_south",
+      "base": "farm_cart_hay",
+      "direction": "south",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_south.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_hay_east",
+      "base": "farm_cart_hay",
+      "direction": "east",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_east.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_hay_north",
+      "base": "farm_cart_hay",
+      "direction": "north",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_north.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "farm_cart_hay_west",
+      "base": "farm_cart_hay",
+      "direction": "west",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_west.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_cart_single_south",
+      "base": "horse_cart_single",
+      "direction": "south",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/horse_cart_single/horse_cart_single_south.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_cart_single_east",
+      "base": "horse_cart_single",
+      "direction": "east",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/horse_cart_single/horse_cart_single_east.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_cart_single_north",
+      "base": "horse_cart_single",
+      "direction": "north",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/horse_cart_single/horse_cart_single_north.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "horse_cart_single_west",
+      "base": "horse_cart_single",
+      "direction": "west",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/horse_cart_single/horse_cart_single_west.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "market_wagon_covered_south",
+      "base": "market_wagon_covered",
+      "direction": "south",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_south.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "market_wagon_covered_east",
+      "base": "market_wagon_covered",
+      "direction": "east",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_east.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "market_wagon_covered_north",
+      "base": "market_wagon_covered",
+      "direction": "north",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_north.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "market_wagon_covered_west",
+      "base": "market_wagon_covered",
+      "direction": "west",
+      "category": "transport_directions",
+      "path": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_west.png",
+      "size": [
+        160,
+        160
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_directional_2026_05_27/source_sheets/transport_directions_source.png",
+      "ok": true
+    }
+  ]
+}

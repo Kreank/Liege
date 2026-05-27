@@ -1,0 +1,183 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p1_farm_props",
+  "count": 16,
+  "items": [
+    {
+      "id": "water_trough",
+      "category": "farm_props",
+      "path": "assets/structures/farm/water_trough.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "feed_trough",
+      "category": "farm_props",
+      "path": "assets/structures/farm/feed_trough.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "hay_bale",
+      "category": "farm_props",
+      "path": "assets/structures/farm/hay_bale.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "hay_stack",
+      "category": "farm_props",
+      "path": "assets/structures/farm/hay_stack.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "straw_bale",
+      "category": "farm_props",
+      "path": "assets/structures/farm/straw_bale.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "feed_sack",
+      "category": "farm_props",
+      "path": "assets/resources/animal_products/feed_sack.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "fence_gate_farm",
+      "category": "farm_props",
+      "path": "assets/structures/farm/fence_gate_farm.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "wooden_fence_segment",
+      "category": "farm_props",
+      "path": "assets/structures/farm/wooden_fence_segment.png",
+      "size": [
+        128,
+        128
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "milking_stool",
+      "category": "farm_props",
+      "path": "assets/structures/farm/milking_stool.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "cheese_press",
+      "category": "farm_props",
+      "path": "assets/structures/farm/cheese_press.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "nesting_box_egg",
+      "category": "farm_props",
+      "path": "assets/structures/farm/nesting_box_egg.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "animal_bedding_straw",
+      "category": "farm_props",
+      "path": "assets/resources/animal_products/animal_bedding_straw.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "pitchfork",
+      "category": "farm_props",
+      "path": "assets/tools/pitchfork.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "shovel",
+      "category": "farm_props",
+      "path": "assets/tools/shovel.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "wooden_bucket",
+      "category": "farm_props",
+      "path": "assets/tools/wooden_bucket.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    },
+    {
+      "id": "rope_coil",
+      "category": "farm_props",
+      "path": "assets/tools/rope_coil.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p1_farm_props_2026_05_27/source_sheets/farm_props_source.png",
+      "ok": true
+    }
+  ]
+}

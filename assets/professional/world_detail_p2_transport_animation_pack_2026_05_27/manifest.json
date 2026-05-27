@@ -1,0 +1,183 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p2_transport_animations",
+  "count": 16,
+  "items": [
+    {
+      "id": "handcart_empty_south",
+      "vehicle": "handcart_empty",
+      "direction": "south",
+      "folder": "assets/animations/transport/handcart_empty/south",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/handcart_empty/handcart_empty_south.png",
+      "roll_sheet": "assets/animations/transport/handcart_empty/south/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/handcart_empty/south/idle_sheet.png"
+    },
+    {
+      "id": "handcart_empty_east",
+      "vehicle": "handcart_empty",
+      "direction": "east",
+      "folder": "assets/animations/transport/handcart_empty/east",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/handcart_empty/handcart_empty_east.png",
+      "roll_sheet": "assets/animations/transport/handcart_empty/east/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/handcart_empty/east/idle_sheet.png"
+    },
+    {
+      "id": "handcart_empty_north",
+      "vehicle": "handcart_empty",
+      "direction": "north",
+      "folder": "assets/animations/transport/handcart_empty/north",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/handcart_empty/handcart_empty_north.png",
+      "roll_sheet": "assets/animations/transport/handcart_empty/north/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/handcart_empty/north/idle_sheet.png"
+    },
+    {
+      "id": "handcart_empty_west",
+      "vehicle": "handcart_empty",
+      "direction": "west",
+      "folder": "assets/animations/transport/handcart_empty/west",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/handcart_empty/handcart_empty_west.png",
+      "roll_sheet": "assets/animations/transport/handcart_empty/west/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/handcart_empty/west/idle_sheet.png"
+    },
+    {
+      "id": "farm_cart_hay_south",
+      "vehicle": "farm_cart_hay",
+      "direction": "south",
+      "folder": "assets/animations/transport/farm_cart_hay/south",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_south.png",
+      "roll_sheet": "assets/animations/transport/farm_cart_hay/south/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/farm_cart_hay/south/idle_sheet.png"
+    },
+    {
+      "id": "farm_cart_hay_east",
+      "vehicle": "farm_cart_hay",
+      "direction": "east",
+      "folder": "assets/animations/transport/farm_cart_hay/east",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_east.png",
+      "roll_sheet": "assets/animations/transport/farm_cart_hay/east/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/farm_cart_hay/east/idle_sheet.png"
+    },
+    {
+      "id": "farm_cart_hay_north",
+      "vehicle": "farm_cart_hay",
+      "direction": "north",
+      "folder": "assets/animations/transport/farm_cart_hay/north",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_north.png",
+      "roll_sheet": "assets/animations/transport/farm_cart_hay/north/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/farm_cart_hay/north/idle_sheet.png"
+    },
+    {
+      "id": "farm_cart_hay_west",
+      "vehicle": "farm_cart_hay",
+      "direction": "west",
+      "folder": "assets/animations/transport/farm_cart_hay/west",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/farm_cart_hay/farm_cart_hay_west.png",
+      "roll_sheet": "assets/animations/transport/farm_cart_hay/west/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/farm_cart_hay/west/idle_sheet.png"
+    },
+    {
+      "id": "horse_cart_single_south",
+      "vehicle": "horse_cart_single",
+      "direction": "south",
+      "folder": "assets/animations/transport/horse_cart_single/south",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/horse_cart_single/horse_cart_single_south.png",
+      "roll_sheet": "assets/animations/transport/horse_cart_single/south/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/horse_cart_single/south/idle_sheet.png"
+    },
+    {
+      "id": "horse_cart_single_east",
+      "vehicle": "horse_cart_single",
+      "direction": "east",
+      "folder": "assets/animations/transport/horse_cart_single/east",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/horse_cart_single/horse_cart_single_east.png",
+      "roll_sheet": "assets/animations/transport/horse_cart_single/east/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/horse_cart_single/east/idle_sheet.png"
+    },
+    {
+      "id": "horse_cart_single_north",
+      "vehicle": "horse_cart_single",
+      "direction": "north",
+      "folder": "assets/animations/transport/horse_cart_single/north",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/horse_cart_single/horse_cart_single_north.png",
+      "roll_sheet": "assets/animations/transport/horse_cart_single/north/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/horse_cart_single/north/idle_sheet.png"
+    },
+    {
+      "id": "horse_cart_single_west",
+      "vehicle": "horse_cart_single",
+      "direction": "west",
+      "folder": "assets/animations/transport/horse_cart_single/west",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/horse_cart_single/horse_cart_single_west.png",
+      "roll_sheet": "assets/animations/transport/horse_cart_single/west/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/horse_cart_single/west/idle_sheet.png"
+    },
+    {
+      "id": "market_wagon_covered_south",
+      "vehicle": "market_wagon_covered",
+      "direction": "south",
+      "folder": "assets/animations/transport/market_wagon_covered/south",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_south.png",
+      "roll_sheet": "assets/animations/transport/market_wagon_covered/south/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/market_wagon_covered/south/idle_sheet.png"
+    },
+    {
+      "id": "market_wagon_covered_east",
+      "vehicle": "market_wagon_covered",
+      "direction": "east",
+      "folder": "assets/animations/transport/market_wagon_covered/east",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_east.png",
+      "roll_sheet": "assets/animations/transport/market_wagon_covered/east/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/market_wagon_covered/east/idle_sheet.png"
+    },
+    {
+      "id": "market_wagon_covered_north",
+      "vehicle": "market_wagon_covered",
+      "direction": "north",
+      "folder": "assets/animations/transport/market_wagon_covered/north",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_north.png",
+      "roll_sheet": "assets/animations/transport/market_wagon_covered/north/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/market_wagon_covered/north/idle_sheet.png"
+    },
+    {
+      "id": "market_wagon_covered_west",
+      "vehicle": "market_wagon_covered",
+      "direction": "west",
+      "folder": "assets/animations/transport/market_wagon_covered/west",
+      "roll_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/props/transport/directions/market_wagon_covered/market_wagon_covered_west.png",
+      "roll_sheet": "assets/animations/transport/market_wagon_covered/west/roll_sheet.png",
+      "idle_sheet": "assets/animations/transport/market_wagon_covered/west/idle_sheet.png"
+    }
+  ]
+}
