@@ -1924,12 +1924,15 @@ class WorldScene extends Phaser.Scene {
                      'granary','hayloft','smokehouse','cart_shed',
                      'duck_pond','goose_pasture_marker',
                      'feed_trough','water_trough','hay_bale','hay_stack','straw_bale',
-                     'cheese_press','butter_churn','milking_stool','nesting_box_egg',
-                     'cheese_rack','wooden_fence_segment']) {
+                     'cheese_press','milking_stool','nesting_box_egg',
+                     'wooden_fence_segment']) {
       this.load.image(`farm_${f}`, `/assets/structures/farm/${f}.png`);
     }
     // fence_gate_farm hat einen abweichenden Filename
     this.load.image('farm_fence_gate', '/assets/structures/farm/fence_gate_farm.png');
+    // butter_churn + cheese_rack liegen unter food/dairy/ statt structures/farm/
+    this.load.image('farm_butter_churn', '/assets/food/dairy/butter_churn.png');
+    this.load.image('farm_cheese_rack',  '/assets/food/dairy/cheese_rack.png');
     for (const p of ['swamp_bubbles','swamp_log']) {
       this.load.image(`prop_${p}`, `/assets/props/biomes/swamp/${p}.png`);
     }
