@@ -66,13 +66,16 @@ HOUSE_TYPES_TOWN = [
     ("tavern",    10),
 ]
 
-# NPC-Pool pro Haustyp — Welle 21 nutzt eigene NPC-Kinds
+# NPC-Pool pro Haustyp — Asset-Drop 2026-05-27 ergänzt um Handwerks-/Dorf-Rollen.
+# Mehrfache Listings für gleiche Rollen sind Absicht — random.choice gewichtet
+# häufige Bewohner stärker.
 NPC_KIND_BY_HOUSE = {
-    "house":     ["villager", "farmer", "wanderer", "hermit"],
-    "shop":      ["merchant"],
-    "smithy":    ["blacksmith"],
-    "workshop":  ["scholar", "mage"],
-    "tavern":    ["bard", "merchant", "villager"],
+    "house":     ["villager", "farmer", "wanderer", "hermit", "peasant",
+                  "woodcutter", "hunter", "fisher", "priest"],
+    "shop":      ["merchant", "baker", "tailor"],
+    "smithy":    ["blacksmith", "carpenter"],
+    "workshop":  ["scholar", "mage", "scribe", "carpenter", "tailor"],
+    "tavern":    ["bard", "merchant", "villager", "innkeeper"],
 }
 
 VILLAGER_NAMES = [
