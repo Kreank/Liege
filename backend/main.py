@@ -103,6 +103,12 @@ async def lifespan(app: FastAPI):
     updated_npc_factions = await factions.assign_faction_to_existing_npcs()
     if updated_npc_factions:
         logging.info("Faction-IDs gesetzt für %d NPCs", updated_npc_factions)
+    # Welle 23: Region-Difficulty-Tabelle (Stage-2-Hook für World-Brain)
+    try:
+        import region_difficulty
+        await region_difficulty.init_schema()
+    except Exception:
+        logging.exception("region_difficulty init_schema failed (non-fatal)")
     # Populate läuft jetzt on-demand pro Chunk beim Connect/Chunk-Cross (siehe populate_chunk_if_needed)
 
     event_task = asyncio.create_task(
@@ -115,7 +121,7 @@ async def lifespan(app: FastAPI):
     )
     item_task = asyncio.create_task(item_worker.run(world, items, manager))
     spawn_task = asyncio.create_task(npc_worker.initial_spawn(world, npcs, manager))
-    respawn_task = asyncio.create_task(npc_worker.respawn_loop(world, npcs, manager))
+    respawn_task = asyncio.create_task(npc_worker.respawn_loop(world, npcs, manager, structures))
     farm_task = asyncio.create_task(farm_worker.run(items, manager))
     world_respawn_task = asyncio.create_task(respawn_worker.run(world, structures, manager))
     needs_task = asyncio.create_task(needs.run(manager, damage_player))
@@ -1164,6 +1170,23 @@ async def websocket_endpoint(websocket: WebSocket):
                                 await manager.broadcast({
                                     "type": "item_spawned", "item": dropped,
                                 })
+                    # Welle 23-F: Camp-Cooldown — wenn der letzte
+                    # Bandit/Robber/Thief im chunk tot ist, mark als cleared.
+                    if npc["kind"] in _nw.CAMP_ONLY_KINDS:
+                        try:
+                            from world import CHUNK_SIZE as _CS
+                            ccx, ccy = npc["x"] // _CS, npc["y"] // _CS
+                            still_alive = any(
+                                (n["x"] // _CS == ccx and n["y"] // _CS == ccy
+                                 and n["kind"] in _nw.CAMP_ONLY_KINDS
+                                 and n["id"] != npc_id)
+                                for n in npcs.all()
+                            )
+                            if not still_alive:
+                                import region_difficulty as _rd
+                                await _rd.mark_zone_cleared(ccx, ccy, "bandit_camp")
+                        except Exception:
+                            logging.exception("Camp-cleared-tracking failed")
                     await manager.broadcast({
                         "type":   "npc_died",
                         "npc_id": npc_id,

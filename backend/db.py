@@ -384,6 +384,16 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS flavor TEXT NULL;
 -- Nur für equipment-Items gesetzt, NULL für resources/consumables/food.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS rolled_stats JSONB NULL;
 
+-- Welle 23-F: Camp-Cooldown nach Clearing. Wenn ein Bandit-Camp ausgelöscht
+-- wird, vermerkt der Chunk dass dort für eine Weile nichts respawnt.
+CREATE TABLE IF NOT EXISTS cleared_zones (
+    chunk_x     INTEGER NOT NULL,
+    chunk_y     INTEGER NOT NULL,
+    zone_kind   TEXT NOT NULL,
+    cleared_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (chunk_x, chunk_y, zone_kind)
+);
+
 -- Welle 18: Talent-Baum
 CREATE TABLE IF NOT EXISTS player_talents (
     player_name  TEXT NOT NULL,

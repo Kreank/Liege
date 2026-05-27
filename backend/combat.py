@@ -540,21 +540,26 @@ def flavor_mult_dmg(kind: str) -> float:
     return max(0.5, min(1.5, base / avg))
 
 
-def kalibrated_npc_hp(kind: str, player_level: int) -> int:
-    """ESO-Style scaling: HP folgt Player-Level + Tier + per-kind Flavor.
+def kalibrated_npc_hp(kind: str, player_power, group_mult: float = 1.0,
+                       region_mod: float = 1.0) -> int:
+    """ESO-Style scaling: HP folgt Power-Score + Tier + per-kind Flavor +
+    Group-Mult + Region-Modifier.
 
     Tier 1-3 sind „adaptive" (entspricht Spieler ± Flavor). Tier 4 (Boss) hat
-    festen Floor + zusätzlichen Per-Level-Bonus, damit er immer fies bleibt.
+    festen Floor + zusätzlichen Per-Score-Bonus, damit er immer fies bleibt.
     """
     import power_budget
     tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
-    base = power_budget.tier_baseline_hp(tier, player_level)
-    return max(1, int(round(base * flavor_mult_hp(kind))))
+    base = power_budget.tier_baseline_hp(tier, player_power)
+    val = base * flavor_mult_hp(kind) * group_mult * region_mod
+    return max(1, int(round(val)))
 
 
-def kalibrated_creature_damage(kind: str, player_level: int) -> int:
-    """ESO-Style scaling: DMG folgt Player-Level + Tier + per-kind Flavor."""
+def kalibrated_creature_damage(kind: str, player_power, group_mult: float = 1.0,
+                                region_mod: float = 1.0) -> int:
+    """ESO-Style scaling: DMG folgt Power-Score + Tier + per-kind Flavor."""
     import power_budget
     tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
-    base = power_budget.tier_baseline_dmg(tier, player_level)
-    return max(1, int(round(base * flavor_mult_dmg(kind))))
+    base = power_budget.tier_baseline_dmg(tier, player_power)
+    val = base * flavor_mult_dmg(kind) * group_mult * region_mod
+    return max(1, int(round(val)))

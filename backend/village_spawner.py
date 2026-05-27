@@ -539,6 +539,15 @@ async def try_spawn_bandit_camp(world, structure_manager, npc_manager,
     nur Camp-Reste + 2-4 Banditen."""
     if random.random() >= BANDIT_CAMP_CHANCE:
         return 0
+    # Welle 23-F: Camp-Cooldown — wenn dieser Chunk vor < 30 min gewiped
+    # wurde, kein neues Camp dort.
+    try:
+        import region_difficulty
+        if await region_difficulty.is_zone_cleared_recently(cx, cy, "bandit_camp"):
+            log.info("Bandit-Camp-Skip @chunk=(%d,%d) — cooldown noch aktiv", cx, cy)
+            return 0
+    except Exception:
+        log.exception("Camp-Cooldown-Check schlug fehl")
     chunk = await world.get_chunk(cx, cy)
     candidates: list[tuple[int, int]] = []
     for ly in range(CHUNK_SIZE):

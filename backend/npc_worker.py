@@ -33,14 +33,16 @@ SPRITE_VARIANTS_BY_KIND = {
 # biomes=None bedeutet "überall walkable". Group-Size (min, max) inklusiv.
 CREATURE_SPAWN_PROFILE = {
     "boar":         {"group": (3, 5),  "biomes": {GRASS, FOREST, JUNGLE}},
-    "bandit":       {"group": (2, 6),  "biomes": None},
-    "robber":       {"group": (1, 3),  "biomes": None},      # kleinere Trupps
-    "thief":        {"group": (1, 2),  "biomes": None},      # Einzelgänger/Pärchen
-    "goblin":       {"group": (5, 10), "biomes": None},
+    # bandit/robber/thief: CAMP_ONLY_KINDS (siehe respawn_loop) — biomes nur
+    # für Bandit-Camp-Spawning informativ, der Loop skipt sie sowieso.
+    "bandit":       {"group": (2, 6),  "biomes": {GRASS, FOREST, DESERT, JUNGLE}},
+    "robber":       {"group": (1, 3),  "biomes": {GRASS, FOREST, DESERT, JUNGLE}},
+    "thief":        {"group": (1, 2),  "biomes": {GRASS, FOREST, DESERT, JUNGLE}},
+    "goblin":       {"group": (5, 10), "biomes": {FOREST, SWAMP, JUNGLE}},
     "wolf":         {"group": (2, 4),  "biomes": {GRASS, FOREST, SNOW}},
-    "spider":       {"group": (1, 1),  "biomes": None},        # Einzelgänger
+    "spider":       {"group": (1, 1),  "biomes": {FOREST, SWAMP, JUNGLE}},
     "skeleton":     {"group": (1, 3),  "biomes": {SWAMP, DESERT, SNOW}},
-    "rat":          {"group": (2, 5),  "biomes": None},
+    "rat":          {"group": (2, 5),  "biomes": {SWAMP, DESERT, SAND}},
     "bat":          {"group": (1, 3),  "biomes": {FOREST, JUNGLE}},
     "zombie":       {"group": (1, 4),  "biomes": {SWAMP, DESERT}},
     "bear":         {"group": (1, 2),  "biomes": {FOREST, SNOW}},
@@ -294,40 +296,94 @@ def _identity_prompt(kind: str) -> str:
     )
 
 
+# Welle 23: Spawn-Safe-Zone-Radien (in Tiles)
+SAFE_ZONE_VILLAGE_RADIUS    = 18   # well/anvil/cooking_pot = Dorf-Anker
+SAFE_ZONE_CAMP_RADIUS       = 12   # camp_tent = Bandit-Camp
+SAFE_ZONE_FRIENDLY_NPC_RADIUS = 8  # Wandernder Händler, Hermit etc.
+
+
+def _is_safe_zone(structure_manager, npc_manager, x: int, y: int) -> bool:
+    """True wenn (x,y) zu nahe an einem Settlement, Bandit-Camp oder
+    Friendly-NPC ist — dort soll kein feindlicher Mob spawnen.
+
+    Settlement-Anker: well, anvil, cooking_pot, sign_* (Dorf-Marker)
+    Camp-Anker:       camp_tent
+    """
+    # Anker-Strukturen scannen
+    village_anchors = ("well", "anvil", "cooking_pot")
+    camp_anchors    = ("camp_tent",)
+    # Scan-Radius = größter Safe-Zone-Radius
+    r = SAFE_ZONE_VILLAGE_RADIUS
+    if hasattr(structure_manager, "iter_in_range"):
+        for s in structure_manager.iter_in_range(x, y, r):
+            t = s["type"]
+            if t.startswith("sign_") or t in village_anchors:
+                if abs(s["x"] - x) + abs(s["y"] - y) <= SAFE_ZONE_VILLAGE_RADIUS:
+                    return True
+            elif t in camp_anchors:
+                if abs(s["x"] - x) + abs(s["y"] - y) <= SAFE_ZONE_CAMP_RADIUS:
+                    return True
+    else:
+        # Fallback: scan structures dict naiv (langsamer)
+        for s in getattr(structure_manager, "_structures", {}).values():
+            t = s.get("type")
+            dist = abs(s["x"] - x) + abs(s["y"] - y)
+            if t in village_anchors and dist <= SAFE_ZONE_VILLAGE_RADIUS:
+                return True
+            if t and t.startswith("sign_") and dist <= SAFE_ZONE_VILLAGE_RADIUS:
+                return True
+            if t in camp_anchors and dist <= SAFE_ZONE_CAMP_RADIUS:
+                return True
+    # Friendly-NPC-Check
+    if npc_manager is not None:
+        for n in npc_manager.all():
+            if n["kind"] in FRIENDLY_KINDS:
+                if abs(n["x"] - x) + abs(n["y"] - y) <= SAFE_ZONE_FRIENDLY_NPC_RADIUS:
+                    return True
+    return False
+
+
 async def _find_spawn_position(world, connection_manager=None,
                                biomes: set[int] | None = None,
-                               strict: bool = True) -> tuple[int, int] | None:
+                               strict: bool = True,
+                               structure_manager=None,
+                               npc_manager=None) -> tuple[int, int] | None:
     """Findet ein walkbares Tile in der Nähe eines aktiven Spielers.
-    Wenn `biomes` gegeben und `strict`: NUR Tiles dieser Biome (kein
-    Fallback auf irgendwelches walkable — sonst landen Schweine in der
-    Wüste oder Drachen im Wald).
-    Bei strict + Fehlschlag → None (Spawn überspringen).
-    Ohne biome-filter / strict=False: jedes walkbare Tile."""
+    Wenn `biomes` gegeben und `strict`: NUR Tiles dieser Biome.
+    Wenn `structure_manager`/`npc_manager` mitgegeben: Safe-Zones werden
+    geprüft (kein Spawn im Schutzradius von Settlements/Camps/Friendly-NPCs).
+    Bei strict + Fehlschlag → None (Spawn überspringen)."""
     center_x, center_y = 60, 40
     if connection_manager is not None:
         players = connection_manager.get_players()
         if players:
             p = random.choice(list(players.values()))
             center_x, center_y = p["x"], p["y"]
+
+    def _safe_ok(xx: int, yy: int) -> bool:
+        if structure_manager is None and npc_manager is None:
+            return True
+        return not _is_safe_zone(structure_manager, npc_manager, xx, yy)
+
     if biomes:
-        # Strikter Versuch — wirklich nur passende Biome
+        # Strikter Versuch — wirklich nur passende Biome + Safe-Zone-frei
         for _ in range(400):
             angle = random.random() * 6.283
             dist = random.randint(8, 35)
             x = center_x + int(math.cos(angle) * dist)
             y = center_y + int(math.sin(angle) * dist)
             tile = await world.tile_at(x, y)
-            if tile in biomes:
+            if tile in biomes and _safe_ok(x, y):
                 return x, y
         if strict:
-            return None  # Kein passendes Biome erreichbar → kein Spawn
-    # Ohne biome-filter / non-strict: irgendein walkbares Tile
+            return None
+    # Ohne biome-filter / non-strict: jedes walkable Tile + Safe-Zone-frei
     for _ in range(200):
         angle = random.random() * 6.283
         dist = random.randint(8, 25)
         x = center_x + int(math.cos(angle) * dist)
         y = center_y + int(math.sin(angle) * dist)
-        if await world.is_walkable(x, y):
+        if await world.is_walkable(x, y) and _safe_ok(x, y):
             return x, y
     s = await world.find_spawn(center_x, center_y)
     return (s["x"], s["y"])
@@ -424,20 +480,33 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
             return None
         x, y = pos
     base_hp = combat.NPC_HP_BY_KIND.get(kind, 40)
-    # Welle 23 (2026-05-27): ESO-Style Tier-Baseline-Skalierung. Normale Mobs
-    # (T1-T3) folgen dem Player-Level. Bosse (T4) haben Floor + Bonus.
-    # Friendly NPCs (kein Tier-Eintrag) behalten ihr base_hp.
+    # Welle 23 (2026-05-27): ESO-Style Adaptive Scaling — Power-Score statt
+    # naivem max(level), Group-aware via nearby-Filter, plus Region-Modifier
+    # (Stage-2-Hook für World-Brain).
     try:
-        import power_budget, skills as _skills
-        player_lvl = 0
-        for pname in connection_manager.get_players().keys():
-            sk = await _skills.get_skills(pname)
-            player_lvl = max(player_lvl, power_budget.player_level_estimate(sk))
+        import power_budget
         if kind in combat.CREATURE_KINDS:
-            max_hp = combat.kalibrated_npc_hp(kind, player_lvl)
+            agg = await power_budget.nearby_player_power(x, y, connection_manager)
+            if agg["count"] == 0:
+                # Niemand in der Nähe — Default: schwacher Mob (Score 0)
+                player_power = 0.0
+                group_hp = group_dmg = 1.0
+            else:
+                player_power = agg["score"]
+                # Group-Mult vom Aggregator — nur HP wird per Gruppe skaliert,
+                # DMG wenn überhaupt sanft (siehe power_budget.group_dmg_mult)
+                group_hp  = power_budget.group_hp_mult(agg["count"])
+                group_dmg = power_budget.group_dmg_mult(agg["count"])
+            region = await power_budget.region_modifier(x, y)
+            max_hp = combat.kalibrated_npc_hp(
+                kind, player_power,
+                group_mult=group_hp,
+                region_mod=region["hp_mod"],
+            )
         else:
             max_hp = base_hp   # friendly NPCs: fixed
     except Exception:
+        log.exception("Mob-HP-Skalierung fehlgeschlagen, fallback base_hp=%d", base_hp)
         max_hp = base_hp
     # Sprite-Variante pro spawn random aus dem Pool (bandit_axe, soldier_spear, …).
     variant_pool = SPRITE_VARIANTS_BY_KIND.get(kind)
@@ -451,12 +520,27 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
     return npc
 
 
-async def respawn_loop(world, npc_manager, connection_manager) -> None:
+# Welle 23: Kinds die NIE über den Respawn-Loop spawnen — kommen nur via
+# scripted Sources (village_spawner bandit_camp, event_worker ambush etc.).
+CAMP_ONLY_KINDS = {"bandit", "robber", "thief"}
+
+
+async def respawn_loop(world, npc_manager, connection_manager,
+                       structure_manager=None) -> None:
     """Periodisch: wenn weniger als MIN_CREATURE_COUNT Creatures existieren, spawne nach.
-    Gruppen-Größe und Biome richten sich nach CREATURE_SPAWN_PROFILE pro Kind."""
-    log.info("Creature-Respawn-Loop startet (interval=%ds, min=%d)",
-             CREATURE_RESPAWN_INTERVAL, MIN_CREATURE_COUNT)
+    Gruppen-Größe und Biome richten sich nach CREATURE_SPAWN_PROFILE pro Kind.
+
+    Welle 23:
+    - CAMP_ONLY_KINDS (bandit/robber/thief) werden hier NICHT gespawnt
+    - structure_manager wird für Safe-Zone-Check durchgereicht
+    - Region-Difficulty kann tier_bias setzen (Mob-Pool filtert nach tier)
+    """
+    log.info("Creature-Respawn-Loop startet (interval=%ds, min=%d, safe_zones=%s)",
+             CREATURE_RESPAWN_INTERVAL, MIN_CREATURE_COUNT,
+             "on" if structure_manager else "off")
     await asyncio.sleep(60)  # Lange Anlaufzeit damit Initial-Spawn vorbei ist
+    # Wild-Spawnable Kinds = CREATURE_KINDS minus camp-only
+    wild_kinds = [k for k in CREATURE_KINDS if k not in CAMP_ONLY_KINDS]
     while True:
         try:
             await asyncio.sleep(CREATURE_RESPAWN_INTERVAL)
@@ -464,17 +548,49 @@ async def respawn_loop(world, npc_manager, connection_manager) -> None:
             deficit = MIN_CREATURE_COUNT - len(creatures)
             if deficit <= 0:
                 continue
-            kind = random.choice(CREATURE_KINDS)
+            # Erst Position finden (irgendwo nahe Spieler) — danach Region/Tier
+            # bestimmen, dann passenden Kind aus dem erlaubten Pool wählen.
+            # Center für Gruppe finden (strict biome + safe-zones)
+            kind = random.choice(wild_kinds)
             profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
             group_min, group_max = profile["group"]
             group_size = min(random.randint(group_min, group_max), deficit)
             biomes = profile["biomes"]
-            # Center für Gruppe finden (strict biome) — kein Spawn wenn nichts passt
-            pos = await _find_spawn_position(world, connection_manager, biomes=biomes, strict=True)
+            pos = await _find_spawn_position(
+                world, connection_manager, biomes=biomes, strict=True,
+                structure_manager=structure_manager, npc_manager=npc_manager,
+            )
             if pos is None:
                 log.info("Gruppen-Respawn-Skip: kein passendes Biome für %s", kind)
                 continue
             cx, cy = pos
+            # Welle 23-D/E: Region-Tier + Density-Check
+            try:
+                import region_difficulty, combat as _cmb
+                tier_max = await region_difficulty.effective_tier_max(cx, cy)
+                density  = region_difficulty.density_for_distance(cx, cy)
+                kind_tier = _cmb.creature_stats(kind).get("tier", 2)
+                # Kind zu stark für diese Region? → re-roll lighter kind, sonst skip
+                if kind_tier > tier_max:
+                    lighter = [k for k in wild_kinds
+                               if _cmb.creature_stats(k).get("tier", 2) <= tier_max
+                               and (CREATURE_SPAWN_PROFILE.get(k, {}).get("biomes")
+                                    is None or biomes is None
+                                    or CREATURE_SPAWN_PROFILE[k]["biomes"] & (biomes or set()))]
+                    if not lighter:
+                        log.info("Region-Skip: %s (tier %d) > tier_max %d @(%d,%d)",
+                                 kind, kind_tier, tier_max, cx, cy)
+                        continue
+                    kind = random.choice(lighter)
+                    profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
+                    group_min, group_max = profile["group"]
+                    group_size = min(random.randint(group_min, group_max), deficit)
+                # Density-Check: Würfel gegen Density-Multiplier
+                if density <= 0.0 or random.random() > density:
+                    log.info("Density-Skip @(%d,%d) density=%.2f", cx, cy, density)
+                    continue
+            except Exception:
+                log.exception("Region-Difficulty-Check fehlgeschlagen")
             log.info("Gruppen-Respawn: %d × %s @(%d,%d) biome=%s (deficit=%d)",
                      group_size, kind, cx, cy, biomes, deficit)
             await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(cx, cy))
@@ -528,13 +644,21 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         if not _has_attack_los(npc, nearest_data["x"], nearest_data["y"],
                                 world, structures_mgr):
             return False
-        # Welle 23: ESO-Style — DMG folgt Player-Level + Tier + per-kind Flavor.
+        # Welle 23: ESO-Style — DMG folgt Player-Power + Tier + Flavor + Region.
+        # Hier nehmen wir den Power-Score des angegriffenen Spielers (nicht der
+        # Gruppe), weil DMG individuell zugefügt wird.
         try:
-            import power_budget, skills as _skills
-            sk = await _skills.get_skills(nearest_name)
-            plvl = power_budget.player_level_estimate(sk)
-            dmg = combat.kalibrated_creature_damage(npc["kind"], plvl)
+            import power_budget
+            score = await power_budget.player_power_score(nearest_name)
+            region = await power_budget.region_modifier(
+                nearest_data["x"], nearest_data["y"])
+            dmg = combat.kalibrated_creature_damage(
+                npc["kind"], score,
+                group_mult=1.0,   # DMG-Mult nicht pro Gruppe (jeder kriegt sein eigenes)
+                region_mod=region["dmg_mod"],
+            )
         except Exception:
+            log.exception("Mob-DMG-Skalierung fehlgeschlagen, fallback")
             dmg = combat.creature_damage(npc["kind"])
         # Welle 15: themed-Mobs verursachen typed damage (fire/ice/...)
         _dmg_type = combat.creature_stats(npc["kind"]).get("damage_type", "physical")
