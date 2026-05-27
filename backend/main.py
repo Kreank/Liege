@@ -2520,7 +2520,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 VALID_ATTRS = {"stärke", "ausdauer", "energie", "intelligenz",
                                 "weisheit", "ausweichen", "geschick", "verteidigung",
                                 "charisma", "krit_rate", "krit_schaden", "schleichen"}
-                MAX_PER_ATTR = 5
+                MAX_PER_ATTR = 10   # Welle 23: erhöht von 5 für mehr Specialization
                 MAX_TOTAL = 20
                 cleaned: dict[str, int] = {}
                 total = 0

@@ -3452,7 +3452,7 @@ class WorldScene extends Phaser.Scene {
       });
       row.querySelector('[data-act="plus"]').addEventListener('click', () => {
         const cur = this._ccState.alloc[a.key] || 0;
-        if (cur < 5 && this._ccState.pool > 0) {
+        if (cur < 10 && this._ccState.pool > 0) {
           this._ccState.alloc[a.key] = cur + 1;
           this._ccState.pool -= 1;
           this._updateCharCreateUI();
