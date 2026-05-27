@@ -432,6 +432,13 @@ async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
                         dmg_type: str = "physical") -> None:
     """Wendet Schaden auf einen Spieler an. Wenn HP ≤ 0 → Respawn.
     Berücksichtigt Armor-Defense + Shield-Status + Element-Resistance."""
+    # Welle 23 — Godmode während Character-Creation: kein Schaden bevor
+    # der Spieler den Character bestätigt hat.
+    cc_row = await db.pool().fetchrow(
+        "SELECT character_created FROM players WHERE name = $1", name,
+    )
+    if cc_row is None or not cc_row["character_created"]:
+        return
     # Armor-Defense gilt nur für physical-Damage (Welle 15)
     import item_stats as _is
     if dmg_type == "physical":

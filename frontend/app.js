@@ -3417,7 +3417,8 @@ class WorldScene extends Phaser.Scene {
         // Welle 23: Player-Preset speichern für Sprite-Resolution
         this.myPreset = msg.preset || null;
         // Welle 23: Character-Creation-Flow wenn nötig
-        if (msg.needs_character_creation) {
+        this.needsCharCreation = !!msg.needs_character_creation;
+        if (this.needsCharCreation) {
           this._showCharacterCreation();
         }
         // Chunks aus init aufnehmen
@@ -3489,6 +3490,10 @@ class WorldScene extends Phaser.Scene {
         this.myPy = msg.spawn.y * TILE_SIZE + TILE_SIZE / 2;
         this.mySprite = this.spawnSprite(MY_ID, msg.spawn.x, msg.spawn.y, true);
         this.cameras.main.startFollow(this.mySprite.container, true, 0.15, 0.15);
+        // Welle 23: Sprite unsichtbar bis Character-Creation abgeschlossen
+        if (this.needsCharCreation && this.mySprite.container) {
+          this.mySprite.container.setVisible(false);
+        }
         this._applyAdaptiveZoom();
         // Re-apply zoom bei Viewport-Änderungen (Orientation, Resize)
         if (!this._zoomListener) {
@@ -3937,13 +3942,17 @@ class WorldScene extends Phaser.Scene {
       case 'character_created': {
         // Welle 23: Character-Creation abgeschlossen — Modal schließen + Sprite-Update
         this.myPreset = msg.preset;
+        this.needsCharCreation = false;
         this._hideCharacterCreation();
-        // Player-Sprite umschalten auf preset
-        if (this.mySprite && this.mySprite.body) {
-          const key = `preset_${msg.preset}`;
-          if (this.textures.exists(key)) {
-            this.mySprite.body.setTexture(key);
-            this.mySprite.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+        // Player-Sprite umschalten auf preset + sichtbar machen
+        if (this.mySprite) {
+          if (this.mySprite.container) this.mySprite.container.setVisible(true);
+          if (this.mySprite.body) {
+            const key = `preset_${msg.preset}`;
+            if (this.textures.exists(key)) {
+              this.mySprite.body.setTexture(key);
+              this.mySprite.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+            }
           }
         }
         this.showEvent(`⚔ Charakter erschaffen: ${msg.preset}`);

@@ -653,10 +653,29 @@ async def initial_spawn(world, npc_manager, connection_manager) -> None:
 async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb,
                            structures_mgr=None) -> bool:
     """Creature-Verhalten: Spieler in Aggro-Range jagen, Spieler in Attack-Range angreifen.
-    Returnt True wenn ein Verhalten ausgelöst wurde."""
+    Returnt True wenn ein Verhalten ausgelöst wurde.
+    Welle 23: Spieler die noch in der Character-Creation sind, sind unsichtbar
+    für NPCs (kein aggro, kein Damage)."""
     players = connection_manager.get_players()
     if not players:
         return False
+    # Charakter-Creation-Filter: Spieler die noch character_created=FALSE sind
+    # werden hier ausgefiltert (godmode in der Welt-Auswahl).
+    import db
+    try:
+        names = list(players.keys())
+        if names:
+            rows = await db.pool().fetch(
+                "SELECT name FROM players WHERE name = ANY($1::text[]) "
+                "AND character_created = TRUE",
+                names,
+            )
+            ready = {r["name"] for r in rows}
+            players = {k: v for k, v in players.items() if k in ready}
+        if not players:
+            return False
+    except Exception:
+        pass  # Fallback: alle Player aggroable
     nearest_name, nearest_dist, nearest_data = None, float("inf"), None
     for pname, pdata in players.items():
         d = combat.manhattan(npc["x"], npc["y"], pdata["x"], pdata["y"])
