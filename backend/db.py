@@ -435,7 +435,11 @@ CREATE TABLE IF NOT EXISTS quests (
     status        TEXT NOT NULL DEFAULT 'active',
     created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+-- Welle 23: Template-basiertes Quest-System
+ALTER TABLE quests ADD COLUMN IF NOT EXISTS template_id TEXT NULL;
+ALTER TABLE quests ADD COLUMN IF NOT EXISTS tier        INTEGER NULL;
 CREATE INDEX IF NOT EXISTS quests_player_status_idx ON quests (player_name, status);
+CREATE INDEX IF NOT EXISTS quests_player_template_idx ON quests (player_name, template_id);
 
 -- Welle 9: Echte Dungeons (eigene Welt pro Instanz)
 CREATE TABLE IF NOT EXISTS dungeons (
