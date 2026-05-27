@@ -116,6 +116,15 @@ async def lifespan(app: FastAPI):
         await disaster_state.init_schema()
     except Exception:
         logging.exception("disaster_state init_schema failed (non-fatal)")
+    # Welle 26: Personality-Backfill für existierende NPCs ohne Archetyp.
+    # Danach Reload damit die personality im In-Memory-Cache landet.
+    try:
+        import npc_chatter as _nc
+        n_p = await _nc.assign_personality_to_existing_npcs()
+        if n_p > 0:
+            await npcs.load()
+    except Exception:
+        logging.exception("Personality-Backfill fehlgeschlagen (non-fatal)")
     # Populate läuft jetzt on-demand pro Chunk beim Connect/Chunk-Cross (siehe populate_chunk_if_needed)
 
     event_task = asyncio.create_task(

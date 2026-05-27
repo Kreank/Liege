@@ -54,6 +54,31 @@ ALTER TABLE structures ADD COLUMN IF NOT EXISTS rotation       INTEGER NOT NULL 
 ALTER TABLE structures ADD COLUMN IF NOT EXISTS max_durability INTEGER NOT NULL DEFAULT 1;
 UPDATE structures SET max_durability = durability WHERE max_durability < durability;
 
+-- Welle 26: NPC-Persönlichkeit für variantenreicheres Chatter-System.
+ALTER TABLE npcs ADD COLUMN IF NOT EXISTS personality TEXT;
+
+-- Welle 26: Chatter-Cache. LLM-generierte Konversationen werden pro
+-- (kind, archetype, phase) gespeichert. lines=array of arrays of strings.
+CREATE TABLE IF NOT EXISTS npc_chatter_cache (
+    cache_key    TEXT PRIMARY KEY,
+    lines        JSONB NOT NULL,
+    use_count    INTEGER NOT NULL DEFAULT 0,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Welle 26: Event-Reactive Chatter (Storyteller schreibt rein, NPCs ziehen daraus).
+CREATE TABLE IF NOT EXISTS event_chatter (
+    id           BIGSERIAL PRIMARY KEY,
+    region_x     INTEGER NOT NULL,
+    region_y     INTEGER NOT NULL,
+    event_kind   TEXT,
+    lines        JSONB NOT NULL,
+    expires_at   TIMESTAMPTZ NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS event_chatter_region_idx ON event_chatter (region_x, region_y, expires_at);
+
 -- Frühe Vorab-CREATEs für nachfolgende ALTERs (Fresh-DB-Init).
 CREATE TABLE IF NOT EXISTS npcs (
     id           BIGSERIAL PRIMARY KEY,

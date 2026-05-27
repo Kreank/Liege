@@ -1413,3 +1413,40 @@
       width: 98vw !important; max-width: 98vw !important;
       max-height: 88vh !important;
     }
+
+    /* ── Char-Create-Modal Mobile (Welle 24) ── */
+    body.is-mobile #char-create-box {
+      width: 98vw !important; max-width: 98vw !important;
+      padding: 10px 12px !important; max-height: 95vh !important;
+      font-size: 12px !important;
+    }
+    body.is-mobile #char-create-box > div:first-child {
+      font-size: 15px !important;
+    }
+    body.is-mobile #char-create-presets {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+      gap: 5px !important;
+    }
+    body.is-mobile #char-create-presets img {
+      width: 56px !important; height: 56px !important;
+    }
+    body.is-mobile #char-create-presets > div {
+      padding: 4px !important;
+    }
+    body.is-mobile #char-create-attrs {
+      grid-template-columns: 1fr !important;
+      gap: 3px 0 !important;
+    }
+    body.is-mobile #char-create-attrs > div {
+      padding: 3px 6px !important;
+    }
+    body.is-mobile #char-create-confirm,
+    body.is-mobile #char-create-reset {
+      padding: 8px 14px !important; font-size: 13px !important;
+    }
+
+    /* ── HUD-Texte allgemein kleiner auf Mobile (Welle 24) ── */
+    body.is-mobile #hotbar { transform: scale(0.85); transform-origin: center bottom; }
+    body.is-mobile .top-right-link { font-size: 11px !important; padding: 3px 6px !important; }
+    body.is-mobile #time-display { font-size: 11px !important; padding: 3px 6px !important; }
+    body.is-mobile #status { font-size: 10px !important; }

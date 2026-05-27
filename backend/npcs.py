@@ -26,6 +26,12 @@ def _row_to_dict(row) -> dict:
             d["sprite_variant"] = row["sprite_variant"]
     except (KeyError, IndexError):
         pass
+    # Welle 26: Persönlichkeit für Chatter
+    try:
+        if row["personality"]:
+            d["personality"] = row["personality"]
+    except (KeyError, IndexError):
+        pass
     return d
 
 
@@ -36,7 +42,7 @@ class NPCManager:
     async def load(self) -> None:
         rows = await db.pool().fetch(
             "SELECT id, name, kind, x, y, backstory, mood, mental_state, hp, max_hp, "
-            "home_x, home_y, created_at, last_moved, sprite_variant FROM npcs"
+            "home_x, home_y, created_at, last_moved, sprite_variant, personality FROM npcs"
         )
         self._by_id = {}
         for r in rows:
@@ -59,13 +65,23 @@ class NPCManager:
 
     async def create(self, name: str, kind: str, x: int, y: int, backstory: str,
                      max_hp: int = 50, sprite_variant: str | None = None) -> dict:
+        # Welle 26: Friendly NPCs kriegen automatisch eine Persönlichkeit für
+        # variantenreiches Chatter. Creatures (hostile) brauchen keine.
+        personality = None
+        try:
+            import combat as _combat, npc_chatter as _nc
+            if kind not in _combat.CREATURE_KINDS:
+                personality = _nc.assign_personality()
+        except Exception:
+            pass
         # Spawn-Position wird Home-Position
         row = await db.pool().fetchrow(
-            "INSERT INTO npcs (name, kind, x, y, backstory, hp, max_hp, home_x, home_y, sprite_variant) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $6, $3, $4, $7) "
+            "INSERT INTO npcs (name, kind, x, y, backstory, hp, max_hp, home_x, home_y, "
+            "  sprite_variant, personality) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $6, $3, $4, $7, $8) "
             "RETURNING id, name, kind, x, y, backstory, mood, mental_state, hp, max_hp, "
-            "created_at, last_moved, sprite_variant",
-            name, kind, x, y, backstory, max_hp, sprite_variant,
+            "created_at, last_moved, sprite_variant, personality",
+            name, kind, x, y, backstory, max_hp, sprite_variant, personality,
         )
         npc = _row_to_dict(row)
         npc["home_x"] = x

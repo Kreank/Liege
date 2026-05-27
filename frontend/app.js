@@ -4350,7 +4350,13 @@ class WorldScene extends Phaser.Scene {
         this._hideCharacterCreation();
         // Player-Sprite umschalten auf preset + sichtbar machen
         if (this.mySprite) {
-          if (this.mySprite.container) this.mySprite.container.setVisible(true);
+          if (this.mySprite.container) {
+            this.mySprite.container.setVisible(true);
+            // Welle 24: Camera explizit auf Player zentrieren (Mobile-Fix)
+            this.cameras.main.centerOn(
+              this.mySprite.container.x, this.mySprite.container.y,
+            );
+          }
           if (this.mySprite.body) {
             const key = `preset_${msg.preset}`;
             if (this.textures.exists(key)) {
@@ -4358,6 +4364,12 @@ class WorldScene extends Phaser.Scene {
               this.mySprite.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
             }
           }
+        }
+        // Welle 24: Canvas-Resize trigger — Phaser muss sich an aktuelle
+        // Viewport-Größe anpassen (auf Mobile war canvas oft 0×0 wenn Modal
+        // initial den Body okkupierte).
+        if (this.scale && this.scale.refresh) {
+          this.scale.refresh();
         }
         this.showEvent(`⚔ Charakter erschaffen: ${msg.preset}`);
         break;
@@ -7428,6 +7440,11 @@ const config = {
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', refreshCanvas);
   }
+  // Welle 24: Mobile-Schwarz-Bildschirm-Fix — wenn die Canvas beim Boot
+  // wegen Login-Form oder Char-Create-Overlay 0×0 ist, refresh nach kurzem
+  // Delay sicherstellen dass sie viewport-fill ist.
+  setTimeout(refreshCanvas, 100);
+  setTimeout(refreshCanvas, 600);
   setupTouchControls();
 })();
 
