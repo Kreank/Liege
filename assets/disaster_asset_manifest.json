@@ -1,0 +1,59 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "disaster_asset_index",
+  "root": "assets",
+  "summary": {
+    "packs": 1,
+    "manifest_items": 287,
+    "events": 7,
+    "png_files_referenced": 287
+  },
+  "packs": [
+    {
+      "manifest": "assets/professional/disaster_pack_2026_05_27/manifest.json",
+      "asset_type": "disaster_pack_p0",
+      "items": 287,
+      "events": [
+        "forest_fire",
+        "ash_rain",
+        "scorching_heat",
+        "toxic_fog",
+        "locust_swarm",
+        "frog_plague",
+        "thunderstorm"
+      ],
+      "contacts": [
+        "assets/professional/disaster_pack_2026_05_27/contacts/forest_fire_contact.jpg",
+        "assets/professional/disaster_pack_2026_05_27/contacts/ash_rain_contact.jpg",
+        "assets/professional/disaster_pack_2026_05_27/contacts/scorching_heat_contact.jpg",
+        "assets/professional/disaster_pack_2026_05_27/contacts/toxic_fog_contact.jpg",
+        "assets/professional/disaster_pack_2026_05_27/contacts/locust_swarm_contact.jpg",
+        "assets/professional/disaster_pack_2026_05_27/contacts/frog_plague_contact.jpg",
+        "assets/professional/disaster_pack_2026_05_27/contacts/thunderstorm_contact.jpg"
+      ]
+    }
+  ],
+  "counts_by_event": {
+    "ash_rain": 24,
+    "forest_fire": 43,
+    "frog_plague": 61,
+    "locust_swarm": 69,
+    "scorching_heat": 28,
+    "thunderstorm": 33,
+    "toxic_fog": 29
+  },
+  "counts_by_category": {
+    "aftermath_prop": 35,
+    "aftermath_tile": 4,
+    "animation_frame": 72,
+    "one_shot_fx": 7,
+    "sky_overlay": 8,
+    "swarm_animation": 73,
+    "swarm_direction": 16,
+    "swarm_variant": 4,
+    "tile_overlay": 54,
+    "ui_icon": 7,
+    "ui_icon_master": 7
+  },
+  "policy": "additive pack only; no existing disaster/effect assets replaced"
+}

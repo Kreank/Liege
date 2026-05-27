@@ -1,0 +1,609 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "character_walk_cycles_static_npcs",
+  "policy": "additive animations generated from existing role sprites; base NPC sprites untouched",
+  "count": 60,
+  "items": [
+    {
+      "kind": "hermit",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/hermit/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/hermit/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/hermit/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/hermit/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/hermit/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/hermit/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/hermit/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/hermit/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/hermit/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "hermit",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/hermit/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/hermit.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/bard/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/bard/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/bard/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/bard/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/bard/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/bard/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/bard/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/bard/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/bard/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "bard",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/bard/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/bard.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/scholar/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/scholar/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/scholar/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/scholar/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/scholar/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/scholar/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/scholar/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/scholar/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/scholar/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "scholar",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/scholar/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/scholar.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/miner/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/miner/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/miner/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/miner/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/miner/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/miner/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/miner/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/miner/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/miner/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "miner",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/miner/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/miner.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/village_elder/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/village_elder/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/village_elder/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/village_elder/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/village_elder/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/village_elder/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/village_elder/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/village_elder/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/village_elder/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "village_elder",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/village_elder/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/village_elder.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/watchman/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/watchman/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/watchman/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/watchman/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/watchman/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/watchman/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/watchman/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/watchman/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/watchman/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    },
+    {
+      "kind": "watchman",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/watchman/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/characters/npcs/variants/watchman_lantern.png"
+    }
+  ],
+  "contact": "assets/professional/character_walk_pack_2026_05_27/contacts/character_walk_p0_contact.jpg"
+}

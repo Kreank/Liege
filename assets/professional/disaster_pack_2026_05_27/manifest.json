@@ -1,0 +1,3196 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "disaster_pack_p0",
+  "policy": "additive pack only; no existing disaster/effect assets replaced",
+  "roadmap": "docu/ASSET_DISASTERS_ROADMAP.md",
+  "events": [
+    "forest_fire",
+    "ash_rain",
+    "scorching_heat",
+    "toxic_fog",
+    "locust_swarm",
+    "frog_plague",
+    "thunderstorm"
+  ],
+  "source_sheets": [
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_forest_ash_tiles_alpha.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_forest_ash_tiles_chromakey.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_fx_props_alpha.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_fx_props_chromakey.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_heat_toxic_tiles_alpha.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_heat_toxic_tiles_chromakey.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_sky_icons_storm_alpha.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_sky_icons_storm_chromakey.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_swarms_alpha.png",
+    "assets/professional/disaster_pack_2026_05_27/source_sheets/p0_swarms_chromakey.png"
+  ],
+  "contacts": [
+    "assets/professional/disaster_pack_2026_05_27/contacts/forest_fire_contact.jpg",
+    "assets/professional/disaster_pack_2026_05_27/contacts/ash_rain_contact.jpg",
+    "assets/professional/disaster_pack_2026_05_27/contacts/scorching_heat_contact.jpg",
+    "assets/professional/disaster_pack_2026_05_27/contacts/toxic_fog_contact.jpg",
+    "assets/professional/disaster_pack_2026_05_27/contacts/locust_swarm_contact.jpg",
+    "assets/professional/disaster_pack_2026_05_27/contacts/frog_plague_contact.jpg",
+    "assets/professional/disaster_pack_2026_05_27/contacts/thunderstorm_contact.jpg"
+  ],
+  "count": 287,
+  "items": [
+    {
+      "id": "forest_fire_smoldering_tile_01",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_smoldering_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_smoldering_tile_02",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_smoldering_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_smoldering_tile_03",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_smoldering_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_smoldering_tile_04",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_smoldering_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_active_tile_01",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_active_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_active_tile_02",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_active_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_active_tile_03",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_active_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_active_tile_04",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_active_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_burned_ground_tile_01",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_burned_ground_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_burned_ground_tile_02",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_burned_ground_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_burned_ground_tile_03",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_burned_ground_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "forest_fire_burned_ground_tile_04",
+      "event": "forest_fire",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/forest_fire/forest_fire_burned_ground_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_dust_tile_01",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_dust_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_dust_tile_02",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_dust_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_dust_tile_03",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_dust_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_dust_tile_04",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_dust_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_accumulated_tile_01",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_accumulated_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_accumulated_tile_02",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_accumulated_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_accumulated_tile_03",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_accumulated_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_accumulated_tile_04",
+      "event": "ash_rain",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_accumulated_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "parched_grass_tile_01",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/parched_grass_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "parched_grass_tile_02",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/parched_grass_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "parched_grass_tile_03",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/parched_grass_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "parched_grass_tile_04",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/parched_grass_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "cracked_earth_tile_01",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/cracked_earth_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "cracked_earth_tile_02",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/cracked_earth_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "cracked_earth_tile_03",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/cracked_earth_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "cracked_earth_tile_04",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/cracked_earth_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "dry_stream_bed_tile_01",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/dry_stream_bed_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "dry_stream_bed_tile_02",
+      "event": "scorching_heat",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/dry_stream_bed_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_thin_tile_01",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_thin_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_thin_tile_02",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_thin_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_thin_tile_03",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_thin_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_thin_tile_04",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_thin_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_dense_tile_01",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_dense_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_dense_tile_02",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_dense_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_dense_tile_03",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_dense_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_layer_dense_tile_04",
+      "event": "toxic_fog",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_dense_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "flame_lick_anim_01",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/flame_lick_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "flame_lick_anim_02",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/flame_lick_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "flame_lick_anim_03",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/flame_lick_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "flame_lick_anim_04",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/flame_lick_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "flame_lick_anim_05",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/flame_lick_anim_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "flame_lick_anim_06",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/flame_lick_anim_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ember_rise_anim_01",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/ember_rise_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ember_rise_anim_02",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/ember_rise_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ember_rise_anim_03",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/ember_rise_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ember_rise_anim_04",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/ember_rise_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_plume_thick_anim_01",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_plume_thick_anim_01.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_plume_thick_anim_02",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_plume_thick_anim_02.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_plume_thick_anim_03",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_plume_thick_anim_03.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_plume_thick_anim_04",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_plume_thick_anim_04.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_plume_thick_anim_05",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_plume_thick_anim_05.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_plume_thick_anim_06",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_plume_thick_anim_06.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_drift_thin_anim_01",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_drift_thin_anim_01.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_drift_thin_anim_02",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_drift_thin_anim_02.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_drift_thin_anim_03",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_drift_thin_anim_03.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "smoke_drift_thin_anim_04",
+      "event": "forest_fire",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/forest_fire/smoke_drift_thin_anim_04.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "burned_tree_pine",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/burned_tree_pine.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "burned_tree_oak",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/burned_tree_oak.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "burned_tree_birch",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/burned_tree_birch.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "burned_stump_01",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/burned_stump_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "burned_stump_02",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/burned_stump_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "burned_stump_03",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/burned_stump_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_pile_small",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/ash_pile_small.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_pile_large",
+      "event": "forest_fire",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/forest_fire/ash_pile_large.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_flake_falling_anim_01",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_flake_falling_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_flake_falling_anim_02",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_flake_falling_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_flake_falling_anim_03",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_flake_falling_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_flake_falling_anim_04",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_flake_falling_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_swirl_wind_anim_01",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_swirl_wind_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_swirl_wind_anim_02",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_swirl_wind_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_swirl_wind_anim_03",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_swirl_wind_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_swirl_wind_anim_04",
+      "event": "ash_rain",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/ash_rain/ash_swirl_wind_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "ash_drift_pile_01",
+      "event": "ash_rain",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/ash_rain/ash_drift_pile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_drift_pile_02",
+      "event": "ash_rain",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/ash_rain/ash_drift_pile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "ash_drift_pile_03",
+      "event": "ash_rain",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/ash_rain/ash_drift_pile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "heat_shimmer_anim_01",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/heat_shimmer_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "heat_shimmer_anim_02",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/heat_shimmer_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "heat_shimmer_anim_03",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/heat_shimmer_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "heat_shimmer_anim_04",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/heat_shimmer_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "sun_beam_dust_anim_01",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/sun_beam_dust_anim_01.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "sun_beam_dust_anim_02",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/sun_beam_dust_anim_02.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "sun_beam_dust_anim_03",
+      "event": "scorching_heat",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/scorching_heat/sun_beam_dust_anim_03.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "withered_crop_wheat",
+      "event": "scorching_heat",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/scorching_heat/withered_crop_wheat.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "withered_crop_corn",
+      "event": "scorching_heat",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/scorching_heat/withered_crop_corn.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "withered_crop_generic",
+      "event": "scorching_heat",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/scorching_heat/withered_crop_generic.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "dried_leaves_pile",
+      "event": "scorching_heat",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/scorching_heat/dried_leaves_pile.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "dead_fish_riverbed_01",
+      "event": "scorching_heat",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/scorching_heat/dead_fish_riverbed_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "dead_fish_riverbed_02",
+      "event": "scorching_heat",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/scorching_heat/dead_fish_riverbed_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_drift_overlay_anim_01",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_fog_drift_overlay_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_drift_overlay_anim_02",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_fog_drift_overlay_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_drift_overlay_anim_03",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_fog_drift_overlay_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_drift_overlay_anim_04",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_fog_drift_overlay_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_drift_overlay_anim_05",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_fog_drift_overlay_anim_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_fog_drift_overlay_anim_06",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_fog_drift_overlay_anim_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_bubble_burst_anim_01",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_bubble_burst_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_bubble_burst_anim_02",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_bubble_burst_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_bubble_burst_anim_03",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_bubble_burst_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_bubble_burst_anim_04",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_bubble_burst_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_drip_residue_anim_01",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_drip_residue_anim_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_drip_residue_anim_02",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_drip_residue_anim_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_drip_residue_anim_03",
+      "event": "toxic_fog",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/toxic_fog/toxic_drip_residue_anim_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "withered_plant_toxic_01",
+      "event": "toxic_fog",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/toxic_fog/withered_plant_toxic_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "withered_plant_toxic_02",
+      "event": "toxic_fog",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/toxic_fog/withered_plant_toxic_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "withered_plant_toxic_03",
+      "event": "toxic_fog",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/toxic_fog/withered_plant_toxic_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_heat_toxic_tiles"
+    },
+    {
+      "id": "toxic_puddle_small",
+      "event": "toxic_fog",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/toxic_fog/toxic_puddle_small.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_puddle_large",
+      "event": "toxic_fog",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/toxic_fog/toxic_puddle_large.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "locust_n",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_n.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_n_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_n_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_n_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_n_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_n_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_n_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_n_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_n_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_ne",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_ne.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_ne_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_ne_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_ne_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_ne_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_ne_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_ne_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_ne_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_ne_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_e",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_e.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_e_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_e_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_e_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_e_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_e_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_e_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_e_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_e_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_se",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_se.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_se_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_se_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_se_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_se_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_se_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_se_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_se_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_se_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_s",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_s.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_s_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_s_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_s_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_s_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_s_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_s_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_s_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_s_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_sw",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_sw.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_sw_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_sw_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_sw_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_sw_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_sw_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_sw_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_sw_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_sw_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_w",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_w.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_w_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_w_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_w_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_w_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_w_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_w_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_w_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_w_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_nw",
+      "event": "locust_swarm",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/locust/directions/locust_nw.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_nw_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_nw_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_nw_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_nw_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_nw_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_nw_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_fly_nw_04",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_fly_nw_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_eat_01",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_eat_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_eat_02",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_eat_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_eat_03",
+      "event": "locust_swarm",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/locust/animations/locust_eat_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_low_tile_01",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_low_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_low_tile_02",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_low_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_low_tile_03",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_low_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_low_tile_04",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_low_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_tile_01",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_high_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_tile_02",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_high_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_tile_03",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_high_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_tile_04",
+      "event": "locust_swarm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/locust_swarm_density_high_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_anim_01",
+      "event": "locust_swarm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_01.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_anim_02",
+      "event": "locust_swarm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_02.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_anim_03",
+      "event": "locust_swarm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_03.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_anim_04",
+      "event": "locust_swarm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_04.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_anim_05",
+      "event": "locust_swarm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_05.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_swarm_density_high_anim_06",
+      "event": "locust_swarm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_06.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "field_eaten_bare_tile_01",
+      "event": "locust_swarm",
+      "category": "aftermath_tile",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/field_eaten_bare_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "field_eaten_bare_tile_02",
+      "event": "locust_swarm",
+      "category": "aftermath_tile",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/field_eaten_bare_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "field_eaten_bare_tile_03",
+      "event": "locust_swarm",
+      "category": "aftermath_tile",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/field_eaten_bare_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "field_eaten_bare_tile_04",
+      "event": "locust_swarm",
+      "category": "aftermath_tile",
+      "path": "assets/tiles/overlays/disasters/locust_swarm/field_eaten_bare_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "crop_stem_remnant_01",
+      "event": "locust_swarm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/locust_swarm/crop_stem_remnant_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "crop_stem_remnant_02",
+      "event": "locust_swarm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/locust_swarm/crop_stem_remnant_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "crop_stem_remnant_03",
+      "event": "locust_swarm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/locust_swarm/crop_stem_remnant_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_carcass_pile_01",
+      "event": "locust_swarm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/locust_swarm/locust_carcass_pile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "locust_carcass_pile_02",
+      "event": "locust_swarm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/locust_swarm/locust_carcass_pile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_n",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_n.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_n_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_n_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_n_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_n_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_n_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_n_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_n_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_n_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_ne",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_ne.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_ne_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_ne_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_ne_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_ne_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_ne_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_ne_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_ne_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_ne_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_e",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_e.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_e_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_e_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_e_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_e_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_e_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_e_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_e_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_e_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_se",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_se.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_se_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_se_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_se_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_se_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_se_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_se_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_se_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_se_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_s",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_s.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_s_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_s_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_s_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_s_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_s_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_s_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_s_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_s_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_sw",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_sw.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_sw_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_sw_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_sw_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_sw_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_sw_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_sw_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_sw_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_sw_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_w",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_w.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_w_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_w_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_w_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_w_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_w_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_w_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_w_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_w_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_nw",
+      "event": "frog_plague",
+      "category": "swarm_direction",
+      "path": "assets/animals/swarms/frog/directions/frog_nw.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_nw_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_nw_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_nw_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_nw_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_nw_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_nw_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_hop_nw_04",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_hop_nw_04.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_idle_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_idle_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_idle_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_idle_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_idle_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_idle_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_croak_01",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_croak_01.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_croak_02",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_croak_02.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_croak_03",
+      "event": "frog_plague",
+      "category": "swarm_animation",
+      "path": "assets/animals/swarms/frog/animations/frog_croak_03.png",
+      "size": [
+        32,
+        32
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_green",
+      "event": "frog_plague",
+      "category": "swarm_variant",
+      "path": "assets/animals/swarms/frog/frog_green.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_brown",
+      "event": "frog_plague",
+      "category": "swarm_variant",
+      "path": "assets/animals/swarms/frog/frog_brown.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_pale",
+      "event": "frog_plague",
+      "category": "swarm_variant",
+      "path": "assets/animals/swarms/frog/frog_pale.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "toad_warty",
+      "event": "frog_plague",
+      "category": "swarm_variant",
+      "path": "assets/animals/swarms/frog/toad_warty.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_swarm_dense_tile_01",
+      "event": "frog_plague",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/frog_plague/frog_swarm_dense_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_swarm_dense_tile_02",
+      "event": "frog_plague",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/frog_plague/frog_swarm_dense_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_swarm_dense_tile_03",
+      "event": "frog_plague",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/frog_plague/frog_swarm_dense_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_swarm_dense_tile_04",
+      "event": "frog_plague",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/frog_plague/frog_swarm_dense_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "slime_trail_tile_01",
+      "event": "frog_plague",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/frog_plague/slime_trail_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "slime_trail_tile_02",
+      "event": "frog_plague",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/frog_plague/slime_trail_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_carcass_01",
+      "event": "frog_plague",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/frog_plague/frog_carcass_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "frog_carcass_02",
+      "event": "frog_plague",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/frog_plague/frog_carcass_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_swarms"
+    },
+    {
+      "id": "ash_rain_sky_overlay_light",
+      "event": "ash_rain",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_rain_sky_overlay_light.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "ash_rain_sky_overlay_heavy",
+      "event": "ash_rain",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/ash_rain/ash_rain_sky_overlay_heavy.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "heat_haze_sky_overlay",
+      "event": "scorching_heat",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/heat_haze_sky_overlay.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "sun_glare_overlay",
+      "event": "scorching_heat",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/scorching_heat/sun_glare_overlay.png",
+      "size": [
+        512,
+        512
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "toxic_fog_icon",
+      "event": "toxic_fog",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/toxic_fog_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "forest_fire_icon",
+      "event": "forest_fire",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/forest_fire_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "ash_rain_icon",
+      "event": "ash_rain",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/ash_rain_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "scorching_heat_icon",
+      "event": "scorching_heat",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/scorching_heat_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "thunderstorm_icon",
+      "event": "thunderstorm",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/thunderstorm_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "locust_swarm_icon",
+      "event": "locust_swarm",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/locust_swarm_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "frog_plague_icon",
+      "event": "frog_plague",
+      "category": "ui_icon",
+      "path": "assets/ui/icons/disasters/frog_plague_icon.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dark_tile_01",
+      "event": "thunderstorm",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/storm_clouds_dark_tile_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dark_tile_02",
+      "event": "thunderstorm",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/storm_clouds_dark_tile_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dark_tile_03",
+      "event": "thunderstorm",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/storm_clouds_dark_tile_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dark_tile_04",
+      "event": "thunderstorm",
+      "category": "sky_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/storm_clouds_dark_tile_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dense_anim_01",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/storm_clouds_dense_anim_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dense_anim_02",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/storm_clouds_dense_anim_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dense_anim_03",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/storm_clouds_dense_anim_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dense_anim_04",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/storm_clouds_dense_anim_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dense_anim_05",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/storm_clouds_dense_anim_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "storm_clouds_dense_anim_06",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/storm_clouds_dense_anim_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "rain_heavy_tile_01",
+      "event": "thunderstorm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/rain_heavy_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "rain_heavy_tile_02",
+      "event": "thunderstorm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/rain_heavy_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "rain_heavy_tile_03",
+      "event": "thunderstorm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/rain_heavy_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "rain_heavy_tile_04",
+      "event": "thunderstorm",
+      "category": "tile_overlay",
+      "path": "assets/tiles/overlays/disasters/thunderstorm/rain_heavy_tile_04.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "lightning_strike_ground_anim_01",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_strike_ground_anim_01.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "lightning_strike_ground_anim_02",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_strike_ground_anim_02.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "lightning_strike_ground_anim_03",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_strike_ground_anim_03.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "lightning_strike_ground_anim_04",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_strike_ground_anim_04.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "lightning_strike_ground_anim_05",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_strike_ground_anim_05.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "lightning_flash_sky_anim_01",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_flash_sky_anim_01.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "lightning_flash_sky_anim_02",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_flash_sky_anim_02.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "lightning_flash_sky_anim_03",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/lightning_flash_sky_anim_03.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "thunder_shockwave_anim_01",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/thunder_shockwave_anim_01.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "thunder_shockwave_anim_02",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/thunder_shockwave_anim_02.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "thunder_shockwave_anim_03",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/thunder_shockwave_anim_03.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "thunder_shockwave_anim_04",
+      "event": "thunderstorm",
+      "category": "animation_frame",
+      "path": "assets/animations/disasters/thunderstorm/thunder_shockwave_anim_04.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "lightning_burn_mark_tile_01",
+      "event": "thunderstorm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/thunderstorm/lightning_burn_mark_tile_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "lightning_burn_mark_tile_02",
+      "event": "thunderstorm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/thunderstorm/lightning_burn_mark_tile_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "lightning_burn_mark_tile_03",
+      "event": "thunderstorm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/thunderstorm/lightning_burn_mark_tile_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "p0_forest_ash_tiles"
+    },
+    {
+      "id": "tree_lightning_split",
+      "event": "thunderstorm",
+      "category": "aftermath_prop",
+      "path": "assets/props/disasters/thunderstorm/tree_lightning_split.png",
+      "size": [
+        96,
+        96
+      ],
+      "source": "p0_fx_props"
+    },
+    {
+      "id": "toxic_fog_icon_master_256",
+      "event": "toxic_fog",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/toxic_fog_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "forest_fire_icon_master_256",
+      "event": "forest_fire",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/forest_fire_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "ash_rain_icon_master_256",
+      "event": "ash_rain",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/ash_rain_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "scorching_heat_icon_master_256",
+      "event": "scorching_heat",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/scorching_heat_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "thunderstorm_icon_master_256",
+      "event": "thunderstorm",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/thunderstorm_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "locust_swarm_icon_master_256",
+      "event": "locust_swarm",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/locust_swarm_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "frog_plague_icon_master_256",
+      "event": "frog_plague",
+      "category": "ui_icon_master",
+      "path": "assets/ui/icons/disasters/masters_256/frog_plague_icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "source": "p0_sky_icons_storm"
+    },
+    {
+      "id": "forest_fire_flame_burst",
+      "event": "forest_fire",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/forest_fire/forest_fire_flame_burst.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/animations/disasters/forest_fire/flame_lick_anim_04.png"
+    },
+    {
+      "id": "ash_rain_ground_swirl",
+      "event": "ash_rain",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/ash_rain/ash_rain_ground_swirl.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/animations/disasters/ash_rain/ash_swirl_wind_anim_03.png"
+    },
+    {
+      "id": "scorching_heat_shimmer",
+      "event": "scorching_heat",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/scorching_heat/scorching_heat_shimmer.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/animations/disasters/scorching_heat/heat_shimmer_anim_03.png"
+    },
+    {
+      "id": "toxic_fog_bubble_burst",
+      "event": "toxic_fog",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/toxic_fog/toxic_fog_bubble_burst.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/animations/disasters/toxic_fog/toxic_bubble_burst_anim_03.png"
+    },
+    {
+      "id": "locust_swarm_pulse",
+      "event": "locust_swarm",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/locust_swarm/locust_swarm_pulse.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_03.png"
+    },
+    {
+      "id": "frog_plague_swarm_splash",
+      "event": "frog_plague",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/frog_plague/frog_plague_swarm_splash.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/tiles/overlays/disasters/frog_plague/frog_swarm_dense_tile_01.png"
+    },
+    {
+      "id": "thunderstorm_lightning_impact",
+      "event": "thunderstorm",
+      "category": "one_shot_fx",
+      "path": "assets/effects/disasters/thunderstorm/thunderstorm_lightning_impact.png",
+      "size": [
+        128,
+        128
+      ],
+      "source": "assets/animations/disasters/thunderstorm/lightning_strike_ground_anim_04.png"
+    }
+  ]
+}
