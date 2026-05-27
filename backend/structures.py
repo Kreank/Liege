@@ -155,6 +155,133 @@ del _slug
 VALID_MATERIALS = {"stone", "wood", "straw"}
 DEFAULT_MATERIAL = "stone"
 
+# ─── Welle 25: Struktur-HP-System ─────────────────────────────────────────
+# Pro Strukturtyp die Combat-Max-HP. Strukturen die NICHT in dieser Tabelle
+# stehen, sind "harvest-only" (Trees, Pflanzen, Felsen) und können nicht
+# als Combat-Ziel angegriffen werden — ihre durability bleibt für Harvest.
+STRUCTURE_MAX_HP = {
+    # Wände & Tore — Festungs-Material
+    "wall":              50,
+    "floor":             30,
+    "door_wood":         40,
+    "door_iron":         80,
+    "door_stone":        70,
+    "door_reinforced":   100,
+    "door_wood_open":    40,
+    "door_iron_open":    80,
+    "door_stone_open":   70,
+    "garden_gate_ew_closed": 25, "garden_gate_ew_open": 25,
+    "garden_gate_ns_closed": 25, "garden_gate_ns_open": 25,
+    "fence":             18,
+    "wooden_fence_segment": 18,
+    "fence_gate_farm":   20,
+    # Möbel / Produktions-Stationen
+    "chest":             40,
+    "workbench":         35,
+    "furnace":           50,
+    "anvil":             60,
+    "bed":               20,
+    "well":              80,
+    "campfire":          15,
+    # Welt-Deko / Container
+    "barrel":            18,
+    "crate":             18,
+    "sack":              10,
+    "marker":            12,
+    "spike_trap":        15,
+    "poison_trap":       15,
+    "stairs_down":       40,
+    "stairs_wood_up":    25, "stairs_wood_down":  25,
+    "stairs_stone_up":   40, "stairs_stone_down": 40,
+    "camp_tent":         15,
+    "cooking_pot":       15,
+    # Ruinen — schon halb-kaputt
+    "ruin_pillar":       25,
+    "rubble":            10,
+    "statue_broken":     35,
+    "gravestone":        40,
+    # Dock/Boat
+    "dock_corner":       20, "dock_straight": 20,
+    "wooden_bridge":     30,
+    "boat_small":        40, "shipwreck": 25,
+    "anchor":            20, "fishing_net": 8,
+    "driftwood":         10, "broken_cart": 20,
+    # Farm-Gebäude — solide
+    "barn_large":        90, "barn_small":   60,
+    "cow_shed":          55, "pigsty":       50,
+    "henhouse":          35, "goat_pen":     45,
+    "sheepfold":         50, "stable":       70,
+    "dovecote":          40, "dairy_house":  55,
+    "granary":           80, "hayloft":      60,
+    "smokehouse":        50, "cart_shed":    55,
+    # Farm-Props (kleiner)
+    "feed_trough":       15, "water_trough": 18,
+    "hay_bale":          12, "hay_stack":     12,
+    "straw_bale":        10, "cheese_press":  20,
+    "butter_churn":      18, "milking_stool":  8,
+    "nesting_box_egg":   10, "cheese_rack":   15,
+    # Gilden / Tempel / Quest-Board — eher unzerstörbar (sehr hoch)
+    "mage_guild":        500, "fighters_guild": 500,
+    "healers_guild":     500, "thieves_guild":  500,
+    "temple":            500, "quest_board":     80,
+}
+
+# Material-Multiplier auf max_hp — Stein zäh, Holz mittel, Stroh weich.
+MATERIAL_HP_MULT = {"stone": 1.5, "wood": 1.0, "straw": 0.6}
+
+# Material-Damage-Resistance gegen verschiedene Damage-Quellen (Spielerwaffen).
+# Stein hart gegen Edge (Schwert/Axt), anfällig gegen Blunt (Mace/Hammer).
+# Holz: andersrum. Stroh: alles geht.
+MATERIAL_RESIST = {
+    # material → {edge_dr, blunt_dr, magic_dr}, jeweils 0..1 (Damage-Reduktion)
+    "stone": {"edge": 0.55, "blunt": 0.10, "magic": 0.30},
+    "wood":  {"edge": 0.15, "blunt": 0.30, "magic": 0.20},
+    "straw": {"edge": 0.00, "blunt": 0.00, "magic": 0.00},
+}
+
+
+def structure_max_hp(type_: str, material: str = DEFAULT_MATERIAL) -> int:
+    """Berechnet max-HP für einen Strukturtyp + Material. None wenn die
+    Struktur nicht im Combat-HP-System ist (Trees/Pflanzen → bleibt harvest)."""
+    base = STRUCTURE_MAX_HP.get(type_)
+    if base is None:
+        return 0
+    mult = MATERIAL_HP_MULT.get(material, 1.0)
+    return max(1, int(round(base * mult)))
+
+
+def is_combat_structure(type_: str) -> bool:
+    """True wenn diese Struktur angegriffen/repariert werden kann.
+    False = harvest-only (Trees, Pflanzen, Felsen)."""
+    return type_ in STRUCTURE_MAX_HP
+
+
+def player_damage_class(weapon_kind: str | None) -> str:
+    """Damage-Klasse einer Waffe vs Strukturen: edge/blunt/magic.
+
+    Edge = Schwert/Axt/Speer/Dolch/Sense — gut gegen Holz, schwach gegen Stein.
+    Blunt = Mace/Hammer — gut gegen Stein.
+    Magic = Staff/Wand — neutral.
+    """
+    if weapon_kind is None:
+        return "blunt"   # Faust = blunt
+    EDGE = {"sword","axe","greatsword","spear","throwing_knife","scythe","dagger"}
+    BLUNT = {"mace","hammer"}
+    MAGIC = {"staff","wand","bow","crossbow"}
+    if weapon_kind in EDGE:  return "edge"
+    if weapon_kind in BLUNT: return "blunt"
+    if weapon_kind in MAGIC: return "magic"
+    return "blunt"
+
+
+def apply_material_resist(material: str, raw_dmg: int, dmg_class: str) -> int:
+    """Wendet Material-DR auf Roh-Schaden gegen Struktur an. Min 1."""
+    if raw_dmg <= 0:
+        return 0
+    resists = MATERIAL_RESIST.get(material, MATERIAL_RESIST["wood"])
+    dr = resists.get(dmg_class, 0.2)
+    return max(1, int(round(raw_dmg * (1 - dr))))
+
 # Welche Strukturen ins floor-Layer gehören (Rest geht ins object-Layer).
 # Floors blockieren nie und ein Object kann oben drauf platziert werden.
 FLOOR_TYPES = {"floor"}
@@ -176,21 +303,40 @@ class StructureManager:
 
     async def load(self) -> None:
         rows = await db.pool().fetch(
-            "SELECT id, x, y, type, owner, material, durability, layer, rotation FROM structures"
+            "SELECT id, x, y, type, owner, material, durability, max_durability, "
+            "layer, rotation FROM structures"
         )
         self._floor_by_coord.clear()
         self._object_by_coord.clear()
         for r in rows:
+            # Welle 25-Migration: max_durability war evtl. 1 (DEFAULT) — backfilll
+            # auf den richtigen Combat-Max wenn die Struktur HP-fähig ist.
+            mdur = int(r["max_durability"] or 0)
+            cdur = int(r["durability"] or 0)
+            wanted_max = structure_max_hp(r["type"], r["material"])
+            if wanted_max > 0 and mdur < wanted_max:
+                # Backfill: existing Strukturen kriegen ihren regulären Max,
+                # current durability auf max gesetzt wenn niedriger (heile Bauten
+                # sollen nach Migration heile sein).
+                mdur = wanted_max
+                cdur = max(cdur, mdur)
+                try:
+                    await db.pool().execute(
+                        "UPDATE structures SET durability = $1, max_durability = $2 "
+                        "WHERE id = $3", cdur, mdur, r["id"])
+                except Exception:
+                    pass
             struct = {
-                "id":         r["id"],
-                "x":          r["x"],
-                "y":          r["y"],
-                "type":       r["type"],
-                "owner":      r["owner"],
-                "material":   r["material"],
-                "durability": r["durability"],
-                "layer":      r["layer"],
-                "rotation":   r["rotation"] or 0,
+                "id":             r["id"],
+                "x":              r["x"],
+                "y":              r["y"],
+                "type":           r["type"],
+                "owner":          r["owner"],
+                "material":       r["material"],
+                "durability":     cdur,
+                "max_durability": mdur,
+                "layer":          r["layer"],
+                "rotation":       r["rotation"] or 0,
             }
             self._layer_map(r["layer"])[(r["x"], r["y"])] = struct
 
@@ -231,24 +377,53 @@ class StructureManager:
         layer_map = self._layer_map(layer)
         if (x, y) in layer_map:
             return None  # Slot in diesem Layer ist belegt
+        # Welle 25: max_durability aus STRUCTURE_MAX_HP-Tabelle. Wenn die
+        # Struktur Combat-fähig ist, override current durability auf max (frische
+        # Bauten sind voll-HP). Sonst bleibt durability = caller-Wert (Harvest).
+        max_dur = structure_max_hp(type_, material)
+        if max_dur > 0:
+            durability = max_dur
+        else:
+            max_dur = durability  # harvest-only: max = initial
         row = await db.pool().fetchrow(
-            "INSERT INTO structures (x, y, type, owner, material, durability, layer, rotation) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-            x, y, type_, owner, material, durability, layer, rotation,
+            "INSERT INTO structures (x, y, type, owner, material, durability, "
+            "max_durability, layer, rotation) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+            x, y, type_, owner, material, durability, max_dur, layer, rotation,
         )
         struct = {
-            "id":         row["id"],
-            "x":          x,
-            "y":          y,
-            "type":       type_,
-            "owner":      owner,
-            "material":   material,
-            "durability": durability,
-            "layer":      layer,
-            "rotation":   rotation,
+            "id":             row["id"],
+            "x":              x,
+            "y":              y,
+            "type":           type_,
+            "owner":          owner,
+            "material":       material,
+            "durability":     durability,
+            "max_durability": max_dur,
+            "layer":          layer,
+            "rotation":       rotation,
         }
         layer_map[(x, y)] = struct
         return struct
+
+    async def repair_structure(self, x: int, y: int, amount: int = 8,
+                                layer: str | None = None) -> dict | None:
+        """Erhöht durability, gecapped bei max_durability. Returns Struktur."""
+        if layer is None:
+            s = self._object_by_coord.get((x, y)) or self._floor_by_coord.get((x, y))
+        else:
+            s = self._layer_map(layer).get((x, y))
+        if s is None:
+            return None
+        max_d = int(s.get("max_durability") or s["durability"])
+        new_dur = min(max_d, int(s["durability"]) + amount)
+        if new_dur == s["durability"]:
+            return s  # bereits voll
+        await db.pool().execute(
+            "UPDATE structures SET durability = $1 WHERE id = $2", new_dur, s["id"]
+        )
+        s["durability"] = new_dur
+        return s
 
     async def damage_structure(self, x: int, y: int, amount: int = 1,
                                layer: str | None = None) -> dict | None:

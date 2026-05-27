@@ -259,16 +259,27 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
             if not player_names:
                 continue
 
+            # Welle 24: Sterbende-Sonne-Disaster verdoppelt Hunger+Thirst-Drain
+            drain_mult = 1
+            try:
+                import disaster_state
+                if disaster_state.is_active("dying_sun"):
+                    drain_mult = 2
+            except Exception:
+                pass
+            hunger_drain = 1 * drain_mult
+            thirst_drain = THIRST_PER_TICK * drain_mult
+
             for name in player_names:
-                # 1) Hunger -1, Stamina-Regen, Durst -THIRST_PER_TICK
+                # 1) Hunger -hunger_drain, Stamina-Regen, Durst -thirst_drain
                 row = await db.pool().fetchrow(
                     "UPDATE players "
-                    "SET hunger  = GREATEST(0, hunger - 1), "
+                    "SET hunger  = GREATEST(0, hunger - $4), "
                     "    thirst  = GREATEST(0, thirst - $3), "
                     "    stamina = LEAST(max_stamina, stamina + $2) "
                     "WHERE name = $1 "
                     "RETURNING hunger, max_hunger, stamina, max_stamina, thirst, max_thirst",
-                    name, STAMINA_REGEN_PER_TICK, THIRST_PER_TICK,
+                    name, STAMINA_REGEN_PER_TICK, thirst_drain, hunger_drain,
                 )
                 if row is None:
                     continue

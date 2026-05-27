@@ -101,6 +101,9 @@ NPC_HP_BY_KIND = {
     "chicken_hen":      8, "rooster":        12, "chick":          3,
     "duck":            10, "drake":          12, "duckling":       3,
     "goose":           18, "gander":         22, "gosling":        4,
+    # Karawanen-Wagen — leicht zerstörbar aber nicht im Fokus
+    "farm_cart_hay":          25, "handcart_empty":         20,
+    "horse_cart_single":      30, "market_wagon_covered":   40,
     # — Welle 14 — professional monster asset-drop (2026-05-26b) —
     # Vermin / Larva (15–35 HP)
     "razorback_vermin":      20,
@@ -569,9 +572,18 @@ def kalibrated_npc_hp(kind: str, player_power, group_mult: float = 1.0,
 
 def kalibrated_creature_damage(kind: str, player_power, group_mult: float = 1.0,
                                 region_mod: float = 1.0) -> int:
-    """ESO-Style scaling: DMG folgt Power-Score + Tier + per-kind Flavor."""
+    """ESO-Style scaling: DMG folgt Power-Score + Tier + per-kind Flavor.
+
+    Welle 24: Blutmond-Effekt — wenn blood_moon aktiv, ×1.3 Damage."""
     import power_budget
     tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
     base = power_budget.tier_baseline_dmg(tier, player_power)
     val = base * flavor_mult_dmg(kind) * group_mult * region_mod
+    # Disaster-Buff (Blutmond)
+    try:
+        import disaster_state
+        if disaster_state.is_active("blood_moon"):
+            val *= 1.3
+    except Exception:
+        pass
     return max(1, int(round(val)))

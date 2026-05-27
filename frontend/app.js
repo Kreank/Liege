@@ -393,6 +393,42 @@ const STRUCTURE_BY_KEY = Object.fromEntries(
   Object.entries(STRUCTURE).map(([id, s]) => [s.key, id])
 );
 
+// Welle 25 — Strukturen die einen Interakt-Effekt haben (Bed/Well/Chest/etc.).
+// Click darauf → use_structure (kein attack).
+const USABLE_STRUCTURE_TYPES = new Set([
+  'bed', 'well', 'chest', 'workbench', 'furnace', 'anvil', 'farm_plot',
+  'campfire', 'cooking_pot', 'quest_board',
+  // Farm-Stationen
+  'cheese_press', 'butter_churn', 'milking_stool', 'nesting_box_egg',
+  'feed_trough', 'water_trough',
+]);
+
+// Strukturen die HP haben und angegriffen werden können (sync mit
+// backend/structures.STRUCTURE_MAX_HP). Trees/Pflanzen/Felsen sind harvest-only
+// und nicht hier drin.
+const COMBAT_STRUCTURE_TYPES = new Set([
+  'wall', 'floor',
+  'door_wood', 'door_iron', 'door_stone', 'door_reinforced',
+  'door_wood_open', 'door_iron_open', 'door_stone_open',
+  'garden_gate_ew_closed', 'garden_gate_ew_open',
+  'garden_gate_ns_closed', 'garden_gate_ns_open',
+  'fence', 'wooden_fence_segment', 'fence_gate_farm',
+  'chest', 'workbench', 'furnace', 'anvil', 'bed', 'well', 'campfire',
+  'barrel', 'crate', 'sack', 'marker', 'spike_trap', 'poison_trap',
+  'stairs_down', 'stairs_wood_up', 'stairs_wood_down',
+  'stairs_stone_up', 'stairs_stone_down',
+  'camp_tent', 'cooking_pot', 'ruin_pillar', 'rubble', 'statue_broken',
+  'gravestone', 'dock_corner', 'dock_straight', 'wooden_bridge',
+  'boat_small', 'shipwreck', 'anchor', 'fishing_net', 'driftwood', 'broken_cart',
+  // Farm-Gebäude
+  'barn_large', 'barn_small', 'cow_shed', 'pigsty', 'henhouse',
+  'goat_pen', 'sheepfold', 'stable', 'dovecote', 'dairy_house',
+  'granary', 'hayloft', 'smokehouse', 'cart_shed',
+  'feed_trough', 'water_trough', 'hay_bale', 'hay_stack', 'straw_bale',
+  'cheese_press', 'butter_churn', 'milking_stool', 'nesting_box_egg',
+  'cheese_rack', 'quest_board',
+]);
+
 // Display-Größe pro Struktur-Typ relativ zu TILE_SIZE.
 // Default 1.0; größere "Bauten" wirken sonst klein gegen Charaktere (32px).
 const STRUCTURE_DISPLAY_SCALE = {
@@ -795,6 +831,11 @@ const NPC_SPRITE = {
   goose:         { sprite: 'animal_goose',          tint: 0xffffff, label: 'Gans' },
   gander:        { sprite: 'animal_gander',         tint: 0xffffff, label: 'Ganter' },
   gosling:       { sprite: 'animal_gosling',        tint: 0xffffff, label: 'Gänseküken' },
+  // ─── Asset-Drop 2026-05-27c: Karawanen-Wagen (NPC-Kinds, mit Animation) ─
+  farm_cart_hay:       { sprite: 'cart_farm_cart_hay',       tint: 0xffffff, label: 'Heuwagen' },
+  handcart_empty:      { sprite: 'cart_handcart_empty',      tint: 0xffffff, label: 'Handkarren' },
+  horse_cart_single:   { sprite: 'cart_horse_cart_single',   tint: 0xffffff, label: 'Pferdewagen' },
+  market_wagon_covered:{ sprite: 'cart_market_wagon_covered',tint: 0xffffff, label: 'Marktwagen' },
   // ─── Hostile Humans (Räuber-Typen) ─────────────────────────────────────
   // Nutzen Character-Sprites aus /assets/characters/npcs/ (nicht monster_*),
   // weil es Menschen sind. variant kann Waffen-Variante (bandit_axe etc.)
@@ -1392,12 +1433,37 @@ const PRO_ARMOR_MAP = {
   },
 };
 
+// Welle 23: Set aller (rarity, slug) Kombinationen die unter rarity_v2/
+// existieren. Generiert via tools/check_weapons.py. Wenn eine angeforderte
+// Kombination NICHT drin ist, fällt proWeaponPath auf icons_128/ zurück
+// (dort liegen die Basis-Sprites für alle Slugs).
+const PRO_WEAPON_RARITY_FILES = new Set([
+  'common|ashwood_recurve_bow','common|black_guard_longsword','common|cleaver_greatsword',
+  'common|hunter_bow_set','common|iron_hook_sickle','common|old_execution_axe',
+  'common|red_oak_staff','common|steel_katana',
+  'legendary|amethyst_trident','legendary|crimson_twinblade','legendary|flame_cleaver_axe',
+  'legendary|gandiva_bow','legendary|obsidian_runeblade','legendary|void_reaper_scythe',
+  'legendary|wolf_end_redblade',
+  'poor|iron_hatchet','poor|plain_aruming_sword','poor|plain_war_spear',
+  'poor|silver_straightsword','poor|woodcutter_hatchet',
+  'rare|blackthorn_shard','rare|bloodtalon_throwers','rare|blue_crescent_axe',
+  'rare|crescent_saber','rare|ebony_longbow','rare|graveyard_scythe',
+  'rare|hooked_ritual_dagger','rare|ice_and_night_blades','rare|raven_halberd',
+  'rare|rose_glass_sword','rare|stormbow','rare|white_magus_staff',
+  'very_rare|azure_glaive','very_rare|bloodpoint_lance','very_rare|chain_reaper',
+  'very_rare|demon_slayer_lance','very_rare|goldleaf_bow','very_rare|ruby_spear',
+  'very_rare|sunspike_lance','very_rare|thorn_blackblade',
+]);
+
 function proWeaponPath(kind, rarity) {
   const m = PRO_WEAPON_MAP[kind];
   if (!m) return null;
   const id = m[rarity] || m.default;
   if (!id) return null;
-  if (rarity && rarity !== 'default') {
+  // Wenn rarity_v2-File existiert: nutze es. Sonst Fallback auf icons_128
+  // (Basis-Sprite ohne Rarity-Tinting).
+  if (rarity && rarity !== 'default'
+      && PRO_WEAPON_RARITY_FILES.has(`${rarity}|${id}`)) {
     return `/assets/equipment/weapons/professional/reference_based/rarity_v2/${rarity}/${id}.png`;
   }
   return `/assets/equipment/weapons/professional/reference_based/icons_128/${id}.png`;
@@ -1729,6 +1795,50 @@ class WorldScene extends Phaser.Scene {
         }
       }
     }
+    // Asset-Drop 2026-05-27b: Walk-Cycles für Nutztiere + Carts.
+    // Struktur: /assets/animations/animals/<base>/<direction>/walk_NN.png (4 frames)
+    // + idle_NN.png (2 frames). Direction = north/south/east/west.
+    // Wir mappen Phaser-Direction → animation-Direction und nutzen Frame 1+3
+    // aus den 4 walk-frames für das existierende 2-Frame-System.
+    const ANIMAL_DIR_MAP = { up: 'north', down: 'south', left: 'west', right: 'east' };
+    const ANIMAL_VARIANTS = {
+      cow: 'cow', bull: 'cow', calf: 'cow', ox: 'cow',
+      sheep: 'sheep', ram: 'sheep', lamb: 'sheep', sheared_sheep: 'sheep',
+      pig: 'pig', piglet: 'pig', boar_domestic: 'pig',
+      goat: 'goat', buck_goat: 'goat', kid_goat: 'goat',
+      horse: 'horse', draft_horse: 'horse', foal: 'horse', donkey: 'horse', mule: 'horse',
+      dog: 'farm_dog',
+    };
+    for (const [variant, base] of Object.entries(ANIMAL_VARIANTS)) {
+      // Idle (2 frames, aus south-Ordner)
+      for (const f of [1, 2]) {
+        this.load.image(`cha_${variant}_idle_${f}`,
+          `/assets/animations/animals/${base}/south/idle_0${f}.png`);
+      }
+      // Walk pro Richtung — Frame 1 und 3 von 4 (Bewegungs-Extrema)
+      for (const [phaserDir, animDir] of Object.entries(ANIMAL_DIR_MAP)) {
+        this.load.image(`cha_${variant}_walk_${phaserDir}_1`,
+          `/assets/animations/animals/${base}/${animDir}/walk_01.png`);
+        this.load.image(`cha_${variant}_walk_${phaserDir}_2`,
+          `/assets/animations/animals/${base}/${animDir}/walk_03.png`);
+      }
+    }
+    // Cart-Animationen: roll_NN statt walk_NN, sonst gleiche Struktur.
+    // Wir mappen auf `cha_<cart>_walk_*` damit der bestehende Walk-Cycle greift.
+    const CART_ANIMS = ['farm_cart_hay', 'handcart_empty', 'horse_cart_single', 'market_wagon_covered'];
+    for (const cart of CART_ANIMS) {
+      for (const f of [1, 2]) {
+        this.load.image(`cha_${cart}_idle_${f}`,
+          `/assets/animations/transport/${cart}/south/idle_0${f}.png`);
+      }
+      for (const [phaserDir, animDir] of Object.entries(ANIMAL_DIR_MAP)) {
+        this.load.image(`cha_${cart}_walk_${phaserDir}_1`,
+          `/assets/animations/transport/${cart}/${animDir}/roll_01.png`);
+        this.load.image(`cha_${cart}_walk_${phaserDir}_2`,
+          `/assets/animations/transport/${cart}/${animDir}/roll_03.png`);
+      }
+    }
+
     // Walk-Cycle für animierte Monster (49 Kinds × 10 Frames).
     for (const kind of ANIMATED_MONSTER_KINDS) {
       for (const f of [1, 2]) {
@@ -1798,6 +1908,12 @@ class WorldScene extends Phaser.Scene {
                      'duck','drake','duckling',
                      'goose','gander','gosling']) {
       this.load.image(`animal_${a}`, `/assets/animals/poultry/${a}.png`);
+    }
+    // Asset-Drop 2026-05-27c: Karawanen-Wagen Static-Fallback-Sprites
+    // (Animationen werden weiter unten als `cha_<cart>_*` geladen, dies hier
+    // ist nur das statische Inventar-/Default-Sprite.)
+    for (const c of ['farm_cart_hay','handcart_empty','horse_cart_single','market_wagon_covered']) {
+      this.load.image(`cart_${c}`, `/assets/props/transport/${c}.png`);
     }
 
     // Items (Waffen, Rüstung, Schmuck, Consumables, Resources)
@@ -2316,15 +2432,45 @@ class WorldScene extends Phaser.Scene {
     const s = this.structures[`${tx},${ty}`];
     if (s) {
       const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
-      if (dist > 1) {
-        this.showEvent('🤚 Zu weit weg');
+      // Welle 25: HP-System Click-Routing.
+      // - Wenn Hammer equipped UND Struktur beschädigt → repair
+      // - Wenn Combat-Struktur ohne Use-Effekt → attack (Range via Waffe)
+      // - Wenn interaktive Struktur → use (close range)
+      // - Wenn Tür → toggle
+      const isUsable = USABLE_STRUCTURE_TYPES.has(s.type);
+      const isDoor = s.type.startsWith('door_') || s.type.startsWith('garden_gate_');
+      const isCombatStruct = COMBAT_STRUCTURE_TYPES.has(s.type);
+      const damaged = (s.durability != null && s.max_durability != null
+                       && s.durability < s.max_durability);
+      const hasHammer = !!(this.inventory || []).find(
+        it => it.equipped_slot === 'tool' && it.kind === 'hammer'
+      );
+      // Repair-Mode: Hammer + beschädigt → reparieren (höchste Priorität)
+      if (hasHammer && damaged && isCombatStruct) {
+        if (dist > 1) { this.showEvent('🤚 Zu weit weg zum Reparieren'); return; }
+        this.ws.send(JSON.stringify({ type: 'repair_structure', x: tx, y: ty }));
         return;
       }
-      // Tür/Tor: Klick togglet open/closed
-      if (s.type.startsWith('door_') || s.type.startsWith('garden_gate_')) {
+      // Türen togglen
+      if (isDoor) {
+        if (dist > 1) { this.showEvent('🤚 Zu weit weg'); return; }
         this.ws.send(JSON.stringify({ type: 'toggle_door', x: tx, y: ty }));
         return;
       }
+      // Attack: combat-fähig + nicht-usable + (nicht eigene Struktur ODER beschädigt)
+      // Eigene volle Strukturen anklicken macht nichts (Frust-vermeidung).
+      const isMine = (s.owner === MY_ID);
+      if (isCombatStruct && !isUsable && (!isMine || damaged)) {
+        const reach = this.currentWeaponRange();
+        if (dist > reach) {
+          this.showEvent(`⚔️ Zu weit weg (Reichweite ${reach})`);
+          return;
+        }
+        this.ws.send(JSON.stringify({ type: 'attack_structure', x: tx, y: ty }));
+        return;
+      }
+      // Usable (Bed/Well/Chest/Workbench/...) — normaler Interakt
+      if (dist > 1) { this.showEvent('🤚 Zu weit weg'); return; }
       this.ws.send(JSON.stringify({ type: 'use_structure', x: tx, y: ty }));
       return;
     }
@@ -3072,6 +3218,12 @@ class WorldScene extends Phaser.Scene {
         this.myTalents = msg.talents || { learned: [], points: 0, tree: {} };
         this.myFactions = msg.factions || [];
         this.myAttributes = msg.attributes || { values: {}, labels: {} };
+        // Welle 24: Aktive Disaster-Overlays bei Verbindung anzeigen
+        if (Array.isArray(msg.active_disasters)) {
+          for (const d of msg.active_disasters) {
+            try { this._onDisasterStarted(d.kind, d.metadata || {}); } catch (e) {}
+          }
+        }
         this.statSheet = msg.stats || null;   // Welle 15: vollständiges Char-Sheet
         this.learnedSpells = msg.learned_spells || [];
         this.refreshHpBar();
@@ -3361,6 +3513,20 @@ class WorldScene extends Phaser.Scene {
 
       case 'toast':
         this.showEvent(msg.text);
+        break;
+
+      // ─── Welle 24 — Disaster-Effekte ────────────────────────────────────
+      case 'disaster_started':
+        this._onDisasterStarted(msg.kind, msg);
+        break;
+      case 'disaster_ended':
+        this._onDisasterEnded(msg.kind);
+        break;
+      case 'earthquake_shake':
+        this._onEarthquakeShake(msg.duration_ms || 6000, msg.magnitude || 6);
+        break;
+      case 'lightning_strike':
+        this._onLightningStrike(msg.x, msg.y);
         break;
 
       case 'chest_open':
@@ -6111,6 +6277,88 @@ class WorldScene extends Phaser.Scene {
     el.textContent = text;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 3000);
+  }
+
+  // ─── Welle 24 — Disaster-Effekte (visuell) ──────────────────────────────
+  _onDisasterStarted(kind, msg) {
+    if (!this._activeDisasters) this._activeDisasters = new Set();
+    this._activeDisasters.add(kind);
+    // Tint-Overlay anwenden — eigenes div per disaster
+    let overlay = document.getElementById(`disaster-${kind}`);
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = `disaster-${kind}`;
+      overlay.style.cssText = `
+        position: fixed; inset: 0; pointer-events: none; z-index: 6;
+        opacity: 0; transition: opacity 4s;
+      `;
+      document.body.appendChild(overlay);
+    }
+    if (kind === 'blood_moon') {
+      overlay.style.background = 'radial-gradient(circle at center, rgba(120,0,0,0) 30%, rgba(200,30,30,0.45) 100%)';
+      overlay.style.mixBlendMode = 'multiply';
+    } else if (kind === 'dying_sun') {
+      overlay.style.background = 'linear-gradient(180deg, rgba(255,140,40,0.30) 0%, rgba(200,80,20,0.15) 100%)';
+      overlay.style.mixBlendMode = 'multiply';
+    } else if (kind === 'tainted_well') {
+      // Kein full-screen tint; stattdessen Marker am Brunnen via existing event-marker
+      if (msg.x != null && msg.y != null) {
+        this.showEvent(`☠️ ${msg.label || 'Vergifteter Brunnen'} bei (${msg.x},${msg.y})`);
+      }
+      return;  // kein Overlay
+    }
+    // Fade in
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+  }
+
+  _onDisasterEnded(kind) {
+    if (this._activeDisasters) this._activeDisasters.delete(kind);
+    const overlay = document.getElementById(`disaster-${kind}`);
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 4500);
+    }
+    this.showEvent(`✨ ${kind} ist vorbei`);
+  }
+
+  _onEarthquakeShake(durationMs, magnitude) {
+    if (!this.cameras || !this.cameras.main) return;
+    this.cameras.main.shake(durationMs, magnitude / 1000);
+    this.showEvent('🏚 ERDBEBEN!');
+  }
+
+  _onLightningStrike(tx, ty) {
+    // Visueller Blitz auf der Tile-Position + 200ms weißer Vollbild-Flash
+    const px = tx * TILE_SIZE + TILE_SIZE / 2;
+    const py = ty * TILE_SIZE + TILE_SIZE / 2;
+    // Wenn die Lightning-Animation als Spritesheet vorhanden ist, abspielen
+    try {
+      if (this.anims && this.anims.exists('lightning_strike')) {
+        const s = this.add.sprite(px, py, 'lightning_strike_01')
+          .setOrigin(0.5, 1.0).setDepth(20);
+        s.play('lightning_strike');
+        s.on('animationcomplete', () => s.destroy());
+      } else {
+        // Fallback: weißer Kreis-Flash auf der Position
+        const g = this.add.graphics().setDepth(20);
+        g.fillStyle(0xffffff, 0.85);
+        g.fillCircle(px, py, TILE_SIZE * 0.7);
+        this.tweens.add({
+          targets: g, alpha: 0, duration: 250,
+          onComplete: () => g.destroy(),
+        });
+      }
+    } catch (e) { /* render-fail egal */ }
+    // Kurzer Vollbild-Flash
+    const flash = document.createElement('div');
+    flash.style.cssText = `
+      position: fixed; inset: 0; background: #ffffff; opacity: 0.55;
+      pointer-events: none; z-index: 50;
+      transition: opacity 0.18s ease-out;
+    `;
+    document.body.appendChild(flash);
+    requestAnimationFrame(() => { flash.style.opacity = '0'; });
+    setTimeout(() => flash.remove(), 250);
   }
 
   update(time, delta) {

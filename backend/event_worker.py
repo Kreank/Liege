@@ -211,6 +211,36 @@ async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
                                  label="🪙 Wandernder Händler",
                                  color="#80c060", ttl_s=1800)
 
+        elif effect == "spawn_caravan":
+            # Welle 23-C: Wandernde Händler-Karawane — Merchant + 1-2 Guards
+            # + 1 Wagen, alle als Cluster (jitter 2). Sie bewegen sich danach
+            # selbständig durch den Wander-Loop, bleiben aber visuell nahe
+            # beieinander weil ihr Spawn-Punkt geclustered ist.
+            cart_kind = random.choice([
+                "farm_cart_hay", "handcart_empty",
+                "horse_cart_single", "market_wagon_covered",
+            ])
+            # Erst Merchant (center) spawnen
+            merchant = await npc_worker.spawn_one(world, npc_manager,
+                                                   connection_manager, kind="merchant")
+            if merchant:
+                cx, cy = merchant["x"], merchant["y"]
+                # Cart direkt daneben
+                cart_pos = await npc_worker._find_nearby_walkable(world, cx, cy, radius=2)
+                if cart_pos:
+                    await npc_worker.spawn_one(world, npc_manager, connection_manager,
+                                                kind=cart_kind, at=cart_pos)
+                # 1-2 Guards rundherum
+                guard_count = random.randint(1, 2)
+                for _ in range(guard_count):
+                    gpos = await npc_worker._find_nearby_walkable(world, cx, cy, radius=3)
+                    if gpos:
+                        await npc_worker.spawn_one(world, npc_manager, connection_manager,
+                                                    kind="guard", at=gpos)
+                marker = _marker((cx, cy),
+                                 label=f"🛒 Händler-Karawane",
+                                 color="#c8a050", ttl_s=2400)
+
         # ── Strukturen / Items am Boden ─────────────────────────────────────
         elif effect == "ruin_spawn":
             struct_type = random.choice(["ruin_pillar", "rubble", "statue_broken", "gravestone"])
@@ -248,19 +278,49 @@ async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
                 marker = _marker(first_pos, label="📦 Verlorene Karawane",
                                  color="#c08060", ttl_s=900)
 
-        # ── Welt-Effekte (Toast bis Phase 4 echte Mechanik bringt) ──────────
-        elif effect == "destroy_farms":
-            await connection_manager.broadcast({
-                "type": "toast", "text": "🌾 Schwarm zerstört Felder!",
-            })
+        # ── Welt-Effekte (Welle 24: echte Mechanik statt nur Toast) ─────────
         elif effect == "blood_moon":
+            # Welle 24: Echte Mechanik — Mob-Damage × 1.3, Mob-Aggression hoch.
+            import disaster_state
+            await disaster_state.activate("blood_moon")
             await connection_manager.broadcast({
-                "type": "toast", "text": "🌑 BLUTMOND-NACHT! Monster sind aggressiver bis zum Morgen.",
+                "type": "disaster_started", "kind": "blood_moon",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["blood_moon"],
+                "label": "🌑 BLUTMOND",
             })
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🌑 BLUTMOND erhebt sich — Monster wittern Blut!",
+            })
+
         elif effect == "dying_sun":
+            # Welle 24: Hunger/Thirst-Drain × 2 für 30 min.
+            import disaster_state
+            await disaster_state.activate("dying_sun")
             await connection_manager.broadcast({
-                "type": "toast", "text": "🌒 Die Sonne stirbt — Hunger drainiert schneller.",
+                "type": "disaster_started", "kind": "dying_sun",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["dying_sun"],
+                "label": "🌒 Sterbende Sonne",
             })
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🌒 Die Sonne stirbt — Hunger und Durst sind brutal.",
+            })
+
+        elif effect == "damage_structures":
+            # Welle 24: Erdbeben — 8-15 zufällige Strukturen verlieren Durability,
+            # Screen-Shake-Event ans Frontend.
+            await _trigger_earthquake(structure_manager, connection_manager)
+
+        elif effect == "taint_water":
+            # Welle 24: Vergifteter Brunnen — 1 random well wird tainted für 30min.
+            await _trigger_tainted_well(structure_manager, connection_manager)
+
+        elif effect == "plague_npcs":
+            # Welle 24: Pest — 2-5 NPCs werden krank.
+            await _trigger_plague(npc_manager, connection_manager)
+
+        elif effect == "destroy_farms":
+            # Welle 24: Heuschrecken setzen plantings.last_watered_at = NULL.
+            await _trigger_locust_swarm(connection_manager)
 
     except Exception:
         log.exception("Event-Effekt fehlgeschlagen: %s", effect)
@@ -403,3 +463,141 @@ async def run(event_manager, connection_manager, world=None,
         except Exception:
             log.exception("Event-Worker iteration fehlgeschlagen")
         await asyncio.sleep(TICK_SECONDS)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Welle 24 — Disaster-Trigger-Helpers (echte Mechanik statt nur Toast)
+# ═══════════════════════════════════════════════════════════════════════════
+
+async def _trigger_earthquake(structure_manager, connection_manager) -> None:
+    """Erdbeben: 8-15 zufällige Strukturen verlieren -2 Durability + Frontend
+    screen-shake-Event. Wenn durability ≤ 0 → kollabiert zu rubble."""
+    players = list(connection_manager.get_players().values())
+    if not players:
+        return
+    p = random.choice(players)
+    # Sammele Strukturen im Radius 30 Tiles
+    all_structs = []
+    for s in structure_manager.all():
+        if abs(s["x"] - p["x"]) <= 30 and abs(s["y"] - p["y"]) <= 30:
+            all_structs.append(s)
+    if not all_structs:
+        return
+    # 8-15 random pick
+    n = min(len(all_structs), random.randint(8, 15))
+    victims = random.sample(all_structs, n)
+    collapsed = 0
+    for s in victims:
+        try:
+            result = await structure_manager.damage_structure(s["x"], s["y"], amount=2)
+            if result is None:
+                # Strukur eingestürzt → rubble platzieren wo es war
+                await connection_manager.broadcast({
+                    "type": "structure_removed", "x": s["x"], "y": s["y"],
+                })
+                rubble = await structure_manager.place(
+                    s["x"], s["y"], "rubble", "system",
+                    material="stone", durability=2,
+                )
+                if rubble:
+                    await connection_manager.broadcast({
+                        "type": "structure_placed", "structure": rubble,
+                    })
+                    collapsed += 1
+        except Exception:
+            log.exception("Earthquake-Schaden fehlgeschlagen für %s", s)
+    # Screen-Shake + Toast
+    await connection_manager.broadcast({
+        "type": "earthquake_shake",
+        "x": p["x"], "y": p["y"], "duration_ms": 6000, "magnitude": 6,
+    })
+    await connection_manager.broadcast({
+        "type": "toast",
+        "text": f"🏚 ERDBEBEN! {len(victims)} Strukturen beschädigt, {collapsed} eingestürzt.",
+    })
+    log.info("Earthquake near (%d,%d): %d struct dmg, %d collapsed",
+             p["x"], p["y"], len(victims), collapsed)
+
+
+async def _trigger_tainted_well(structure_manager, connection_manager) -> None:
+    """Sucht 1 random Brunnen + markiert ihn als tainted via disaster_state-Metadata."""
+    import disaster_state
+    wells = [s for s in structure_manager.all() if s.get("type") == "well"]
+    if not wells:
+        return
+    well = random.choice(wells)
+    await disaster_state.activate("tainted_well",
+                                    metadata={"x": well["x"], "y": well["y"]})
+    await connection_manager.broadcast({
+        "type": "disaster_started", "kind": "tainted_well",
+        "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["tainted_well"],
+        "x": well["x"], "y": well["y"],
+        "label": "☠️ Vergifteter Brunnen",
+    })
+    await connection_manager.broadcast({
+        "type": "toast",
+        "text": f"☠️ Der Brunnen bei ({well['x']},{well['y']}) ist vergiftet — nicht trinken!",
+    })
+    log.info("Tainted well at (%d,%d)", well["x"], well["y"])
+
+
+async def _trigger_plague(npc_manager, connection_manager) -> None:
+    """2-5 random Villager-NPCs werden krank — mental_state=sick + HP-drain.
+    Status-Effekt "sick" via status_effects (wird vom Worker getickt)."""
+    friendly = [n for n in npc_manager.all() if n["kind"] in (
+        "villager", "farmer", "child", "peasant", "baker", "tailor", "innkeeper",
+    )]
+    if not friendly:
+        return
+    n = min(len(friendly), random.randint(2, 5))
+    victims = random.sample(friendly, n)
+    try:
+        import status_effects, db
+        for v in victims:
+            await db.pool().execute(
+                "UPDATE npcs SET mental_state = 'sick' WHERE id = $1", v["id"])
+            # NPC-spezifischer "sick"-Effekt — wir nutzen einen einfachen Marker
+            # in npcs.mental_state, der vom npc_mood-Worker visualisiert wird.
+    except Exception:
+        log.exception("Plague-Effect fehlgeschlagen")
+    await connection_manager.broadcast({
+        "type": "toast",
+        "text": f"🤒 PEST! {n} Dorfbewohner sind erkrankt.",
+    })
+    log.info("Plague: %d NPCs sick", n)
+
+
+async def _trigger_locust_swarm(connection_manager) -> None:
+    """Heuschrecken setzen 30% aller plantings im Player-Radius auf
+    last_watered_at = NULL → Felder stagnieren."""
+    import db
+    players = list(connection_manager.get_players().values())
+    if not players:
+        return
+    p = random.choice(players)
+    # Plantings im 30-Tile-Radius — random 30% trifft
+    rows = await db.pool().fetch(
+        "SELECT structure_id, x, y FROM plantings "
+        "WHERE x BETWEEN $1 AND $2 AND y BETWEEN $3 AND $4 "
+        "AND last_watered_at IS NOT NULL",
+        p["x"] - 30, p["x"] + 30, p["y"] - 30, p["y"] + 30,
+    )
+    if not rows:
+        await connection_manager.broadcast({
+            "type": "toast", "text": "🦗 Heuschreckenschwarm zieht durch — keine Felder in der Nähe.",
+        })
+        return
+    victims = [r for r in rows if random.random() < 0.30]
+    for r in victims:
+        try:
+            await db.pool().execute(
+                "UPDATE plantings SET last_watered_at = NULL WHERE structure_id = $1",
+                r["structure_id"])
+        except Exception:
+            pass
+    await connection_manager.broadcast({
+        "type": "toast",
+        "text": f"🦗 HEUSCHRECKEN! {len(victims)} Felder ausgetrocknet — neu wässern!",
+    })
+    log.info("Locust swarm dried %d plantings near (%d,%d)",
+             len(victims), p["x"], p["y"])

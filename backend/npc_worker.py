@@ -131,7 +131,11 @@ FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier"
                   # Geflügel
                   "chicken_hen", "rooster", "chick",
                   "duck", "drake", "duckling",
-                  "goose", "gander", "gosling"]
+                  "goose", "gander", "gosling",
+                  # Asset-Drop 2026-05-27c: Karawanen-Wagen (passive NPCs die
+                  # mit Händler-Konvois mitlaufen; kein direkter Player-Interakt)
+                  "farm_cart_hay", "handcart_empty",
+                  "horse_cart_single", "market_wagon_covered"]
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",
@@ -194,6 +198,9 @@ NPC_MOVE_CHANCE = {
     "chicken_hen":  0.35, "rooster":      0.30, "chick":        0.45,
     "duck":         0.30, "drake":        0.28, "duckling":     0.42,
     "goose":        0.25, "gander":       0.22, "gosling":      0.38,
+    # Karawanen-Wagen — bewegen sich langsam mit Händler-Konvoi
+    "farm_cart_hay":         0.18, "handcart_empty":         0.20,
+    "horse_cart_single":     0.18, "market_wagon_covered":   0.15,
     # Asset-Drop 2026-05-26
     "miner":        0.20,  # gräbt in einer Region
     "village_elder":0.05,  # bleibt fast immer

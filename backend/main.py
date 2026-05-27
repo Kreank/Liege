@@ -15,6 +15,7 @@ import db
 import llm
 import combat
 import dialog
+import disaster_state
 import dungeons
 import event_worker
 import farm_worker
@@ -109,6 +110,12 @@ async def lifespan(app: FastAPI):
         await region_difficulty.init_schema()
     except Exception:
         logging.exception("region_difficulty init_schema failed (non-fatal)")
+    # Welle 24: Disaster-State (Blutmond, Sterbende Sonne, Pest, ...)
+    try:
+        import disaster_state
+        await disaster_state.init_schema()
+    except Exception:
+        logging.exception("disaster_state init_schema failed (non-fatal)")
     # Populate läuft jetzt on-demand pro Chunk beim Connect/Chunk-Cross (siehe populate_chunk_if_needed)
 
     event_task = asyncio.create_task(
@@ -135,6 +142,8 @@ async def lifespan(app: FastAPI):
     )
     # Welle 22: Research-Tick-Worker (online-Player bekommen alle 5min +1 Pool)
     research_tick_task = asyncio.create_task(research.time_tick_loop(manager))
+    # Welle 24: Disaster-Tick (refresht Cache, broadcastet ended-Events)
+    disaster_task = asyncio.create_task(disaster_state.run(manager))
 
     yield
 
@@ -558,6 +567,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "quests":   await quests.list_for_player(player_id),
         "factions":     await factions.list_all_reputations(player_id),
         "attributes":   await _compute_attributes(player_id),
+        "active_disasters": await disaster_state.list_active(),
         "stats":        await _build_stat_sheet(player_id),
         "learned_spells": await _list_learned_spells(player_id),
         "talents": {
@@ -1383,6 +1393,134 @@ async def websocket_endpoint(websocket: WebSocket):
                 if xp_result:
                     await websocket.send_json({"type": "skill_xp", **xp_result})
 
+            elif mtype == "attack_structure":
+                # Welle 25: Spieler greift Struktur an (eigene Wand zerstören
+                # in Build-Mode geht weiter via remove_structure Long-Press).
+                # Hier: feindliche Strukturen (Bandit-Camp-Strukturen, fremde
+                # Wände) angreifen mit der ausgerüsteten Waffe.
+                x, y = int(data.get("x", -1)), int(data.get("y", -1))
+                s = structures.object_at(x, y) or structures.floor_at(x, y)
+                if s is None:
+                    continue
+                if not structures.is_combat_structure(s["type"]):
+                    await websocket.send_json({
+                        "type": "toast", "text": "Diese Struktur kann nicht angegriffen werden.",
+                    })
+                    continue
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                # Range-Check
+                weapon = await get_equipped_weapon_kind(player_id)
+                import item_stats as _is_struct
+                attack_range = max(combat.ATTACK_RANGE, _is_struct.weapon_range(weapon))
+                if combat.manhattan(player["x"], player["y"], x, y) > attack_range:
+                    await websocket.send_json({"type": "toast", "text": "Zu weit weg."})
+                    continue
+                # Damage-Calc
+                weapon_quality = "normal"
+                if weapon:
+                    qrow = await db.pool().fetchrow(
+                        "SELECT quality FROM items WHERE owner = $1 "
+                        "AND equipped_slot = 'weapon' LIMIT 1", player_id)
+                    if qrow:
+                        weapon_quality = qrow["quality"]
+                combat_level = await skills.get_skill_level(player_id, "combat")
+                raw_dmg, is_crit = combat.calc_player_damage(
+                    weapon_kind=weapon, weapon_quality=weapon_quality,
+                    combat_level=combat_level, rng_roll=0.5,
+                )
+                # Material-Resistance anwenden (Stein vs Edge etc.)
+                dmg_class = structures.player_damage_class(weapon)
+                final_dmg = structures.apply_material_resist(s["material"], raw_dmg, dmg_class)
+                result = await structures.damage_structure(x, y, amount=final_dmg)
+                if result is None:
+                    # Kollabiert
+                    await manager.broadcast({
+                        "type": "structure_removed", "x": x, "y": y,
+                    })
+                    # Splittert in rubble wenn vorher eine Wand/Tür war
+                    if s["type"] in ("wall", "door_wood", "door_iron", "door_stone",
+                                      "door_reinforced", "barn_large", "barn_small",
+                                      "stable", "granary"):
+                        rubble = await structures.place(
+                            x, y, "rubble", "system",
+                            material=s["material"], durability=2,
+                        )
+                        if rubble:
+                            await manager.broadcast({
+                                "type": "structure_placed", "structure": rubble,
+                            })
+                else:
+                    await manager.broadcast({
+                        "type": "structure_damaged",
+                        "x": x, "y": y,
+                        "durability":     result["durability"],
+                        "max_durability": result["max_durability"],
+                        "dmg":            final_dmg,
+                        "by":             player_id,
+                    })
+                # Combat-XP fürs Angreifen — kleiner Bonus, hauptsächlich für
+                # Strukturen-die-zurückschlagen-System (kommt später)
+                try:
+                    await skills.gain_xp(player_id, "combat", 2)
+                except Exception:
+                    pass
+
+            elif mtype == "repair_structure":
+                # Welle 25: Mit equipped hammer + 1 Material gleicher Sorte
+                # die Struktur reparieren. +8 HP pro Klick, cap = max_durability.
+                x, y = int(data.get("x", -1)), int(data.get("y", -1))
+                s = structures.object_at(x, y) or structures.floor_at(x, y)
+                if s is None:
+                    continue
+                if not structures.is_combat_structure(s["type"]):
+                    continue
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                if combat.manhattan(player["x"], player["y"], x, y) > 1:
+                    await websocket.send_json({"type": "toast", "text": "🤚 Zu weit weg."})
+                    continue
+                if s["durability"] >= s.get("max_durability", s["durability"]):
+                    await websocket.send_json({"type": "toast", "text": "✨ Bereits voll repariert."})
+                    continue
+                # Hammer-Check
+                tool = await db.pool().fetchrow(
+                    "SELECT id FROM items WHERE owner = $1 AND equipped_slot = 'tool' "
+                    "AND kind = 'hammer' LIMIT 1", player_id,
+                )
+                if not tool:
+                    await websocket.send_json({"type": "toast", "text": "🔨 Hammer ausrüsten."})
+                    continue
+                # Material verfügbar? consume_one() handelt Stack-Logik selbst.
+                needed_mat = s["material"]   # 'stone', 'wood', oder 'straw'
+                consumed = await items.consume_one(player_id, needed_mat)
+                if not consumed:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"📦 Du brauchst 1× {needed_mat} zum Reparieren.",
+                    })
+                    continue
+                result = await structures.repair_structure(x, y, amount=8)
+                if result is not None:
+                    await manager.broadcast({
+                        "type": "structure_repaired",
+                        "x": x, "y": y,
+                        "durability":     result["durability"],
+                        "max_durability": result["max_durability"],
+                        "by":             player_id,
+                    })
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"🔨 +8 HP — {result['durability']}/{result['max_durability']}",
+                    })
+                # Construction-XP
+                try:
+                    await skills.gain_xp(player_id, "construction", 3)
+                except Exception:
+                    pass
+
             elif mtype == "use_structure":
                 # Klick auf Bed/Well/Anvil etc. — heilt oder anderes je nach Typ
                 x, y = int(data.get("x", -1)), int(data.get("y", -1))
@@ -1613,6 +1751,35 @@ async def websocket_endpoint(websocket: WebSocket):
                     await heal_player(player_id, heal_amount)
                     # Welle 17: Brunnen tränkt auch — Durst auffüllen
                     if s["type"] == "well":
+                        # Welle 24: Check ob dieser Brunnen vergiftet ist
+                        is_tainted = False
+                        try:
+                            active_disasters = await disaster_state.list_active()
+                            for d in active_disasters:
+                                if d["kind"] == "tainted_well":
+                                    meta = d.get("metadata") or {}
+                                    if isinstance(meta, str):
+                                        import json as _j
+                                        meta = _j.loads(meta)
+                                    if meta.get("x") == s["x"] and meta.get("y") == s["y"]:
+                                        is_tainted = True
+                                        break
+                        except Exception:
+                            pass
+                        if is_tainted:
+                            # Spieler kriegt Poison-Status für 30s
+                            try:
+                                await status_effects.apply(
+                                    "player", player_id, "poisoned",
+                                    magnitude=5, duration_seconds=30)
+                            except Exception:
+                                log.exception("Tainted-well poison apply failed")
+                                await damage_player(player_id, 12)
+                            await websocket.send_json({
+                                "type": "toast",
+                                "text": "☠️ Das Wasser ist vergiftet! Du bist verseucht!",
+                            })
+                            continue
                         amt = needs.thirst_value("well_drink") or 30
                         new_needs = await needs.restore_thirst(player_id, amt)
                         if new_needs:

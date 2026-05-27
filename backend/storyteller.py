@@ -79,6 +79,7 @@ EVENT_TEMPLATES = [
     {"tier": "encounter", "tag": "wolf_pack",     "weight": 18, "audience": ["warrior","ranger"], "danger": 0.5},
     {"tier": "encounter", "tag": "bandit_scout",  "weight": 16, "audience": ["warrior"], "danger": 0.6, "effect": "spawn_bandits"},
     {"tier": "encounter", "tag": "wandering_trader","weight":15, "audience": ["any","crafter"], "danger": 0.0, "effect": "spawn_merchant"},
+    {"tier": "encounter", "tag": "merchant_caravan","weight":10, "audience": ["any","crafter"], "danger": 0.0, "effect": "spawn_caravan"},
     {"tier": "encounter", "tag": "rare_herb",     "weight": 12, "audience": ["any","farmer","mage"], "danger": 0.0, "effect": "spawn_herb"},
     {"tier": "encounter", "tag": "ore_vein",      "weight": 12, "audience": ["crafter"], "danger": 0.1, "effect": "spawn_ore"},
     {"tier": "encounter", "tag": "lost_caravan",  "weight": 10, "audience": ["any","ranger"], "danger": 0.3, "effect": "drop_items"},

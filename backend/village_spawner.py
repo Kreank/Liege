@@ -702,6 +702,40 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
         except Exception:
             log.exception("Extra-NPC-Spawn fehlgeschlagen (%d,%d)", sx, sy)
 
+    # Asset-Drop 2026-05-27c: Nutztiere in Siedlungen.
+    # Pro Settlement: 4-10 Tiere aus einem Mix-Pool. Capital bekommt mehr.
+    livestock_pool = [
+        # (kind, weight) — Geflügel häufiger als Großvieh
+        ("chicken_hen", 6), ("rooster", 2), ("chick", 4),
+        ("duck", 3), ("goose", 2),
+        ("sheep", 4), ("lamb", 2), ("ram", 1),
+        ("pig", 3), ("piglet", 2),
+        ("cow", 3), ("calf", 1), ("bull", 1),
+        ("goat", 3), ("kid_goat", 2),
+        ("horse", 2), ("foal", 1), ("donkey", 1),
+        ("dog", 2), ("cat", 2),
+    ]
+    livestock_kinds = [k for k, w in livestock_pool for _ in range(w)]
+    livestock_count = random.randint(4, 10) if kind != "capital" else random.randint(8, 16)
+    for _ in range(livestock_count):
+        sx = random.randint(min_x, max_x)
+        sy = random.randint(min_y, max_y)
+        if not world.is_walkable_sync(sx, sy):
+            continue
+        if structure_manager.at(sx, sy) is not None:
+            continue
+        animal_kind = random.choice(livestock_kinds)
+        try:
+            npc = await npc_manager.create(
+                name=animal_kind.replace("_", " ").capitalize(),
+                kind=animal_kind, x=sx, y=sy,
+                backstory="Ein Nutztier auf dem Bauernhof.",
+                max_hp=30,
+            )
+            all_npcs.append(npc)
+        except Exception:
+            log.exception("Livestock-Spawn fehlgeschlagen (%d,%d)", sx, sy)
+
     await _broadcast_all(connection_manager, all_placed, all_npcs)
     log.info(
         "%s in Chunk (%d,%d) gespawnt: %d Häuser, %d Strukturen, %d NPCs",

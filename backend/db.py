@@ -47,9 +47,12 @@ CREATE TABLE IF NOT EXISTS structures (
     UNIQUE (x, y)
 );
 
-ALTER TABLE structures ADD COLUMN IF NOT EXISTS material   TEXT    NOT NULL DEFAULT 'stone';
-ALTER TABLE structures ADD COLUMN IF NOT EXISTS durability INTEGER NOT NULL DEFAULT 1;
-ALTER TABLE structures ADD COLUMN IF NOT EXISTS rotation   INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS material       TEXT    NOT NULL DEFAULT 'stone';
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS durability     INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS rotation       INTEGER NOT NULL DEFAULT 0;
+-- Welle 25: max_durability für HP-System. Migrationsdefault = aktuelle durability.
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS max_durability INTEGER NOT NULL DEFAULT 1;
+UPDATE structures SET max_durability = durability WHERE max_durability < durability;
 
 -- Frühe Vorab-CREATEs für nachfolgende ALTERs (Fresh-DB-Init).
 CREATE TABLE IF NOT EXISTS npcs (
