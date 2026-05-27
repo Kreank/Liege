@@ -1,0 +1,214 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "original_weapon_pack_inspired_2026_05_27",
+  "policy": "additive pack only; no existing assets replaced; local Vorlagen used only as non-copied inspiration for quality and silhouette ambition",
+  "source_sheet": "assets/equipment/weapons/professional/inspired_2026_05_27/source_sheets/original_weapon_sheet_alpha.png",
+  "source_chromakey": "assets/equipment/weapons/professional/inspired_2026_05_27/source_sheets/original_weapon_sheet_chromakey.png",
+  "count": 12,
+  "items": [
+    {
+      "id": "iron_vigil_longsword",
+      "name": "Iron Vigil Longsword",
+      "game_kind_hint": "sword",
+      "description": "balanced steel longsword with blue gem guard",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/iron_vigil_longsword.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/iron_vigil_longsword.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/iron_vigil_longsword.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/iron_vigil_longsword.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "oxhide_execution_axe",
+      "name": "Oxhide Execution Axe",
+      "game_kind_hint": "axe",
+      "description": "heavy double-bit axe with wrapped haft",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/oxhide_execution_axe.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/oxhide_execution_axe.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/oxhide_execution_axe.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/oxhide_execution_axe.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "thornwood_recurve_bow",
+      "name": "Thornwood Recurve Bow",
+      "game_kind_hint": "bow",
+      "description": "gnarled hunter bow with dark leather string",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/thornwood_recurve_bow.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/thornwood_recurve_bow.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/thornwood_recurve_bow.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/thornwood_recurve_bow.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "emberroot_staff",
+      "name": "Emberroot Staff",
+      "game_kind_hint": "staff",
+      "description": "carved root staff with red crystal head",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/emberroot_staff.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/emberroot_staff.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/emberroot_staff.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/emberroot_staff.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 0
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "bramble_witch_wand",
+      "name": "Bramble Witch Wand",
+      "game_kind_hint": "wand",
+      "description": "crooked thorn wand with violet crystal",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/bramble_witch_wand.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/bramble_witch_wand.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/bramble_witch_wand.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/bramble_witch_wand.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "quarry_cleaver_greatsword",
+      "name": "Quarry Cleaver Greatsword",
+      "game_kind_hint": "greatsword",
+      "description": "massive chipped slab blade with ring pommel",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/quarry_cleaver_greatsword.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/quarry_cleaver_greatsword.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/quarry_cleaver_greatsword.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/quarry_cleaver_greatsword.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "duskpoint_war_spear",
+      "name": "Duskpoint War Spear",
+      "game_kind_hint": "spear",
+      "description": "long spear with barbed dark steel head",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/duskpoint_war_spear.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/duskpoint_war_spear.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/duskpoint_war_spear.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/duskpoint_war_spear.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "siegewood_crossbow",
+      "name": "Siegewood Crossbow",
+      "game_kind_hint": "crossbow",
+      "description": "heavy wooden crossbow with iron fittings",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/siegewood_crossbow.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/siegewood_crossbow.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/siegewood_crossbow.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/siegewood_crossbow.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 1
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "paired_ravencut_knives",
+      "name": "Paired Ravencut Knives",
+      "game_kind_hint": "throwing_knife",
+      "description": "paired black steel throwing knives",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/paired_ravencut_knives.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/paired_ravencut_knives.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/paired_ravencut_knives.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/paired_ravencut_knives.png"
+      },
+      "source_cell": {
+        "col": 0,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "oathbound_iron_mace",
+      "name": "Oathbound Iron Mace",
+      "game_kind_hint": "mace",
+      "description": "spiked round iron mace with engraved head",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/oathbound_iron_mace.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/oathbound_iron_mace.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/oathbound_iron_mace.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/oathbound_iron_mace.png"
+      },
+      "source_cell": {
+        "col": 1,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "gravebriar_scythe",
+      "name": "Gravebriar Scythe",
+      "game_kind_hint": "scythe",
+      "description": "briar-wrapped grave scythe with skull-like socket",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/gravebriar_scythe.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/gravebriar_scythe.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/gravebriar_scythe.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/gravebriar_scythe.png"
+      },
+      "source_cell": {
+        "col": 2,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    },
+    {
+      "id": "crescent_hook_dagger",
+      "name": "Crescent Hook Dagger",
+      "game_kind_hint": "dagger",
+      "description": "curved hooked dagger with dark metal blade",
+      "paths": {
+        "master_512": "assets/equipment/weapons/professional/inspired_2026_05_27/masters_512/crescent_hook_dagger.png",
+        "icon_256": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_256/crescent_hook_dagger.png",
+        "icon_128": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/crescent_hook_dagger.png",
+        "icon_64": "assets/equipment/weapons/professional/inspired_2026_05_27/icons_64/crescent_hook_dagger.png"
+      },
+      "source_cell": {
+        "col": 3,
+        "row": 2
+      },
+      "originality_note": "Generated as a new original design from prompt; Vorlagen were used only as quality inspiration, not copied or cropped."
+    }
+  ]
+}
