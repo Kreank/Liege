@@ -3328,27 +3328,51 @@ class WorldScene extends Phaser.Scene {
       alloc: {},
       pool: 20,
     };
+    // Welle 23 — Preset-Defaults: 10 vorvergebene Punkte pro Klasse
+    // (Wanderer = frei, alle 20 selbst verteilen).
+    const PRESET_DEFAULTS = {
+      ember_mage:    { intelligenz: 4, energie: 3, krit_schaden: 2, weisheit: 1 },
+      iron_delver:   { stärke: 4, ausdauer: 3, verteidigung: 2, geschick: 1 },
+      knife_runner:  { geschick: 4, schleichen: 3, krit_rate: 2, ausweichen: 1 },
+      shieldbearer:  { verteidigung: 4, ausdauer: 3, stärke: 2, charisma: 1 },
+      wild_ranger:   { geschick: 4, ausweichen: 3, stärke: 2, krit_rate: 1 },
+      wanderer_cloak: {},   // frei
+    };
     const PRESETS = [
-      { id: 'wanderer_cloak', name: 'Wanderer',   desc: 'Ausgewogen, fĂĽr Anfänger. Reiseerfahrung, leichte Verteidigung.', tags: '⚖ Balance' },
-      { id: 'iron_delver',    name: 'Eisengräber', desc: 'Kräftiger Bergmann. Stark, ausdauernd, gut im Mining.',          tags: '⛏ Stärke / Ausdauer' },
-      { id: 'shieldbearer',   name: 'Schildträger',desc: 'Tank-Klasse mit hoher Verteidigung. Beschützer.',                tags: '🛡 Verteidigung / Ausdauer' },
-      { id: 'wild_ranger',    name: 'Wildläufer', desc: 'Jäger mit Bogen. Flink, geschickt, gute Ausweichquote.',          tags: '🏹 Geschick / Ausweichen' },
-      { id: 'knife_runner',   name: 'Klingengänger', desc: 'Leichtfüßiger Dieb. Schleichen, kritische Treffer.',           tags: '🗡 Geschick / Schleichen' },
-      { id: 'ember_mage',     name: 'Glutmagier',  desc: 'Feuermagier. Intelligenz und Energie für Magieschaden.',          tags: '🔮 Intelligenz / Energie' },
+      { id: 'wanderer_cloak', name: 'Wanderer',   desc: 'Frei verteilbar — keine Default-Punkte. Für eigene Builds.', tags: '⚖ Frei / 20 Punkte' },
+      { id: 'iron_delver',    name: 'Eisengräber', desc: 'Kräftiger Bergmann. Stark, ausdauernd, gut im Mining.',     tags: '⛏ Stärke / Ausdauer' },
+      { id: 'shieldbearer',   name: 'Schildträger',desc: 'Tank-Klasse mit hoher Verteidigung. Beschützer.',           tags: '🛡 Verteidigung / Ausdauer' },
+      { id: 'wild_ranger',    name: 'Wildläufer', desc: 'Jäger mit Bogen. Flink, geschickt, gute Ausweichquote.',     tags: '🏹 Geschick / Ausweichen' },
+      { id: 'knife_runner',   name: 'Klingengänger', desc: 'Leichtfüßiger Dieb. Schleichen, kritische Treffer.',      tags: '🗡 Geschick / Schleichen' },
+      { id: 'ember_mage',     name: 'Glutmagier',  desc: 'Feuermagier. Intelligenz und Energie für Magieschaden.',     tags: '🔮 Intelligenz / Energie' },
     ];
+    // Welle 23 — Attribut-Beschreibungen (Tooltips). Erklären was der Stat
+    // im Spiel beeinflusst (siehe backend/attributes.py SKILL_CONTRIBUTIONS).
     const ATTRS = [
-      { key: 'stärke',        label: 'Stärke',         icon: '💪' },
-      { key: 'ausdauer',      label: 'Ausdauer',       icon: '🛡️' },
-      { key: 'energie',       label: 'Energie (Mana)', icon: '✨' },
-      { key: 'intelligenz',   label: 'Intelligenz',    icon: '📖' },
-      { key: 'weisheit',      label: 'Weisheit',       icon: '🌿' },
-      { key: 'geschick',      label: 'Geschick',       icon: '🤚' },
-      { key: 'ausweichen',    label: 'Ausweichen',     icon: '💨' },
-      { key: 'verteidigung',  label: 'Verteidigung',   icon: '🛡' },
-      { key: 'charisma',      label: 'Charisma',       icon: '💬' },
-      { key: 'krit_rate',     label: 'Krit-Rate',      icon: '🎯' },
-      { key: 'krit_schaden',  label: 'Krit-Schaden',   icon: '💥' },
-      { key: 'schleichen',    label: 'Schleichen',     icon: '🌑' },
+      { key: 'stärke',       label: 'Stärke',         icon: '💪',
+        tip: 'Erhöht Nahkampf-Schaden, Tragkraft, Bergbau- und Holzfäller-Ertrag.' },
+      { key: 'ausdauer',     label: 'Ausdauer',       icon: '🛡️',
+        tip: 'Erhöht Stamina-Pool, Bau-Geschwindigkeit und Marsch-Reichweite.' },
+      { key: 'energie',      label: 'Energie (Mana)', icon: '✨',
+        tip: 'Vergrößert den Mana-Pool und verstärkt Magie-Schaden.' },
+      { key: 'intelligenz',  label: 'Intelligenz',    icon: '📖',
+        tip: 'Beeinflusst Magie-Effizienz, Crafting-Qualität und Heilkunde.' },
+      { key: 'weisheit',     label: 'Weisheit',       icon: '🌿',
+        tip: 'Bessere NPC-Dialoge, stärkere Heilung, Lebensraub bei Magie.' },
+      { key: 'geschick',     label: 'Geschick',       icon: '🤚',
+        tip: 'Boni für Dolche, Wurfwaffen und Finesse-Klassen. Crafting-Qualität.' },
+      { key: 'ausweichen',   label: 'Ausweichen',     icon: '💨',
+        tip: 'Chance, einem feindlichen Treffer komplett auszuweichen (kein Schaden).' },
+      { key: 'verteidigung', label: 'Verteidigung',   icon: '🛡',
+        tip: 'Reduziert eingehenden physischen Schaden zusätzlich zur Rüstung.' },
+      { key: 'charisma',     label: 'Charisma',       icon: '💬',
+        tip: 'Bessere Handelspreise, NPC-Stimmung, Quest-Belohnungen, soziale Optionen.' },
+      { key: 'krit_rate',    label: 'Krit-Rate',      icon: '🎯',
+        tip: 'Erhöht die Chance auf kritische Treffer (Schaden × Krit-Multiplikator).' },
+      { key: 'krit_schaden', label: 'Krit-Schaden',   icon: '💥',
+        tip: 'Erhöht den Multiplikator bei einem kritischen Treffer (1.5× → 2.5×).' },
+      { key: 'schleichen',   label: 'Schleichen',     icon: '🌑',
+        tip: 'Reduziert die Aggro-Reichweite von Feinden. Hinterhalt-Schaden.' },
     ];
 
     // Preset-Karten rendern
@@ -3365,6 +3389,11 @@ class WorldScene extends Phaser.Scene {
         <div style="font-size:9px;color:#807060;margin-top:3px;line-height:1.3">${p.desc}</div>`;
       card.addEventListener('click', () => {
         this._ccState.preset = p.id;
+        // Welle 23: Default-Punkte aus Preset-Map vorbelegen
+        const defaults = PRESET_DEFAULTS[p.id] || {};
+        this._ccState.alloc = { ...defaults };
+        const used = Object.values(defaults).reduce((a, b) => a + b, 0);
+        this._ccState.pool = 20 - used;
         presetEl.querySelectorAll('div[data-preset]').forEach(d =>
           d.style.borderColor = d.dataset.preset === p.id ? '#ffd060' : '#5a4828');
         this._updateCharCreateUI();
@@ -3377,10 +3406,12 @@ class WorldScene extends Phaser.Scene {
     attrsEl.innerHTML = '';
     for (const a of ATTRS) {
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:6px;background:#221a14;border-radius:3px;padding:4px 8px';
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;background:#221a14;border-radius:3px;padding:4px 8px;position:relative';
+      // Welle 23: Info-Bubble per native title-Attribut + Hilfs-Icon
       row.innerHTML = `
         <span style="width:18px">${a.icon}</span>
-        <span style="flex:1;font-size:11px">${a.label}</span>
+        <span style="flex:1;font-size:11px" title="${a.tip}">${a.label}</span>
+        <span class="cc-info" title="${a.tip}" style="cursor:help;color:#7a8aa0;font-size:11px;border:1px solid #5a6a78;border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center">?</span>
         <button data-act="minus" data-attr="${a.key}" style="width:24px;height:22px;background:#3a2818;border:1px solid #807060;color:#c8b878;cursor:pointer;border-radius:2px">−</button>
         <span data-val="${a.key}" style="display:inline-block;min-width:24px;text-align:center;color:#ffd060;font-weight:bold">0</span>
         <button data-act="plus" data-attr="${a.key}" style="width:24px;height:22px;background:#3a2818;border:1px solid #807060;color:#c8b878;cursor:pointer;border-radius:2px">+</button>`;
@@ -3405,8 +3436,11 @@ class WorldScene extends Phaser.Scene {
     this._updateCharCreateUI();
 
     document.getElementById('char-create-reset').onclick = () => {
-      this._ccState.alloc = {};
-      this._ccState.pool = 20;
+      // Welle 23: Reset stellt Preset-Defaults wieder her (Wanderer = leer)
+      const defaults = PRESET_DEFAULTS[this._ccState.preset] || {};
+      this._ccState.alloc = { ...defaults };
+      const used = Object.values(defaults).reduce((a, b) => a + b, 0);
+      this._ccState.pool = 20 - used;
       this._updateCharCreateUI();
     };
     document.getElementById('char-create-confirm').onclick = () => {

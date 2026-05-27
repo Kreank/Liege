@@ -2,7 +2,7 @@
    Cache-first für static Assets (Icons, Phaser CDN), Netzwerk-first für alles andere.
    Versionierung über CACHE_NAME — bumpen wenn UI/JS gross umgebaut wird, damit alte Clients aktualisieren. */
 
-const CACHE_NAME = 'liege-v32';
+const CACHE_NAME = 'liege-v33';
 const STATIC_ASSETS = [
   '/static/icon-192.png',
   '/static/icon-512.png',
