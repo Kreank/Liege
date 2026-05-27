@@ -793,15 +793,20 @@ async def websocket_endpoint(websocket: WebSocket):
                             "type": "visual_effect", "kind": "wp_build_hammer",
                             "x": x, "y": y,
                         })
-                    # Auto-Spread: löst den "Streifen am Wand-Tile"-Effekt, der
-                    # entsteht weil Wand-Sprites nur ~27px in der Mitte des 64px-
-                    # Tiles füllen — ohne Boden darunter sieht man den Untergrund.
+                    # Auto-Spread: löst den "Streifen am Object-Tile"-Effekt, der
+                    # entsteht weil Object-Sprites die Tile-Fläche nicht voll
+                    # füllen — ohne Boden darunter sieht man den Untergrund.
+                    # Welle 25: gilt jetzt für ALLE Objects (Wände, Möbel, Container,
+                    # Stationen). Trigger: ein direkter Nachbar hat Floor → Indoor-
+                    # Platzierung → Floor auch darunter. Outdoor-Bauten (Lagerfeuer
+                    # auf Wiese, Grabstein etc.) bleiben ohne Floor weil kein
+                    # Floor-Nachbar.
                     if type_ == "floor":
-                        # Boden gesetzt → unter angrenzende Wände auch Boden
+                        # Boden gesetzt → unter angrenzende Objects auch Boden
                         for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
                             nx, ny = x + dx, y + dy
                             obj_neighbor = structures.object_at(nx, ny)
-                            if not obj_neighbor or obj_neighbor["type"] != "wall":
+                            if obj_neighbor is None:
                                 continue
                             if structures.floor_at(nx, ny) is not None:
                                 continue
@@ -813,11 +818,11 @@ async def websocket_endpoint(websocket: WebSocket):
                                     "type": "structure_placed",
                                     "structure": auto,
                                 })
-                    elif type_ == "wall":
-                        # Wand neben existierendem Boden gesetzt → Boden auch
-                        # unter diese Wand. Material vom angrenzenden Boden
-                        # (sonst stimmt der Look nicht: stone-Floor mit wood-Wand-
-                        # Lücke käme komisch).
+                    else:
+                        # Beliebiges Object platziert (wall/chest/bed/workbench/
+                        # furnace/anvil/well/...). Wenn Nachbar-Tile Floor hat,
+                        # Floor auch hier drunter setzen. Material vom Nachbar-
+                        # Floor übernommen für konsistenten Look.
                         if structures.floor_at(x, y) is None:
                             adj_floor_mat = None
                             for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
@@ -2661,7 +2666,18 @@ async def websocket_endpoint(websocket: WebSocket):
                         if created is not None:
                             await websocket.send_json({"type": "inventory_add",
                                                         "item": created})
-                # XP
+                # Welle 23: Research-Pool statt Skill-XP für wertvolle Quests.
+                # Skill-XP gibt's bei Mob-Kills / Crafting direkt, nicht via Quest.
+                if "research" in reward:
+                    n_research = int(reward["research"])
+                    new_pool = await research.award_points(
+                        player_id, n_research, reason="quest_turn_in",
+                    )
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"🔬 +{n_research} Forschungspunkte (Pool: {new_pool})",
+                    })
+                # Legacy: alte Quests in DB könnten noch "xp" haben → still apply
                 if "xp" in reward:
                     xp_res = await skills.gain_xp(player_id, "combat", int(reward["xp"]))
                     if xp_res:
@@ -2815,6 +2831,21 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json({
                         "type": "toast",
                         "text": f"⚔️ {npc.get('name', 'Diese Kreatur')} ist feindlich — angreifen, nicht reden!",
+                    })
+                    continue
+                # Welle 25: Nutztiere + Karawanen-Wagen reden nicht.
+                # Spätere Interaktions-Mechanik (Streichen/Melken/Scheren/
+                # Schlachten/Wolle/Eier) kommt als eigenes System.
+                if npc["kind"] in npc_worker.LIVESTOCK_KINDS:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"🐾 {npc.get('name', 'Das Tier')} ist ein Nutztier — keine Konversation.",
+                    })
+                    continue
+                if npc["kind"] in npc_worker.CART_KINDS:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": "🛒 Ein Wagen redet nicht — sprich den Händler daneben an.",
                     })
                     continue
                 await npcs.add_talk(npc_id, player_id, "user", message)

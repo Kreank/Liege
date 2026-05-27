@@ -136,6 +136,26 @@ FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier"
                   # mit Händler-Konvois mitlaufen; kein direkter Player-Interakt)
                   "farm_cart_hay", "handcart_empty",
                   "horse_cart_single", "market_wagon_covered"]
+
+# Welle 25: Nutztiere — können nicht reden, später Streichen/Melken/Scheren/etc.
+LIVESTOCK_KINDS = {
+    # Großvieh
+    "cow", "bull", "calf", "ox",
+    "sheep", "ram", "lamb", "sheared_sheep",
+    "pig", "piglet", "boar_domestic",
+    "goat", "buck_goat", "kid_goat",
+    "horse", "draft_horse", "foal", "donkey", "mule",
+    # Geflügel
+    "chicken_hen", "rooster", "chick",
+    "duck", "drake", "duckling",
+    "goose", "gander", "gosling",
+}
+
+# Welle 25: Karawanen-Wagen — keine echten NPCs, kein Dialog.
+CART_KINDS = {
+    "farm_cart_hay", "handcart_empty",
+    "horse_cart_single", "market_wagon_covered",
+}
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",

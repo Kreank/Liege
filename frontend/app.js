@@ -3611,7 +3611,8 @@ class WorldScene extends Phaser.Scene {
   _formatQuestReward(reward) {
     const parts = [];
     if (reward.gold) parts.push(`${reward.gold} Gold`);
-    if (reward.xp) parts.push(`${reward.xp} XP`);
+    if (reward.research) parts.push(`🔬 ${reward.research} Forschung`);
+    if (reward.xp) parts.push(`${reward.xp} XP`);   // legacy fallback
     for (const [k, v] of Object.entries(reward.items || {})) {
       const name = (ITEM[k] && ITEM[k].name) || k;
       parts.push(`${v}× ${name}`);
