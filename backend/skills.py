@@ -172,6 +172,21 @@ async def gain_xp(player_name: str, skill: str, amount: int) -> dict | None:
                 await _talents.grant_talent_point(player_name, points_gained)
             except Exception:
                 log.exception("Talent-Punkt-Vergabe schlug fehl")
+            # Welle 15: zusätzlich Attribut-Allocation-Punkte (1 pro Level)
+            try:
+                import player_stats as _ps
+                await _ps.grant_attr_points(player_name,
+                                            points_gained * _ps.POINTS_PER_LEVEL)
+            except Exception:
+                log.exception("Attr-Punkt-Vergabe schlug fehl")
+    # Welle 22: kleine Menge Forschungspunkte aus jeder XP-Aktivität
+    try:
+        import research as _research
+        # 1 Pool-Punkt pro 10 XP (mindestens 1 bei kleinen Gains)
+        pool_gain = max(1, amount // 10)
+        await _research.award_points(player_name, pool_gain, f"skill:{skill}")
+    except Exception:
+        log.debug("research-pool aus XP fehlgeschlagen", exc_info=True)
     return {
         "skill":          skill,
         "xp":             new_xp,

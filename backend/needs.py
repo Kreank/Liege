@@ -14,6 +14,9 @@ SCHEMA_ALTERS: tuple[str, ...] = (
     "ALTER TABLE players ADD COLUMN IF NOT EXISTS max_hunger INTEGER NOT NULL DEFAULT 100",
     "ALTER TABLE players ADD COLUMN IF NOT EXISTS stamina INTEGER NOT NULL DEFAULT 100",
     "ALTER TABLE players ADD COLUMN IF NOT EXISTS max_stamina INTEGER NOT NULL DEFAULT 100",
+    # Welle 17 — Durst
+    "ALTER TABLE players ADD COLUMN IF NOT EXISTS thirst INTEGER NOT NULL DEFAULT 100",
+    "ALTER TABLE players ADD COLUMN IF NOT EXISTS max_thirst INTEGER NOT NULL DEFAULT 100",
 )
 
 # — Tuning-Konstanten —————————————————————————————————————————————————————————
@@ -21,6 +24,39 @@ HUNGER_TICK_SECONDS: int = int(os.environ.get("HUNGER_TICK_SECONDS", "30"))
 HUNGER_STARVE_HP_DAMAGE: int = 2
 STAMINA_REGEN_PER_TICK: int = 5
 SLEEP_STAMINA_RESTORE: int = 100
+# Durst tickt schneller als Hunger (RimWorld/Survival-style ~1.5×)
+THIRST_PER_TICK: int = int(os.environ.get("THIRST_PER_TICK", "2"))
+THIRST_DEHYDRATE_HP_DAMAGE: int = 3   # mehr als hunger weil schneller tödlich
+
+# Drink-Werte pro Item-Kind (analog FOOD_RESTORE)
+THIRST_RESTORE: dict[str, int] = {
+    "water_drink":   25,    # generischer Wasser-Trink (Brunnen / Wasser-Tile)
+    "well_drink":    30,    # Brunnen direkt = etwas mehr
+    "fish":           5,    # rohes Fleisch/Fisch hat etwas Flüssigkeit
+    "raw_meat":       3,
+    # Beeren/Obst geben Mini-Hydratation
+    "strawberry":     3,
+    "blueberry":      3,
+    "blackberry":     3,
+    "raspberry":      3,
+    "berries":        3,
+    "apple":          4,
+    "pear":           4,
+    "plum":           3,
+    "cherry":         3,
+    "cucumber":       6,    # Gurke = viel Wasser
+    "tomato":         5,
+    "grapes_blue":    5,
+    "grapes_green":   5,
+    "pumpkin":        4,
+    # Tränke
+    "health_potion":  8,    # auch ein bisschen Flüssigkeit
+    "mana_potion":    8,
+}
+
+
+def thirst_value(kind: str) -> int:
+    return THIRST_RESTORE.get(kind, 0)
 
 # Welche Items füllen Hunger auf (0 oder Abwesenheit => kein Food).
 # Balance-Achsen:
@@ -56,6 +92,10 @@ FOOD_RESTORE: dict[str, int] = {
     "cabbage":       20,
     "corn":          22,
     "pumpkin":       28,
+    # Welle 16 — neue Pflanzen
+    "garlic":         8,    # Würzig, mehr Aroma als Sättigung
+    "grapes_blue":   12,    # Wie kleine Beeren-Cluster
+    "grapes_green":  12,
     # Fleisch / Fisch
     "raw_meat":      16,    # Sättigend, aber kein HP
     "fish":          22,
@@ -88,14 +128,29 @@ def _row_to_needs(row) -> dict:
         "max_hunger":  row["max_hunger"],
         "stamina":     row["stamina"],
         "max_stamina": row["max_stamina"],
+        "thirst":      row["thirst"],
+        "max_thirst":  row["max_thirst"],
     }
 
 
 async def get_needs(player_name: str) -> dict | None:
     row = await db.pool().fetchrow(
-        "SELECT hunger, max_hunger, stamina, max_stamina "
+        "SELECT hunger, max_hunger, stamina, max_stamina, thirst, max_thirst "
         "FROM players WHERE name = $1",
         player_name,
+    )
+    return _row_to_needs(row) if row else None
+
+
+async def restore_thirst(player_name: str, amount: int) -> dict | None:
+    if amount <= 0:
+        return None
+    row = await db.pool().fetchrow(
+        "UPDATE players "
+        "SET thirst = LEAST(max_thirst, thirst + $2) "
+        "WHERE name = $1 AND thirst < max_thirst "
+        "RETURNING hunger, max_hunger, stamina, max_stamina, thirst, max_thirst",
+        player_name, amount,
     )
     return _row_to_needs(row) if row else None
 
@@ -109,7 +164,7 @@ async def restore_hunger(player_name: str, amount: int) -> dict | None:
         "UPDATE players "
         "SET hunger = LEAST(max_hunger, hunger + $2) "
         "WHERE name = $1 AND hunger < max_hunger "
-        "RETURNING hunger, max_hunger, stamina, max_stamina",
+        "RETURNING hunger, max_hunger, stamina, max_stamina, thirst, max_thirst",
         player_name, amount,
     )
     return _row_to_needs(row) if row else None
@@ -124,7 +179,7 @@ async def restore_stamina(player_name: str, amount: int) -> dict | None:
         "UPDATE players "
         "SET stamina = LEAST(max_stamina, stamina + $2) "
         "WHERE name = $1 AND stamina < max_stamina "
-        "RETURNING hunger, max_hunger, stamina, max_stamina",
+        "RETURNING hunger, max_hunger, stamina, max_stamina, thirst, max_thirst",
         player_name, amount,
     )
     return _row_to_needs(row) if row else None
@@ -161,6 +216,8 @@ async def _send_needs(connection_manager, player_name: str, needs: dict) -> None
             "max_hunger":  needs["max_hunger"],
             "stamina":     needs["stamina"],
             "max_stamina": needs["max_stamina"],
+            "thirst":      needs["thirst"],
+            "max_thirst":  needs["max_thirst"],
         })
     except Exception:
         log.debug("send_needs an %s fehlgeschlagen", player_name, exc_info=True)
@@ -180,14 +237,15 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
                 continue
 
             for name in player_names:
-                # 1) Hunger -1 (clamp >= 0) und Stamina-Regen (clamp <= max)
+                # 1) Hunger -1, Stamina-Regen, Durst -THIRST_PER_TICK
                 row = await db.pool().fetchrow(
                     "UPDATE players "
                     "SET hunger  = GREATEST(0, hunger - 1), "
+                    "    thirst  = GREATEST(0, thirst - $3), "
                     "    stamina = LEAST(max_stamina, stamina + $2) "
                     "WHERE name = $1 "
-                    "RETURNING hunger, max_hunger, stamina, max_stamina",
-                    name, STAMINA_REGEN_PER_TICK,
+                    "RETURNING hunger, max_hunger, stamina, max_stamina, thirst, max_thirst",
+                    name, STAMINA_REGEN_PER_TICK, THIRST_PER_TICK,
                 )
                 if row is None:
                     continue
@@ -200,8 +258,14 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
                         await damage_player_cb(name, HUNGER_STARVE_HP_DAMAGE)
                     except Exception:
                         log.exception("Starve-Damage fehlgeschlagen für %s", name)
+                # 3) Dehydration-Damage bei Durst == 0
+                if needs["thirst"] == 0:
+                    try:
+                        await damage_player_cb(name, THIRST_DEHYDRATE_HP_DAMAGE)
+                    except Exception:
+                        log.exception("Dehydration-Damage fehlgeschlagen für %s", name)
 
-                # 3) WS-Update an diesen Spieler
+                # 4) WS-Update an diesen Spieler
                 await _send_needs(connection_manager, name, needs)
 
         except asyncio.CancelledError:

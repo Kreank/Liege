@@ -66,6 +66,26 @@ items = ItemManager()
 world: World | None = None
 
 
+async def _find_drop_xy(x: int, y: int) -> tuple[int, int]:
+    """Return a coordinate suitable for ground-loot near (x, y).
+
+    If (x, y) is walkable and not blocked by a structure, returns it as-is.
+    Otherwise searches outward in a spiral up to radius 3 for the first
+    walkable, non-blocked tile. Falls back to (x, y) if nothing is found.
+    """
+    if world is not None and await world.is_walkable(x, y) and not structures.blocks(x, y):
+        return x, y
+    for radius in range(1, 4):
+        for dy in range(-radius, radius + 1):
+            for dx in range(-radius, radius + 1):
+                if abs(dx) != radius and abs(dy) != radius:
+                    continue
+                nx, ny = x + dx, y + dy
+                if world is not None and await world.is_walkable(nx, ny) and not structures.blocks(nx, ny):
+                    return nx, ny
+    return x, y
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global world
@@ -85,7 +105,9 @@ async def lifespan(app: FastAPI):
         event_worker.run(events, manager, world, npcs, structures)
     )
     wander_task = asyncio.create_task(
-        npc_worker.wander_loop(world, npcs, manager, damage_player_cb=damage_player)
+        npc_worker.wander_loop(world, npcs, manager,
+                                damage_player_cb=damage_player,
+                                structures_mgr=structures)
     )
     item_task = asyncio.create_task(item_worker.run(world, items, manager))
     spawn_task = asyncio.create_task(npc_worker.initial_spawn(world, npcs, manager))
@@ -101,6 +123,8 @@ async def lifespan(app: FastAPI):
     status_task = asyncio.create_task(
         status_effects.run(manager, damage_player, heal_player)
     )
+    # Welle 22: Research-Tick-Worker (online-Player bekommen alle 5min +1 Pool)
+    research_tick_task = asyncio.create_task(research.time_tick_loop(manager))
 
     yield
 
@@ -195,10 +219,31 @@ async def _compute_attributes(player_name: str) -> dict:
     return {"values": attrs, "labels": attributes.ATTR_LABELS}
 
 
+async def _build_stat_sheet(player_name: str) -> dict:
+    """Vollständiges Stat-Sheet (Welle 15): Attribute + Allokation + Resistances."""
+    import player_stats as _ps
+    inv = await items.get_inventory(player_name)
+    equipped = [it for it in inv if it.get("equipped_slot")]
+    te = await talents.aggregate_effects(player_name)
+    bp = await body_parts.get_body_parts(player_name)
+    sheet = await _ps.get_stat_sheet(player_name, equipped, te, bp)
+    sheet["labels"] = attributes.ATTR_LABELS
+    return sheet
+
+
+async def _send_attrs_update(websocket, player_name: str) -> None:
+    """Schickt einen frischen Stat-Sheet-Snapshot. Bei jedem Equip/Allocation."""
+    try:
+        sheet = await _build_stat_sheet(player_name)
+        await websocket.send_json({"type": "attrs_update", "stats": sheet})
+    except Exception:
+        logging.exception("attrs_update fehlgeschlagen")
+
+
 async def load_or_create_player(name: str) -> dict:
     row = await db.pool().fetchrow(
         "SELECT x, y, hp, max_hp, mana, max_mana, hunger, max_hunger, "
-        "stamina, max_stamina FROM players WHERE name = $1", name
+        "stamina, max_stamina, thirst, max_thirst FROM players WHERE name = $1", name
     )
     if row is not None:
         await db.pool().execute(
@@ -210,6 +255,7 @@ async def load_or_create_player(name: str) -> dict:
             "mana": row["mana"], "max_mana": row["max_mana"],
             "hunger": row["hunger"], "max_hunger": row["max_hunger"],
             "stamina": row["stamina"], "max_stamina": row["max_stamina"],
+            "thirst": row["thirst"], "max_thirst": row["max_thirst"],
         }
         walkable = await world.is_walkable(spawn["x"], spawn["y"])
         if not walkable or structures.blocks(spawn["x"], spawn["y"]):
@@ -363,19 +409,32 @@ _heal_cooldowns: dict[tuple[str, int], float] = {}
 _dungeon_cooldowns: dict[str, float] = {}
 
 
-async def damage_player(name: str, dmg: int, source_npc_id: int | None = None) -> None:
+async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
+                        dmg_type: str = "physical") -> None:
     """Wendet Schaden auf einen Spieler an. Wenn HP ≤ 0 → Respawn.
-    Berücksichtigt Armor-Defense + Shield-Status."""
-    # Armor-Defense: Summe Defense aller equipped Rüstungs-Items
+    Berücksichtigt Armor-Defense + Shield-Status + Element-Resistance."""
+    # Armor-Defense gilt nur für physical-Damage (Welle 15)
     import item_stats as _is
-    rows = await db.pool().fetch(
-        "SELECT kind, quality FROM items WHERE owner = $1 "
-        "AND equipped_slot IN ('helmet','chestplate','shield','boots')",
-        name,
-    )
-    total_def = sum(_is.armor_defense(r["kind"], r["quality"]) for r in rows)
-    dr_pct = _is.damage_reduction(total_def)
-    dmg = max(1, int(round(dmg * (1.0 - dr_pct))))
+    if dmg_type == "physical":
+        rows = await db.pool().fetch(
+            "SELECT kind, quality FROM items WHERE owner = $1 "
+            "AND equipped_slot IN ('helmet','chestplate','shield','boots')",
+            name,
+        )
+        total_def = sum(_is.armor_defense(r["kind"], r["quality"]) for r in rows)
+        dr_pct = _is.damage_reduction(total_def)
+        dmg = max(1, int(round(dmg * (1.0 - dr_pct))))
+    else:
+        # Element/Magic: Player-Resistance anwenden (kombiniert DB-Basis
+        # + Affix-Boni von equipped). Lookup nur DB-Basis hier (schnell);
+        # Affix-Boni werden separat bei Equipping in der DB aufaddiert über
+        # apply_equipment_to_resists()… für jetzt: nur Basis.
+        try:
+            import player_stats as _ps
+            resist = await _ps.player_resistance(name, dmg_type)
+            dmg = _ps.apply_resist_to_damage(dmg, resist)
+        except Exception:
+            pass
     # Status-Effekt 'shielded'
     try:
         import status_effects as _se
@@ -480,6 +539,8 @@ async def websocket_endpoint(websocket: WebSocket):
         "max_hunger": state.get("max_hunger", 100),
         "stamina": state.get("stamina", 100),
         "max_stamina": state.get("max_stamina", 100),
+        "thirst": state.get("thirst", 100),
+        "max_thirst": state.get("max_thirst", 100),
         "skills": await skills.get_skills(player_id),
         "body_parts": await body_parts.get_body_parts(player_id) or {"legs": 100, "arms": 100, "torso": 100},
         "research": await research.get_player_research(player_id),
@@ -487,6 +548,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "quests":   await quests.list_for_player(player_id),
         "factions":     await factions.list_all_reputations(player_id),
         "attributes":   await _compute_attributes(player_id),
+        "stats":        await _build_stat_sheet(player_id),
         "learned_spells": await _list_learned_spells(player_id),
         "talents": {
             "learned":      await talents.list_learned(player_id),
@@ -649,6 +711,7 @@ async def websocket_endpoint(websocket: WebSocket):
             elif mtype == "place_structure":
                 x, y, type_ = data["x"], data["y"], data["structure_type"]
                 material = data.get("material", "stone")
+                rotation = int(data.get("rotation", 0) or 0)
                 if not await world.is_walkable(x, y):
                     continue
                 # Spezial: Türen ersetzen eine vorhandene Wand am Ziel-Tile.
@@ -675,12 +738,65 @@ async def websocket_endpoint(websocket: WebSocket):
                             "text": "🚪 Türen brauchen eine Wand zum Einsetzen",
                         })
                         continue
-                placed = await structures.place(x, y, type_, player_id, material=material)
+                placed = await structures.place(x, y, type_, player_id, material=material, rotation=rotation)
                 if placed is not None:
                     await manager.broadcast({
                         "type": "structure_placed",
                         "structure": placed,
                     })
+                    # Welle 50: Effekt am gebauten Tile.
+                    # farm_plot → Hoe (Acker hacken), sonst Hammer. Floor: still.
+                    if type_ == "farm_plot":
+                        await manager.broadcast({
+                            "type": "visual_effect", "kind": "wp_hoe_soil",
+                            "x": x, "y": y,
+                        })
+                    elif type_ != "floor":
+                        await manager.broadcast({
+                            "type": "visual_effect", "kind": "wp_build_hammer",
+                            "x": x, "y": y,
+                        })
+                    # Auto-Spread: löst den "Streifen am Wand-Tile"-Effekt, der
+                    # entsteht weil Wand-Sprites nur ~27px in der Mitte des 64px-
+                    # Tiles füllen — ohne Boden darunter sieht man den Untergrund.
+                    if type_ == "floor":
+                        # Boden gesetzt → unter angrenzende Wände auch Boden
+                        for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
+                            nx, ny = x + dx, y + dy
+                            obj_neighbor = structures.object_at(nx, ny)
+                            if not obj_neighbor or obj_neighbor["type"] != "wall":
+                                continue
+                            if structures.floor_at(nx, ny) is not None:
+                                continue
+                            auto = await structures.place(
+                                nx, ny, "floor", player_id, material=material
+                            )
+                            if auto is not None:
+                                await manager.broadcast({
+                                    "type": "structure_placed",
+                                    "structure": auto,
+                                })
+                    elif type_ == "wall":
+                        # Wand neben existierendem Boden gesetzt → Boden auch
+                        # unter diese Wand. Material vom angrenzenden Boden
+                        # (sonst stimmt der Look nicht: stone-Floor mit wood-Wand-
+                        # Lücke käme komisch).
+                        if structures.floor_at(x, y) is None:
+                            adj_floor_mat = None
+                            for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
+                                fl = structures.floor_at(x + dx, y + dy)
+                                if fl is not None:
+                                    adj_floor_mat = fl.get("material") or "stone"
+                                    break
+                            if adj_floor_mat is not None:
+                                auto = await structures.place(
+                                    x, y, "floor", player_id, material=adj_floor_mat
+                                )
+                                if auto is not None:
+                                    await manager.broadcast({
+                                        "type": "structure_placed",
+                                        "structure": auto,
+                                    })
                     # Hammer-Tool gibt +50% Construction-XP
                     has_hammer = await has_tool_for_skill(player_id, "construction")
                     xp_amount = 12 if has_hammer else 8
@@ -765,10 +881,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif mtype == "merge_stacks":
                 kind = str(data.get("kind", ""))
-                quality = str(data.get("quality", "normal"))
+                quality_str = str(data.get("quality", "normal"))
                 if not kind:
                     continue
-                result = await items.merge_stacks(player_id, kind, quality)
+                result = await items.merge_stacks(player_id, kind, quality_str)
                 if result is not None:
                     # Full-refresh damit Frontend die gelöschten Rows + neue Quantities sieht
                     new_inv = await items.get_inventory(player_id)
@@ -782,12 +898,28 @@ async def websocket_endpoint(websocket: WebSocket):
                 item = await items.equip(item_id, player_id)
                 if item is not None:
                     await websocket.send_json({"type": "inventory_update", "item": item})
+                    await _send_attrs_update(websocket, player_id)
 
             elif mtype == "unequip_item":
                 item_id = int(data.get("item_id", 0))
                 item = await items.unequip(item_id, player_id)
                 if item is not None:
                     await websocket.send_json({"type": "inventory_update", "item": item})
+                    await _send_attrs_update(websocket, player_id)
+
+            elif mtype == "allocate_attr":
+                attr = (data.get("attr") or "").strip()
+                n = int(data.get("n", 1) or 1)
+                if attr and -50 <= n <= 50:
+                    import player_stats as _ps
+                    result = await _ps.allocate_point(player_id, attr, n)
+                    if result and "ok" in result:
+                        await _send_attrs_update(websocket, player_id)
+                    elif result and "error" in result:
+                        await websocket.send_json({
+                            "type": "toast",
+                            "text": f"Allokation: {result['error']}",
+                        })
 
             elif mtype == "use_item":
                 item_id = int(data.get("item_id", 0))
@@ -847,6 +979,21 @@ async def websocket_endpoint(websocket: WebSocket):
                     new_state = await needs.restore_hunger(player_id, eff_val)
                     if new_state is not None:
                         await websocket.send_json({"type": "player_needs", **new_state})
+                # Welle 17: viele Foods geben auch Durst-Restore (Gurke, Tomate, Trauben, ...)
+                if kind:
+                    t_val = needs.thirst_value(kind)
+                    if t_val > 0:
+                        t_state = await needs.restore_thirst(player_id, t_val)
+                        if t_state is not None:
+                            await websocket.send_json({"type": "player_needs", **t_state})
+                # Welle 22: Forschungs-Items → Pool füllen
+                if kind in ("research_scroll", "research_tome"):
+                    gain = 5 if kind == "research_scroll" else 20
+                    new_pool = await research.award_points(player_id, gain, f"item:{kind}")
+                    await websocket.send_json({
+                        "type": "research_pool_update", "pool": new_pool,
+                        "gained": gain, "reason": f"📜 {kind}",
+                    })
                     # Master-Chef-Talent: zusätzlich 10 HP bei gegarten Mahlzeiten
                     talent_eff_c = await talents.aggregate_effects(player_id)
                     if (kind in ("bread", "cooked_meat")
@@ -973,11 +1120,22 @@ async def websocket_endpoint(websocket: WebSocket):
                     "type": "visual_effect", "kind": weapon_fx,
                     "x": npc["x"], "y": npc["y"],
                 })
+                # Welle 15: Monster-Resists/Defense anwenden
+                # armor_pen aus Waffen-Stat (z.B. mace hat 0.25)
+                _w_cfg = _is.WEAPON_STATS.get(weapon, {}) if weapon else {}
+                _armor_pen = _w_cfg.get("armor_pen", 0.0)
+                dmg = combat.apply_creature_resists(
+                    npc["kind"], dmg,
+                    dmg_type=combat.weapon_damage_type(weapon),
+                    armor_pen=_armor_pen,
+                )
                 result = await npcs.damage(npc_id, dmg)
                 if result is None:
-                    # Loot droppen auf NPC-Position (walkable check ok da NPC dort war)
+                    # Loot droppen — wenn NPC-Tile durch Struktur geblockt ist,
+                    # weiche auf den ersten freien Nachbar aus.
+                    drop_x, drop_y = await _find_drop_xy(npc["x"], npc["y"])
                     for drop_kind in loot.roll_loot(npc["kind"]):
-                        dropped = await items.spawn_on_ground(drop_kind, npc["x"], npc["y"])
+                        dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
                         if dropped is not None:
                             await manager.broadcast({
                                 "type": "item_spawned", "item": dropped,
@@ -1096,11 +1254,21 @@ async def websocket_endpoint(websocket: WebSocket):
                                 "type": "visual_effect", "kind": spell_fx,
                                 "x": target["x"], "y": target["y"],
                             })
+                            # Welle 15: Spell-Damage-Typ je nach Spell-Item
+                            _spell_dmg_type = {
+                                "spell_book": "fire",
+                                "scroll":     "lightning",
+                                "rune_stone": "magic",
+                            }.get(row["kind"], "magic")
                             for t in targets:
-                                result = await npcs.damage(t["id"], spell["damage"])
+                                _final = combat.apply_creature_resists(
+                                    t["kind"], spell["damage"], dmg_type=_spell_dmg_type
+                                )
+                                result = await npcs.damage(t["id"], _final)
                                 if result is None:
+                                    drop_x, drop_y = await _find_drop_xy(t["x"], t["y"])
                                     for drop_kind in loot.roll_loot(t["kind"]):
-                                        dropped = await items.spawn_on_ground(drop_kind, t["x"], t["y"])
+                                        dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
                                         if dropped:
                                             await manager.broadcast({
                                                 "type": "item_spawned", "item": dropped,
@@ -1254,6 +1422,17 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type": "visual_effect", "kind": "hit_spark",
                         "x": s["x"], "y": s["y"],
                     })
+                    # Welle 50: skill-spezifischer World-Polish-Effect oben drauf
+                    polish_kind = {
+                        "woodcutting": "wp_chop_wood",
+                        "mining":      "wp_mining_chip",
+                        "gathering":   "wp_harvest_crop",
+                    }.get(skill_name)
+                    if polish_kind:
+                        await manager.broadcast({
+                            "type": "visual_effect", "kind": polish_kind,
+                            "x": s["x"], "y": s["y"],
+                        })
                     # Damage applied — structure bleibt oder geht weg
                     # Damage zielt auf den Layer, den at() liefert (Object > Floor)
                     damage_layer = s.get("layer", "object")
@@ -1337,6 +1516,11 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type": "inventory_full_refresh",
                         "inventory": await items.get_inventory(player_id),
                     })
+                    # Welle 50: Sow-Seeds Pop am Feld
+                    await manager.broadcast({
+                        "type": "visual_effect", "kind": "wp_sow_seeds",
+                        "x": s["x"], "y": s["y"],
+                    })
                     await websocket.send_json({
                         "type": "toast", "text": "🌱 Kraut gepflanzt",
                     })
@@ -1346,6 +1530,14 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type":     "crafting_open",
                         "station":  s["type"],
                         "recipes":  recipes.get_recipes(s["type"]),
+                    })
+                    continue
+                # Welle 51 — Settlement-Schild anklicken → Inspect-Modal
+                if s["type"].startswith("sign_"):
+                    slug = s["type"][len("sign_"):]
+                    await websocket.send_json({
+                        "type": "sign_inspect",
+                        "slug": slug,
                     })
                     continue
                 heal_amount = combat.STRUCTURE_HEAL.get(s["type"])
@@ -1359,10 +1551,170 @@ async def websocket_endpoint(websocket: WebSocket):
                         continue
                     _heal_cooldowns[key] = now
                     await heal_player(player_id, heal_amount)
+                    # Welle 17: Brunnen tränkt auch — Durst auffüllen
+                    if s["type"] == "well":
+                        amt = needs.thirst_value("well_drink") or 30
+                        new_needs = await needs.restore_thirst(player_id, amt)
+                        if new_needs:
+                            await websocket.send_json({
+                                "type":        "player_needs",
+                                "hunger":      new_needs["hunger"],
+                                "max_hunger":  new_needs["max_hunger"],
+                                "stamina":     new_needs["stamina"],
+                                "max_stamina": new_needs["max_stamina"],
+                                "thirst":      new_needs["thirst"],
+                                "max_thirst":  new_needs["max_thirst"],
+                            })
+                            await websocket.send_json({
+                                "type": "toast", "text": f"💧 Brunnen-Trunk: +{amt} Durst",
+                            })
                 else:
                     await websocket.send_json({
                         "type": "toast",
                         "text": f"{s['type']} — Mechanik kommt noch",
+                    })
+
+            elif mtype == "fill_container":
+                # Füllt ein Container-Item (Eimer/Wasserschlauch/Gießkanne) am
+                # angegebenen Tile-Click (entweder ein Brunnen oder Wasser-Tile).
+                item_id = int(data.get("item_id", 0))
+                x, y = int(data.get("x", 0)), int(data.get("y", 0))
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                    await websocket.send_json({"type": "toast", "text": "Zu weit weg."})
+                    continue
+                # Wasserquelle: Brunnen ODER WATER-Tile
+                obj_here = structures.object_at(x, y)
+                is_well = obj_here is not None and obj_here["type"] == "well"
+                from world import WATER as _W
+                tile_id = await world.tile_at(x, y)
+                is_water_tile = (tile_id == _W)
+                if not (is_well or is_water_tile):
+                    await websocket.send_json({"type": "toast", "text": "Keine Wasserquelle."})
+                    continue
+                # Item muss Container sein und dem Spieler gehören
+                cur_item = await db.pool().fetchrow(
+                    "SELECT kind FROM items WHERE id = $1 AND owner = $2",
+                    item_id, player_id,
+                )
+                if cur_item is None or not items.is_water_container(cur_item["kind"]):
+                    await websocket.send_json({"type": "toast", "text": "Kein Behälter."})
+                    continue
+                cap = items.container_capacity(cur_item["kind"])
+                filled = await items.set_charges(item_id, player_id, cap)
+                if filled:
+                    await websocket.send_json({"type": "inventory_update", "item": filled})
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"💧 {cur_item['kind']} aufgefüllt ({cap} Ladungen).",
+                    })
+
+            elif mtype == "water_plant":
+                # Bewässert einen farm_plot in Reichweite (verbraucht 1 Container-Ladung)
+                x, y = int(data.get("x", 0)), int(data.get("y", 0))
+                container_id = int(data.get("item_id", 0))
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                    await websocket.send_json({"type": "toast", "text": "Zu weit weg."})
+                    continue
+                target = structures.at(x, y)
+                if target is None or target["type"] != "farm_plot":
+                    await websocket.send_json({"type": "toast", "text": "Hier ist kein Acker."})
+                    continue
+                # Container prüfen
+                cur_item = await db.pool().fetchrow(
+                    "SELECT kind, charges FROM items WHERE id = $1 AND owner = $2",
+                    container_id, player_id,
+                )
+                if cur_item is None or not items.is_water_container(cur_item["kind"]):
+                    await websocket.send_json({"type": "toast", "text": "Kein Wasserbehälter ausgewählt."})
+                    continue
+                if (cur_item["charges"] or 0) <= 0:
+                    await websocket.send_json({"type": "toast", "text": "Behälter ist leer."})
+                    continue
+                # Bewässern: pflanze last_watered_at = NOW
+                upd = await db.pool().fetchrow(
+                    "UPDATE plantings SET last_watered_at = NOW() "
+                    "WHERE structure_id = $1 "
+                    "RETURNING structure_id, plant_kind",
+                    target["id"],
+                )
+                if upd is None:
+                    await websocket.send_json({"type": "toast", "text": "Acker ist leer (kein Samen)."})
+                    continue
+                # Charges -1
+                updated = await items.add_charges(container_id, player_id, -1)
+                if updated:
+                    await websocket.send_json({"type": "inventory_update", "item": updated})
+                # Welle 50: Wasser-Pop am Acker
+                await manager.broadcast({
+                    "type": "visual_effect", "kind": "wp_water_crop_tile",
+                    "x": x, "y": y,
+                })
+                await websocket.send_json({
+                    "type": "toast",
+                    "text": f"🌱💧 Bewässert ({upd['plant_kind']})",
+                })
+
+            elif mtype == "drink_container":
+                # Trinkt 1 Ladung aus einem vollen Container im Inventar.
+                item_id = int(data.get("item_id", 0))
+                cur_item = await db.pool().fetchrow(
+                    "SELECT kind, charges FROM items WHERE id = $1 AND owner = $2",
+                    item_id, player_id,
+                )
+                if cur_item is None or not items.is_water_container(cur_item["kind"]):
+                    continue
+                if (cur_item["charges"] or 0) <= 0:
+                    await websocket.send_json({"type": "toast", "text": "Behälter ist leer."})
+                    continue
+                # Trinken: +25 Durst pro Ladung
+                amt = needs.thirst_value("water_drink") or 25
+                new_needs = await needs.restore_thirst(player_id, amt)
+                if new_needs:
+                    await websocket.send_json({"type": "player_needs", **new_needs})
+                updated = await items.add_charges(item_id, player_id, -1)
+                if updated:
+                    await websocket.send_json({"type": "inventory_update", "item": updated})
+                await websocket.send_json({
+                    "type": "toast",
+                    "text": f"💧 +{amt} Durst (Behälter: {updated['charges']}/{items.container_capacity(cur_item['kind'])})",
+                })
+
+            elif mtype == "drink_water_tile":
+                # Trinkt aus angrenzendem Wasser-Tile (oder direkt drauf)
+                x, y = int(data.get("x", 0)), int(data.get("y", 0))
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                    continue
+                # WATER = tile id 0 (siehe world.py)
+                tile_id = await world.tile_at(x, y)
+                from world import WATER as _W
+                if tile_id != _W:
+                    await websocket.send_json({
+                        "type": "toast", "text": "Hier ist kein Wasser.",
+                    })
+                    continue
+                amt = needs.thirst_value("water_drink") or 25
+                new_needs = await needs.restore_thirst(player_id, amt)
+                if new_needs:
+                    await websocket.send_json({
+                        "type":        "player_needs",
+                        "hunger":      new_needs["hunger"],
+                        "max_hunger":  new_needs["max_hunger"],
+                        "stamina":     new_needs["stamina"],
+                        "max_stamina": new_needs["max_stamina"],
+                        "thirst":      new_needs["thirst"],
+                        "max_thirst":  new_needs["max_thirst"],
+                    })
+                    await websocket.send_json({
+                        "type": "toast", "text": f"💧 Aus dem See getrunken: +{amt} Durst",
                     })
 
             elif mtype == "chest_transfer_to":
@@ -1402,6 +1754,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 recipe_id = str(data.get("recipe_id", ""))
                 recipe = recipes.find_recipe(station, recipe_id)
                 if recipe is None:
+                    continue
+                # Welle 22: Research-Gate
+                req = recipe.get("requires")
+                if req and not await research.is_node_done(player_id, req):
+                    node_name = research.RESEARCH_NODES.get(req, {}).get("name", req)
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"🔒 Erst forschen: {node_name}",
+                    })
                     continue
                 counts = await items.count_owned_by_kind(player_id)
                 if not all(counts.get(k, 0) >= n for k, n in recipe["inputs"]):
@@ -1472,6 +1833,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 xp_result = await skills.gain_xp(player_id, "crafting", 15)
                 if xp_result:
                     await websocket.send_json({"type": "skill_xp", **xp_result})
+                # Welle 22: Crafting an Station gibt +1 Forschungs-Pool
+                _new_pool = await research.award_points(player_id, 1, f"craft:{station}")
+                await websocket.send_json({
+                    "type": "research_pool_update", "pool": _new_pool,
+                    "gained": 1, "reason": f"🔨 {station}",
+                })
                 # Cooking-XP wenn das Rezept Food produziert
                 if recipe["output"] in ("bread", "cooked_meat"):
                     cook_xp = await skills.gain_xp(player_id, "cooking", 20)
@@ -1804,6 +2171,16 @@ async def websocket_endpoint(websocket: WebSocket):
                 station_type = data.get("station_type", "")
                 recipe_id = data.get("recipe_id", "")
                 count = max(1, min(99, int(data.get("count", 1))))
+                # Welle 22: Research-Gate auch hier
+                _recipe = recipes.find_recipe(station_type, recipe_id)
+                _req = _recipe.get("requires") if _recipe else None
+                if _req and not await research.is_node_done(player_id, _req):
+                    node_name = research.RESEARCH_NODES.get(_req, {}).get("name", _req)
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"🔒 Erst forschen: {node_name}",
+                    })
+                    continue
                 bill = await bill_queue.add_bill(player_id, station_type, recipe_id, count)
                 bills_now = await bill_queue.list_bills(player_id)
                 await websocket.send_json({"type": "bills_update", "bills": bills_now})

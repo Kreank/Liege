@@ -1,5 +1,18 @@
 import db
 
+# Welle 51 — Settlement-Schilder. Slug = Manifest-Slug aus
+# assets/props/settlement/signs/professional/manifest.json
+SIGN_SLUGS = [
+    "schmiede", "gasthaus", "wohnhaus", "baeckerei", "marktstand",
+    "lagerhaus", "apotheke_heiler", "stall", "wache", "kaserne",
+    "rathaus", "bergwerk", "saegewerk", "holzfaeller", "bauernhof",
+    "muehle", "fischerhuette", "taverne_brauerei", "schneiderei",
+    "gerberei", "jaegerhuette", "alchemie", "magierturm", "kapelle",
+    "friedhof", "bibliothek", "schule", "goldschmied", "waffenladen",
+    "ruestungsschmied", "hafen", "brunnen", "ritualplatz", "portalraum",
+    "verzauberer", "drachenstall",
+]
+
 STRUCTURE_TYPES = {
     "wall":      {"blocking": True},
     "floor":     {"blocking": False},
@@ -96,6 +109,11 @@ STRUCTURE_TYPES = {
     "wheat_grown":     {"blocking": False},
 }
 
+# Welle 51 — alle Sign-Varianten als platzierbare Strukturen registrieren.
+for _slug in SIGN_SLUGS:
+    STRUCTURE_TYPES[f"sign_{_slug}"] = {"blocking": False}
+del _slug
+
 VALID_MATERIALS = {"stone", "wood", "straw"}
 DEFAULT_MATERIAL = "stone"
 
@@ -120,7 +138,7 @@ class StructureManager:
 
     async def load(self) -> None:
         rows = await db.pool().fetch(
-            "SELECT id, x, y, type, owner, material, durability, layer FROM structures"
+            "SELECT id, x, y, type, owner, material, durability, layer, rotation FROM structures"
         )
         self._floor_by_coord.clear()
         self._object_by_coord.clear()
@@ -134,6 +152,7 @@ class StructureManager:
                 "material":   r["material"],
                 "durability": r["durability"],
                 "layer":      r["layer"],
+                "rotation":   r["rotation"] or 0,
             }
             self._layer_map(r["layer"])[(r["x"], r["y"])] = struct
 
@@ -160,19 +179,24 @@ class StructureManager:
         return bool(spec and spec["blocking"])
 
     async def place(self, x: int, y: int, type_: str, owner: str,
-                    material: str = DEFAULT_MATERIAL, durability: int = 1) -> dict | None:
+                    material: str = DEFAULT_MATERIAL, durability: int = 1,
+                    rotation: int = 0) -> dict | None:
         if type_ not in STRUCTURE_TYPES:
             return None
         if material not in VALID_MATERIALS:
             material = DEFAULT_MATERIAL
+        # Rotation normalisieren: nur 0/90/180/270 erlaubt
+        rotation = int(rotation) % 360
+        if rotation not in (0, 90, 180, 270):
+            rotation = 0
         layer = _layer_for(type_)
         layer_map = self._layer_map(layer)
         if (x, y) in layer_map:
             return None  # Slot in diesem Layer ist belegt
         row = await db.pool().fetchrow(
-            "INSERT INTO structures (x, y, type, owner, material, durability, layer) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-            x, y, type_, owner, material, durability, layer,
+            "INSERT INTO structures (x, y, type, owner, material, durability, layer, rotation) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+            x, y, type_, owner, material, durability, layer, rotation,
         )
         struct = {
             "id":         row["id"],
@@ -183,6 +207,7 @@ class StructureManager:
             "material":   material,
             "durability": durability,
             "layer":      layer,
+            "rotation":   rotation,
         }
         layer_map[(x, y)] = struct
         return struct

@@ -65,40 +65,53 @@ async def auth_me(user: dict = Depends(get_current_user)):
 
 @router.post("/auth/register")
 async def auth_register(creds: Credentials, response: Response):
-    """Only allowed if no users exist yet — creates the first admin."""
-    if await user_count() > 0:
-        raise HTTPException(
-            status_code=403,
-            detail="Registrierung geschlossen. Wende dich an einen Admin.",
-        )
+    """Only allowed if no users exist yet — creates the first admin.
+
+    Race-safe: the whole check-and-insert runs in one transaction with
+    a SERIALIZABLE isolation level so two concurrent first-time registrations
+    cannot both succeed.
+    """
     validate_username(creds.username)
     validate_password(creds.password)
-
-    pool = db.pool()
-    existing = await pool.fetchrow("SELECT name FROM players WHERE name = $1", creds.username)
+    username = creds.username.lower()
     pw_hash = hash_password(creds.password)
 
-    if existing:
-        await pool.execute(
-            "UPDATE players SET password_hash = $1, role = 'admin' WHERE name = $2",
-            pw_hash, creds.username,
-        )
-    else:
-        await pool.execute(
-            "INSERT INTO players (name, x, y, password_hash, role) "
-            "VALUES ($1, 0, 0, $2, 'admin')",
-            creds.username, pw_hash,
-        )
+    pool = db.pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction(isolation="serializable"):
+            n = await conn.fetchval(
+                "SELECT COUNT(*) FROM players WHERE password_hash IS NOT NULL"
+            )
+            if int(n) > 0:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Registrierung geschlossen. Wende dich an einen Admin.",
+                )
+            existing = await conn.fetchrow(
+                "SELECT name FROM players WHERE LOWER(name) = $1", username
+            )
+            if existing:
+                await conn.execute(
+                    "UPDATE players SET password_hash = $1, role = 'admin' "
+                    "WHERE LOWER(name) = $2",
+                    pw_hash, username,
+                )
+            else:
+                await conn.execute(
+                    "INSERT INTO players (name, x, y, password_hash, role) "
+                    "VALUES ($1, 0, 0, $2, 'admin')",
+                    username, pw_hash,
+                )
 
-    _set_session(response, creds.username)
-    return {"username": creds.username, "role": "admin"}
+    _set_session(response, username)
+    return {"username": username, "role": "admin"}
 
 
 @router.post("/auth/login")
 async def auth_login(creds: Credentials, response: Response):
     pool = db.pool()
     row = await pool.fetchrow(
-        "SELECT name, password_hash, role FROM players WHERE name = $1",
+        "SELECT name, password_hash, role FROM players WHERE LOWER(name) = LOWER($1)",
         creds.username,
     )
     if not row or not row["password_hash"] or not verify_password(creds.password, row["password_hash"]):
@@ -142,9 +155,10 @@ async def admin_create_user(data: CreateUser, _admin: dict = Depends(get_admin_u
     if data.role not in ("user", "admin"):
         raise HTTPException(status_code=400, detail="role muss 'user' oder 'admin' sein")
 
+    username = data.username.lower()
     pool = db.pool()
     existing = await pool.fetchrow(
-        "SELECT password_hash FROM players WHERE name = $1", data.username
+        "SELECT name, password_hash FROM players WHERE LOWER(name) = $1", username
     )
     if existing and existing["password_hash"]:
         raise HTTPException(status_code=409, detail="Username existiert bereits")
@@ -152,16 +166,16 @@ async def admin_create_user(data: CreateUser, _admin: dict = Depends(get_admin_u
     pw_hash = hash_password(data.password)
     if existing:
         await pool.execute(
-            "UPDATE players SET password_hash = $1, role = $2 WHERE name = $3",
-            pw_hash, data.role, data.username,
+            "UPDATE players SET password_hash = $1, role = $2 WHERE LOWER(name) = $3",
+            pw_hash, data.role, username,
         )
     else:
         await pool.execute(
             "INSERT INTO players (name, x, y, password_hash, role) "
             "VALUES ($1, 0, 0, $2, $3)",
-            data.username, pw_hash, data.role,
+            username, pw_hash, data.role,
         )
-    return {"username": data.username, "role": data.role}
+    return {"username": username, "role": data.role}
 
 
 @router.patch("/admin/users/{username}")
@@ -172,30 +186,38 @@ async def admin_update_role(
 ):
     if data.role not in ("user", "admin"):
         raise HTTPException(status_code=400, detail="role muss 'user' oder 'admin' sein")
-    if username == admin["name"] and data.role != "admin":
+    pool = db.pool()
+    row = await pool.fetchrow(
+        "SELECT name FROM players WHERE LOWER(name) = LOWER($1)", username
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="User nicht gefunden")
+    canonical = row["name"]
+    if canonical == admin["name"] and data.role != "admin":
         raise HTTPException(
             status_code=400,
             detail="Du kannst dir nicht selbst die Admin-Rechte entziehen",
         )
-    pool = db.pool()
-    row = await pool.fetchrow("SELECT name FROM players WHERE name = $1", username)
-    if not row:
-        raise HTTPException(status_code=404, detail="User nicht gefunden")
-    await pool.execute("UPDATE players SET role = $1 WHERE name = $2", data.role, username)
-    return {"username": username, "role": data.role}
+    await pool.execute(
+        "UPDATE players SET role = $1 WHERE name = $2", data.role, canonical
+    )
+    return {"username": canonical, "role": data.role}
 
 
 @router.delete("/admin/users/{username}")
 async def admin_delete_user(username: str, admin: dict = Depends(get_admin_user)):
-    if username == admin["name"]:
-        raise HTTPException(status_code=400, detail="Du kannst dich nicht selbst löschen")
     pool = db.pool()
-    row = await pool.fetchrow("SELECT name FROM players WHERE name = $1", username)
+    row = await pool.fetchrow(
+        "SELECT name FROM players WHERE LOWER(name) = LOWER($1)", username
+    )
     if not row:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
+    canonical = row["name"]
+    if canonical == admin["name"]:
+        raise HTTPException(status_code=400, detail="Du kannst dich nicht selbst löschen")
     # Soft-disable: Login entfernen, Spielfortschritt erhalten
     await pool.execute(
         "UPDATE players SET password_hash = NULL, role = 'user' WHERE name = $1",
-        username,
+        canonical,
     )
     return {"ok": True, "soft_deleted": True}

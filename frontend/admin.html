@@ -143,8 +143,18 @@
 
     function showMsg(id, text, kind) {
       const el = document.getElementById(id);
-      if (!text) { el.innerHTML = ''; return; }
-      el.innerHTML = `<div class="msg ${kind}">${text}</div>`;
+      el.textContent = '';
+      if (!text) return;
+      const box = document.createElement('div');
+      box.className = `msg ${kind}`;
+      box.textContent = text;
+      el.appendChild(box);
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
     }
 
     async function loadMe() {
@@ -172,26 +182,31 @@
       }
       const users = await r.json();
       const tbody = document.getElementById('users-tbody');
-      tbody.innerHTML = users.map(u => `
-        <tr data-username="${u.username}">
-          <td>${u.username}${u.username === me.username ? ' <span style="color:#888;">(du)</span>' : ''}</td>
+      tbody.innerHTML = users.map(u => {
+        const safeName = escapeHtml(u.username);
+        const safeRole = u.role === 'admin' ? 'admin' : 'user';
+        const isMe = u.username === me.username;
+        const target = safeRole === 'admin' ? 'user' : 'admin';
+        return `
+        <tr data-username="${safeName}">
+          <td>${safeName}${isMe ? ' <span style="color:#888;">(du)</span>' : ''}</td>
           <td>
             ${u.has_password
-              ? `<span class="role-${u.role}">${u.role}</span>`
+              ? `<span class="role-${safeRole}">${safeRole}</span>`
               : '<span class="no-pw">deaktiviert</span>'}
           </td>
-          <td>${fmtDate(u.created_at)}</td>
-          <td>${fmtDate(u.last_seen)}</td>
+          <td>${escapeHtml(fmtDate(u.created_at))}</td>
+          <td>${escapeHtml(fmtDate(u.last_seen))}</td>
           <td class="actions">
-            ${u.has_password && u.username !== me.username ? `
-              <button data-action="toggle-role" data-target="${u.role === 'admin' ? 'user' : 'admin'}">
-                → ${u.role === 'admin' ? 'user' : 'admin'}
+            ${u.has_password && !isMe ? `
+              <button data-action="toggle-role" data-target="${target}">
+                → ${target}
               </button>
               <button class="danger" data-action="delete">Login entfernen</button>
             ` : ''}
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
     document.getElementById('users-tbody').addEventListener('click', async (ev) => {

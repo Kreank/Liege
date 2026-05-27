@@ -120,6 +120,39 @@ LOOT_TABLE = {
                   ("gold_coin", 45), ("mythril_ore", 20), ("crystal", 40), ("scroll", 20)],
     "manticore": [("raw_meat", 65), ("leather", 65), ("bone", 55),
                   ("gold_coin", 35), ("crystal", 25), ("spear", 10)],
+
+    # — Welle 14 — professional monster asset-drop (2026-05-26b) —
+    # Vermin / Larva — wenig Loot, einfache Materialien
+    "razorback_vermin":   [("raw_meat", 30), ("leather", 25), ("bone", 30)],
+    "spined_abyss_larva": [("bone", 25), ("cloth", 20), ("herb", 20), ("crystal", 8)],
+    # Mittlere Tiere
+    "reed_walker":        [("raw_meat", 45), ("leather", 50), ("bone", 35), ("herb", 15)],
+    "redland_scavenger":  [("raw_meat", 50), ("leather", 55), ("bone", 40), ("copper_coin", 15)],
+    "mossback_warden":    [("wood", 50), ("herb", 40), ("leather", 30), ("crystal", 12)],
+    # Undead / Magic
+    "grave_wraith":       [("bone", 70), ("cloth", 40), ("scroll", 15), ("mana_potion", 12), ("silver_coin", 12)],
+    "serpent_oracle":     [("leather", 50), ("scroll", 25), ("rune_stone", 15), ("crystal", 25),
+                           ("mana_potion", 20), ("silver_coin", 18)],
+    "urtikus_eye_fiend":  [("crystal", 35), ("herb", 25), ("scroll", 18), ("mana_potion", 15), ("bone", 30)],
+    # Heavy beasts
+    "mantis_chimera":     [("raw_meat", 60), ("leather", 65), ("bone", 50), ("dagger", 6)],
+    "iron_spider":        [("iron_ore", 60), ("crystal", 25), ("bone", 20), ("steel_ingot", 15)],
+    "dendroid_guardian":  [("wood", 95), ("herb", 40), ("apple", 25), ("crystal", 15), ("silver_coin", 12)],
+    "blood_antler_drake": [("raw_meat", 70), ("leather", 75), ("bone", 65), ("gold_coin", 25), ("crystal", 20)],
+    # Bosse — fette Drops mit Münzen + selten Equipment
+    "kaiju_thornback":      [("raw_meat", 80), ("leather", 80), ("bone", 70),
+                             ("gold_coin", 35), ("crystal", 25), ("mythril_ore", 10)],
+    "void_eye_brute":       [("bone", 60), ("crystal", 50), ("scroll", 20), ("rune_stone", 15),
+                             ("gold_coin", 35), ("mana_potion", 25), ("amulet", 6)],
+    "frost_rune_boar_prime":[("raw_meat", 85), ("leather", 80), ("bone", 70),
+                             ("crystal", 40), ("gold_coin", 40), ("rune_stone", 12),
+                             ("mythril_ore", 15)],
+    "magma_shell_devourer": [("stone", 70), ("crystal", 50), ("iron_ore", 50),
+                             ("gold_ore", 25), ("mythril_ore", 20), ("gold_coin", 45),
+                             ("steel_ingot", 30)],
+    "rockshell_colossus":   [("stone", 95), ("crystal", 60), ("iron_ore", 55),
+                             ("silver_ore", 30), ("gold_ore", 20), ("mythril_ore", 25),
+                             ("gold_coin", 50), ("chestplate", 8)],
 }
 
 # Münz-Gewichte für Banditen — Bronze sehr häufig, Gold selten
@@ -148,16 +181,33 @@ def _pick_weighted(items: list[tuple[str, int]]) -> str | None:
     return random.choices(kinds, weights=weights, k=1)[0]
 
 
-def _roll_drop_count() -> int:
-    return random.choices([0, 1, 2, 3], weights=DROP_COUNT_WEIGHTS, k=1)[0]
+def _roll_drop_count(tier: int = 2) -> int:
+    """Tier-skaliertes Drop-Count.
+    Tier 1 (trash): überwiegend 0-1 Drops.
+    Tier 2 (normal): default 0-3.
+    Tier 3 (elite): 1-3, häufiger 2-3.
+    Tier 4 (boss): garantiert 2-4 Drops."""
+    if tier <= 1:
+        return random.choices([0, 1, 2], weights=[25, 60, 15], k=1)[0]
+    if tier == 2:
+        return random.choices([0, 1, 2, 3], weights=DROP_COUNT_WEIGHTS, k=1)[0]
+    if tier == 3:
+        return random.choices([1, 2, 3], weights=[30, 50, 20], k=1)[0]
+    return random.choices([2, 3, 4], weights=[40, 45, 15], k=1)[0]
 
 
 def roll_loot(kind: str) -> list[str]:
-    """Returnt 0-3 Item-Kinds die dieses Creature droppt (ohne Duplikate
-    aus der Standard-Tabelle)."""
+    """Returnt 0-4 Item-Kinds die dieses Creature droppt (ohne Duplikate
+    aus der Standard-Tabelle). Anzahl skaliert mit Monster-Tier."""
     table = LOOT_TABLE.get(kind, [])
+    # Tier aus den Combat-Stats holen (Default 2 wenn unbekannt)
+    try:
+        import combat as _c
+        tier = _c.creature_stats(kind).get("tier", 2)
+    except Exception:
+        tier = 2
     drops: list[str] = []
-    n = _roll_drop_count()
+    n = _roll_drop_count(tier)
     if n > 0 and table:
         # Ziehe n unterschiedliche kinds gewichtet
         pool = list(table)

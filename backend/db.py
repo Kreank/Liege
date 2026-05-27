@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS structures (
 
 ALTER TABLE structures ADD COLUMN IF NOT EXISTS material   TEXT    NOT NULL DEFAULT 'stone';
 ALTER TABLE structures ADD COLUMN IF NOT EXISTS durability INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS rotation   INTEGER NOT NULL DEFAULT 0;
 
 -- Frühe Vorab-CREATEs für nachfolgende ALTERs (Fresh-DB-Init).
 CREATE TABLE IF NOT EXISTS npcs (
@@ -93,7 +94,16 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS hunger     INTEGER NOT NULL DEFAULT
 ALTER TABLE players ADD COLUMN IF NOT EXISTS max_hunger INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS stamina    INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS max_stamina INTEGER NOT NULL DEFAULT 100;
+-- Welle 17 — Durst
+ALTER TABLE players ADD COLUMN IF NOT EXISTS thirst     INTEGER NOT NULL DEFAULT 100;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS max_thirst INTEGER NOT NULL DEFAULT 100;
+
+-- Welle 17 — Container-Charges (Wasser-Eimer/Gießkanne/Wasserschlauch)
+ALTER TABLE items ADD COLUMN IF NOT EXISTS charges INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS quality TEXT NOT NULL DEFAULT 'normal';
+
+-- Welle 22 — Research-Pool: gesammelte Forschungspunkte aus Aktivitäten
+ALTER TABLE players ADD COLUMN IF NOT EXISTS research_pool INTEGER NOT NULL DEFAULT 0;
 -- Welle 36: Item-Stacking — quantity-Spalte
 ALTER TABLE items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1;
 -- One-time-Merge: konsolidiert alte Multi-Row-Items in Stacks (idempotent)
@@ -153,6 +163,17 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS torso_health INTEGER NOT NULL DEFAU
 -- Auth
 ALTER TABLE players ADD COLUMN IF NOT EXISTS password_hash TEXT;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS role          TEXT NOT NULL DEFAULT 'user';
+
+-- Welle 15 (2026-05-26f): Element-Resistances + Stat-Allocation
+-- Werte in % (0 = neutral, positiv = resistant, negativ = vulnerable)
+ALTER TABLE players ADD COLUMN IF NOT EXISTS fire_resist      INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS ice_resist       INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS lightning_resist INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS necrotic_resist  INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS magic_resist     INTEGER NOT NULL DEFAULT 0;
+-- Allocation: {attr_de: points} dict, plus separater Counter für freie Punkte
+ALTER TABLE players ADD COLUMN IF NOT EXISTS allocated_attrs     JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS unspent_attr_points INTEGER NOT NULL DEFAULT 0;
 
 -- Material (für equipment-Sprite-Resolver: sword_1h_iron.png etc.)
 ALTER TABLE items ADD COLUMN IF NOT EXISTS material TEXT;
@@ -257,6 +278,8 @@ CREATE TABLE IF NOT EXISTS plantings (
     plant_kind   TEXT NOT NULL,
     planted_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+-- Welle 17 — Pflanzen brauchen Wasser zum Wachsen
+ALTER TABLE plantings ADD COLUMN IF NOT EXISTS last_watered_at TIMESTAMPTZ;
 
 -- Issue: gelernte Zauber
 CREATE TABLE IF NOT EXISTS learned_spells (

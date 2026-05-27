@@ -7,6 +7,8 @@ import random
 
 import combat
 import llm
+import npc_chatter
+import npc_goals
 from world import GRASS, FOREST, MOUNTAIN, DESERT, JUNGLE, LAVA, SNOW, SWAMP, SAND
 
 log = logging.getLogger("liege.npc_worker")
@@ -87,6 +89,26 @@ CREATURE_SPAWN_PROFILE = {
     "griffin":      {"group": (1, 1),  "biomes": {SNOW}},
     "hydra":        {"group": (1, 1),  "biomes": {SWAMP}},
     "manticore":    {"group": (1, 1),  "biomes": {DESERT}},
+
+    # — Welle 14 — professional monster asset-drop (2026-05-26b) —
+    "razorback_vermin":      {"group": (3, 6),  "biomes": {GRASS, FOREST, DESERT}},
+    "spined_abyss_larva":    {"group": (2, 4),  "biomes": {SWAMP, JUNGLE}},
+    "reed_walker":           {"group": (1, 3),  "biomes": {SWAMP, JUNGLE}},
+    "redland_scavenger":     {"group": (2, 4),  "biomes": {DESERT}},
+    "mossback_warden":       {"group": (1, 2),  "biomes": {FOREST, JUNGLE}},
+    "grave_wraith":          {"group": (1, 2),  "biomes": {SWAMP, DESERT}},
+    "serpent_oracle":        {"group": (1, 1),  "biomes": {DESERT, JUNGLE}},
+    "urtikus_eye_fiend":     {"group": (1, 1),  "biomes": {SWAMP}},
+    "mantis_chimera":        {"group": (1, 2),  "biomes": {JUNGLE, FOREST}},
+    "iron_spider":           {"group": (1, 1),  "biomes": {DESERT}},
+    "dendroid_guardian":     {"group": (1, 1),  "biomes": {FOREST, JUNGLE}},
+    "blood_antler_drake":    {"group": (1, 1),  "biomes": {FOREST, SNOW}},
+    # Bosse — alle solo
+    "kaiju_thornback":       {"group": (1, 1),  "biomes": {JUNGLE, SWAMP}},
+    "void_eye_brute":        {"group": (1, 1),  "biomes": {SWAMP}},
+    "frost_rune_boar_prime": {"group": (1, 1),  "biomes": {SNOW}},
+    "magma_shell_devourer":  {"group": (1, 1),  "biomes": {DESERT}},
+    "rockshell_colossus":    {"group": (1, 1),  "biomes": {SNOW, DESERT}},
 }
 FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier",
                   "mage", "farmer", "villager", "guard", "healer",
@@ -110,9 +132,18 @@ CREATURE_KINDS = [
     "stone_golem", "crystal_golem", "gargoyle", "bone_crawler", "giant_spider",
     # Welle 13 — Bosse
     "minotaur", "harpy", "basilisk", "chimera", "griffin", "hydra", "manticore",
+    # Welle 14 — professional asset-drop (2026-05-26b)
+    "razorback_vermin", "spined_abyss_larva", "reed_walker", "redland_scavenger",
+    "mossback_warden", "grave_wraith", "serpent_oracle", "urtikus_eye_fiend",
+    "mantis_chimera", "iron_spider", "dendroid_guardian", "blood_antler_drake",
+    "kaiju_thornback", "void_eye_brute", "frost_rune_boar_prime",
+    "magma_shell_devourer", "rockshell_colossus",
 ]
 BOSS_KINDS = ["ogre", "necromancer", "dragon_whelp",
-              "minotaur", "harpy", "basilisk", "chimera", "griffin", "hydra", "manticore"]
+              "minotaur", "harpy", "basilisk", "chimera", "griffin", "hydra", "manticore",
+              # Welle 14 — neue Bosse
+              "kaiju_thornback", "void_eye_brute", "frost_rune_boar_prime",
+              "magma_shell_devourer", "rockshell_colossus"]
 NPC_KINDS = FRIENDLY_KINDS + CREATURE_KINDS
 
 # Wander-Tick alle N Sekunden, pro NPC unabhängige Wahrscheinlichkeit zu bewegen
@@ -192,6 +223,25 @@ NPC_MOVE_CHANCE = {
     "griffin":      0.28,
     "hydra":        0.10,
     "manticore":    0.22,
+    # Welle 14 — professional asset-drop (2026-05-26b)
+    "razorback_vermin":      0.45,  # huschig
+    "spined_abyss_larva":    0.20,  # kriecht
+    "reed_walker":           0.25,
+    "redland_scavenger":     0.30,
+    "mossback_warden":       0.12,  # bedacht
+    "grave_wraith":          0.22,  # gleitet
+    "serpent_oracle":        0.15,  # kontemplativ
+    "urtikus_eye_fiend":     0.18,
+    "mantis_chimera":        0.30,  # zwitschernd schnell
+    "iron_spider":           0.20,  # mechanisch
+    "dendroid_guardian":     0.05,  # baum-langsam
+    "blood_antler_drake":    0.25,
+    # Bosse — bedächtig
+    "kaiju_thornback":       0.10,
+    "void_eye_brute":        0.08,
+    "frost_rune_boar_prime": 0.18,
+    "magma_shell_devourer":  0.06,
+    "rockshell_colossus":    0.04,
 }
 
 IDENTITY_SYSTEM = (
@@ -260,6 +310,61 @@ async def _find_spawn_position(world, connection_manager=None,
             return x, y
     s = await world.find_spawn(center_x, center_y)
     return (s["x"], s["y"])
+
+
+async def find_event_cluster_center(world, connection_manager,
+                                     biomes: set[int] | None = None,
+                                     min_dist: int = 18,
+                                     max_dist: int = 32) -> tuple[int, int] | None:
+    """Welle 21: Pickt EINEN Cluster-Mittelpunkt in einer zufälligen Richtung
+    um einen aktiven Spieler — für 'Welle-Spawns'. Returns (x,y) oder None.
+
+    Wenn biomes gesetzt: muss in passendem Biome liegen.
+    Distanz min_dist..max_dist Tiles vom Spieler (Standard 18-32: außerhalb
+    der Sicht aber so dass die Welle sich bewegen kann)."""
+    players = list(connection_manager.get_players().values()) if connection_manager else []
+    if not players:
+        return None
+    p = random.choice(players)
+    cx, cy = p["x"], p["y"]
+    for _ in range(200):
+        angle = random.random() * 6.283
+        dist = random.randint(min_dist, max_dist)
+        x = cx + int(math.cos(angle) * dist)
+        y = cy + int(math.sin(angle) * dist)
+        if not await world.is_walkable(x, y):
+            continue
+        if biomes:
+            tile = await world.tile_at(x, y)
+            if tile not in biomes:
+                continue
+        return (x, y)
+    return None
+
+
+async def spawn_cluster(world, npc_manager, connection_manager, kind: str,
+                        count: int, jitter: int = 4) -> tuple[int, int] | None:
+    """Welle 21: spawn `count` Mobs in einem Cluster um EINEN gemeinsamen
+    Mittelpunkt (echte 'Welle' / 'Horde' / 'Raid'). Returns Cluster-Center
+    oder None wenn kein passender Spawnpunkt."""
+    biomes = (CREATURE_SPAWN_PROFILE.get(kind) or {}).get("biomes")
+    center = await find_event_cluster_center(world, connection_manager, biomes=biomes)
+    if center is None:
+        # Fallback: ohne Biome-Filter
+        center = await find_event_cluster_center(world, connection_manager, biomes=None)
+    if center is None:
+        return None
+    cx, cy = center
+    for _ in range(count):
+        # Jitter um den Cluster-Center
+        for _try in range(20):
+            jx = cx + random.randint(-jitter, jitter)
+            jy = cy + random.randint(-jitter, jitter)
+            if await world.is_walkable(jx, jy):
+                await spawn_one(world, npc_manager, connection_manager,
+                                 kind=kind, at=(jx, jy))
+                break
+    return center
 
 
 async def _find_nearby_walkable(world, cx: int, cy: int, radius: int = 3) -> tuple[int, int]:
@@ -375,7 +480,8 @@ async def initial_spawn(world, npc_manager, connection_manager) -> None:
     log.info("Initial-Spawn fertig.")
 
 
-async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb) -> bool:
+async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb,
+                           structures_mgr=None) -> bool:
     """Creature-Verhalten: Spieler in Aggro-Range jagen, Spieler in Attack-Range angreifen.
     Returnt True wenn ein Verhalten ausgelöst wurde."""
     players = connection_manager.get_players()
@@ -386,9 +492,16 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         d = combat.manhattan(npc["x"], npc["y"], pdata["x"], pdata["y"])
         if d < nearest_dist:
             nearest_name, nearest_dist, nearest_data = pname, d, pdata
-    if nearest_name is None or nearest_dist > combat.AGGRO_RANGE:
+    # Welle 15: per-Kind Aggro-Range (Stalker sehen weiter, Scheue weniger)
+    _kind_aggro = combat.creature_stats(npc["kind"]).get("aggro_range", combat.AGGRO_RANGE)
+    if nearest_name is None or nearest_dist > _kind_aggro:
         return False
     if nearest_dist <= combat.ATTACK_RANGE:
+        # Welle 17: LoS-Check — Wand/Geschlossene Tür zwischen NPC und Spieler
+        # blockt den Angriff. Gebäude sind dadurch echter Schutz.
+        if not _has_attack_los(npc, nearest_data["x"], nearest_data["y"],
+                                world, structures_mgr):
+            return False
         dmg = combat.creature_damage(npc["kind"])
         # Power-Budget: Damage skaliert mit Player-Level
         try:
@@ -398,7 +511,9 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
             dmg = power_budget.kalibrate_mob_damage(dmg, plvl)
         except Exception:
             pass
-        await damage_cb(nearest_name, dmg, npc["id"])
+        # Welle 15: themed-Mobs verursachen typed damage (fire/ice/...)
+        _dmg_type = combat.creature_stats(npc["kind"]).get("damage_type", "physical")
+        await damage_cb(nearest_name, dmg, npc["id"], _dmg_type)
         await connection_manager.broadcast({
             "type":   "npc_attacked",
             "npc_id": npc["id"],
@@ -417,7 +532,7 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         if dx == 0 and dy == 0:
             continue
         nx, ny = npc["x"] + dx, npc["y"] + dy
-        if world.is_walkable_sync(nx, ny):
+        if _can_walk(nx, ny, world, structures_mgr):
             await npc_manager.move(npc["id"], nx, ny)
             await connection_manager.broadcast({
                 "type":   "npc_moved",
@@ -429,7 +544,42 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
     return False
 
 
-async def _try_move_toward(npc, tx, ty, world, npc_manager, connection_manager) -> bool:
+def _can_walk(x: int, y: int, world, structures_mgr) -> bool:
+    """Walkable = TILE ist begehbar UND keine blockende Struktur drauf.
+    structures_mgr=None disabled den Struktur-Check (Legacy-Fallback)."""
+    if not world.is_walkable_sync(x, y):
+        return False
+    if structures_mgr is not None and structures_mgr.blocks(x, y):
+        return False
+    return True
+
+
+def _has_attack_los(npc, target_x: int, target_y: int, world,
+                     structures_mgr) -> bool:
+    """Line-of-Sight für Attack: NPC kann Player NICHT angreifen wenn dazwischen
+    eine Wand/geschlossene Tür/Felsen liegt. Verwendet Bresenham für Distanz>1,
+    bei Distanz 1 (adjacent) ist LoS immer klar.
+
+    Wichtig: ein geschlossenes Tor zwischen NPC und Spieler blockt den Angriff.
+    Damit bietet ein Gebäude echten Schutz, solange Türen zu sind."""
+    if structures_mgr is None:
+        return True
+    dx = target_x - npc["x"]
+    dy = target_y - npc["y"]
+    steps = max(abs(dx), abs(dy))
+    if steps <= 1:
+        return True   # adjacent → kein Tile zwischen
+    # Bresenham — gehe alle Zwischen-Tiles ab, ohne start und end
+    for i in range(1, steps):
+        ix = npc["x"] + round(dx * i / steps)
+        iy = npc["y"] + round(dy * i / steps)
+        if structures_mgr.blocks(ix, iy):
+            return False
+    return True
+
+
+async def _try_move_toward(npc, tx, ty, world, npc_manager, connection_manager,
+                            structures_mgr=None) -> bool:
     """Bewegt NPC einen Schritt Richtung (tx, ty). Returns True wenn bewegt."""
     dx = 0 if tx == npc["x"] else (1 if tx > npc["x"] else -1)
     dy = 0 if ty == npc["y"] else (1 if ty > npc["y"] else -1)
@@ -442,7 +592,7 @@ async def _try_move_toward(npc, tx, ty, world, npc_manager, connection_manager) 
         if ddx == 0 and ddy == 0:
             continue
         nx, ny = npc["x"] + ddx, npc["y"] + ddy
-        if world.is_walkable_sync(nx, ny):
+        if _can_walk(nx, ny, world, structures_mgr):
             await npc_manager.move(npc["id"], nx, ny)
             await connection_manager.broadcast({
                 "type": "npc_moved", "npc_id": npc["id"], "x": nx, "y": ny,
@@ -451,12 +601,13 @@ async def _try_move_toward(npc, tx, ty, world, npc_manager, connection_manager) 
     return False
 
 
-async def _try_random_move(npc, world, npc_manager, connection_manager) -> None:
+async def _try_random_move(npc, world, npc_manager, connection_manager,
+                            structures_mgr=None) -> None:
     dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     random.shuffle(dirs)
     for dx, dy in dirs:
         nx, ny = npc["x"] + dx, npc["y"] + dy
-        if world.is_walkable_sync(nx, ny):
+        if _can_walk(nx, ny, world, structures_mgr):
             await npc_manager.move(npc["id"], nx, ny)
             await connection_manager.broadcast({
                 "type":   "npc_moved",
@@ -467,9 +618,11 @@ async def _try_random_move(npc, world, npc_manager, connection_manager) -> None:
             return
 
 
-async def wander_loop(world, npc_manager, connection_manager, damage_player_cb=None) -> None:
+async def wander_loop(world, npc_manager, connection_manager,
+                       damage_player_cb=None, structures_mgr=None) -> None:
     """Pro Tick (~2s): Creatures versuchen Aggression, andere random walken.
-    damage_player_cb: async function (player_name, dmg, source_npc_id) — Aggression callback."""
+    damage_player_cb: async function (player_name, dmg, source_npc_id, dmg_type).
+    structures_mgr: StructureManager — verhindert NPC durch Wände/Türen."""
     log.info("NPC-Wander-Loop startet (tick=%.1fs)", NPC_WANDER_TICK_SECONDS)
     await asyncio.sleep(10)
     while True:
@@ -478,7 +631,8 @@ async def wander_loop(world, npc_manager, connection_manager, damage_player_cb=N
             for npc in list(npc_manager.all()):  # copy weil damage löschen kann
                 # Creatures: Aggression versuchen (jeden Tick — Verfolgung soll konsistent sein)
                 if npc["kind"] in combat.CREATURE_KINDS and damage_player_cb is not None:
-                    if await _try_aggression(npc, world, npc_manager, connection_manager, damage_player_cb):
+                    if await _try_aggression(npc, world, npc_manager, connection_manager,
+                                              damage_player_cb, structures_mgr):
                         continue
                 # Random Wander mit kind-spezifischer Chance — Tag/Nacht modulieren
                 chance = NPC_MOVE_CHANCE.get(npc["kind"], 0.15)
@@ -488,22 +642,56 @@ async def wander_loop(world, npc_manager, connection_manager, damage_player_cb=N
                 except Exception:
                     is_night = False
                 is_friendly = npc["kind"] in FRIENDLY_KINDS
+                # Welle 20: NPC-Chatter — adjacent friendly NPCs plaudern
+                if is_friendly:
+                    try:
+                        await npc_chatter.maybe_chat(npc, npc_manager, connection_manager)
+                    except Exception:
+                        log.debug("npc_chatter failed", exc_info=True)
                 if is_night and is_friendly:
                     chance *= 0.2   # Friendlies schlafen / bleiben in Hütte
                 elif is_night and not is_friendly:
                     chance *= 1.3   # Creatures aktiver nachts
                 if random.random() >= chance:
                     continue
-                # Tagesablauf: nachts wandert friendly NPC zum home zurück
-                home_x = npc.get("home_x")
-                home_y = npc.get("home_y")
-                if (is_night and is_friendly and home_x is not None
-                        and home_y is not None
-                        and (abs(npc["x"] - home_x) + abs(npc["y"] - home_y)) > 2):
-                    await _try_move_toward(npc, home_x, home_y, world,
-                                            npc_manager, connection_manager)
-                    continue
-                await _try_random_move(npc, world, npc_manager, connection_manager)
+
+                # ── Welle 20: NPC-Goal-System (friendly NPCs mit Tagesplan) ──
+                if is_friendly and structures_mgr is not None:
+                    # Goal repicken wenn nötig (Phase gewechselt, Reached, Stuck)
+                    if npc_goals.should_repick_goal(npc):
+                        g = npc_goals.pick_goal(npc, structures_mgr, npc_manager)
+                        if g is not None:
+                            goal, gx, gy = g
+                            old_goal = npc.get("_goal")
+                            npc_goals.assign_goal(npc, goal, gx, gy)
+                            # Broadcast Goal-Change damit Frontend Icon zeigt
+                            if old_goal != goal:
+                                await connection_manager.broadcast({
+                                    "type":    "npc_goal",
+                                    "npc_id":  npc["id"],
+                                    "goal":    goal,
+                                    "emoji":   npc_goals.goal_emoji(goal),
+                                })
+                        else:
+                            npc_goals.clear_goal(npc)
+                    # Wenn aktives Goal: gezielt dorthin laufen statt random
+                    gtx, gty = npc.get("_goal_target_x"), npc.get("_goal_target_y")
+                    if gtx is not None and gty is not None and not npc_goals.goal_reached(npc):
+                        prev_d = abs(gtx - npc["x"]) + abs(gty - npc["y"])
+                        moved = await _try_move_toward(
+                            npc, gtx, gty, world, npc_manager, connection_manager,
+                            structures_mgr,
+                        )
+                        new_d = abs(gtx - npc["x"]) + abs(gty - npc["y"])
+                        if not moved or new_d >= prev_d:
+                            npc["_goal_stuck_count"] = npc.get("_goal_stuck_count", 0) + 1
+                        else:
+                            npc["_goal_stuck_count"] = 0
+                        continue
+
+                # Fallback: random walk
+                await _try_random_move(npc, world, npc_manager, connection_manager,
+                                        structures_mgr)
         except asyncio.CancelledError:
             log.info("NPC-Wander-Loop gestoppt")
             raise

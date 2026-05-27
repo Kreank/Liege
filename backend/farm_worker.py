@@ -9,19 +9,24 @@ log = logging.getLogger("liege.farm_worker")
 
 GROWTH_TICK_SECONDS = int(os.environ.get("FARM_GROWTH_TICK_SECONDS", "30"))
 GROWTH_DURATION_SECONDS = int(os.environ.get("FARM_GROWTH_DURATION_SECONDS", "60"))
+# Welle 17: Bewässerung muss innerhalb dieser Zeit erfolgt sein damit gewachsen wird
+WATER_VALIDITY_SECONDS = int(os.environ.get("FARM_WATER_VALIDITY_SECONDS", "600"))
 
 
 async def run(item_manager, connection_manager) -> None:
-    log.info("Farm-Worker startet (tick=%ds, growth=%ds)",
-             GROWTH_TICK_SECONDS, GROWTH_DURATION_SECONDS)
+    log.info("Farm-Worker startet (tick=%ds, growth=%ds, water_validity=%ds)",
+             GROWTH_TICK_SECONDS, GROWTH_DURATION_SECONDS, WATER_VALIDITY_SECONDS)
     while True:
         try:
             await asyncio.sleep(GROWTH_TICK_SECONDS)
             rows = await db.pool().fetch(
                 "SELECT p.structure_id, p.plant_kind, s.x, s.y "
                 "FROM plantings p JOIN structures s ON s.id = p.structure_id "
-                "WHERE p.planted_at < NOW() - $1::interval",
+                "WHERE p.planted_at < NOW() - $1::interval "
+                "  AND p.last_watered_at IS NOT NULL "
+                "  AND p.last_watered_at > NOW() - $2::interval",
                 timedelta(seconds=GROWTH_DURATION_SECONDS),
+                timedelta(seconds=WATER_VALIDITY_SECONDS),
             )
             for r in rows:
                 # Check ob da schon was am Boden ist (vermeidet double-spawn bei langen Outages)
@@ -39,6 +44,11 @@ async def run(item_manager, connection_manager) -> None:
                 if spawned is not None:
                     await connection_manager.broadcast({
                         "type": "item_spawned", "item": spawned,
+                    })
+                    # Welle 50: harvest_crop-Pop am Feld, wenn die Pflanze reif ist
+                    await connection_manager.broadcast({
+                        "type": "visual_effect", "kind": "wp_harvest_crop",
+                        "x": r["x"], "y": r["y"],
                     })
                     log.info("Pflanze gewachsen: %s @ (%d, %d)",
                              r["plant_kind"], r["x"], r["y"])

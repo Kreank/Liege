@@ -20,68 +20,101 @@ import quality
 # Damage-Klassen: passen zu unterschiedlichen Skill/Mana-Bonus
 # Kategorien: physical, ranged, magic, finesse
 WEAPON_STATS = {
-    # — Standard-Waffen ——————————————————————————————————————————————————————
+    # ─── Welle 19 (2026-05-26i): Stat-Rebalance — klare Klassen-Identitäten ────
+    # Faustformel: 1H DPS ≈ X, 2H DPS ≈ 1.3-1.5×X. Range-Waffen ~0.9×X als
+    # Reichweite-Steuer. Magic ~0.7×X kompensiert durch Mana/Range.
+    #
+    # ── 1H Melee ────────────────────────────────────────────────────────────
+    "dagger": {
+        # Assassin — schnell, sehr hohe Crit, niedrige Basis. DPS 6×1.8=10.8.
+        # Mit Crit-Avg (22% × 2.5× extra-mult): ~13 effektive DPS.
+        "damage": 6, "speed": 1.8, "crit": 0.22, "crit_mult": 2.5,
+        "range": 1, "class": "finesse", "two_handed": False,
+    },
     "sword": {
-        "damage": 10, "speed": 1.0, "crit": 0.05, "crit_mult": 1.5,
+        # Allrounder — balanced. DPS 11×1.0=11.0. Reliable, kein Spezialeffekt.
+        "damage": 11, "speed": 1.0, "crit": 0.06, "crit_mult": 1.5,
         "range": 1, "class": "physical", "two_handed": False,
     },
     "axe": {
-        "damage": 14, "speed": 0.85, "crit": 0.04, "crit_mult": 1.7,
+        # Brawler — hoch DMG, langsam, leichte armor_pen.
+        # DPS 15×0.85=12.75 (+armor_pen-Bonus).
+        "damage": 15, "speed": 0.85, "crit": 0.05, "crit_mult": 1.7,
         "range": 1, "class": "physical", "two_handed": False,
+        "armor_pen": 0.10,
     },
-    "bow": {
-        "damage": 8, "speed": 1.0, "crit": 0.08, "crit_mult": 1.5,
-        "range": 5, "class": "ranged", "two_handed": True,
+    "mace": {
+        # Anti-Armor — niedrige DMG, sehr langsam, MASSIVE armor_pen.
+        # Gegen gerüstete Gegner deutlich effektiver als Sword/Axe.
+        "damage": 13, "speed": 0.80, "crit": 0.03, "crit_mult": 1.6,
+        "range": 1, "class": "physical", "two_handed": False,
+        "armor_pen": 0.35,
     },
-    "staff": {
-        "damage": 7, "speed": 1.0, "crit": 0.06, "crit_mult": 1.4,
-        "range": 4, "class": "magic", "two_handed": True,
-        "mana_bonus": 10,
+
+    # ── 1H Magic/Finesse Ranged ─────────────────────────────────────────────
+    "throwing_knife": {
+        # Skirmisher — sehr schnell, gute Crit, mittlere Range.
+        "damage": 6, "speed": 1.6, "crit": 0.15, "crit_mult": 2.0,
+        "range": 3, "class": "finesse", "two_handed": False,
     },
-    # — Welle 16-Erweiterung ————————————————————————————————————————————————
     "wand": {
-        "damage": 6, "speed": 1.3, "crit": 0.10, "crit_mult": 1.5,
+        # Caster-1H — schnell, hoher Crit, mana-bonus. DPS 7×1.3=9.1.
+        "damage": 7, "speed": 1.3, "crit": 0.10, "crit_mult": 1.5,
         "range": 4, "class": "magic", "two_handed": False,
         "mana_bonus": 15,
     },
+
+    # ── 2H Melee ────────────────────────────────────────────────────────────
     "greatsword": {
-        "damage": 22, "speed": 0.65, "crit": 0.06, "crit_mult": 1.8,
+        # Power-2H — sehr hoher single-target DMG, sehr langsam.
+        # DPS 26×0.65=16.9 (~50% mehr als 1H Sword — 2H-Premium).
+        "damage": 26, "speed": 0.65, "crit": 0.07, "crit_mult": 1.9,
         "range": 1, "class": "physical", "two_handed": True,
     },
     "spear": {
-        "damage": 12, "speed": 1.0, "crit": 0.07, "crit_mult": 1.5,
-        "range": 2, "class": "physical", "two_handed": True,  # Reichweite!
-    },
-    "crossbow": {
-        "damage": 16, "speed": 0.55, "crit": 0.12, "crit_mult": 1.8,
-        "range": 6, "class": "ranged", "two_handed": True,
-    },
-    "throwing_knife": {
-        "damage": 5, "speed": 1.6, "crit": 0.15, "crit_mult": 2.0,
-        "range": 3, "class": "finesse", "two_handed": False,
-    },
-    "mace": {
-        "damage": 13, "speed": 0.85, "crit": 0.03, "crit_mult": 1.6,
-        "range": 1, "class": "physical", "two_handed": False,
-        "armor_pen": 0.25,   # ignoriert 25% Defense
+        # Reach-Waffe — Range 2 ist der Selling-Point.
+        "damage": 13, "speed": 1.0, "crit": 0.08, "crit_mult": 1.6,
+        "range": 2, "class": "physical", "two_handed": True,
     },
     "scythe": {
-        "damage": 16, "speed": 0.75, "crit": 0.08, "crit_mult": 1.8,
+        # AOE-Cleaver — hoher DMG + cleave (Mehrfach-Hit-Potenzial).
+        "damage": 18, "speed": 0.70, "crit": 0.08, "crit_mult": 1.9,
         "range": 1, "class": "physical", "two_handed": True,
-        "cleave": True,    # AOE 1-Tile-Radius (später nutzbar)
+        "cleave": True,
     },
-    "dagger": {
-        "damage": 6, "speed": 1.8, "crit": 0.20, "crit_mult": 2.5,
-        "range": 1, "class": "finesse", "two_handed": False,
+
+    # ── 2H Ranged ───────────────────────────────────────────────────────────
+    "bow": {
+        # Standard-Bogen — gute DPS, Range 5. DPS 10×1.0=10.
+        "damage": 10, "speed": 1.0, "crit": 0.10, "crit_mult": 1.6,
+        "range": 5, "class": "ranged", "two_handed": True,
+    },
+    "crossbow": {
+        # Sniper — niedrige DPS aber MASSIVER single-shot + armor_pen.
+        # DPS 22×0.50=11. Single-Hit deutlich tödlicher als Bow.
+        "damage": 22, "speed": 0.50, "crit": 0.15, "crit_mult": 1.9,
+        "range": 6, "class": "ranged", "two_handed": True,
+        "armor_pen": 0.30,
+    },
+
+    # ── 2H Magic ────────────────────────────────────────────────────────────
+    "staff": {
+        # Caster-2H — Range 4, mana-bonus, etwas mehr DMG als Wand.
+        "damage": 9, "speed": 1.0, "crit": 0.08, "crit_mult": 1.5,
+        "range": 4, "class": "magic", "two_handed": True,
+        "mana_bonus": 12,
     },
 }
 
-# Rüstung: Defense pro Item-Kind
+# Rüstung: Defense pro Slot (Welle 19 — höhere Werte für meaningful protection).
+# Vollausrüstung Common (8+22+4+15+6 = 55) → 35% DR
+# Vollausrüstung Legendary (×1.5 = 82) → 45% DR
 ARMOR_STATS = {
-    "helmet":     {"defense": 4,  "weight": 2},
-    "chestplate": {"defense": 12, "weight": 5},
-    "shield":     {"defense": 8,  "weight": 4, "block_chance": 0.15},
-    "boots":      {"defense": 3,  "weight": 1, "speed_bonus": 0.05},
+    "helmet":     {"defense": 8,  "weight": 3},
+    "chestplate": {"defense": 22, "weight": 8},     # größter Brocken
+    "gloves":     {"defense": 4,  "weight": 1, "crit_chance_bonus": 0.01},
+    "shield":     {"defense": 15, "weight": 5, "block_chance": 0.15},
+    "boots":      {"defense": 6,  "weight": 2, "speed_bonus": 0.05},
 }
 
 # Schmuck: prozentuale Effekte

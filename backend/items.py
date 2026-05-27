@@ -18,6 +18,7 @@ ITEM_KINDS = {
     # Rüstung
     "helmet":     {"category": "armor", "name": "Helm",         "slot": "helmet",     "sprite": "/assets/equipment/armor/helmet.png"},
     "chestplate": {"category": "armor", "name": "Brustpanzer",  "slot": "chestplate", "sprite": "/assets/equipment/armor/chestplate.png"},
+    "gloves":     {"category": "armor", "name": "Handschuhe",   "slot": "gloves",     "sprite": "/assets/equipment/armor/professional/reference_based/by_rarity/common/thief_buckled_gloves.png"},
     "shield":     {"category": "armor", "name": "Schild",       "slot": "shield",     "sprite": "/assets/equipment/armor/shield.png"},
     "boots":      {"category": "armor", "name": "Stiefel",      "slot": "boots",      "sprite": "/assets/equipment/armor/boots.png"},
     # Schmuck
@@ -57,6 +58,10 @@ ITEM_KINDS = {
     "cabbage":        {"category": "food", "name": "Kohl",        "sprite": "/assets/food/cabbage.png"},
     "pumpkin":        {"category": "food", "name": "Kürbis",      "sprite": "/assets/food/pumpkin.png"},
     "corn":           {"category": "food", "name": "Mais",        "sprite": "/assets/food/corn.png"},
+    # Welle 16 — neue Pflanzen (2026-05-26g)
+    "garlic":         {"category": "food", "name": "Knoblauch",   "sprite": "/assets/food/garlic.png"},
+    "grapes_blue":    {"category": "food", "name": "Blaue Trauben","sprite": "/assets/food/grapes_blue.png"},
+    "grapes_green":   {"category": "food", "name": "Grüne Trauben","sprite": "/assets/food/grapes_green.png"},
     # Saatgut (resource — anpflanzbar)
     "strawberry_seeds":{"category":"resource","name":"Erdbeer-Samen",   "sprite":"/assets/seeds/strawberry_seeds.png"},
     "blueberry_seeds": {"category":"resource","name":"Blaubeer-Samen",  "sprite":"/assets/seeds/blueberry_seeds.png"},
@@ -78,12 +83,21 @@ ITEM_KINDS = {
     "spell_book": {"category": "magic", "name": "Feuerball-Buch", "sprite": "/assets/magic/spell_book.png"},
     "scroll":     {"category": "magic", "name": "Schriftrolle",   "sprite": "/assets/magic/scroll.png"},
     "rune_stone": {"category": "magic", "name": "Heilrune",       "sprite": "/assets/magic/rune_stone.png"},
+    # Welle 22 — Forschungs-Items (geben Pool-Punkte beim Use)
+    "research_scroll": {"category": "consumable", "name": "Forschungs-Schriftrolle", "sprite": "/assets/magic/scroll.png"},
+    "research_tome":   {"category": "consumable", "name": "Forschungs-Folianten",    "sprite": "/assets/magic/spell_book.png"},
     # Tools — skill-spezifischer Bonus beim Equipping
     "pickaxe": {"category": "tool", "name": "Spitzhacke", "slot": "tool", "sprite": "/assets/tools/pickaxe.png"},
     "shovel":  {"category": "tool", "name": "Schaufel",   "slot": "tool", "sprite": "/assets/tools/shovel.png"},
     "hammer":  {"category": "tool", "name": "Hammer",     "slot": "tool", "sprite": "/assets/tools/hammer.png"},
     "hoe":     {"category": "tool", "name": "Hacke",      "slot": "tool", "sprite": "/assets/tools/hoe.png"},
     "sickle":  {"category": "tool", "name": "Sichel",     "slot": "tool", "sprite": "/assets/tools/sickle.png"},
+    # Welle 16 — Wasser-Tools (Buckets / Watering Cans / Waterskin)
+    "wooden_bucket":       {"category": "tool", "name": "Holzeimer",      "slot": "tool", "sprite": "/assets/tools/wooden_bucket.png"},
+    "iron_bucket":         {"category": "tool", "name": "Eisen-Eimer",    "slot": "tool", "sprite": "/assets/tools/iron_bucket.png"},
+    "wooden_watering_can": {"category": "tool", "name": "Holz-Gießkanne", "slot": "tool", "sprite": "/assets/tools/wooden_watering_can.png"},
+    "iron_watering_can":   {"category": "tool", "name": "Eisen-Gießkanne","slot": "tool", "sprite": "/assets/tools/iron_watering_can.png"},
+    "leather_waterskin":   {"category": "tool", "name": "Wasserschlauch", "slot": "tool", "sprite": "/assets/tools/leather_waterskin.png"},
     # Ressourcen
     "wood":         {"category": "resource", "name": "Holz",          "sprite": "/assets/resources/wood.png"},
     "stone":        {"category": "resource", "name": "Stein",         "sprite": "/assets/resources/stone.png"},
@@ -105,6 +119,7 @@ ITEM_KINDS = {
     "crystal":      {"category": "resource", "name": "Kristall",      "sprite": "/assets/resources/crystal.png"},
     "bone":         {"category": "resource", "name": "Knochen",       "sprite": "/assets/resources/bone.png"},
     "cloth":        {"category": "resource", "name": "Stoff",         "sprite": "/assets/resources/cloth.png"},
+    "cloth_green":  {"category": "resource", "name": "Grüner Stoff",  "sprite": "/assets/resources/cloth_green.png"},
     "plant_fiber":  {"category": "resource", "name": "Pflanzenfaser", "sprite": "/assets/resources/cloth.png"},
     "leather":      {"category": "resource", "name": "Leder",         "sprite": "/assets/resources/leather.png"},
     # Münzen — von Banditen/NPCs als Loot
@@ -113,7 +128,7 @@ ITEM_KINDS = {
     "gold_coin":    {"category": "resource", "name": "Goldmünze",     "sprite": "/assets/currency/coin_gold.png"},
 }
 
-EQUIP_SLOTS = ["weapon", "helmet", "chestplate", "shield", "boots", "ring", "amulet", "tool"]
+EQUIP_SLOTS = ["weapon", "helmet", "chestplate", "gloves", "shield", "boots", "ring", "amulet", "tool"]
 
 # Welle 36: stackable Kategorien (gleich-kind-items mergen in einer Row mit quantity)
 STACKABLE_CATEGORIES = frozenset({"resource", "food", "consumable", "magic"})
@@ -151,6 +166,12 @@ def _row_to_dict(row) -> dict:
     try:
         if "quantity" in row.keys() and row["quantity"]:
             out["quantity"] = int(row["quantity"])
+    except (KeyError, IndexError):
+        pass
+    # Welle 17: Container-Charges
+    try:
+        if "charges" in row.keys():
+            out["charges"] = int(row["charges"] or 0)
     except (KeyError, IndexError):
         pass
     # Welle 19: Affixes + Unique-Naming, falls Spalten existieren
@@ -191,14 +212,14 @@ class ItemManager:
 
     async def get_on_ground(self) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
             "FROM items WHERE owner IS NULL"
         )
         return [_row_to_dict(r) for r in rows]
 
     async def get_at(self, x: int, y: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
             "FROM items WHERE x = $1 AND y = $2 AND owner IS NULL",
             x, y,
         )
@@ -206,7 +227,7 @@ class ItemManager:
 
     async def get_inventory(self, player_name: str) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
             "FROM items WHERE owner = $1 ORDER BY id",
             player_name,
         )
@@ -427,7 +448,7 @@ class ItemManager:
 
     async def get_chest_contents(self, chest_id: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
             "FROM items WHERE owner = $1 ORDER BY id",
             f"chest:{chest_id}",
         )
@@ -521,3 +542,44 @@ class ItemManager:
             kind, cfg["name"], cfg["category"], player_name, quality_kind, material,
         )
         return _row_to_dict(row)
+
+
+# ─── Welle 17 — Container-Charges (Wasser-Eimer/Gießkanne/Wasserschlauch) ─
+WATER_CONTAINER_CAPACITY = {
+    "wooden_bucket":       1,
+    "iron_bucket":         2,    # größer / haltbarer
+    "leather_waterskin":   3,    # tragbar, mehrere Schlücke
+    "wooden_watering_can": 4,
+    "iron_watering_can":   6,
+}
+
+def container_capacity(kind: str) -> int:
+    return WATER_CONTAINER_CAPACITY.get(kind, 0)
+
+def is_water_container(kind: str) -> bool:
+    return kind in WATER_CONTAINER_CAPACITY
+
+
+async def set_charges(item_id: int, owner: str, charges: int) -> dict | None:
+    """Setzt die charges eines Container-Items absolut. Returns updated row."""
+    row = await db.pool().fetchrow(
+        "UPDATE items SET charges = GREATEST(0, $1) "
+        "WHERE id = $2 AND owner = $3 "
+        "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
+        "created_at, affixes, unique_name, flavor, quantity, material, charges",
+        charges, item_id, owner,
+    )
+    return _row_to_dict(row) if row else None
+
+
+async def add_charges(item_id: int, owner: str, delta: int) -> dict | None:
+    """Inkrementelle Änderung; clamp auf 0..capacity."""
+    cur = await db.pool().fetchrow(
+        "SELECT kind, charges FROM items WHERE id = $1 AND owner = $2",
+        item_id, owner,
+    )
+    if cur is None:
+        return None
+    cap = container_capacity(cur["kind"])
+    new_charges = max(0, min(cap, (cur["charges"] or 0) + delta))
+    return await set_charges(item_id, owner, new_charges)

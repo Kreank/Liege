@@ -92,8 +92,12 @@
 
     function setMessage(text, kind) {
       const el = document.getElementById('message');
-      if (!text) { el.innerHTML = ''; return; }
-      el.innerHTML = `<div class="${kind}">${text}</div>`;
+      el.textContent = '';
+      if (!text) return;
+      const box = document.createElement('div');
+      box.className = kind;
+      box.textContent = text;
+      el.appendChild(box);
     }
 
     function setMode(newMode) {

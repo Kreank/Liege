@@ -1,3 +1,10 @@
+"""Event-Worker v2 (Welle 20) — Tiered World-Brain.
+
+Statt einem globalen Event-Loop: separate Timer pro Tier. Jeder Tick (1 Minute)
+prüft alle Tiers ob fällig. Pro Tick wird höchstens EIN Event abgefeuert
+(Cataclysm > Boss > Catastrophe > Encounter > Atmosphere), damit nicht alles
+gleichzeitig knallt — außer im chaos-Modus, da darf ein zweites Tier folgen.
+"""
 import asyncio
 import json
 import logging
@@ -7,191 +14,392 @@ import random
 import combat
 import llm
 import npc_worker
+import player_profile
+import skills as _skills
 import storyteller
 
 log = logging.getLogger("liege.event_worker")
 
-EVENT_INTERVAL_SECONDS = int(os.environ.get("EVENT_INTERVAL_SECONDS", "3600"))
-EVENT_KIND_HINTS = ["weather", "creature", "discovery", "faction", "natural", "rumor"]
+# Wie oft der Dispatcher prüft ob Tiers fällig sind
+TICK_SECONDS = int(os.environ.get("EVENT_TICK_SECONDS", "60"))
 
-# Storyteller-Modi nach RimWorld-Vorbild (Cassandra/Phoebe/Randy)
-STORYTELLER_MODE = os.environ.get("STORYTELLER_MODE", "balanced").lower()
-STORYTELLER_PROMPTS = {
-    "chill": (
-        "Du bist ein gemächlicher Erzähler — die Welt ist friedlich, "
-        "Events sind atmosphärisch, selten gefährlich. Kreaturen tauchen selten auf."
+# System-Prompts pro Tier (LLM-Färbung)
+TIER_SYSTEM_PROMPTS = {
+    "atmosphere": (
+        "Du bist der atmosphärische Erzähler einer Fantasy-Welt 'Liege'. "
+        "Beschreibe stimmungsvolle, harmlose Welt-Momente: Wetter, Geräusche, "
+        "kleine Funde. Halte den Ton ruhig und poetisch."
     ),
-    "balanced": (
-        "Du bist ein ausgewogener Erzähler — Mix aus ruhigen, mysteriösen "
-        "und gefährlichen Events. Kreaturen kommen regelmäßig."
+    "encounter": (
+        "Du bist der Erzähler einer Fantasy-Welt 'Liege'. Beschreibe eine "
+        "Begegnung oder Entdeckung — kleine Mob-Gruppe, alte Ruine, wandernder "
+        "NPC. Konkret und visuell."
     ),
-    "chaos": (
-        "Du bist ein chaotischer Erzähler — überraschende, oft gefährliche Events. "
-        "Häufige Kreaturen-Spawns, manchmal Bosse. Spielspieler werden herausgefordert."
+    "catastrophe": (
+        "Du bist der Erzähler einer Fantasy-Welt 'Liege'. Erzähle von einer "
+        "bedrohlichen Welt-Entwicklung — Schwarm, Brand, Erdbeben, Seuche. "
+        "Dramatisch, mit Konsequenzen-Andeutung."
+    ),
+    "boss": (
+        "Du bist der Erzähler einer Fantasy-Welt 'Liege'. Verkünde das Erwachen "
+        "eines Welt-Bosses — episch, mit Furcht und Lockruf. Spieler werden "
+        "herausgefordert ihn zu finden und zu besiegen."
+    ),
+    "cataclysm": (
+        "Du bist der Erzähler einer Fantasy-Welt 'Liege'. Verkünde ein welt-"
+        "veränderndes Ereignis. Apokalyptisch, mythisch, lange Nachwirkung."
     ),
 }
-# Spawn-Wahrscheinlichkeit Modifier
-STORYTELLER_SPAWN_MULT = {"chill": 0.4, "balanced": 1.0, "chaos": 2.0}
 
-def _system_prompt() -> str:
-    mode_hint = STORYTELLER_PROMPTS.get(STORYTELLER_MODE, STORYTELLER_PROMPTS["balanced"])
-    return (
-        "Du bist der Spielleiter einer lebenden Fantasy-Welt namens 'Liege'. "
-        f"{mode_hint} "
-        "Du erfindest atmosphärische Welt-Events, die für Spieler interessant sind. "
-        "Antworte AUSSCHLIESSLICH als gültiges JSON, ohne Kommentar, ohne Markdown."
-    )
-
-SYSTEM_PROMPT = _system_prompt()
+EVENT_RESPONSE_SCHEMA = (
+    'Antworte AUSSCHLIESSLICH als gültiges JSON ohne Markdown:\n'
+    '{"title": "kurzer Titel max 80 Zeichen, Deutsch",\n'
+    ' "body":  "1-2 Sätze Beschreibung, Deutsch, atmosphärisch"}'
+)
 
 
-def _build_prompt(state_summary: str = "", forced_kind: str | None = None,
-                  forced_tag: str | None = None) -> str:
-    # Storyteller-Director gibt 'kind' und 'tag' vor; LLM macht nur Narrative
-    hint = forced_kind or random.choice(EVENT_KIND_HINTS)
-    tag_hint = f" mit dem Sub-Thema '{forced_tag}'" if forced_tag else ""
-    base = (
-        f"Erfinde EIN unerwartetes Welt-Event vom Typ '{hint}'{tag_hint}, das gerade in der Welt passiert.\n"
-        "Felder:\n"
-        '  "kind": Kategorie ("weather" | "creature" | "discovery" | "faction" | "natural" | "rumor")\n'
-        '  "title": kurzer Titel, max 60 Zeichen, Deutsch\n'
-        '  "body": 1-2 Sätze Beschreibung, atmosphärisch, Deutsch\n'
-        'Beispiel:\n'
-        '{"kind": "weather", "title": "Nebel zieht über die Hügel", '
-        '"body": "Ein dichter Silbernebel kriecht aus den Tälern und verschluckt jeden Pfad. '
-        'Reisende berichten von flüsternden Stimmen darin."}'
-    )
-    if state_summary:
-        base = (
-            f"Aktueller Welt-Zustand:\n{state_summary}\n\n"
-            "Das Event soll zu diesem Zustand passen (z.B. viele Kreaturen → Wildnis-Unruhe,\n"
-            "viele Bauten → wachsende Zivilisation, wenige Spieler → Stille).\n\n" + base
+def _build_prompt(tier: str, tag: str, state_summary: str, audiences: set[str]) -> str:
+    audience_hint = ""
+    if audiences:
+        labels = ", ".join(sorted(audiences))
+        audience_hint = (
+            f"Aktive Spieler-Profile: {labels}. Das Event soll für sie "
+            "interessant sein.\n"
         )
-    return base
+    return (
+        f"Tier: {tier}\nThema: {tag}\n{audience_hint}"
+        f"Aktueller Welt-Zustand:\n{state_summary}\n\n"
+        f"Erfinde EIN Welt-Event zum Thema '{tag}'. {EVENT_RESPONSE_SCHEMA}"
+    )
 
 
 def world_state_summary(npc_manager, structure_manager, connection_manager) -> str:
-    """Knapper Welt-Zustand für den Slow Brain als Kontext."""
-    import combat
     players = connection_manager.get_players()
     npcs_all = npc_manager.all()
     creatures = [n for n in npcs_all if n["kind"] in combat.CREATURE_KINDS]
     friendlies = [n for n in npcs_all if n["kind"] not in combat.CREATURE_KINDS]
     structs = structure_manager.all()
-    natural = sum(1 for s in structs if s.get("owner") == "system")
     built = sum(1 for s in structs if s.get("owner") not in (None, "system"))
-
+    natural = sum(1 for s in structs if s.get("owner") == "system")
     lines = [
         f"- Aktive Spieler: {len(players)}",
-        f"- Wilde Kreaturen: {len(creatures)}"
-        + (f" (z.B. {', '.join(set(c['kind'] for c in creatures[:6]))})" if creatures else ""),
+        f"- Wilde Kreaturen: {len(creatures)}",
         f"- Bewohner (NPCs): {len(friendlies)}",
         f"- Spieler-Bauten: {built}",
-        f"- Natürliche Strukturen geladen: {natural}",
+        f"- Natürliche Strukturen: {natural}",
     ]
     return "\n".join(lines)
 
 
-async def _generate_event(state_summary: str = "",
-                          forced_kind: str | None = None,
-                          forced_tag: str | None = None) -> dict | None:
-    raw = await llm.slow_brain(
-        _build_prompt(state_summary, forced_kind, forced_tag),
-        system=SYSTEM_PROMPT, json_mode=True,
-    )
+async def _generate_event_text(tier: str, tag: str, state_summary: str,
+                                audiences: set[str]) -> dict | None:
+    """LLM-Call für Titel+Body. Returns {title, body} oder None bei Fehler."""
     try:
+        raw = await llm.slow_brain(
+            _build_prompt(tier, tag, state_summary, audiences),
+            system=TIER_SYSTEM_PROMPTS.get(tier, TIER_SYSTEM_PROMPTS["atmosphere"]),
+            json_mode=True,
+        )
         data = json.loads(raw)
-    except json.JSONDecodeError as e:
-        log.warning("LLM lieferte kein valides JSON: %s — raw: %s", e, raw[:200])
+        return {
+            "title": str(data["title"])[:120],
+            "body":  str(data["body"])[:1000],
+        }
+    except (json.JSONDecodeError, KeyError, Exception) as e:
+        log.warning("LLM-Event-Text fehlgeschlagen (%s/%s): %s", tier, tag, e)
+        # Fallback-Text (kein LLM-Crash)
+        return {
+            "title": f"[{tier}] {tag}",
+            "body":  f"Etwas geschieht in der Welt ({tag}).",
+        }
+
+
+async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
+                              structure_manager, connection_manager) -> dict | None:
+    """Mechanische Effekte je nach Template. Returns optional einen Marker-Dict
+    {x, y, label, color, ttl_s} der dem Event-Broadcast hinzugefügt wird, damit
+    Frontend einen Map-Marker zeigen kann. Best-effort — Fehler werden geloggt."""
+    effect = tmpl.get("effect")
+    if not effect:
         return None
-    if not all(k in data for k in ("kind", "title", "body")):
-        log.warning("Event fehlen Felder: %s", data)
-        return None
+    marker = None
+    try:
+        # ── Boss-Spawn — Format "boss_spawn:<kind>" ─────────────────────────
+        if effect.startswith("boss_spawn:"):
+            kind = effect.split(":", 1)[1]
+            # Boss spawnt etwas weiter weg damit der Player ihn JAGEN muss
+            biomes = (npc_worker.CREATURE_SPAWN_PROFILE.get(kind) or {}).get("biomes")
+            center = await npc_worker.find_event_cluster_center(
+                world, connection_manager, biomes=biomes, min_dist=28, max_dist=50,
+            )
+            if center is None:
+                spawned = await npc_worker.spawn_one(world, npc_manager,
+                                                      connection_manager, kind=kind)
+                if spawned:
+                    center = (spawned["x"], spawned["y"])
+            else:
+                await npc_worker.spawn_one(world, npc_manager, connection_manager,
+                                            kind=kind, at=center)
+            if center:
+                marker = _marker(center, label=f"💀 {tmpl.get('tag','Boss')}",
+                                 color="#ff4060", ttl_s=1800)
+
+        # ── Invasion — Format "spawn_invasion:<kind>:<count>" ──────────────
+        elif effect.startswith("spawn_invasion:"):
+            parts = effect.split(":")
+            kind = parts[1]
+            n = int(parts[2]) if len(parts) > 2 else 30
+            center = await npc_worker.spawn_cluster(world, npc_manager,
+                                                     connection_manager,
+                                                     kind=kind, count=n, jitter=5)
+            if center:
+                marker = _marker(center, label=f"🌑 Invasion ({n}×{kind})",
+                                 color="#d060ff", ttl_s=3600)
+
+        # ── Cluster-Mob-Spawns ─────────────────────────────────────────────
+        elif effect == "spawn_bandits":
+            n = random.randint(3, 5)
+            center = await npc_worker.spawn_cluster(world, npc_manager, connection_manager,
+                                                     kind="bandit", count=n, jitter=3)
+            if center:
+                marker = _marker(center, label=f"🗡 Banditen ({n})",
+                                 color="#e85040", ttl_s=900)
+
+        elif effect == "spawn_spiders":
+            n = random.randint(2, 4)
+            center = await npc_worker.spawn_cluster(world, npc_manager, connection_manager,
+                                                     kind="spider", count=n, jitter=2)
+            if center:
+                marker = _marker(center, label=f"🕷 Spinnennest ({n})",
+                                 color="#a060c0", ttl_s=900)
+
+        elif effect == "spawn_undead":
+            n = random.randint(2, 4)
+            kind = random.choice(["skeleton", "zombie"])
+            center = await npc_worker.spawn_cluster(world, npc_manager, connection_manager,
+                                                     kind=kind, count=n, jitter=3)
+            if center:
+                marker = _marker(center, label=f"☠️ Untote ({n})",
+                                 color="#c060c0", ttl_s=900)
+
+        elif effect == "spawn_elites":
+            elite_pool = ["mantis_chimera", "iron_spider", "mossback_warden",
+                          "serpent_oracle", "urtikus_eye_fiend"]
+            kind = random.choice(elite_pool)
+            n = random.randint(2, 3)
+            center = await npc_worker.spawn_cluster(world, npc_manager, connection_manager,
+                                                     kind=kind, count=n, jitter=4)
+            if center:
+                marker = _marker(center, label=f"🔥 Elite-Rudel ({n})",
+                                 color="#ff8040", ttl_s=1200)
+
+        elif effect == "spawn_raid":
+            kind = random.choice(["bandit", "goblin"])
+            n = random.randint(6, 10)
+            center = await npc_worker.spawn_cluster(world, npc_manager, connection_manager,
+                                                     kind=kind, count=n, jitter=4)
+            if center:
+                marker = _marker(center, label=f"⚔️ Raid ({n}×{kind})",
+                                 color="#ff6020", ttl_s=1500)
+
+        elif effect == "spawn_merchant":
+            # Merchant ist friendly — spawnt direkt nahe Spieler (8-15 Tiles)
+            spawned = await npc_worker.spawn_one(world, npc_manager,
+                                                  connection_manager, kind="merchant")
+            if spawned:
+                marker = _marker((spawned["x"], spawned["y"]),
+                                 label="🪙 Wandernder Händler",
+                                 color="#80c060", ttl_s=1800)
+
+        # ── Strukturen / Items am Boden ─────────────────────────────────────
+        elif effect == "ruin_spawn":
+            struct_type = random.choice(["ruin_pillar", "rubble", "statue_broken", "gravestone"])
+            placed = await _spawn_structure_near_player(world, structure_manager,
+                                                        connection_manager, struct_type)
+            if placed:
+                marker = _marker((placed["x"], placed["y"]),
+                                 label=f"🏛 {struct_type}",
+                                 color="#a0a0a0", ttl_s=1200)
+
+        elif effect == "spawn_ore":
+            kind = random.choice(["iron_ore", "silver_ore", "gold_ore", "crystal"])
+            pos = await _spawn_ground_item_near_player(world, connection_manager, kind)
+            if pos:
+                marker = _marker(pos, label=f"⛏ {kind}", color="#d0c060", ttl_s=900)
+
+        elif effect == "spawn_herb":
+            pos = await _spawn_ground_item_near_player(world, connection_manager, "herb")
+            if pos:
+                marker = _marker(pos, label="🌿 Heilkraut", color="#60d060", ttl_s=900)
+
+        elif effect == "drop_coin":
+            kind = random.choice(["copper_coin", "silver_coin"])
+            pos = await _spawn_ground_item_near_player(world, connection_manager, kind)
+            if pos:
+                marker = _marker(pos, label="🪙 Münzbeutel", color="#e8c860", ttl_s=600)
+
+        elif effect == "drop_items":
+            first_pos = None
+            for k in random.sample(["cloth", "bone", "leather", "wood", "stone"], k=2):
+                pos = await _spawn_ground_item_near_player(world, connection_manager, k)
+                if pos and first_pos is None:
+                    first_pos = pos
+            if first_pos:
+                marker = _marker(first_pos, label="📦 Verlorene Karawane",
+                                 color="#c08060", ttl_s=900)
+
+        # ── Welt-Effekte (Toast bis Phase 4 echte Mechanik bringt) ──────────
+        elif effect == "destroy_farms":
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🌾 Schwarm zerstört Felder!",
+            })
+        elif effect == "blood_moon":
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🌑 BLUTMOND-NACHT! Monster sind aggressiver bis zum Morgen.",
+            })
+        elif effect == "dying_sun":
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🌒 Die Sonne stirbt — Hunger drainiert schneller.",
+            })
+
+    except Exception:
+        log.exception("Event-Effekt fehlgeschlagen: %s", effect)
+    return marker
+
+
+def _marker(pos: tuple[int, int], label: str, color: str, ttl_s: int) -> dict:
+    """Standardisiert ein Map-Marker-Dict für Event-Broadcasts."""
     return {
-        "kind":  str(data["kind"])[:32],
-        "title": str(data["title"])[:120],
-        "body":  str(data["body"])[:1000],
+        "x": int(pos[0]), "y": int(pos[1]),
+        "label": label, "color": color, "ttl_s": ttl_s,
     }
+
+
+async def _spawn_structure_near_player(world, structure_manager, connection_manager,
+                                        struct_type: str) -> dict | None:
+    """Spawnt eine Struktur auf einem walkable Tile in 8-15 Tiles Entfernung
+    von einem zufälligen aktiven Spieler. Returns placed-dict oder None."""
+    players = list(connection_manager.get_players().values())
+    if not players:
+        return None
+    p = random.choice(players)
+    for _ in range(20):
+        dx = random.randint(-15, 15)
+        dy = random.randint(-15, 15)
+        if abs(dx) < 8 and abs(dy) < 8:
+            continue
+        x, y = p["x"] + dx, p["y"] + dy
+        if not await world.is_walkable(x, y):
+            continue
+        if structure_manager.object_at(x, y) is not None:
+            continue
+        placed = await structure_manager.place(x, y, struct_type, owner="system")
+        if placed is not None:
+            await connection_manager.broadcast({
+                "type": "structure_placed", "structure": placed,
+            })
+            log.info("Event-Struktur %s @ (%d,%d)", struct_type, x, y)
+            return placed
+    return None
+
+
+async def _spawn_ground_item_near_player(world, connection_manager, item_kind: str) -> tuple[int, int] | None:
+    players = list(connection_manager.get_players().values())
+    if not players:
+        return None
+    p = random.choice(players)
+    try:
+        for _ in range(15):
+            dx = random.randint(-10, 10)
+            dy = random.randint(-10, 10)
+            x, y = p["x"] + dx, p["y"] + dy
+            if not await world.is_walkable(x, y):
+                continue
+            from main import items as _glob_items
+            spawned = await _glob_items.spawn_on_ground(item_kind, x, y)
+            if spawned:
+                await connection_manager.broadcast({
+                    "type": "item_spawned", "item": spawned,
+                })
+                return (x, y)
+    except Exception:
+        log.debug("ground-item-spawn fehlgeschlagen", exc_info=True)
+    return None
 
 
 async def run(event_manager, connection_manager, world=None,
               npc_manager=None, structure_manager=None) -> None:
-    """Hintergrund-Loop: alle EVENT_INTERVAL_SECONDS ein Welt-Event.
-    Welt-Zustand wird dem Slow Brain als Kontext mitgegeben → KI reagiert
-    auf was gerade los ist.
-    Zusätzlich: bei 'creature'-Events spawnt der Worker passende Creatures."""
-    log.info("Event-Worker startet, Intervall %ss", EVENT_INTERVAL_SECONDS)
+    """Multi-Tier-Dispatcher (Welle 20).
+
+    Pro Tick (default 60s): prüft alle Tiers in Prioritätsreihenfolge
+    (cataclysm > boss > catastrophe > encounter > atmosphere). Höchstens 1
+    Event pro Tick — außer chaos-Modus, da kann ein zweites Tier folgen.
+    """
+    log.info("Event-Worker v2 startet, Tick=%ds, Tiers=%s",
+             TICK_SECONDS, ", ".join(storyteller.TIERS))
+    # Initialer Sleep — Welt soll erst hochfahren
     await asyncio.sleep(15)
+
+    # Priority — Cataclysm zuerst (dominantes Event), atmosphere zuletzt
+    priority_order = ("cataclysm", "boss", "catastrophe", "encounter", "atmosphere")
+
     while True:
         try:
-            state = ""
             ws_state = {}
+            state_text = ""
+            audiences: set[str] = set()
             if npc_manager and structure_manager:
-                state = world_state_summary(npc_manager, structure_manager, connection_manager)
-                # Numerischer State für Storyteller
+                state_text = world_state_summary(npc_manager, structure_manager, connection_manager)
                 npcs_all = npc_manager.all()
                 creatures = [n for n in npcs_all if n["kind"] in combat.CREATURE_KINDS]
                 structs = structure_manager.all()
+                audiences = await player_profile.active_audiences(connection_manager, _skills)
                 ws_state = {
-                    "active_players":  len(connection_manager.get_players()),
-                    "wealth_score":    sum(1 for s in structs if s.get("owner") not in (None, "system")),
-                    "creature_count":  len(creatures),
-                    "structure_count": len(structs),
+                    "active_players":   len(connection_manager.get_players()),
+                    "active_audiences": audiences,
+                    "wealth_score":     sum(1 for s in structs if s.get("owner") not in (None, "system")),
+                    "creature_count":   len(creatures),
+                    "structure_count":  len(structs),
                 }
-            # Welle 22: Storyteller-Director wählt Event-Typ deterministisch
-            forced_kind = None
-            forced_tag = None
-            tmpl = storyteller.select_event(ws_state)
-            if tmpl is not None:
-                forced_kind = tmpl["kind"]
-                forced_tag = tmpl.get("tag")
-                log.info("Storyteller (%s) → kind=%s tag=%s",
-                         storyteller.get_mode(), forced_kind, forced_tag)
-            ev = await _generate_event(state, forced_kind, forced_tag)
-            if ev is not None:
-                saved = await event_manager.save(ev["kind"], ev["title"], ev["body"])
+
+            fired_this_tick = 0
+            for tier in priority_order:
+                if not storyteller.tier_due(tier):
+                    continue
+                tmpl = storyteller.select_event(tier, ws_state)
+                if tmpl is None:
+                    continue
+                ev = await _generate_event_text(tier, tmpl["tag"], state_text, audiences)
+                if ev is None:
+                    continue
+                # Effekt zuerst — Marker hängen wir dann ans Event
+                marker = None
+                if world is not None and npc_manager is not None and structure_manager is not None:
+                    marker = await _apply_event_effect(
+                        tmpl, ev, world, npc_manager, structure_manager, connection_manager
+                    )
+                saved = await event_manager.save(
+                    tier, ev["title"], ev["body"]
+                )
+                event_payload = {**saved, "tier": tier, "tag": tmpl["tag"]}
+                if marker is not None:
+                    event_payload["marker"] = marker
                 await connection_manager.broadcast({
                     "type":  "event",
-                    "event": saved,
+                    "event": event_payload,
                 })
-                storyteller.mark_event_fired()
-                log.info("Event geschickt: %s — %s", saved["kind"], saved["title"])
-                if world is not None and npc_manager is not None:
-                    await _maybe_spawn_event_creatures(
-                        ev, world, npc_manager, connection_manager
-                    )
+                storyteller.mark_event_fired(tier, danger=tmpl.get("danger", 0))
+                log.info("[%s] %s — %s%s",
+                         tier, ev["title"], tmpl["tag"],
+                         f" @ ({marker['x']},{marker['y']})" if marker else "")
+                fired_this_tick += 1
+                # Im chaos-Modus erlauben wir bis zu 2 Events pro Tick
+                if storyteller.get_mode() != "chaos" or fired_this_tick >= 2:
+                    break
+
         except asyncio.CancelledError:
             log.info("Event-Worker gestoppt")
             raise
         except Exception:
             log.exception("Event-Worker iteration fehlgeschlagen")
-        await asyncio.sleep(EVENT_INTERVAL_SECONDS)
-
-
-async def _maybe_spawn_event_creatures(event, world, npc_manager, connection_manager) -> None:
-    """Wenn das Event Creatures andeutet, spawne welche in der Nähe der Spieler."""
-    kind = event["kind"]
-    body = event["body"].lower()
-    if not connection_manager.get_players():
-        return
-
-    # Heuristik: Event-Kind oder Body legt Creature nahe
-    spawn_kind = None
-    for creature_kind in combat.CREATURE_KINDS:
-        if creature_kind in body:
-            spawn_kind = creature_kind
-            break
-    if spawn_kind is None and kind == "creature":
-        spawn_kind = random.choice(list(combat.CREATURE_KINDS))
-    if spawn_kind is None and random.random() < 0.25 * STORYTELLER_SPAWN_MULT.get(STORYTELLER_MODE, 1.0):
-        spawn_kind = random.choice(list(combat.CREATURE_KINDS))
-    if spawn_kind is None:
-        return
-
-    # 1-3 Creatures spawnen (mehr bei chaos)
-    n = random.randint(1, 2)
-    if STORYTELLER_MODE == "chaos" and random.random() < 0.3:
-        n += random.randint(1, 2)
-    log.info("Event-Spawn: %d × %s nahe Spieler", n, spawn_kind)
-    for _ in range(n):
-        await npc_worker.spawn_one(world, npc_manager, connection_manager, kind=spawn_kind)
+        await asyncio.sleep(TICK_SECONDS)

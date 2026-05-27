@@ -116,6 +116,27 @@ NPC_KIND_FACTIONS = {
     "slime":       None,
     "ogre":        None,
     "dragon_whelp":None,
+    # — Welle 14 — professional asset-drop (2026-05-26b) —
+    # Tiere / Bestien → wild_beasts
+    "razorback_vermin":      "wild_beasts",
+    "reed_walker":           "wild_beasts",
+    "redland_scavenger":     "wild_beasts",
+    "mossback_warden":       "wild_beasts",
+    "mantis_chimera":        "wild_beasts",
+    "dendroid_guardian":     "wild_beasts",
+    "blood_antler_drake":    "wild_beasts",
+    "kaiju_thornback":       "wild_beasts",
+    "frost_rune_boar_prime": "wild_beasts",
+    # Untot
+    "grave_wraith":          "undead_cult",
+    # Magisch / eldritch — keine klare Faction
+    "spined_abyss_larva":    None,
+    "serpent_oracle":        None,
+    "urtikus_eye_fiend":     None,
+    "iron_spider":           None,
+    "void_eye_brute":        None,
+    "magma_shell_devourer":  None,
+    "rockshell_colossus":    None,
 }
 
 
