@@ -2201,6 +2201,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 npc = npcs.get(npc_id)
                 if npc is None or not message:
                     continue
+                # Hostile Kreaturen (Bandit/Wolf/Goblin/…) reden nicht — die greifen an.
+                if npc["kind"] in combat.CREATURE_KINDS:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"⚔️ {npc.get('name', 'Diese Kreatur')} ist feindlich — angreifen, nicht reden!",
+                    })
+                    continue
                 await npcs.add_talk(npc_id, player_id, "user", message)
                 history = await npcs.recent_talks(npc_id, player_id, limit=10)
                 # History enthält die soeben gespeicherte Spieler-Nachricht;

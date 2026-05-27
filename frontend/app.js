@@ -576,8 +576,11 @@ const NPC_SPRITE = {
   wanderer:    { sprite: 'npc_villager',     tint: 0xffffff, label: 'Wanderer' },
   villager:    { sprite: 'npc_villager',     tint: 0xffffff, label: 'Dorfbewohner' },
   merchant:    { sprite: 'npc_merchant',     tint: 0xffffff, label: 'Händler' },
-  hermit:      { sprite: 'char_player',      tint: 0xb0e0d0, label: 'Einsiedler' },
-  bard:        { sprite: 'char_player',      tint: 0xf0a0d0, label: 'Barde' },
+  // hermit/bard nutzen Friendly-Sprites mit Charakter-Tint statt char_player,
+  // damit die Player/Friendly/Hostile-Trennung sauber bleibt. Dedizierte
+  // npc_hermit.png / npc_bard.png stehen in docu/missing_assets.md.
+  hermit:      { sprite: 'npc_village_elder', tint: 0xb0e0d0, label: 'Einsiedler' },
+  bard:        { sprite: 'npc_villager',      tint: 0xf0a0d0, label: 'Barde' },
   scholar:     { sprite: 'npc_mage',         tint: 0xffffff, label: 'Gelehrter' },
   soldier:     { sprite: 'npc_guard',        tint: 0xffffff, label: 'Soldat' },
   // Welle 21 — neue NPC-Kinds mit eigenen Sprites
@@ -661,6 +664,12 @@ const CREATURE_KINDS = new Set([
   'frost_sprite','fire_imp','mushroom_imp','thornling','treant',
   'stone_golem','crystal_golem','gargoyle','bone_crawler','giant_spider',
   'minotaur','harpy','basilisk','chimera','griffin','hydra','manticore',
+  // Welle 14 — professional asset-drop (muss mit backend/npc_worker.CREATURE_KINDS sync sein)
+  'razorback_vermin','spined_abyss_larva','reed_walker','redland_scavenger',
+  'mossback_warden','grave_wraith','serpent_oracle','urtikus_eye_fiend',
+  'mantis_chimera','iron_spider','dendroid_guardian','blood_antler_drake',
+  'kaiju_thornback','void_eye_brute','frost_rune_boar_prime',
+  'magma_shell_devourer','rockshell_colossus',
 ]);
 
 // ─── Items ───────────────────────────────────────────────────────────────────
@@ -1341,10 +1350,7 @@ class WorldScene extends Phaser.Scene {
     this.load.image('char_player',     '/assets/characters/player.png');
     this.load.image('fx_shadow',       '/assets/effects/shadow.png');
 
-    // Welle 19 (2026-05-26j): Legacy-Monster-Sprites entfernt (commit 1fb41c5).
-    // Nur noch das Pro-Set unter world_sprites/reference_based/sprites_96/.
-    // Legacy-Mob-Kinds (wolf, goblin, bear, ...) bekommen über `monster_unknown`
-    // einen Fallback gerendert.
+    // Pro-Set (Welle 14): hochwertige world-Sprites unter world_sprites/reference_based/.
     const PRO_MONSTERS = [
       'razorback_vermin','spined_abyss_larva','reed_walker',
       'redland_scavenger','mossback_warden','grave_wraith',
@@ -1357,7 +1363,27 @@ class WorldScene extends Phaser.Scene {
       this.load.image(`monster_${m}`,
         `/assets/monsters/world_sprites/reference_based/sprites_96/${m}_world_96.png`);
     }
-    // Generischer Fallback für legacy mob-kinds die noch in der DB existieren
+    // Welle 23: Legacy-Creature-Sprites aus dem Animations-Asset-Pool nutzen
+    // (idle_1.png als static-Sprite). Jede Kreatur bekommt damit ihr eigenes
+    // Aussehen statt monster_unknown-Fallback. Hostile-only: friendly NPCs
+    // werden weiterhin aus /assets/characters/npcs/ geladen (siehe unten).
+    const LEGACY_MONSTERS = [
+      'goblin','wolf','skeleton','spider','slime',
+      'rat','bat','zombie','bandit','boar','bear',
+      'ogre','necromancer','dragon_whelp',
+      'stag','lynx','cougar','wolverine','dire_wolf','wolf_alpha',
+      'cave_bear','polar_bear','crocodile','cobra',
+      'slimelet','fae_mite','gloom_moth','ember_newt','ember_rat',
+      'shadow_bat','thorn_scarab','crystal_beetle','crystal_tick',
+      'frost_sprite','fire_imp','mushroom_imp','thornling','treant',
+      'stone_golem','crystal_golem','gargoyle','bone_crawler','giant_spider',
+      'minotaur','harpy','basilisk','chimera','griffin','hydra','manticore',
+    ];
+    for (const m of LEGACY_MONSTERS) {
+      this.load.image(`monster_${m}`, `/assets/animations/monsters/${m}/idle_1.png`);
+    }
+    // Generischer Fallback nur noch falls eine Kreatur weder Pro- noch Legacy-
+    // Sprite hat (sollte nicht passieren, aber schützt vor Crashes).
     this.load.image('monster_unknown',
       `/assets/monsters/world_sprites/reference_based/sprites_96/razorback_vermin_world_96.png`);
     // Walk-Animation (Welle 40)
@@ -1389,9 +1415,12 @@ class WorldScene extends Phaser.Scene {
     this.load.image('fx_arrow_projectile', '/assets/animations/attacks/arrow_projectile.png');
     this.load.image('fx_arrow_hit', '/assets/animations/attacks/arrow_hit.png');
 
-    // Friendly-NPC-Sprites
-    for (const n of ['mage', 'farmer', 'villager', 'guard', 'merchant',
-                     'healer', 'quest_giver', 'blacksmith',
+    // Friendly-NPC-Sprites — alle Files unter /assets/characters/npcs/.
+    // Backend `SPRITE_VARIANTS_BY_KIND` kann Gender-/Stil-Varianten zuweisen
+    // (farmer_female), `_npcSpriteKey` fällt sonst auf den kind-default zurück.
+    for (const n of ['mage', 'farmer', 'farmer_female', 'villager',
+                     'guard', 'merchant', 'healer', 'quest_giver',
+                     'blacksmith',
                      // Asset-Drop 2026-05-26
                      'miner', 'village_elder', 'cat', 'dog', 'child']) {
       this.load.image(`npc_${n}`, `/assets/characters/npcs/${n}.png`);
