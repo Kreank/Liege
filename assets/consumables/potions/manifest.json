@@ -1,0 +1,101 @@
+{
+  "pack": "original_potion_variants_2026_05_27",
+  "items": [
+    {
+      "slug": "health_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/health_potion.png",
+        "128": "assets/consumables/potions/icons_128/health_potion.png",
+        "64": "assets/consumables/potions/icons_64/health_potion.png"
+      }
+    },
+    {
+      "slug": "greater_health_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/greater_health_potion.png",
+        "128": "assets/consumables/potions/icons_128/greater_health_potion.png",
+        "64": "assets/consumables/potions/icons_64/greater_health_potion.png"
+      }
+    },
+    {
+      "slug": "mana_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/mana_potion.png",
+        "128": "assets/consumables/potions/icons_128/mana_potion.png",
+        "64": "assets/consumables/potions/icons_64/mana_potion.png"
+      }
+    },
+    {
+      "slug": "greater_mana_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/greater_mana_potion.png",
+        "128": "assets/consumables/potions/icons_128/greater_mana_potion.png",
+        "64": "assets/consumables/potions/icons_64/greater_mana_potion.png"
+      }
+    },
+    {
+      "slug": "stamina_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/stamina_potion.png",
+        "128": "assets/consumables/potions/icons_128/stamina_potion.png",
+        "64": "assets/consumables/potions/icons_64/stamina_potion.png"
+      }
+    },
+    {
+      "slug": "antidote_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/antidote_potion.png",
+        "128": "assets/consumables/potions/icons_128/antidote_potion.png",
+        "64": "assets/consumables/potions/icons_64/antidote_potion.png"
+      }
+    },
+    {
+      "slug": "strength_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/strength_potion.png",
+        "128": "assets/consumables/potions/icons_128/strength_potion.png",
+        "64": "assets/consumables/potions/icons_64/strength_potion.png"
+      }
+    },
+    {
+      "slug": "speed_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/speed_potion.png",
+        "128": "assets/consumables/potions/icons_128/speed_potion.png",
+        "64": "assets/consumables/potions/icons_64/speed_potion.png"
+      }
+    },
+    {
+      "slug": "invisibility_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/invisibility_potion.png",
+        "128": "assets/consumables/potions/icons_128/invisibility_potion.png",
+        "64": "assets/consumables/potions/icons_64/invisibility_potion.png"
+      }
+    },
+    {
+      "slug": "fire_resist_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/fire_resist_potion.png",
+        "128": "assets/consumables/potions/icons_128/fire_resist_potion.png",
+        "64": "assets/consumables/potions/icons_64/fire_resist_potion.png"
+      }
+    },
+    {
+      "slug": "frost_resist_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/frost_resist_potion.png",
+        "128": "assets/consumables/potions/icons_128/frost_resist_potion.png",
+        "64": "assets/consumables/potions/icons_64/frost_resist_potion.png"
+      }
+    },
+    {
+      "slug": "poison_potion",
+      "paths": {
+        "256": "assets/consumables/potions/masters_256/poison_potion.png",
+        "128": "assets/consumables/potions/icons_128/poison_potion.png",
+        "64": "assets/consumables/potions/icons_64/poison_potion.png"
+      }
+    }
+  ]
+}

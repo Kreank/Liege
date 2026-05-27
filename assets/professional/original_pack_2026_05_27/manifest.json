@@ -1,0 +1,607 @@
+{
+  "pack": "original_pack_2026_05_27",
+  "source": "newly generated original assets, not reference-pack derivatives",
+  "style": "dark fantasy hand-painted RPG icons, transparent PNG outputs",
+  "items": [
+    {
+      "slug": "black_guard_longsword",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/black_guard_longsword.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/black_guard_longsword.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/black_guard_longsword.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/black_guard_longsword.png"
+      }
+    },
+    {
+      "slug": "old_execution_axe",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/old_execution_axe.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/old_execution_axe.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/old_execution_axe.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/old_execution_axe.png"
+      }
+    },
+    {
+      "slug": "ashwood_recurve_bow",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/ashwood_recurve_bow.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/ashwood_recurve_bow.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/ashwood_recurve_bow.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/ashwood_recurve_bow.png"
+      }
+    },
+    {
+      "slug": "red_oak_staff",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/red_oak_staff.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/red_oak_staff.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/red_oak_staff.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/red_oak_staff.png"
+      }
+    },
+    {
+      "slug": "hooked_ritual_dagger",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/hooked_ritual_dagger.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/hooked_ritual_dagger.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/hooked_ritual_dagger.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/hooked_ritual_dagger.png"
+      }
+    },
+    {
+      "slug": "cleaver_greatsword",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/cleaver_greatsword.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/cleaver_greatsword.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/cleaver_greatsword.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/cleaver_greatsword.png"
+      }
+    },
+    {
+      "slug": "plain_war_spear",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/plain_war_spear.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/plain_war_spear.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/plain_war_spear.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/plain_war_spear.png"
+      }
+    },
+    {
+      "slug": "stormbow_crossbow",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/stormbow_crossbow.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/stormbow_crossbow.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/stormbow_crossbow.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/stormbow_crossbow.png"
+      }
+    },
+    {
+      "slug": "iron_mace",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/iron_mace.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/iron_mace.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/iron_mace.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/iron_mace.png"
+      }
+    },
+    {
+      "slug": "graveyard_scythe",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/graveyard_scythe.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/graveyard_scythe.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/graveyard_scythe.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/graveyard_scythe.png"
+      }
+    },
+    {
+      "slug": "crested_hoplite_helm",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/crested_hoplite_helm.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/crested_hoplite_helm.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/crested_hoplite_helm.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/crested_hoplite_helm.png"
+      }
+    },
+    {
+      "slug": "wandering_knight_armor",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/wandering_knight_armor.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/wandering_knight_armor.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/wandering_knight_armor.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/wandering_knight_armor.png"
+      }
+    },
+    {
+      "slug": "thief_buckled_gloves",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/thief_buckled_gloves.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/thief_buckled_gloves.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/thief_buckled_gloves.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/thief_buckled_gloves.png"
+      }
+    },
+    {
+      "slug": "ornate_guard_shield",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/ornate_guard_shield.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/ornate_guard_shield.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/ornate_guard_shield.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/ornate_guard_shield.png"
+      }
+    },
+    {
+      "slug": "dwarven_field_boots",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/dwarven_field_boots.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/dwarven_field_boots.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/dwarven_field_boots.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/dwarven_field_boots.png"
+      }
+    },
+    {
+      "slug": "cloth_cap",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/cloth_cap.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/cloth_cap.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/cloth_cap.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/cloth_cap.png"
+      }
+    },
+    {
+      "slug": "leather_vest",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/leather_vest.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/leather_vest.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/leather_vest.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/leather_vest.png"
+      }
+    },
+    {
+      "slug": "iron_gauntlets",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/iron_gauntlets.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/iron_gauntlets.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/iron_gauntlets.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/iron_gauntlets.png"
+      }
+    },
+    {
+      "slug": "tower_shield",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/tower_shield.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/tower_shield.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/tower_shield.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/tower_shield.png"
+      }
+    },
+    {
+      "slug": "reinforced_greaves",
+      "category": "equipment_runtime",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/reinforced_greaves.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/reinforced_greaves.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/reinforced_greaves.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/reinforced_greaves.png"
+      }
+    },
+    {
+      "slug": "health_potion",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/health_potion.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/health_potion.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/health_potion.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/health_potion.png"
+      }
+    },
+    {
+      "slug": "mana_potion",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/mana_potion.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/mana_potion.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/mana_potion.png"
+      }
+    },
+    {
+      "slug": "antidote_potion",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/antidote_potion.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/antidote_potion.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/antidote_potion.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/antidote_potion.png"
+      }
+    },
+    {
+      "slug": "stamina_potion",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/stamina_potion.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/stamina_potion.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/stamina_potion.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/stamina_potion.png"
+      }
+    },
+    {
+      "slug": "fire_resist_potion",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/fire_resist_potion.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/fire_resist_potion.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/fire_resist_potion.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/fire_resist_potion.png"
+      }
+    },
+    {
+      "slug": "wood_logs",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/wood_logs.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/wood_logs.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/wood_logs.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/wood_logs.png"
+      }
+    },
+    {
+      "slug": "rough_stone",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/rough_stone.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/rough_stone.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/rough_stone.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/rough_stone.png"
+      }
+    },
+    {
+      "slug": "iron_ore",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/iron_ore.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/iron_ore.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/iron_ore.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/iron_ore.png"
+      }
+    },
+    {
+      "slug": "gold_ore",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/gold_ore.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/gold_ore.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/gold_ore.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/gold_ore.png"
+      }
+    },
+    {
+      "slug": "blue_crystal",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/blue_crystal.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/blue_crystal.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/blue_crystal.png"
+      }
+    },
+    {
+      "slug": "leather_roll",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/leather_roll.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/leather_roll.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/leather_roll.png"
+      }
+    },
+    {
+      "slug": "cloth_bolt",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/cloth_bolt.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/cloth_bolt.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/cloth_bolt.png"
+      }
+    },
+    {
+      "slug": "bone_fragments",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/bone_fragments.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/bone_fragments.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/bone_fragments.png"
+      }
+    },
+    {
+      "slug": "herb_bundle",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/herb_bundle.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/herb_bundle.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/herb_bundle.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/herb_bundle.png"
+      }
+    },
+    {
+      "slug": "torch",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/torch.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/torch.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/torch.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/torch.png"
+      }
+    },
+    {
+      "slug": "bread_loaf",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/bread_loaf.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/bread_loaf.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/bread_loaf.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/bread_loaf.png"
+      }
+    },
+    {
+      "slug": "cooked_meat",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/cooked_meat.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/cooked_meat.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/cooked_meat.png"
+      }
+    },
+    {
+      "slug": "water_flask",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/water_flask.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/water_flask.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/water_flask.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/water_flask.png"
+      }
+    },
+    {
+      "slug": "coin_stack",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/coin_stack.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/coin_stack.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/coin_stack.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/coin_stack.png"
+      }
+    },
+    {
+      "slug": "supply_crate",
+      "category": "resources_consumables_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/supply_crate.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/supply_crate.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/supply_crate.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/supply_crate.png"
+      }
+    },
+    {
+      "slug": "goblin_raider_bust",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/goblin_raider_bust.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/goblin_raider_bust.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/goblin_raider_bust.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/goblin_raider_bust.png"
+      }
+    },
+    {
+      "slug": "skeletal_warrior_bust",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/skeletal_warrior_bust.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/skeletal_warrior_bust.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/skeletal_warrior_bust.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/skeletal_warrior_bust.png"
+      }
+    },
+    {
+      "slug": "wolf_head",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/wolf_head.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/wolf_head.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/wolf_head.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/wolf_head.png"
+      }
+    },
+    {
+      "slug": "giant_spider",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/giant_spider.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/giant_spider.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/giant_spider.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/giant_spider.png"
+      }
+    },
+    {
+      "slug": "slime_creature",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/slime_creature.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/slime_creature.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/slime_creature.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/slime_creature.png"
+      }
+    },
+    {
+      "slug": "zombie_torso",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/zombie_torso.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/zombie_torso.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/zombie_torso.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/zombie_torso.png"
+      }
+    },
+    {
+      "slug": "boar",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/boar.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/boar.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/boar.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/boar.png"
+      }
+    },
+    {
+      "slug": "bear_head",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/bear_head.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/bear_head.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/bear_head.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/bear_head.png"
+      }
+    },
+    {
+      "slug": "necromancer_bust",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/necromancer_bust.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/necromancer_bust.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/necromancer_bust.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/necromancer_bust.png"
+      }
+    },
+    {
+      "slug": "dragon_whelp",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/dragon_whelp.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/dragon_whelp.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/dragon_whelp.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/dragon_whelp.png"
+      }
+    },
+    {
+      "slug": "oak_tree",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/oak_tree.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/oak_tree.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/oak_tree.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/oak_tree.png"
+      }
+    },
+    {
+      "slug": "pine_tree",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/pine_tree.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/pine_tree.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/pine_tree.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/pine_tree.png"
+      }
+    },
+    {
+      "slug": "dead_tree",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/dead_tree.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/dead_tree.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/dead_tree.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/dead_tree.png"
+      }
+    },
+    {
+      "slug": "mossy_rock",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/mossy_rock.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/mossy_rock.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/mossy_rock.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/mossy_rock.png"
+      }
+    },
+    {
+      "slug": "mushroom_cluster",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/mushroom_cluster.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/mushroom_cluster.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/mushroom_cluster.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/mushroom_cluster.png"
+      }
+    },
+    {
+      "slug": "bush",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/bush.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/bush.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/bush.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/bush.png"
+      }
+    },
+    {
+      "slug": "tall_grass_tuft",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/tall_grass_tuft.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/tall_grass_tuft.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/tall_grass_tuft.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/tall_grass_tuft.png"
+      }
+    },
+    {
+      "slug": "broken_cart",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/broken_cart.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/broken_cart.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/broken_cart.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/broken_cart.png"
+      }
+    },
+    {
+      "slug": "barrel",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/barrel.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/barrel.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/barrel.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/barrel.png"
+      }
+    },
+    {
+      "slug": "rune_altar",
+      "category": "monsters_nature_props",
+      "paths": {
+        "512": "assets/professional/original_pack_2026_05_27/masters_512/rune_altar.png",
+        "256": "assets/professional/original_pack_2026_05_27/icons_256/rune_altar.png",
+        "128": "assets/professional/original_pack_2026_05_27/icons_128/rune_altar.png",
+        "64": "assets/professional/original_pack_2026_05_27/icons_64/rune_altar.png"
+      }
+    }
+  ]
+}
