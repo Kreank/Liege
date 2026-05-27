@@ -1,0 +1,1161 @@
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100vw; height: 100vh; height: 100dvh; }
+    body { background: #0a0a0f; overflow: hidden; font-family: monospace; }
+    canvas {
+      display: block;
+      touch-action: none;
+      -webkit-user-select: none; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      /* Phaser RESIZE kümmert sich selbst um width/height. Hier KEIN
+         !important — sonst weicht Display-Size von Render-Resolution ab
+         und das Bild wirkt verschoben/verzerrt. */
+    }
+    #ui {
+      position: fixed; top: 12px; left: 12px; z-index: 10;
+      color: #c8b88a; font-size: 13px; text-shadow: 1px 1px 3px #000;
+      pointer-events: none;
+    }
+    #minimap {
+      position: fixed; bottom: 12px; right: 12px; z-index: 10;
+      border: 1px solid #444; image-rendering: pixelated;
+    }
+    #status {
+      position: fixed; top: 12px; right: 12px; z-index: 10;
+      color: #7aad6a; font-size: 12px; text-shadow: 1px 1px 3px #000;
+    }
+    /* Welle 18: Vitals-Bars deutlich breiter + größere Zahlen für Lesbarkeit */
+    #hp-bar, #mana-bar, #hunger-bar, #thirst-bar, #stamina-bar {
+      position: fixed; left: 12px; z-index: 10;
+      width: 320px; height: 24px;
+      background: rgba(0,0,0,0.65); border: 1px solid #888;
+    }
+    #hp-bar      { top: 38px;  border-color: #c8b88a; }
+    #mana-bar    { top: 68px;  border-color: #5a7aa8; }
+    #hunger-bar  { top: 98px;  border-color: #a08040; }
+    #thirst-bar  { top: 128px; border-color: #4080a8; }
+    #stamina-bar { top: 158px; border-color: #4a8a4a; }
+    #hp-fill, #mana-fill, #hunger-fill, #thirst-fill, #stamina-fill {
+      height: 100%; width: 100%;
+      transition: width 0.3s;
+    }
+    #hp-fill      { background: linear-gradient(to right, #a02820, #e85040); }
+    #mana-fill    { background: linear-gradient(to right, #2030a0, #4080e8); }
+    #hunger-fill  { background: linear-gradient(to right, #6a4020, #d08040); }
+    #thirst-fill  { background: linear-gradient(to right, #1a3a6a, #3080d0); }
+    #stamina-fill { background: linear-gradient(to right, #205020, #50a050); }
+    #hp-text, #mana-text, #hunger-text, #thirst-text, #stamina-text {
+      position: absolute; inset: 0;
+      text-align: center; color: white;
+      font-size: 15px; line-height: 24px;
+      text-shadow: 1px 1px 3px #000, 0 0 2px #000;
+      font-family: monospace; font-weight: bold;
+      letter-spacing: 0.3px;
+    }
+    /* Body-Parts — oben rechts, weg von Chronik */
+    #body-parts {
+      position: fixed; top: 60px; right: 12px; z-index: 30;
+      width: 200px;
+      display: flex; flex-direction: column; gap: 3px;
+      background: rgba(0,0,0,0.45); padding: 6px; border: 1px solid #555;
+    }
+    .bp-row {
+      position: relative; height: 16px; background: rgba(0,0,0,0.6);
+      border: 1px solid #707080;
+    }
+    .bp-fill { height: 100%; background: linear-gradient(to right, #802020, #d04040); transition: width 0.3s; }
+    .bp-label { position: absolute; inset: 0; text-align: center; color: #fff;
+      font-size: 11px; line-height: 16px; text-shadow: 1px 1px 1px #000; font-family: monospace; }
+
+    /* Skills-Panel */
+    #skills-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #skills-overlay.active { display: flex; }
+    #skills-box {
+      width: 90%; max-width: 480px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+    }
+    #skills-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #skills-list { padding: 10px 14px; }
+    .skill-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .skill-icon { font-size: 18px; width: 28px; }
+    .skill-name { flex: 0 0 110px; color: #e8d870; }
+    .skill-level { flex: 0 0 60px; color: #fff; text-align: center; font-weight: bold; }
+    .skill-progress { flex: 1; height: 12px; background: rgba(0,0,0,0.5); border: 1px solid #555; position: relative; }
+    .skill-progress-fill { height: 100%; background: linear-gradient(to right, #4a5a8a, #6a8acf); }
+
+    /* Research-Panel (Welle 6) */
+    #research-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #research-overlay.active { display: flex; }
+    #research-box {
+      width: 92%; max-width: 620px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8a868;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column; max-height: 86vh;
+    }
+    #research-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8c870; font-weight: bold;
+    }
+    #research-list { padding: 8px 14px; overflow-y: auto; }
+    .research-row {
+      display: grid; grid-template-columns: 36px 1fr 90px 100px;
+      gap: 8px; padding: 8px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .research-row.locked { opacity: 0.4; }
+    .research-row.done { background: rgba(40,60,30,0.3); }
+    .research-icon { font-size: 22px; text-align: center; }
+    .research-name { color: #e8c870; }
+    .research-desc { font-size: 10px; color: #807060; }
+    .research-bar { height: 10px; background: rgba(0,0,0,0.5); border: 1px solid #555; position: relative; }
+    .research-bar-fill { height: 100%; background: linear-gradient(to right, #806020, #d0a040); }
+    .research-bar-text { position: absolute; inset: 0; text-align: center; font-size: 9px; color: #fff; line-height: 10px; text-shadow: 1px 1px 1px #000; }
+    .research-actions button {
+      background: #404020; border: 1px solid #a09060; color: #fff; cursor: pointer;
+      padding: 3px 7px; font-size: 10px; margin-left: 2px; border-radius: 3px;
+    }
+    .research-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Talent-Panel (Welle 18) */
+    #talents-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #talents-overlay.active { display: flex; }
+    #talents-box {
+      width: 92%; max-width: 720px;
+      background: rgba(20,18,14,0.97); border: 1px solid #b89858;
+      color: #c8b88a; font-size: 12px; max-height: 88vh;
+      display: flex; flex-direction: column;
+    }
+    #talents-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #ffd060; font-weight: bold;
+    }
+    #talents-points { color: #ffd060; font-size: 14px; }
+    #talents-tabs {
+      display: flex; gap: 2px; padding: 6px 10px; background: rgba(0,0,0,0.3);
+      flex-wrap: wrap;
+    }
+    .talents-tab {
+      background: rgba(60,50,30,0.7); border: 1px solid #806040; color: #c8b88a;
+      padding: 4px 10px; cursor: pointer; font-size: 11px; border-radius: 3px;
+    }
+    .talents-tab.active { background: rgba(120,90,40,0.9); color: #fff; }
+    #talents-list { padding: 8px 14px; overflow-y: auto; flex: 1; }
+    .talent-row {
+      display: grid; grid-template-columns: 32px 1fr 100px;
+      gap: 8px; padding: 6px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .talent-row.locked { opacity: 0.45; }
+    .talent-row.learned { background: rgba(40,60,30,0.3); }
+    .talent-row.available { background: rgba(60,50,20,0.3); }
+    .talent-icon { font-size: 22px; text-align: center; }
+    .talent-name { color: #e8c870; font-weight: bold; }
+    .talent-desc { font-size: 10px; color: #a09080; }
+    .talent-meta { font-size: 9px; color: #807060; }
+    .talent-action button {
+      background: #604020; border: 1px solid #a08040; color: #fff; cursor: pointer;
+      padding: 4px 8px; font-size: 11px; border-radius: 3px; width: 100%;
+    }
+    .talent-action button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .talent-status { font-size: 10px; padding: 2px 6px; border-radius: 3px; text-align: center; }
+    .talent-status.learned     { background: #305030; color: #80f080; }
+    .talent-status.needs_points{ background: #503020; color: #ff8060; }
+    .talent-status.locked      { background: #303030; color: #808080; }
+
+    /* Character-Panel (Attribute) */
+    #attributes-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #attributes-overlay.active { display: flex; }
+    #attributes-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8a888;
+      color: #c8b88a; font-size: 12px; max-height: 84vh;
+      display: flex; flex-direction: column;
+    }
+    #attributes-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8c870; font-weight: bold;
+    }
+    #attributes-list { padding: 10px 14px; overflow-y: auto; }
+    .attr-row {
+      display: grid; grid-template-columns: 110px 1fr 60px;
+      gap: 8px; padding: 5px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .attr-label { color: #e8c870; font-weight: bold; }
+    .attr-desc  { font-size: 10px; color: #a09060; }
+    .attr-value { font-size: 14px; font-weight: bold; color: #fff;
+                  text-align: right; font-family: monospace; }
+
+    /* Hotbar (Welle 34) */
+    #hotbar {
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 50; display: flex; gap: 4px;
+      padding: 4px; background: rgba(0,0,0,0.55); border: 1px solid #806040;
+      border-radius: 6px;
+    }
+    .hotbar-slot {
+      width: 52px; height: 52px; position: relative;
+      background: rgba(20,18,14,0.85); border: 2px solid #555;
+      border-radius: 4px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hotbar-slot:hover { border-color: #c8b88a; }
+    .hotbar-slot.active { border-color: #ffd060; box-shadow: 0 0 8px rgba(255,208,96,0.5); }
+    .hotbar-slot img { width: 44px; height: 44px; object-fit: contain; }
+    .hotbar-key {
+      position: absolute; top: 1px; left: 3px;
+      color: #ffd060; font-size: 10px; font-family: monospace;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .hotbar-count {
+      position: absolute; bottom: 1px; right: 3px;
+      color: #fff; font-size: 11px; font-weight: bold; font-family: monospace;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .hotbar-empty { opacity: 0.4; }
+
+    /* Item-Tooltip (Welle 35) */
+    #item-tooltip {
+      position: fixed; z-index: 200; pointer-events: none;
+      background: rgba(15,12,8,0.97); border: 1px solid #b89858;
+      padding: 8px 10px; color: #c8b88a; font-size: 11px;
+      font-family: monospace; min-width: 180px; max-width: 280px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: none;
+    }
+    #item-tooltip.active { display: block; }
+    .tt-name { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
+    .tt-quality { font-size: 10px; margin-bottom: 4px; opacity: 0.8; }
+    .tt-stats { margin: 4px 0; line-height: 1.4; }
+    .tt-stats div { color: #b0c0a0; }
+    .tt-stats .neg { color: #c08080; }
+    .tt-affix {
+      color: #a0a060; font-size: 11px; margin-top: 4px;
+      border-top: 1px dashed #443524; padding-top: 4px;
+    }
+    .tt-affix-row { margin-bottom: 3px; line-height: 1.3; }
+    .tt-desc { color: #b0a080; font-size: 11px; margin-top: 4px; line-height: 1.4; }
+    .tt-flavor { color: #807060; font-style: italic; margin-top: 4px; font-size: 10px; }
+    /* Persistenter Tooltip (Rechtsklick) */
+    #item-tooltip.pinned { pointer-events: auto; box-shadow: 0 0 12px rgba(255,208,96,0.4); }
+    #item-tooltip .tt-actions {
+      display: flex; gap: 4px; margin-top: 6px; padding-top: 6px;
+      border-top: 1px solid #4a3a20;
+    }
+    #item-tooltip .tt-actions button {
+      flex: 1; background: rgba(60,50,30,0.7); border: 1px solid #806040;
+      color: #c8b88a; padding: 3px 6px; cursor: pointer; font-size: 10px;
+      border-radius: 3px;
+    }
+    #item-tooltip .tt-actions button:hover { background: rgba(120,90,40,0.7); }
+    #item-tooltip .tt-close {
+      position: absolute; top: 2px; right: 4px;
+      color: #806040; cursor: pointer; font-size: 14px;
+    }
+
+    /* Faction-Panel (Welle 27) */
+    #factions-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #factions-overlay.active { display: flex; }
+    #factions-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #b88858;
+      color: #c8b88a; font-size: 12px; max-height: 80vh;
+      display: flex; flex-direction: column;
+    }
+    #factions-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8b870; font-weight: bold;
+    }
+    #factions-list { padding: 10px 14px; overflow-y: auto; }
+    .faction-row {
+      display: grid; grid-template-columns: 18px 1fr 80px 80px;
+      gap: 8px; padding: 6px 0; align-items: center;
+      border-bottom: 1px dashed #443a20;
+    }
+    .faction-dot { width: 14px; height: 14px; border-radius: 50%; }
+    .faction-name { color: #e8c870; }
+    .faction-bar { width: 80px; height: 8px; background: rgba(0,0,0,0.5); border: 1px solid #555; position: relative; }
+    .faction-bar-fill { position: absolute; top: 0; bottom: 0; }
+    .faction-tier {
+      font-size: 10px; text-align: center; padding: 2px 4px; border-radius: 3px;
+    }
+    .faction-tier.hostile    { background: #802020; color: #ffcccc; }
+    .faction-tier.unfriendly { background: #604030; color: #ffdda0; }
+    .faction-tier.neutral    { background: #404040; color: #c0c0c0; }
+    .faction-tier.friendly   { background: #306030; color: #c0ffc0; }
+    .faction-tier.allied     { background: #2050a0; color: #c0e0ff; }
+
+    /* Status-Effekte (Welle 11) */
+    #status-effects-row {
+      position: fixed; top: 150px; left: 12px; z-index: 11;
+      display: flex; gap: 4px; flex-wrap: wrap;
+      max-width: 220px;
+    }
+    .status-chip {
+      background: rgba(0,0,0,0.55); border: 1px solid #806040;
+      padding: 2px 6px; color: #fff; font-size: 11px; font-family: monospace;
+      border-radius: 8px;
+    }
+    /* Tag/Nacht-Overlay (Welle 7) */
+    #time-tint {
+      position: fixed; inset: 0; z-index: 5; pointer-events: none;
+      transition: background 4s ease-in-out;
+      background: transparent;
+    }
+    #time-display {
+      position: fixed; top: 10px; right: 168px; z-index: 12;
+      background: rgba(0,0,0,0.55); border: 1px solid #806040;
+      padding: 4px 10px; color: #ffeec0; font-family: monospace;
+      font-size: 12px; font-weight: bold;
+    }
+    /* Quest-Panel (Welle 10) */
+    #quests-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #quests-overlay.active { display: flex; }
+    #quests-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 12px; max-height: 84vh;
+      display: flex; flex-direction: column;
+    }
+    #quests-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #quests-list { padding: 8px 14px; overflow-y: auto; }
+    .quest-row {
+      padding: 8px 0; border-bottom: 1px dashed #443a20;
+    }
+    .quest-row.completed { background: rgba(30, 60, 30, 0.25); }
+    .quest-title { color: #e8d870; font-weight: bold; }
+    .quest-desc { font-size: 11px; color: #b09870; margin: 2px 0; }
+    .quest-objective { font-size: 11px; color: #b8b890; }
+    .quest-reward { font-size: 11px; color: #80c0a0; }
+    .quest-claim {
+      background: #205020; border: 1px solid #50a050; color: #fff;
+      cursor: pointer; padding: 3px 8px; border-radius: 3px; margin-top: 3px;
+      font-size: 11px;
+    }
+    .skill-progress-text { position: absolute; inset: 0; text-align: center; color: #fff; font-size: 9px; line-height: 12px; }
+    #hp-bar.damage-flash {
+      animation: hpFlash 0.3s;
+    }
+    @keyframes hpFlash {
+      0%   { box-shadow: 0 0 0 0 rgba(232,80,64,0); }
+      30%  { box-shadow: 0 0 12px 6px rgba(232,80,64,0.8); }
+      100% { box-shadow: 0 0 0 0 rgba(232,80,64,0); }
+    }
+    #screen-damage {
+      position: fixed; inset: 0; z-index: 50;
+      pointer-events: none;
+      box-shadow: inset 0 0 80px 30px rgba(232,40,40,0); opacity: 0;
+      transition: opacity 0.2s, box-shadow 0.2s;
+    }
+    #screen-damage.active {
+      opacity: 1;
+      box-shadow: inset 0 0 80px 30px rgba(232,40,40,0.7);
+    }
+    /* Build-Menu — RimWorld-inspirierte Bottom-Bar mit Kategorie-Tabs */
+    #build-bar {
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(18,16,12,0.96); border: 1px solid #6e5e3a;
+      color: #c8b88a; font-size: 12px;
+      z-index: 60; display: none;
+      width: min(900px, 96vw);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+    /* Welle 51 — Hotbar im Build-Mode aus, sonst überdeckt sie das Menü */
+    body.build-mode-active #hotbar { display: none !important; }
+    #build-bar-tabs {
+      display: flex; flex-wrap: wrap;
+      background: rgba(0,0,0,0.55); border-bottom: 1px solid #6e5e3a;
+    }
+    /* Welle 51 — Sub-Tabs für Schilder & andere Kategorien mit Unterteilungen */
+    #build-bar-subtabs {
+      display: none; flex-wrap: wrap; gap: 2px;
+      padding: 6px 8px; background: rgba(0,0,0,0.42);
+      border-bottom: 1px solid #443524;
+    }
+    #build-bar-subtabs.active { display: flex; }
+    .bb-subtab {
+      background: rgba(30,24,16,0.7); border: 1px solid #4a3a20;
+      color: #9a8c66; padding: 4px 9px; cursor: pointer;
+      font-family: monospace; font-size: 11px; border-radius: 3px;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .bb-subtab:hover { border-color: #c8b88a; color: #d8c89a; background: rgba(60,46,28,0.8); }
+    .bb-subtab.active {
+      background: rgba(140,110,40,0.55); color: #ffe070;
+      border-color: #c8b88a;
+    }
+    .bb-tab {
+      flex: 1 1 auto;
+      background: transparent; border: none; border-right: 1px solid #443524;
+      color: #9a8c66; padding: 8px 10px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      transition: background 0.1s;
+    }
+    .bb-tab:last-child { border-right: none; }
+    .bb-tab:hover { background: rgba(80,60,30,0.4); color: #d8c89a; }
+    .bb-tab.active {
+      background: rgba(120,90,40,0.55); color: #e8d870; font-weight: bold;
+      border-bottom: 2px solid #e8d870;
+    }
+    #build-palette {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+      gap: 4px; padding: 8px;
+      max-height: 220px; overflow-y: auto;
+      background: rgba(0,0,0,0.25);
+    }
+    .palette-btn {
+      background: rgba(40,32,20,0.7); border: 1px solid #555;
+      color: #c8b88a; padding: 6px 4px; cursor: pointer;
+      font-family: monospace; font-size: 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      min-height: 64px; text-align: center;
+      border-radius: 2px;
+    }
+    .palette-btn:hover { border-color: #c8b88a; background: rgba(60,48,28,0.85); }
+    .palette-btn.active {
+      background: rgba(140,110,40,0.6); border-color: #e8d870; color: #fff;
+      box-shadow: 0 0 6px rgba(232,216,112,0.4);
+    }
+    .palette-btn .palette-icon { font-size: 20px; line-height: 1; }
+    /* Welle 51 — Sign-Palette zeigt das echte Schild-Sprite */
+    .palette-btn .palette-img {
+      width: 40px; height: 40px; object-fit: contain;
+      image-rendering: pixelated;
+    }
+    /* Welle 51 — Sign-Inspect-Modal */
+    #sign-inspect-overlay {
+      position: fixed; inset: 0; z-index: 160;
+      background: rgba(0,0,0,0.65);
+      display: none; justify-content: center; align-items: center;
+    }
+    #sign-inspect-overlay.active { display: flex; }
+    #sign-inspect-box {
+      background: rgba(20,16,10,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 0;
+      max-width: 90%; max-height: 92vh; min-width: 280px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 0 24px rgba(0,0,0,0.7);
+    }
+    #sign-inspect-header {
+      padding: 10px 16px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #6a5a3a;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold; font-size: 16px;
+    }
+    #sign-inspect-close {
+      background: #402020; border: 1px solid #a05050; color: #fff;
+      cursor: pointer; padding: 2px 10px; border-radius: 3px;
+      font-family: monospace; font-size: 16px; line-height: 1;
+    }
+    #sign-inspect-body {
+      padding: 14px; display: flex; justify-content: center; align-items: center;
+    }
+    #sign-inspect-img {
+      max-width: 100%; max-height: 70vh; min-width: 256px;
+      image-rendering: auto;
+    }
+    .palette-btn .palette-label {
+      font-size: 10px; line-height: 1.1; max-width: 100%;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .palette-btn .palette-key {
+      position: absolute; top: 2px; right: 4px;
+      color: #e8d870; font-weight: bold; font-size: 9px; opacity: 0.85;
+    }
+    .palette-btn { position: relative; }
+    #build-bar-footer {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.55); border-top: 1px solid #443524;
+      font-size: 11px;
+    }
+    #build-bar-footer label { display: flex; align-items: center; gap: 6px; color: #aaa280; }
+    #build-material-select {
+      background: #1a1410; border: 1px solid #6e5e3a; color: #e8d870;
+      padding: 3px 6px; font-family: monospace; font-size: 11px;
+      cursor: pointer;
+    }
+    .bb-info { color: #aaa280; }
+    .bb-info .bb-val { color: #e8d870; font-weight: bold; }
+    .bb-hint { color: #777; margin-left: auto; font-size: 10px; }
+    @media (max-width: 720px) {
+      #build-bar { width: 98vw; bottom: 0; }
+      .bb-tab { font-size: 10px; padding: 6px 4px; }
+      .bb-hint { display: none; }
+    }
+
+    /* Chronik-Panel — links unten, weg von Vitals/Body-Parts oben */
+    #chronik {
+      position: fixed; left: 12px; bottom: 120px; z-index: 10;
+      width: 280px; max-height: 40vh;
+      background: rgba(0,0,0,0.65); border: 1px solid #555;
+      color: #c8b88a; font-size: 11px;
+      display: flex; flex-direction: column;
+    }
+    #chronik-header {
+      padding: 10px 12px; background: rgba(0,0,0,0.55);
+      border-bottom: 1px solid #555; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      touch-action: manipulation;
+      -webkit-user-select: none; user-select: none;
+      min-height: 32px;
+    }
+    #chronik-header:active { background: rgba(60,60,80,0.7); }
+    #chronik-toggle {
+      color: #e8d870; font-size: 18px; line-height: 1; padding: 0 4px;
+    }
+    #chronik-list {
+      overflow-y: auto; padding: 6px 10px; flex: 1;
+      scrollbar-width: thin;
+    }
+    #chronik-list .ev {
+      margin-bottom: 8px; padding-bottom: 8px;
+      border-bottom: 1px dashed #333;
+    }
+    #chronik-list .ev:last-child { border-bottom: none; }
+    #chronik-list .ev-title { color: #e8d870; font-weight: bold; }
+    #chronik-list .ev-body  { color: #c8b88a; margin-top: 2px; line-height: 1.4; }
+    #chronik-list .ev-meta  { color: #888; font-size: 10px; margin-top: 2px; }
+    #chronik.collapsed #chronik-list { display: none; }
+    @media (max-width: 720px) {
+      #chronik {
+        left: 8px; bottom: 100px; top: auto;
+        width: calc(50vw - 12px); max-width: 240px;
+        max-height: 30vh;
+        font-size: 10px;
+      }
+      #chronik-header { padding: 12px; min-height: 40px; }
+      #chronik-toggle { font-size: 20px; }
+    }
+
+    /* Dialog-Modal */
+    #dialog-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #dialog-overlay.active { display: flex; }
+    #dialog-box {
+      width: 90%; max-width: 540px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 75vh;
+    }
+    #dialog-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    #dialog-npc-name { color: #e8d870; font-weight: bold; }
+    #dialog-npc-kind { color: #aaaa88; font-size: 11px; margin-left: 4px; }
+    #dialog-npc-bg   { color: #888; font-style: italic; font-size: 11px;
+                       padding: 6px 14px; border-bottom: 1px solid #333; }
+    #dialog-close {
+      background: none; border: 1px solid #555; color: #c8b88a;
+      padding: 2px 8px; cursor: pointer; font-family: monospace;
+    }
+    #dialog-close:hover { background: rgba(255,255,255,0.05); }
+    #dialog-history {
+      flex: 1; overflow-y: auto; padding: 10px 14px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #dialog-history .bubble {
+      max-width: 85%; padding: 6px 10px; line-height: 1.4;
+      border-radius: 4px;
+    }
+    #dialog-history .bubble.user {
+      align-self: flex-end; background: rgba(80,80,40,0.5); color: #e8d870;
+    }
+    #dialog-history .bubble.npc {
+      align-self: flex-start; background: rgba(40,40,60,0.5); color: #c8d8e8;
+    }
+    #dialog-history .bubble.typing {
+      color: #888; font-style: italic;
+      animation: typingBlink 1.4s ease-in-out infinite;
+    }
+    @keyframes typingBlink {
+      0%, 100% { opacity: 0.35; }
+      50%      { opacity: 0.95; }
+    }
+    #dialog-input-row {
+      display: flex; gap: 6px;
+      padding: 10px 14px; border-top: 1px solid #555;
+    }
+    #dialog-input {
+      flex: 1; padding: 6px 10px; background: rgba(0,0,0,0.4);
+      border: 1px solid #555; color: #c8b88a; font-family: monospace;
+      font-size: 13px; outline: none;
+    }
+    #dialog-input:focus { border-color: #c8b88a; }
+    #dialog-send {
+      padding: 6px 14px; background: rgba(80,80,40,0.5);
+      border: 1px solid #c8b88a; color: #e8d870;
+      cursor: pointer; font-family: monospace;
+    }
+    #dialog-send:hover { background: rgba(120,120,60,0.5); }
+    #dialog-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Inventar-Modal */
+    #inventory-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.65);
+      display: none; justify-content: center; align-items: center;
+    }
+    #inventory-overlay.active { display: flex; }
+    #inventory-box {
+      width: 96%; max-width: 920px;
+      background: rgba(20,18,14,0.97); border: 1px solid #6e5e3a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 88vh;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.7);
+    }
+    #inventory-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.5);
+      border-bottom: 1px solid #6e5e3a;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #hand-craft-btn {
+      background: rgba(60,90,40,0.5); border: 1px solid #80c060;
+      color: #d0e8a0; padding: 4px 10px; cursor: pointer; margin-right: 6px;
+      font-family: monospace; font-size: 11px;
+    }
+    #hand-craft-btn:hover { background: rgba(80,120,50,0.6); }
+    #inventory-close {
+      background: none; border: 1px solid #555; color: #c8b88a;
+      padding: 3px 10px; cursor: pointer; font-family: monospace;
+    }
+    /* RimWorld-Style: 2-Spalten — links Ausrüstung+Stats, rechts Beutel */
+    #inventory-body {
+      display: grid; grid-template-columns: 280px 1fr;
+      gap: 0;
+      flex: 1; min-height: 0;
+    }
+    #inventory-equip-col {
+      background: rgba(0,0,0,0.25); border-right: 1px solid #443524;
+      padding: 10px 12px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .inv-section-title {
+      color: #aaaa88; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid #443524; padding-bottom: 4px; margin-bottom: 4px;
+    }
+    #inventory-equip-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+    .equip-slot {
+      background: rgba(0,0,0,0.4); border: 1px solid #555;
+      padding: 4px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      min-height: 76px;
+      border-radius: 2px;
+    }
+    .equip-slot:hover { border-color: #c8b88a; background: rgba(60,48,28,0.6); }
+    .equip-slot img { width: 40px; height: 40px; image-rendering: pixelated; object-fit: contain; }
+    .equip-slot .slot-label { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .equip-slot .slot-item  { color: #e8d870; font-size: 10px; text-align: center; line-height: 1.1; }
+    .equip-slot.empty { opacity: 0.55; }
+    .equip-slot.empty .placeholder { font-size: 22px; color: #555; margin: 4px 0; }
+    .equip-slot.rough      { border-color: #888e91; }
+    .equip-slot.fine       { border-color: #4581e0; }
+    .equip-slot.masterwork { border-color: #e7c44b; }
+    .equip-slot.legendary  { border-color: #ee772b; }
+    #inventory-stats {
+      background: rgba(0,0,0,0.4); border: 1px solid #443524;
+      padding: 8px 10px; font-size: 11px;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    #inventory-stats .stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      color: #c8b88a; gap: 6px;
+    }
+    #inventory-stats .stat-row .stat-val { color: #e8d870; font-weight: bold; }
+    #inventory-stats .stat-row .stat-bonus { color: #7aad6a; font-size: 10px; }
+    #inventory-stats .stat-row .alloc-btn {
+      background: rgba(60,90,40,0.5); border: 1px solid #80c060;
+      color: #d0e8a0; font-size: 10px;
+      padding: 0 6px; margin-left: 4px; cursor: pointer;
+      font-family: monospace; line-height: 14px; min-width: 16px;
+    }
+    #inventory-stats .stat-row .alloc-btn:hover { background: rgba(80,120,50,0.7); }
+    #inventory-stats .stat-row .alloc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #inventory-stats .stat-row .alloc-btn.minus {
+      background: rgba(100,40,40,0.4); border-color: #c08080; color: #f0a0a0;
+    }
+    .stat-section-title {
+      color: #aaaa88; font-size: 10px; margin-top: 8px; margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px dotted #443524; padding-bottom: 2px;
+    }
+    .unspent-banner {
+      background: rgba(120,90,30,0.4); border: 1px solid #c8a868;
+      color: #f0d870; padding: 6px 8px; font-size: 11px; font-weight: bold;
+      text-align: center; margin-bottom: 4px;
+    }
+    .resist-row {
+      display: flex; justify-content: space-between; align-items: center;
+      color: #c8b88a; padding: 2px 0;
+    }
+    .resist-val.pos { color: #7aad6a; font-weight: bold; }
+    .resist-val.neg { color: #e85040; font-weight: bold; }
+    .resist-val.zero { color: #666; }
+    #inventory-bag-col {
+      padding: 10px 14px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    #inventory-list {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+      gap: 4px;
+      flex: 1; align-content: start;
+    }
+    .inv-slot {
+      position: relative; aspect-ratio: 1;
+      background: rgba(40,32,20,0.7); border: 2px solid #6a5a3a;
+      border-radius: 4px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .inv-slot:hover { border-color: #c8b88a; background: rgba(60,48,28,0.8); }
+    .inv-slot img { width: 80%; height: 80%; object-fit: contain; image-rendering: pixelated; }
+    /* Drag-and-Drop visual feedback */
+    .inv-slot.drag-over, .hotbar-slot.drag-over {
+      background: rgba(120,200,80,0.35) !important;
+      border-color: #80c080 !important;
+    }
+    .inv-slot[draggable="true"], .hotbar-slot[draggable="true"] { cursor: grab; }
+    .inv-slot[draggable="true"]:active, .hotbar-slot[draggable="true"]:active { cursor: grabbing; }
+    .inv-slot-count {
+      position: absolute; bottom: 2px; right: 4px;
+      color: #fff; font-size: 11px; font-weight: bold; font-family: monospace;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .inv-slot-quality {
+      position: absolute; top: 2px; left: 3px; font-size: 10px;
+      text-shadow: 1px 1px 1px #000;
+    }
+    .inv-slot-empty { opacity: 0.3; pointer-events: none; }
+    /* Rarity-Border-Farben — synchron mit assets/.../rarity_weapon_manifest.json */
+    .inv-slot.rough      { border-color: #888e91; }  /* poor */
+    /* normal/common = #4fab58 (Standard-Border bleibt) */
+    .inv-slot.fine       { border-color: #4581e0; }  /* rare = blau */
+    .inv-slot.masterwork { border-color: #e7c44b; }  /* very_rare = gelb */
+    .inv-slot.legendary  { border-color: #ee772b; }  /* legendary = orange */
+    .item-cat { color: #888; font-size: 10px; margin-right: 8px; text-transform: uppercase; }
+    .item-actions { display: flex; gap: 4px; }
+    .item-actions button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 3px 8px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+    }
+    .item-actions button:hover { background: rgba(120,120,60,0.6); }
+    .inv-empty { color: #666; font-style: italic; padding: 10px; text-align: center; }
+
+    /* Trade-Modal — analog zu Chest */
+    #trade-overlay {
+      position: fixed; inset: 0; z-index: 160;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #trade-overlay.active { display: flex; }
+    #trade-box {
+      width: 90%; max-width: 720px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    #trade-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #trade-coins { color: #ffd060; }
+    #trade-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding: 10px 14px; flex: 1; overflow-y: auto;
+    }
+    #trade-cols .col-title { color: #aaaa88; font-size: 11px;
+      text-transform: uppercase; margin-bottom: 6px; }
+    /* Welle 38: Händler-Card-Layout */
+    .trade-col {
+      display: flex; flex-direction: column; gap: 4px;
+      background: rgba(0,0,0,0.25); border: 1px solid #4a3a20;
+      border-radius: 4px; padding: 8px;
+    }
+    .trade-row {
+      display: grid; grid-template-columns: 32px 1fr auto auto;
+      align-items: center; gap: 8px;
+      padding: 4px 6px; border-radius: 3px;
+      background: rgba(30,24,16,0.5);
+    }
+    .trade-row:hover { background: rgba(50,40,24,0.7); }
+    .trade-row img { width: 28px; height: 28px; image-rendering: pixelated; object-fit: contain; }
+    .trade-row .name { font-size: 12px; color: #c8b88a; }
+    .trade-row .qty { font-size: 10px; color: #aaaa88; }
+    .trade-row .price { color: #ffd060; font-size: 11px; font-weight: bold; }
+    .trade-row button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 3px 10px; cursor: pointer;
+      font-family: monospace; font-size: 11px; border-radius: 3px;
+    }
+    .trade-row button:hover { background: rgba(120,90,40,0.7); }
+    .trade-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .trade-row.unaffordable { opacity: 0.55; }
+
+    /* Chest- + Crafting-Modal */
+    #chest-overlay, #crafting-overlay {
+      position: fixed; inset: 0; z-index: 160;
+      background: rgba(0,0,0,0.55);
+      display: none; justify-content: center; align-items: center;
+    }
+    #chest-overlay.active, #crafting-overlay.active { display: flex; }
+    #chest-box, #crafting-box {
+      width: 90%; max-width: 720px;
+      background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+      color: #c8b88a; font-size: 13px;
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    #chest-header, #crafting-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #e8d870; font-weight: bold;
+    }
+    #chest-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding: 10px 14px; flex: 1; overflow-y: auto;
+    }
+    #chest-cols .col-title { color: #aaaa88; font-size: 11px;
+      text-transform: uppercase; margin-bottom: 6px; }
+    .chest-item-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px; border-bottom: 1px dashed #333;
+    }
+    .chest-item-row img { width: 24px; height: 24px; image-rendering: pixelated; }
+    .chest-item-row .name { flex: 1; }
+    .chest-item-row button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 2px 8px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+    }
+    #crafting-recipes { overflow-y: auto; padding: 10px 14px; max-height: 50vh; }
+    #crafting-bills-section { padding: 6px 14px 4px; border-bottom: 1px solid #4a3a20; max-height: 20vh; overflow-y: auto; background: rgba(40,20,8,0.4); }
+    #crafting-bills-header { font-size: 11px; color: #cfa060; margin-bottom: 4px; }
+    .bill-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 11px; }
+    .bill-row .bill-name { flex: 1; color: #e8d8a0; }
+    .bill-row .bill-progress { color: #a0c8a0; min-width: 60px; text-align: right; }
+    .bill-row .bill-status { font-size: 10px; min-width: 70px; text-align: center; }
+    .bill-row .bill-status.blocked { color: #d04040; }
+    .bill-row .bill-status.active  { color: #80c080; }
+    .bill-row .bill-remove { background: #602020; border: 1px solid #a04040; color: #fff; cursor: pointer; padding: 1px 6px; border-radius: 3px; }
+    .recipe-controls { display: flex; gap: 4px; align-items: center; }
+    .recipe-controls button { padding: 3px 7px; font-size: 10px; }
+    .recipe-controls .bill-btn { background: #303058; border: 1px solid #5a5aa0; color: #fff; cursor: pointer; border-radius: 3px; }
+    /* Welle 37: Crafting-UI als Card-Grid */
+    #crafting-recipes {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 8px;
+    }
+    .recipe-row {
+      padding: 8px; background: rgba(30,24,16,0.7);
+      border: 1px solid #6a5a3a; border-radius: 4px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .recipe-row.craftable { border-color: #c8b88a; }
+    .recipe-row.craftable:hover { background: rgba(50,40,24,0.9); }
+    /* Welle 22: gelocked Rezepte (Research fehlt) ausgegraut */
+    .recipe-row.research-locked {
+      opacity: 0.45;
+      background: rgba(20,16,10,0.5);
+      border-color: #4a3a2a;
+    }
+    .recipe-row.research-locked .recipe-name::before { content: "🔒 "; }
+    .recipe-row.research-locked button { opacity: 0.5; cursor: not-allowed !important; }
+    .recipe-icon {
+      width: 48px; height: 48px;
+      background: rgba(0,0,0,0.4); border: 1px solid #555;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .recipe-icon img { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; }
+    .recipe-info { flex: 1; min-width: 0; }
+    .recipe-name { color: #e8d870; font-weight: bold; font-size: 12px; }
+    .recipe-ingredients {
+      font-size: 11px; margin-top: 3px; display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .ingredient-chip {
+      display: inline-flex; align-items: center; gap: 2px;
+      padding: 1px 4px; border-radius: 3px; background: rgba(0,0,0,0.4);
+    }
+    .ingredient-chip img { width: 14px; height: 14px; image-rendering: pixelated; }
+    .ingredient-chip.ok { color: #7aad6a; border: 1px solid #4a7a4a; }
+    .ingredient-chip.missing { color: #b85a5a; border: 1px solid #7a4040; }
+    .recipe-row button {
+      background: rgba(80,80,40,0.5); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 4px 10px; cursor: pointer;
+      font-family: monospace; font-size: 11px;
+    }
+    .recipe-row button:disabled {
+      opacity: 0.4; cursor: not-allowed; background: rgba(60,60,40,0.3);
+    }
+    /* Welle 50: Kategorie-Tabs im Crafting-Overlay */
+    .crafting-tabs {
+      grid-column: 1 / -1;
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding-bottom: 6px; border-bottom: 1px solid #4a3a20; margin-bottom: 4px;
+      position: sticky; top: 0; background: rgba(20,14,8,0.95); z-index: 2;
+    }
+    .crafting-tab {
+      background: rgba(40,30,20,0.6); border: 1px solid #6a5a3a;
+      color: #c8b88a; padding: 4px 9px; cursor: pointer;
+      font-family: monospace; font-size: 11px; border-radius: 3px;
+    }
+    .crafting-tab:hover { background: rgba(60,46,28,0.9); }
+    .crafting-tab.active {
+      background: rgba(200,184,138,0.18); color: #ffe070;
+      border-color: #c8b88a;
+    }
+    .crafting-subcat {
+      grid-column: 1 / -1;
+      color: #cfa060; font-size: 11px; font-weight: bold;
+      padding: 4px 0 2px; border-bottom: 1px dashed #4a3a20; margin-top: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* Story-Toast: groß, mittig, für KI-Events */
+    .story-toast {
+      position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+      background: rgba(10,10,15,0.92); border: 1px solid #c8b88a;
+      color: #c8b88a; padding: 12px 20px; max-width: 480px;
+      z-index: 100; font-size: 13px; line-height: 1.5;
+      animation: storyFade 10s forwards;
+    }
+    .story-toast .st-title { color: #e8d870; font-weight: bold; margin-bottom: 4px; }
+    @keyframes storyFade {
+      0%   { opacity: 0; transform: translate(-50%, -10px); }
+      8%   { opacity: 1; transform: translate(-50%, 0); }
+      85%  { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -10px); }
+    }
+
+    /* ───── Mobile (Phone-Portrait) Anpassungen ───── */
+    @media (max-width: 720px) {
+      /* UI links oben kleiner, kompakt */
+      #ui { font-size: 11px; top: 8px; left: 8px; }
+      #status { font-size: 10px; top: 8px; right: 8px; }
+      /* Vitals-Bars schmaler */
+      #hp-bar, #mana-bar, #hunger-bar, #thirst-bar, #stamina-bar {
+        width: 200px !important; left: 8px !important; height: 22px !important;
+      }
+      #hp-bar      { top: 32px !important; }
+      #mana-bar    { top: 60px !important; }
+      #hunger-bar  { top: 88px !important; }
+      #thirst-bar  { top: 116px !important; }
+      #stamina-bar { top: 144px !important; }
+      #hp-text, #mana-text, #hunger-text, #thirst-text, #stamina-text {
+        font-size: 14px !important; line-height: 22px !important;
+      }
+      /* Body-Parts auf Mobile: oben rechts, kompakter */
+      #body-parts {
+        top: 60px !important; right: 8px !important; left: auto !important;
+        width: 140px !important; padding: 4px !important; gap: 2px !important;
+      }
+      #body-parts .bp-row { height: 13px !important; }
+      #body-parts .bp-label { font-size: 9px !important; line-height: 13px !important; }
+      /* Minimap kleiner auf Mobile (Desktop default 320×220) */
+      #minimap {
+        width: 140px !important; height: 96px !important;
+        bottom: 8px !important; right: 8px !important;
+      }
+      /* Overlays füllen Screen */
+      #skills-box, #research-box, #talents-box,
+      #inventory-box, #quests-box, #factions-box,
+      #chest-box, #trade-box, #npc-dialog {
+        width: 96vw !important; max-width: 96vw !important;
+        max-height: 86vh !important;
+      }
+      /* Logout/Admin Links nach unten links damit sie nicht mit Minimap kollidieren */
+      /* (admin/logout werden per JS angehängt, position rechts oben – passt aber gerade bei kleinen Screens) */
+    }
+    /* Touch-Optimierung: keine Hover-Effekte erzwingen, Tap-Highlight aus */
+    @media (hover: none) {
+      * { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+    }
+    /* Pull-to-refresh aus, damit Touch-Scroll im Game nicht den Browser triggert */
+    html, body { overscroll-behavior: none; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TIERED-EVENT-STYLING (Welle 20) — Chronik + Story-Toast
+       Höhere Tiers werden visuell prominenter.
+       ════════════════════════════════════════════════════════════════════════ */
+    .ev-tier-atmosphere .ev-title { color: #a0c0e0; }
+    .ev-tier-encounter  .ev-title { color: #c0e090; }
+    .ev-tier-catastrophe .ev-title {
+      color: #f0a050; font-weight: bold;
+      text-shadow: 0 0 4px rgba(240,160,80,0.4);
+    }
+    .ev-tier-boss .ev-title {
+      color: #ff4060; font-weight: bold; font-size: 1.05em;
+      text-shadow: 0 0 6px rgba(255,80,100,0.55);
+    }
+    .ev-tier-boss { border-left: 3px solid #ff4060; padding-left: 6px; }
+    .ev-tier-cataclysm .ev-title {
+      color: #d060ff; font-weight: bold; font-size: 1.1em;
+      text-shadow: 0 0 8px rgba(208,96,255,0.7);
+    }
+    .ev-tier-cataclysm {
+      border-left: 3px solid #d060ff; padding-left: 6px;
+      background: rgba(80,30,120,0.12);
+    }
+    /* Story-Toast (Popup oben rechts/mitte) — Boss/Cataclysm bekommen Glow */
+    .story-toast.ev-tier-boss {
+      border: 2px solid #ff4060;
+      box-shadow: 0 0 18px rgba(255,80,100,0.7), 0 4px 16px rgba(0,0,0,0.6);
+      background: linear-gradient(180deg, rgba(60,10,20,0.95), rgba(20,5,10,0.95));
+    }
+    .story-toast.ev-tier-boss .st-title { color: #ff6080; font-size: 17px; }
+    .story-toast.ev-tier-cataclysm {
+      border: 2px solid #d060ff;
+      box-shadow: 0 0 24px rgba(208,96,255,0.8), 0 4px 20px rgba(0,0,0,0.7);
+      background: linear-gradient(180deg, rgba(60,20,80,0.97), rgba(20,5,30,0.97));
+      animation: cataclysm-pulse 2s ease-in-out infinite;
+    }
+    .story-toast.ev-tier-cataclysm .st-title { color: #e080ff; font-size: 18px; }
+    @keyframes cataclysm-pulse {
+      0%,100% { box-shadow: 0 0 24px rgba(208,96,255,0.6), 0 4px 20px rgba(0,0,0,0.7); }
+      50%     { box-shadow: 0 0 40px rgba(208,96,255,1.0), 0 4px 20px rgba(0,0,0,0.7); }
+    }
+    .story-toast.ev-tier-catastrophe {
+      border: 1px solid #f0a050;
+      box-shadow: 0 0 12px rgba(240,160,80,0.5);
+    }
+    .story-toast.ev-tier-catastrophe .st-title { color: #ffb060; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TOP-RIGHT-STACK (Welle 18, 2026-05-26h) — aufgeräumte Ecke oben rechts
+       Admin/Logout als Buttons in einer Reihe, dann Status, dann Body-Parts.
+       Vorher: jedes Element hatte hardcoded x-Offsets, nach Font-Bump überlappte alles.
+       ════════════════════════════════════════════════════════════════════════ */
+    .top-right-link {
+      position: fixed; top: 10px; z-index: 100;
+      color: #c8b88a; background: rgba(0,0,0,0.55);
+      border: 1px solid #6e5e3a;
+      padding: 4px 10px; text-decoration: none;
+      font-size: 14px !important; font-family: monospace;
+      text-shadow: 1px 1px 2px #000;
+      border-radius: 3px;
+    }
+    .top-right-link:hover { border-color: #c8b88a; background: rgba(40,30,15,0.75); }
+    #top-link-logout { right: 12px; }
+    #top-link-admin  { right: 108px; }   /* links von Logout */
+    .chat-mini {
+      position: fixed !important; top: 10px !important;
+      right: 204px !important;       /* links von Admin */
+      z-index: 200;
+      background: rgba(0,0,0,0.55) !important; border: 1px solid #6e5e3a !important;
+      padding: 4px 10px !important;
+      font-size: 14px !important;
+    }
+    /* Status (Online-Count + Tageszeit) eine Zeile UNTER Admin/Logout */
+    #status { top: 48px !important; right: 12px !important; }
+    /* Body-Parts weiter nach unten, damit kein Overlap mit Status */
+    #body-parts { top: 90px !important; right: 12px !important; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       FONT-SIZE-BUMP (Welle 18, vergrößert) — global noch besser lesbar
+       Vorher 13-15px war noch zu klein laut User. Bumpt jetzt auf 14-18px.
+       ════════════════════════════════════════════════════════════════════════ */
+    /* HUD oben links/rechts */
+    #ui      { font-size: 18px !important; }
+    #status  { font-size: 15px !important; }
+    /* Vitals-Bars-Text — synchron mit den vergrößerten 24px-Bars (Welle 18) */
+    #hp-text, #mana-text, #hunger-text, #thirst-text, #stamina-text {
+      font-size: 15px !important; line-height: 24px !important;
+    }
+    /* Body-Parts-Labels */
+    #body-parts .bp-label  { font-size: 14px !important; line-height: 18px !important; }
+    /* Chronik */
+    #chronik              { font-size: 15px !important; }
+    #chronik-list .ev-title { font-size: 15px !important; }
+    #chronik-list .ev-body  { font-size: 14px !important; }
+    #chronik-list .ev-meta  { font-size: 12px !important; }
+    /* Tooltip */
+    #item-tooltip          { font-size: 15px !important; padding: 12px 14px !important; }
+    .tt-name               { font-size: 18px !important; }
+    .tt-quality            { font-size: 13px !important; }
+    .tt-desc               { font-size: 14px !important; }
+    .tt-stats              { font-size: 15px !important; }
+    .tt-affix              { font-size: 14px !important; }
+    .tt-flavor             { font-size: 12px !important; }
+    /* Inventar */
+    #inventory-box         { font-size: 16px !important; }
+    #inventory-header      { font-size: 17px !important; }
+    .inv-section-title     { font-size: 13px !important; }
+    .equip-slot .slot-label{ font-size: 13px !important; }
+    .equip-slot .slot-item { font-size: 14px !important; }
+    #inventory-stats       { font-size: 15px !important; }
+    .stat-section-title    { font-size: 13px !important; }
+    /* Build-Bar */
+    .bb-tab                { font-size: 14px !important; }
+    .palette-btn .palette-label { font-size: 13px !important; }
+    .palette-btn .palette-icon  { font-size: 26px !important; }
+    #build-bar-footer      { font-size: 14px !important; }
+    /* Skills / Talents / Research / Quests / Factions / Attributes Overlays */
+    #skills-box, #talents-box, #research-box, #quests-box,
+    #factions-box, #attributes-box { font-size: 16px !important; }
+    .skill-icon, .talent-icon, .research-icon { font-size: 28px !important; }
+    .skill-desc, .talent-desc, .research-desc { font-size: 14px !important; }
+    .attr-desc             { font-size: 14px !important; }
+    .attr-value            { font-size: 18px !important; }
+    /* Chat */
+    #chat-console          { font-size: 16px !important; }
+    .chat-msg              { font-size: 15px !important; }
+    /* Touch-Buttons (Mobile) */
+    .touch-btn             { font-size: 28px !important; }
+    /* Trade / Chest / Crafting */
+    #trade-box, #chest-box, #crafting-box { font-size: 16px !important; }
+    /* Toast-Notifications (Event-Popups) */
+    .event-toast, #event-toasts { font-size: 16px !important; }
+    /* Inv-Slot Count + Quality-Badges */
+    .inv-slot-count, .inv-slot-quality { font-size: 13px !important; }
