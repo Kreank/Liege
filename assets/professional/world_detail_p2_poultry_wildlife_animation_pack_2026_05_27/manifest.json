@@ -1,0 +1,223 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p2_poultry_wildlife_animations",
+  "count": 24,
+  "items": [
+    {
+      "id": "chicken_hen_south",
+      "animal": "chicken_hen",
+      "direction": "south",
+      "folder": "assets/animations/animals/chicken_hen/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/chicken_hen/chicken_hen_south.png"
+    },
+    {
+      "id": "chicken_hen_east",
+      "animal": "chicken_hen",
+      "direction": "east",
+      "folder": "assets/animations/animals/chicken_hen/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/chicken_hen/chicken_hen_east.png"
+    },
+    {
+      "id": "chicken_hen_north",
+      "animal": "chicken_hen",
+      "direction": "north",
+      "folder": "assets/animations/animals/chicken_hen/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/chicken_hen/chicken_hen_north.png"
+    },
+    {
+      "id": "chicken_hen_west",
+      "animal": "chicken_hen",
+      "direction": "west",
+      "folder": "assets/animations/animals/chicken_hen/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/chicken_hen/chicken_hen_west.png"
+    },
+    {
+      "id": "rooster_south",
+      "animal": "rooster",
+      "direction": "south",
+      "folder": "assets/animations/animals/rooster/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rooster/rooster_south.png"
+    },
+    {
+      "id": "rooster_east",
+      "animal": "rooster",
+      "direction": "east",
+      "folder": "assets/animations/animals/rooster/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rooster/rooster_east.png"
+    },
+    {
+      "id": "rooster_north",
+      "animal": "rooster",
+      "direction": "north",
+      "folder": "assets/animations/animals/rooster/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rooster/rooster_north.png"
+    },
+    {
+      "id": "rooster_west",
+      "animal": "rooster",
+      "direction": "west",
+      "folder": "assets/animations/animals/rooster/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rooster/rooster_west.png"
+    },
+    {
+      "id": "duck_south",
+      "animal": "duck",
+      "direction": "south",
+      "folder": "assets/animations/animals/duck/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/duck/duck_south.png"
+    },
+    {
+      "id": "duck_east",
+      "animal": "duck",
+      "direction": "east",
+      "folder": "assets/animations/animals/duck/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/duck/duck_east.png"
+    },
+    {
+      "id": "duck_north",
+      "animal": "duck",
+      "direction": "north",
+      "folder": "assets/animations/animals/duck/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/duck/duck_north.png"
+    },
+    {
+      "id": "duck_west",
+      "animal": "duck",
+      "direction": "west",
+      "folder": "assets/animations/animals/duck/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/duck/duck_west.png"
+    },
+    {
+      "id": "goose_south",
+      "animal": "goose",
+      "direction": "south",
+      "folder": "assets/animations/animals/goose/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goose/goose_south.png"
+    },
+    {
+      "id": "goose_east",
+      "animal": "goose",
+      "direction": "east",
+      "folder": "assets/animations/animals/goose/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goose/goose_east.png"
+    },
+    {
+      "id": "goose_north",
+      "animal": "goose",
+      "direction": "north",
+      "folder": "assets/animations/animals/goose/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goose/goose_north.png"
+    },
+    {
+      "id": "goose_west",
+      "animal": "goose",
+      "direction": "west",
+      "folder": "assets/animations/animals/goose/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/goose/goose_west.png"
+    },
+    {
+      "id": "rabbit_south",
+      "animal": "rabbit",
+      "direction": "south",
+      "folder": "assets/animations/animals/rabbit/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rabbit/rabbit_south.png"
+    },
+    {
+      "id": "rabbit_east",
+      "animal": "rabbit",
+      "direction": "east",
+      "folder": "assets/animations/animals/rabbit/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rabbit/rabbit_east.png"
+    },
+    {
+      "id": "rabbit_north",
+      "animal": "rabbit",
+      "direction": "north",
+      "folder": "assets/animations/animals/rabbit/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rabbit/rabbit_north.png"
+    },
+    {
+      "id": "rabbit_west",
+      "animal": "rabbit",
+      "direction": "west",
+      "folder": "assets/animations/animals/rabbit/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/rabbit/rabbit_west.png"
+    },
+    {
+      "id": "fox_south",
+      "animal": "fox",
+      "direction": "south",
+      "folder": "assets/animations/animals/fox/south",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/fox/fox_south.png"
+    },
+    {
+      "id": "fox_east",
+      "animal": "fox",
+      "direction": "east",
+      "folder": "assets/animations/animals/fox/east",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/fox/fox_east.png"
+    },
+    {
+      "id": "fox_north",
+      "animal": "fox",
+      "direction": "north",
+      "folder": "assets/animations/animals/fox/north",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/fox/fox_north.png"
+    },
+    {
+      "id": "fox_west",
+      "animal": "fox",
+      "direction": "west",
+      "folder": "assets/animations/animals/fox/west",
+      "walk_frames": 4,
+      "idle_frames": 2,
+      "source": "assets/animals/directions/fox/fox_west.png"
+    }
+  ]
+}

@@ -1,0 +1,319 @@
+{
+  "generated": "2026-05-27",
+  "asset_type": "world_detail_p2_poultry_wildlife_directional",
+  "count": 24,
+  "items": [
+    {
+      "id": "chicken_hen_south",
+      "base": "chicken_hen",
+      "direction": "south",
+      "category": "poultry",
+      "path": "assets/animals/directions/chicken_hen/chicken_hen_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "chicken_hen_east",
+      "base": "chicken_hen",
+      "direction": "east",
+      "category": "poultry",
+      "path": "assets/animals/directions/chicken_hen/chicken_hen_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "chicken_hen_north",
+      "base": "chicken_hen",
+      "direction": "north",
+      "category": "poultry",
+      "path": "assets/animals/directions/chicken_hen/chicken_hen_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "chicken_hen_west",
+      "base": "chicken_hen",
+      "direction": "west",
+      "category": "poultry",
+      "path": "assets/animals/directions/chicken_hen/chicken_hen_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rooster_south",
+      "base": "rooster",
+      "direction": "south",
+      "category": "poultry",
+      "path": "assets/animals/directions/rooster/rooster_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rooster_east",
+      "base": "rooster",
+      "direction": "east",
+      "category": "poultry",
+      "path": "assets/animals/directions/rooster/rooster_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rooster_north",
+      "base": "rooster",
+      "direction": "north",
+      "category": "poultry",
+      "path": "assets/animals/directions/rooster/rooster_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rooster_west",
+      "base": "rooster",
+      "direction": "west",
+      "category": "poultry",
+      "path": "assets/animals/directions/rooster/rooster_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck_south",
+      "base": "duck",
+      "direction": "south",
+      "category": "poultry",
+      "path": "assets/animals/directions/duck/duck_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck_east",
+      "base": "duck",
+      "direction": "east",
+      "category": "poultry",
+      "path": "assets/animals/directions/duck/duck_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck_north",
+      "base": "duck",
+      "direction": "north",
+      "category": "poultry",
+      "path": "assets/animals/directions/duck/duck_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "duck_west",
+      "base": "duck",
+      "direction": "west",
+      "category": "poultry",
+      "path": "assets/animals/directions/duck/duck_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose_south",
+      "base": "goose",
+      "direction": "south",
+      "category": "poultry",
+      "path": "assets/animals/directions/goose/goose_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose_east",
+      "base": "goose",
+      "direction": "east",
+      "category": "poultry",
+      "path": "assets/animals/directions/goose/goose_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose_north",
+      "base": "goose",
+      "direction": "north",
+      "category": "poultry",
+      "path": "assets/animals/directions/goose/goose_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "goose_west",
+      "base": "goose",
+      "direction": "west",
+      "category": "poultry",
+      "path": "assets/animals/directions/goose/goose_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rabbit_south",
+      "base": "rabbit",
+      "direction": "south",
+      "category": "wildlife",
+      "path": "assets/animals/directions/rabbit/rabbit_south.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rabbit_east",
+      "base": "rabbit",
+      "direction": "east",
+      "category": "wildlife",
+      "path": "assets/animals/directions/rabbit/rabbit_east.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rabbit_north",
+      "base": "rabbit",
+      "direction": "north",
+      "category": "wildlife",
+      "path": "assets/animals/directions/rabbit/rabbit_north.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "rabbit_west",
+      "base": "rabbit",
+      "direction": "west",
+      "category": "wildlife",
+      "path": "assets/animals/directions/rabbit/rabbit_west.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "fox_south",
+      "base": "fox",
+      "direction": "south",
+      "category": "wildlife",
+      "path": "assets/animals/directions/fox/fox_south.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "fox_east",
+      "base": "fox",
+      "direction": "east",
+      "category": "wildlife",
+      "path": "assets/animals/directions/fox/fox_east.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "fox_north",
+      "base": "fox",
+      "direction": "north",
+      "category": "wildlife",
+      "path": "assets/animals/directions/fox/fox_north.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    },
+    {
+      "id": "fox_west",
+      "base": "fox",
+      "direction": "west",
+      "category": "wildlife",
+      "path": "assets/animals/directions/fox/fox_west.png",
+      "size": [
+        96,
+        96
+      ],
+      "source_sheet": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/source_sheets/poultry_wildlife_directions_source.png",
+      "ok": true
+    }
+  ]
+}

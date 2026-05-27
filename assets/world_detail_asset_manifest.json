@@ -3,9 +3,9 @@
   "asset_type": "world_detail_asset_index",
   "root": "assets",
   "summary": {
-    "manifest_items": 260,
-    "png_files_referenced": 540,
-    "packs": 7
+    "manifest_items": 308,
+    "png_files_referenced": 756,
+    "packs": 9
   },
   "packs": [
     {
@@ -49,11 +49,24 @@
       "asset_type": "world_detail_p2_transport_animations",
       "items": 16,
       "pngs": 128
+    },
+    {
+      "manifest": "assets/professional/world_detail_p2_poultry_wildlife_directional_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p2_poultry_wildlife_directional",
+      "items": 24,
+      "pngs": 24
+    },
+    {
+      "manifest": "assets/professional/world_detail_p2_poultry_wildlife_animation_pack_2026_05_27/manifest.json",
+      "asset_type": "world_detail_p2_poultry_wildlife_animations",
+      "items": 24,
+      "pngs": 192
     }
   ],
   "frontend_integration": {
     "build_category": "farm_world",
     "structure_texture_keys": "direct basename keys for generated sign/transport/farm props",
+    "animal_animation_keys": "animal_<kind>_<dir> plus idle/walk frames for livestock, poultry, rabbit, fox",
     "file": "frontend/app.js"
   },
   "backend_integration": {
@@ -64,6 +77,15 @@
       "FARM_STRUCTURE_TYPES",
       "FARM_PROP_TYPES"
     ],
-    "file": "backend/structures.py"
+    "animal_systems": [
+      "DOMESTIC_ANIMAL_KINDS",
+      "DOMESTIC_ANIMAL_SPAWN_PROFILE",
+      "animal_worker.PRODUCT_RULES"
+    ],
+    "files": [
+      "backend/structures.py",
+      "backend/npc_worker.py",
+      "backend/animal_worker.py"
+    ]
   }
 }
