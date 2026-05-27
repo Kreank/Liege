@@ -224,26 +224,6 @@
       }
     },
     {
-      "slug": "nft_project_plants_assets_jessica_ribeiro",
-      "category": "nature",
-      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/NFT Project - Plants Assets - Jéssica Ribeiro.jpeg",
-      "source_name": "NFT Project - Plants Assets - Jéssica Ribeiro.jpeg",
-      "quality_metrics": {
-        "coverage": 0.4035,
-        "strong_coverage": 0.4035,
-        "bbox": [
-          246,
-          430
-        ]
-      },
-      "files": {
-        "512": "assets/props/nature/professional/from_neu/masters_512/nft_project_plants_assets_jessica_ribeiro.png",
-        "256": "assets/props/nature/professional/from_neu/icons_256/nft_project_plants_assets_jessica_ribeiro.png",
-        "128": "assets/props/nature/professional/from_neu/icons_128/nft_project_plants_assets_jessica_ribeiro.png",
-        "64": "assets/props/nature/professional/from_neu/icons_64/nft_project_plants_assets_jessica_ribeiro.png"
-      }
-    },
-    {
       "slug": "professional_floral_brushes_including_many_f",
       "category": "nature",
       "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/🌸 Professional floral brushes including many FREE….jpeg",

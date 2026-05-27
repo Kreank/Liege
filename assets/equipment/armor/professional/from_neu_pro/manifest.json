@@ -64,54 +64,6 @@
       }
     },
     {
-      "slug": "plate_mail_cavalier_set_homm5_concept_art_01",
-      "category": "armor",
-      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "files": {
-        "512": "assets/equipment/armor/professional/from_neu_pro/masters_512/plate_mail_cavalier_set_homm5_concept_art_01.png",
-        "256": "assets/equipment/armor/professional/from_neu_pro/icons_256/plate_mail_cavalier_set_homm5_concept_art_01.png",
-        "128": "assets/equipment/armor/professional/from_neu_pro/icons_128/plate_mail_cavalier_set_homm5_concept_art_01.png",
-        "64": "assets/equipment/armor/professional/from_neu_pro/icons_64/plate_mail_cavalier_set_homm5_concept_art_01.png"
-      }
-    },
-    {
-      "slug": "plate_mail_cavalier_set_homm5_concept_art_02",
-      "category": "armor",
-      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "files": {
-        "512": "assets/equipment/armor/professional/from_neu_pro/masters_512/plate_mail_cavalier_set_homm5_concept_art_02.png",
-        "256": "assets/equipment/armor/professional/from_neu_pro/icons_256/plate_mail_cavalier_set_homm5_concept_art_02.png",
-        "128": "assets/equipment/armor/professional/from_neu_pro/icons_128/plate_mail_cavalier_set_homm5_concept_art_02.png",
-        "64": "assets/equipment/armor/professional/from_neu_pro/icons_64/plate_mail_cavalier_set_homm5_concept_art_02.png"
-      }
-    },
-    {
-      "slug": "plate_mail_cavalier_set_homm5_concept_art_03",
-      "category": "armor",
-      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "files": {
-        "512": "assets/equipment/armor/professional/from_neu_pro/masters_512/plate_mail_cavalier_set_homm5_concept_art_03.png",
-        "256": "assets/equipment/armor/professional/from_neu_pro/icons_256/plate_mail_cavalier_set_homm5_concept_art_03.png",
-        "128": "assets/equipment/armor/professional/from_neu_pro/icons_128/plate_mail_cavalier_set_homm5_concept_art_03.png",
-        "64": "assets/equipment/armor/professional/from_neu_pro/icons_64/plate_mail_cavalier_set_homm5_concept_art_03.png"
-      }
-    },
-    {
-      "slug": "plate_mail_cavalier_set_homm5_concept_art_04",
-      "category": "armor",
-      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "source_name": "Plate Mail • 🐎 • cavalier set • homm5 • concept art.jpeg",
-      "files": {
-        "512": "assets/equipment/armor/professional/from_neu_pro/masters_512/plate_mail_cavalier_set_homm5_concept_art_04.png",
-        "256": "assets/equipment/armor/professional/from_neu_pro/icons_256/plate_mail_cavalier_set_homm5_concept_art_04.png",
-        "128": "assets/equipment/armor/professional/from_neu_pro/icons_128/plate_mail_cavalier_set_homm5_concept_art_04.png",
-        "64": "assets/equipment/armor/professional/from_neu_pro/icons_64/plate_mail_cavalier_set_homm5_concept_art_04.png"
-      }
-    },
-    {
       "slug": "spiked_crown_horned_demon_set_hom_m5_01",
       "category": "armor",
       "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Spiked Crown 👹 Horned Demon Set (HoM&M5).jpeg",

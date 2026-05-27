@@ -64,26 +64,6 @@
       }
     },
     {
-      "slug": "insignias_de_roblox_png_dibujos_insignia_her_01",
-      "category": "jewelry",
-      "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/Insignias De Roblox PNG ,dibujos  Insignia, Hermosa Insignia, Insignia Dorada PNG Imagen para Descarga Gratuita _ Pngtree.jpeg",
-      "source_name": "Insignias De Roblox PNG ,dibujos  Insignia, Hermosa Insignia, Insignia Dorada PNG Imagen para Descarga Gratuita _ Pngtree.jpeg",
-      "quality_metrics": {
-        "coverage": 0.3207,
-        "strong_coverage": 0.3129,
-        "bbox": [
-          363,
-          428
-        ]
-      },
-      "files": {
-        "512": "assets/equipment/jewelry/professional/from_neu/masters_512/insignias_de_roblox_png_dibujos_insignia_her_01.png",
-        "256": "assets/equipment/jewelry/professional/from_neu/icons_256/insignias_de_roblox_png_dibujos_insignia_her_01.png",
-        "128": "assets/equipment/jewelry/professional/from_neu/icons_128/insignias_de_roblox_png_dibujos_insignia_her_01.png",
-        "64": "assets/equipment/jewelry/professional/from_neu/icons_64/insignias_de_roblox_png_dibujos_insignia_her_01.png"
-      }
-    },
-    {
       "slug": "mi_libra",
       "category": "jewelry",
       "source": "/mnt/dev/Privat/Liege/Vorlagen/Neu/mi libra.jpeg",
