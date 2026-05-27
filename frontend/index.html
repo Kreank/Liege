@@ -256,9 +256,14 @@
     <div style="font-size:11px;color:#a0907a;margin-bottom:14px;text-align:center">
       Wähle einen Charakter und verteile 20 Punkte auf deine Attribute (max 5 pro Attribut).
     </div>
-    <div style="font-weight:bold;margin-bottom:6px">1. Charakter wählen</div>
+    <div style="font-weight:bold;margin-bottom:6px">1. Spielername wählen</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+      <input type="text" id="char-create-name" maxlength="24" placeholder="Dein Spielername (3-24 Zeichen)" style="flex:1;background:#221a14;border:1px solid #5a4828;color:#ffd060;padding:6px 10px;border-radius:3px;font-family:monospace;font-size:13px">
+      <span id="char-create-name-status" style="font-size:10px;color:#807060;min-width:90px"></span>
+    </div>
+    <div style="font-weight:bold;margin-bottom:6px">2. Charakter wählen</div>
     <div id="char-create-presets" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:14px"></div>
-    <div style="font-weight:bold;margin-bottom:4px">2. Stat-Punkte verteilen
+    <div style="font-weight:bold;margin-bottom:4px">3. Stat-Punkte verteilen
       <span id="char-create-pool" style="float:right;color:#9fc890">20 Punkte übrig</span>
     </div>
     <div id="char-create-attrs" style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;margin-bottom:14px"></div>

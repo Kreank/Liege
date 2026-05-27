@@ -2463,12 +2463,52 @@ async def websocket_endpoint(websocket: WebSocket):
                 attrs = await _compute_attributes(player_id)
                 await websocket.send_json({"type": "attributes_update", **attrs})
 
+            elif mtype == "character_check_name":
+                # Welle 23: Live-Check ob ein gewünschter display_name frei ist.
+                want = str(data.get("display_name", "")).strip()[:24]
+                if not want or len(want) < 3:
+                    await websocket.send_json({"type": "character_name_check",
+                        "name": want, "available": False, "reason": "zu kurz (min 3 Zeichen)"})
+                    continue
+                if not all(c.isalnum() or c in "-_ " for c in want):
+                    await websocket.send_json({"type": "character_name_check",
+                        "name": want, "available": False, "reason": "nur Buchstaben/Zahlen/-_ Leerzeichen"})
+                    continue
+                taken = await db.pool().fetchval(
+                    "SELECT 1 FROM players WHERE LOWER(display_name) = LOWER($1) "
+                    "AND name <> $2", want, player_id,
+                )
+                await websocket.send_json({
+                    "type": "character_name_check",
+                    "name": want,
+                    "available": not taken,
+                    "reason": "schon vergeben" if taken else "frei",
+                })
+
             elif mtype == "character_create":
-                # Welle 23: Spieler wählt Preset + verteilt 20 Startpunkte
-                # auf seine Attribute. Wird nur akzeptiert wenn character_created
+                # Welle 23: Spieler wählt Preset + display_name + verteilt 20
+                # Startpunkte. Wird nur akzeptiert wenn character_created
                 # noch FALSE ist (kein erneutes Char-Creation für gleichen Account).
                 preset = str(data.get("preset", "")).strip()[:32]
                 allocated_in = data.get("allocated") or {}
+                display_name = str(data.get("display_name", "")).strip()[:24]
+                # display_name-Validation
+                if not display_name or len(display_name) < 3:
+                    await websocket.send_json({"type": "toast",
+                        "text": "Spielername muss mindestens 3 Zeichen lang sein."})
+                    continue
+                if not all(c.isalnum() or c in "-_ " for c in display_name):
+                    await websocket.send_json({"type": "toast",
+                        "text": "Spielername: nur Buchstaben/Zahlen/-_ Leerzeichen erlaubt."})
+                    continue
+                taken = await db.pool().fetchval(
+                    "SELECT 1 FROM players WHERE LOWER(display_name) = LOWER($1) "
+                    "AND name <> $2", display_name, player_id,
+                )
+                if taken:
+                    await websocket.send_json({"type": "toast",
+                        "text": f"Spielername '{display_name}' ist bereits vergeben."})
+                    continue
                 # Validate preset
                 VALID_PRESETS = {"ember_mage", "iron_delver", "knife_runner",
                                   "shieldbearer", "wanderer_cloak", "wild_ranger"}
@@ -2504,22 +2544,25 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json({"type": "toast",
                         "text": "Charakter ist bereits erstellt"})
                     continue
-                # Persist preset + allocated_attrs + flag set
+                # Persist preset + allocated_attrs + display_name + flag set
                 import json as _json
                 remaining_points = MAX_TOTAL - total
                 await db.pool().execute(
                     "UPDATE players SET preset = $2, "
                     "  allocated_attrs = $3::jsonb, "
                     "  unspent_attr_points = $4, "
+                    "  display_name = $5, "
                     "  character_created = TRUE "
                     "WHERE name = $1",
-                    player_id, preset, _json.dumps(cleaned), remaining_points,
+                    player_id, preset, _json.dumps(cleaned),
+                    remaining_points, display_name,
                 )
-                log.info("Character created: %s preset=%s alloc=%s",
-                         player_id, preset, cleaned)
+                log.info("Character created: %s preset=%s name=%s alloc=%s",
+                         player_id, preset, display_name, cleaned)
                 await websocket.send_json({
                     "type": "character_created",
                     "preset": preset,
+                    "display_name": display_name,
                     "allocated": cleaned,
                     "unspent": remaining_points,
                 })

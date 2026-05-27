@@ -3327,6 +3327,8 @@ class WorldScene extends Phaser.Scene {
       preset: null,
       alloc: {},
       pool: 20,
+      display_name: '',
+      name_available: false,
     };
     // Welle 23 — Preset-Defaults: 10 vorvergebene Punkte pro Klasse
     // (Wanderer = frei, alle 20 selbst verteilen).
@@ -3444,13 +3446,46 @@ class WorldScene extends Phaser.Scene {
       this._updateCharCreateUI();
     };
     document.getElementById('char-create-confirm').onclick = () => {
-      if (!this._ccState.preset) return;
+      // Welle 23: konkretes Feedback warum disabled
+      if (!this._ccState.display_name || !this._ccState.name_available) {
+        this.showEvent('⚠ Wähle einen gültigen, freien Spielernamen.');
+        return;
+      }
+      if (!this._ccState.preset) {
+        this.showEvent('⚠ Wähle einen Charakter.');
+        return;
+      }
+      if (this._ccState.pool > 0) {
+        this.showEvent(`⚠ Verteile noch ${this._ccState.pool} Stat-Punkte.`);
+        return;
+      }
       this.ws.send(JSON.stringify({
         type: 'character_create',
         preset: this._ccState.preset,
+        display_name: this._ccState.display_name,
         allocated: this._ccState.alloc,
       }));
     };
+    // Welle 23 — Name-Input mit Live-Check (300ms debounce)
+    const nameEl = document.getElementById('char-create-name');
+    const statusEl = document.getElementById('char-create-name-status');
+    let nameDebounce = null;
+    nameEl.addEventListener('input', () => {
+      const v = nameEl.value.trim();
+      this._ccState.display_name = v;
+      this._ccState.name_available = false;
+      if (statusEl) { statusEl.textContent = '…'; statusEl.style.color = '#807060'; }
+      if (nameDebounce) clearTimeout(nameDebounce);
+      if (!v || v.length < 3) {
+        if (statusEl) { statusEl.textContent = 'min 3 Zeichen'; statusEl.style.color = '#e85040'; }
+        this._updateCharCreateUI();
+        return;
+      }
+      nameDebounce = setTimeout(() => {
+        this.ws.send(JSON.stringify({type: 'character_check_name', display_name: v}));
+      }, 300);
+    });
+    if (statusEl) statusEl.textContent = '';
   }
 
   _updateCharCreateUI() {
@@ -3466,10 +3501,18 @@ class WorldScene extends Phaser.Scene {
       const k = el.dataset.val;
       if (!(k in this._ccState.alloc)) el.textContent = '0';
     });
-    // Confirm-Button aktiv wenn preset gewählt und alle 20 Punkte verteilt
+    // Confirm-Button aktiv wenn Name OK + preset gewählt + alle 20 Punkte verteilt
     const btn = document.getElementById('char-create-confirm');
-    btn.disabled = !this._ccState.preset || this._ccState.pool > 0;
+    btn.disabled = !this._ccState.preset
+      || this._ccState.pool > 0
+      || !this._ccState.name_available;
     btn.style.opacity = btn.disabled ? '0.5' : '1';
+    // Hint im Button-Title was noch fehlt
+    const reasons = [];
+    if (!this._ccState.name_available) reasons.push('Name fehlt/vergeben');
+    if (!this._ccState.preset) reasons.push('Charakter wählen');
+    if (this._ccState.pool > 0) reasons.push(`${this._ccState.pool} Punkte zu verteilen`);
+    btn.title = reasons.length ? 'Noch zu tun: ' + reasons.join(', ') : 'Charakter erschaffen';
   }
 
   _hideCharacterCreation() {
@@ -4259,6 +4302,20 @@ class WorldScene extends Phaser.Scene {
         this.myReputation = msg.reputation || {};
         if (this.questsOpen) this.refreshQuestsUI();
         break;
+
+      case 'character_name_check': {
+        // Welle 23: Name-Verfügbarkeits-Feedback
+        const statusEl = document.getElementById('char-create-name-status');
+        if (this._ccState && this._ccState.display_name === msg.name) {
+          this._ccState.name_available = !!msg.available;
+        }
+        if (statusEl) {
+          statusEl.textContent = (msg.available ? '✓ ' : '✗ ') + msg.reason;
+          statusEl.style.color = msg.available ? '#9fc890' : '#e85040';
+        }
+        this._updateCharCreateUI();
+        break;
+      }
 
       case 'character_created': {
         // Welle 23: Character-Creation abgeschlossen — Modal schließen + Sprite-Update
