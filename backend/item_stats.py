@@ -3,18 +3,24 @@
 Jede Waffen-/Rüstungs-Kind hat einen Basis-Stat-Block. Die effektiven Stats
 beim Equipping ergeben sich aus:
 
-    final_stat = base_stat * QUALITY_MULT[quality] * (1 + skill_bonus)
+    final_stat = rolled_base_stat * (1 + skill_bonus)
+
+Welle 23: Per-Instance-Variance — jedes Equipment-Item rollt beim Erzeugen
+seine eigenen Basis-Stats (damage als min/max range, andere Stats als
+einzelner Wert). Höhere Quality vergrößert die Variance-Breite, sodass
+legendäre Items deutlich von ihrer Basis abweichen können.
 
 Combat-Damage-Formel:
-    swing_damage   = (base_damage + combat_lvl_bonus) * quality_mult * crit_mult
-    attack_cooldown = base_cooldown / (1 + combat_lvl * 0.01)   # bis -20% bei lvl 20
-    crit_chance     = base_crit + combat_lvl * 0.005           # +10% bei lvl 20
+    swing_damage   = random(rolled.damage_min, rolled.damage_max) + combat_bonus
+    attack_cooldown = base_cooldown / (1 + combat_lvl * 0.01)
+    crit_chance     = rolled.crit + combat_level * 0.005
 
 Armor-Damage-Reduktion:
-    dr_pct  = total_defense / (total_defense + 100)            # diminishing returns
+    dr_pct  = total_defense / (total_defense + 100)
     final_dmg = incoming_dmg * (1 - dr_pct)
 """
 
+import random
 import quality
 
 # Damage-Klassen: passen zu unterschiedlichen Skill/Mana-Bonus
@@ -214,3 +220,107 @@ def damage_reduction(total_defense: int) -> float:
     if total_defense <= 0:
         return 0.0
     return total_defense / (total_defense + 100.0)
+
+
+# ─── Welle 23 — Per-Instance Stat-Roll ────────────────────────────────────
+# Wie weit darf ein einzelnes Item vom Quality-multiplizierten Mittelwert
+# abweichen? Höhere Quality = breitere Range (Bedeutung der Knappheit).
+# Plus per-Swing-Variance auf damage damit kein Treffer gleich ist.
+_INSTANCE_VARIANCE_PCT = {
+    "rough":      0.08,   # ±8% Mittelpunkt
+    "normal":     0.12,
+    "fine":       0.18,
+    "masterwork": 0.25,
+    "legendary":  0.35,
+}
+_SWING_RANGE_PCT = {
+    "rough":      0.12,   # damage_min/max ±12% des Mittelpunkts
+    "normal":     0.15,
+    "fine":       0.18,
+    "masterwork": 0.22,
+    "legendary":  0.30,
+}
+
+
+def _vary(base: float, pct: float, rng: random.Random | None = None) -> float:
+    """Multipliziert base mit (1 ± pct) gleichverteilt."""
+    r = rng or random
+    return base * (1.0 + r.uniform(-pct, pct))
+
+
+def roll_base_stats(item_kind: str, quality_kind: str = "normal",
+                    rng: random.Random | None = None) -> dict | None:
+    """Würfelt pro Item-Instanz die Basis-Stats inkl. damage-Range.
+    Returns None für Nicht-Equipment-Items (resources/consumables/food).
+
+    Schema je Slot:
+      Waffe:   {damage_min, damage_max, speed, crit, crit_mult, range, armor_pen?}
+      Rüstung: {defense, [weight], [crit_chance_bonus|block_chance|speed_bonus]}
+      Schmuck: jewelry-stats (hp_bonus / mana_bonus / regen_bonus / magic_bonus)
+    """
+    r = rng or random
+    q_mult = quality.QUALITY_MULT.get(quality_kind, 1.0)
+    inst_pct = _INSTANCE_VARIANCE_PCT.get(quality_kind, 0.12)
+    swing_pct = _SWING_RANGE_PCT.get(quality_kind, 0.15)
+
+    # — Waffe —
+    w = WEAPON_STATS.get(item_kind)
+    if w is not None:
+        center = w["damage"] * q_mult
+        center = _vary(center, inst_pct, r)
+        rolled = {
+            "damage_min": max(1, int(round(center * (1.0 - swing_pct)))),
+            "damage_max": max(1, int(round(center * (1.0 + swing_pct)))),
+            "speed":      round(_vary(w["speed"],     inst_pct * 0.5, r), 3),
+            "crit":       round(max(0.0, _vary(w["crit"], inst_pct, r)), 4),
+            "crit_mult":  round(_vary(w["crit_mult"], inst_pct * 0.5, r), 3),
+            "range":      w["range"],     # Range nie variieren (Gameplay-Logik)
+        }
+        if "armor_pen" in w:
+            rolled["armor_pen"] = round(max(0.0, _vary(w["armor_pen"], inst_pct, r)), 3)
+        if w.get("two_handed"):
+            rolled["two_handed"] = True
+        if w.get("cleave"):
+            rolled["cleave"] = True
+        return rolled
+
+    # — Rüstung —
+    a = ARMOR_STATS.get(item_kind)
+    if a is not None:
+        rolled = {
+            "defense": max(1, int(round(_vary(a["defense"] * q_mult, inst_pct, r)))),
+        }
+        if "weight" in a:
+            rolled["weight"] = a["weight"]
+        if "crit_chance_bonus" in a:
+            rolled["crit_chance_bonus"] = round(_vary(a["crit_chance_bonus"], inst_pct, r), 4)
+        if "block_chance" in a:
+            rolled["block_chance"] = round(_vary(a["block_chance"], inst_pct, r), 4)
+        if "speed_bonus" in a:
+            rolled["speed_bonus"] = round(_vary(a["speed_bonus"], inst_pct, r), 4)
+        return rolled
+
+    # — Schmuck —
+    j = JEWELRY_STATS.get(item_kind)
+    if j is not None:
+        rolled = {}
+        for k, v in j.items():
+            scaled = v * q_mult if isinstance(v, (int, float)) else v
+            rolled[k] = (int(round(_vary(scaled, inst_pct, r)))
+                         if isinstance(v, int)
+                         else round(_vary(scaled, inst_pct, r), 4))
+        return rolled
+
+    return None
+
+
+def roll_swing_damage(rolled: dict | None,
+                      fallback_kind: str | None = None,
+                      rng: random.Random | None = None) -> int:
+    """Pro-Swing-Damage: rolled in (damage_min, damage_max), sonst Legacy-Base."""
+    r = rng or random
+    if rolled and "damage_min" in rolled and "damage_max" in rolled:
+        lo, hi = rolled["damage_min"], rolled["damage_max"]
+        return r.randint(lo, hi) if hi > lo else lo
+    # Fallback für Items ohne rolled_stats (Pre-Welle-23-Inventar)
+    return weapon_base_damage(fallback_kind)

@@ -379,6 +379,11 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS affixes JSONB NULL;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS unique_name TEXT NULL;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS flavor TEXT NULL;
 
+-- Welle 23: Per-Instance Base-Stat-Roll für Equipment.
+-- JSONB enthält damage_min/max, speed, crit, defense usw.
+-- Nur für equipment-Items gesetzt, NULL für resources/consumables/food.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS rolled_stats JSONB NULL;
+
 -- Welle 18: Talent-Baum
 CREATE TABLE IF NOT EXISTS player_talents (
     player_name  TEXT NOT NULL,

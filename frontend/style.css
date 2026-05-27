@@ -1159,3 +1159,257 @@
     .event-toast, #event-toasts { font-size: 16px !important; }
     /* Inv-Slot Count + Quality-Badges */
     .inv-slot-count, .inv-slot-quality { font-size: 13px !important; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       MOBILE OVERHAUL (Welle 23) — single source of truth über body.is-*-Klassen,
+       gesetzt vom MobileUI-IIFE in app.js. Überschreibt vorherige @media-Regeln
+       wo nötig (deshalb !important).
+       ════════════════════════════════════════════════════════════════════════ */
+
+    /* ── Chronik: über Joystick-Zone tappable + nicht im Action-Button-Bereich ── */
+    body.is-mobile #chronik {
+      z-index: 145 !important;          /* über Joystick-Zone (140), damit Toggle tappbar */
+      font-size: 12px !important;       /* override Welle-18-Bump für Mobile */
+    }
+    body.is-mobile #chronik-list .ev-title { font-size: 12px !important; }
+    body.is-mobile #chronik-list .ev-body  { font-size: 11px !important; }
+    body.is-mobile #chronik-list .ev-meta  { font-size: 10px !important; }
+    body.is-mobile #chronik-header {
+      padding: 10px 14px !important; min-height: 38px !important;
+    }
+    body.is-mobile #chronik-toggle {
+      font-size: 22px !important; padding: 0 10px !important;
+      background: rgba(60,46,28,0.7); border-radius: 4px; min-width: 28px; text-align: center;
+    }
+    /* Portrait: über den Action-Buttons (~72px Höhe inkl. safe-area) */
+    body.is-portrait #chronik {
+      left: 8px !important; bottom: 90px !important;
+      width: calc(60vw - 12px) !important; max-width: 260px !important;
+      max-height: 28vh !important;
+    }
+    /* Landscape: links unten, weg vom Joystick-Spawn-Hotspot */
+    body.is-landscape #chronik {
+      left: 8px !important; bottom: 8px !important;
+      width: 220px !important; max-width: 30vw !important;
+      max-height: 50vh !important;
+    }
+    /* Eingeklappt: schlanker Header-Streifen, super tappbar */
+    body.is-mobile #chronik.collapsed {
+      max-height: 42px !important;
+    }
+
+    /* ── Minimap: deutlich kleiner + Toggle-Button ── */
+    body.is-mobile #minimap {
+      cursor: pointer;
+    }
+    body.is-portrait #minimap {
+      width: 96px !important; height: 72px !important;
+      top: 76px !important; right: 6px !important; bottom: auto !important;
+    }
+    body.is-landscape #minimap {
+      width: 112px !important; height: 80px !important;
+      top: 6px !important; right: 6px !important; bottom: auto !important;
+    }
+    /* Minimap eingeklappt → reines Icon-Knöpfchen, gibt den Screen frei */
+    body.is-mobile #minimap.collapsed {
+      width: 36px !important; height: 36px !important;
+      background: rgba(15,15,22,0.7);
+      border: 1px solid rgba(200,184,138,0.6);
+      border-radius: 6px;
+      image-rendering: auto;
+    }
+    /* Minimap-Toggle-Button (oben rechts auf der Karte) */
+    #minimap-toggle {
+      position: fixed; z-index: 11;
+      width: 22px; height: 22px;
+      background: rgba(0,0,0,0.6); color: #c8b88a;
+      border: 1px solid #6e5e3a; border-radius: 3px;
+      font-family: monospace; font-size: 14px; line-height: 20px; text-align: center;
+      cursor: pointer; user-select: none; -webkit-user-select: none;
+      display: none;                    /* erst auf Mobile aktiv */
+      touch-action: manipulation;
+    }
+    #minimap-toggle:active { background: rgba(60,46,28,0.8); }
+    body.is-mobile #minimap-toggle { display: block; }
+
+    /* ── Build-Bar Mobile: Close + Rotate Buttons, kompakter ── */
+    body.is-mobile #build-bar {
+      width: 100vw !important; bottom: 0 !important;
+      left: 0 !important; transform: none !important;
+      border-left: none; border-right: none; border-bottom: none;
+    }
+    body.is-portrait #build-palette {
+      max-height: 30vh !important;
+    }
+    body.is-landscape #build-palette {
+      max-height: 38vh !important;
+    }
+    body.is-mobile #build-bar-footer {
+      padding: 6px 8px !important; gap: 8px !important;
+      font-size: 12px !important;
+    }
+    body.is-mobile .bb-hint { display: none !important; }
+    body.is-mobile .bb-tab { font-size: 11px !important; padding: 8px 4px !important; min-height: 36px; }
+    /* Mobile-Action-Bar im Build-Footer: Close (×) + Rotate (↻) — beide gut tap-bar */
+    .bb-touch-actions {
+      display: none;
+      margin-left: auto;
+      gap: 6px;
+    }
+    body.is-mobile .bb-touch-actions { display: flex !important; }
+    .bb-touch-btn {
+      width: 36px; height: 36px; line-height: 32px; text-align: center;
+      background: rgba(40,32,20,0.85); border: 1px solid #6e5e3a;
+      color: #e8d870; cursor: pointer; border-radius: 4px;
+      font-size: 18px; font-family: monospace;
+      touch-action: manipulation;
+      user-select: none; -webkit-user-select: none;
+    }
+    .bb-touch-btn:active { background: rgba(120,90,40,0.7); }
+    .bb-touch-btn.close { color: #ff8888; }
+
+    /* ── Top-Right-Stack: auf Mobile als Icon-Spalte, kein Hardcoded-Right-Offset ── */
+    body.is-mobile .top-right-link {
+      padding: 4px 8px !important;
+      font-size: 13px !important;
+      /* Text wird in JS auf Icon reduziert */
+    }
+    body.is-mobile #top-link-logout { right: 8px !important; top: 8px !important; }
+    body.is-mobile #top-link-admin  { right: 50px !important; top: 8px !important; }
+    body.is-mobile .chat-mini       { right: 92px !important; top: 8px !important;
+                                       padding: 4px 8px !important; font-size: 13px !important; }
+    body.is-mobile #time-display    { right: 140px !important; top: 8px !important;
+                                       font-size: 13px !important; }
+    body.is-portrait #status {
+      top: 36px !important; right: 8px !important; font-size: 11px !important;
+    }
+    body.is-landscape #status {
+      top: 36px !important; right: 8px !important; font-size: 11px !important;
+    }
+    /* Body-Parts unter den Top-Right-Buttons + Status */
+    body.is-portrait #body-parts {
+      top: 76px !important; right: 110px !important;  /* links neben Minimap */
+      width: 130px !important; padding: 3px 4px !important;
+    }
+    body.is-portrait #body-parts .bp-row { height: 12px !important; }
+    body.is-portrait #body-parts .bp-label { font-size: 9px !important; line-height: 12px !important; }
+    body.is-landscape #body-parts {
+      top: 36px !important; right: 130px !important;
+      width: 130px !important;
+    }
+
+    /* ── Vitals-Bars Portrait: kompakter, kleinere Schrift, eng gestapelt ── */
+    body.is-portrait #hp-bar,
+    body.is-portrait #mana-bar,
+    body.is-portrait #hunger-bar,
+    body.is-portrait #thirst-bar,
+    body.is-portrait #stamina-bar {
+      width: 160px !important; left: 6px !important; height: 18px !important;
+    }
+    body.is-portrait #hp-bar      { top: 28px  !important; }
+    body.is-portrait #mana-bar    { top: 50px  !important; }
+    body.is-portrait #hunger-bar  { top: 72px  !important; }
+    body.is-portrait #thirst-bar  { top: 94px  !important; }
+    body.is-portrait #stamina-bar { top: 116px !important; }
+    body.is-portrait #hp-text,
+    body.is-portrait #mana-text,
+    body.is-portrait #hunger-text,
+    body.is-portrait #thirst-text,
+    body.is-portrait #stamina-text {
+      font-size: 11px !important; line-height: 18px !important;
+    }
+    /* is-narrow (<380px Breite): noch eine Stufe runter */
+    body.is-narrow #hp-bar,
+    body.is-narrow #mana-bar,
+    body.is-narrow #hunger-bar,
+    body.is-narrow #thirst-bar,
+    body.is-narrow #stamina-bar {
+      width: 140px !important; height: 16px !important;
+    }
+
+    /* Status-Effects-Row unter den Vitals, nicht über ihnen */
+    body.is-portrait #status-effects-row {
+      top: 140px !important; left: 6px !important; max-width: 160px !important;
+    }
+
+    /* ── Action-Buttons als 4×2-Grid Portrait (8 Buttons statt 6) ── */
+    body.is-portrait #touch-actions {
+      right: auto !important; left: 50% !important; transform: translateX(-50%) !important;
+      bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+      grid-template-columns: repeat(4, 48px) !important;
+      grid-template-rows: repeat(2, 48px);
+      gap: 5px !important;
+    }
+    body.is-portrait .touch-btn {
+      width: 48px !important; height: 48px !important; font-size: 20px !important;
+    }
+    /* In Build-Mode: nur essentielle Buttons (Build/Inv/Quests/Map), Rest aus dem Weg */
+    body.is-mobile.build-mode-active #touch-actions {
+      grid-template-rows: 48px !important;
+      grid-template-columns: repeat(4, 48px) !important;
+    }
+    body.is-mobile.build-mode-active .touch-btn[data-secondary="1"] {
+      display: none !important;
+    }
+    body.is-landscape #touch-actions {
+      right: 6px !important; bottom: 6px !important;
+      grid-template-columns: repeat(2, 50px) !important;
+      gap: 5px !important;
+    }
+    body.is-landscape .touch-btn {
+      width: 50px !important; height: 50px !important; font-size: 20px !important;
+    }
+
+    /* ── Joystick-Zone schmaler: lässt Chronik + Action-Buttons frei ── */
+    body.is-portrait #touch-joystick-zone {
+      width: 100vw !important; height: 28vh !important;
+    }
+    body.is-landscape #touch-joystick-zone {
+      width: 60vw !important; height: 40vh !important;
+      /* In Landscape: nur linke Hälfte, rechts bleibt für Action-Buttons frei */
+    }
+    /* Joystick selbst kleiner auf is-narrow */
+    body.is-narrow #touch-joystick {
+      width: 110px !important; height: 110px !important;
+    }
+    body.is-narrow #touch-joystick-thumb {
+      width: 48px !important; height: 48px !important; margin: -24px 0 0 -24px !important;
+    }
+
+    /* ── Hotbar Mobile: schmaler + nicht über Chronik ── */
+    body.is-portrait #hotbar {
+      bottom: calc(112px + env(safe-area-inset-bottom)) !important;
+      /* über den Action-Buttons (96px hoch + safe-area) */
+      gap: 3px;
+    }
+    body.is-portrait .hotbar-slot {
+      width: 42px !important; height: 42px !important;
+    }
+    body.is-landscape #hotbar {
+      bottom: 6px !important;
+    }
+    body.is-landscape .hotbar-slot {
+      width: 44px !important; height: 44px !important;
+    }
+
+    /* ── Tooltip: nicht off-screen rutschen ── */
+    body.is-mobile #item-tooltip {
+      max-width: calc(100vw - 16px) !important;
+      font-size: 12px !important; padding: 8px 10px !important;
+    }
+
+    /* ── Overlays: voller Screen-Bezug auf Mobile (kein Klaustro) ── */
+    body.is-portrait #skills-box,
+    body.is-portrait #research-box,
+    body.is-portrait #talents-box,
+    body.is-portrait #inventory-box,
+    body.is-portrait #quests-box,
+    body.is-portrait #factions-box,
+    body.is-portrait #attributes-box,
+    body.is-portrait #chest-box,
+    body.is-portrait #trade-box,
+    body.is-portrait #crafting-box,
+    body.is-portrait #dialog-box {
+      width: 98vw !important; max-width: 98vw !important;
+      max-height: 88vh !important;
+    }

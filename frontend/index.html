@@ -123,6 +123,7 @@
 </div>
 
 <canvas id="minimap" width="320" height="220"></canvas>
+<div id="minimap-toggle" title="Karte ein/ausblenden">🗺</div>
 
 <div id="build-bar">
   <div id="build-bar-tabs"></div>
@@ -139,6 +140,10 @@
     <span class="bb-info">Aktiv: <span class="bb-val" id="build-selected">–</span></span>
     <span class="bb-info">Rotation: <span class="bb-val" id="build-rotation-label">0°</span> <span style="opacity:0.6">(R)</span></span>
     <span class="bb-hint">Klick = setzen · Rechts = abreißen · B = beenden</span>
+    <div class="bb-touch-actions">
+      <div class="bb-touch-btn" id="bb-rotate-btn" title="Drehen">↻</div>
+      <div class="bb-touch-btn close" id="bb-close-btn" title="Bauen beenden">×</div>
+    </div>
   </div>
 </div>
 

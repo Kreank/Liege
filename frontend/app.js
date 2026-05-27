@@ -1,3 +1,84 @@
+// === MobileUI: single source of truth für Mobile/Orientation-State ===
+// Setzt body-Klassen (is-mobile/is-portrait/is-landscape/is-narrow) die CSS-Regeln
+// ansprechen können. Reagiert auf resize + orientationchange.
+window.MobileUI = (function () {
+  const state = { isMobile: false, isPortrait: false, isLandscape: false, isNarrow: false };
+  function compute() {
+    const isTouch = ('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0) ||
+                    window.matchMedia('(pointer: coarse)').matches;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    state.isMobile   = isTouch && Math.min(w, h) <= 900;  // Mobile oder kleines Tablet
+    state.isPortrait = state.isMobile && h >= w;
+    state.isLandscape= state.isMobile && w > h;
+    state.isNarrow   = w < 380;
+    const b = document.body;
+    b.classList.toggle('is-mobile',    state.isMobile);
+    b.classList.toggle('is-portrait',  state.isPortrait);
+    b.classList.toggle('is-landscape', state.isLandscape);
+    b.classList.toggle('is-narrow',    state.isNarrow);
+  }
+  compute();
+  window.addEventListener('resize', compute);
+  window.addEventListener('orientationchange', () => setTimeout(compute, 200));
+  return state;
+})();
+
+// === build-bar touch buttons (close × und rotate ↻) — funktioniert auf allen Geräten ===
+(function () {
+  const closeBtn = document.getElementById('bb-close-btn');
+  const rotBtn   = document.getElementById('bb-rotate-btn');
+  function getScene() {
+    if (!window._gameInstance) return null;
+    return window._gameInstance.scene.getScene('WorldScene') || null;
+  }
+  function withRetry(fn) {
+    const sc = getScene();
+    if (sc) fn(sc); else setTimeout(() => withRetry(fn), 200);
+  }
+  function bind(btn, handler) {
+    if (!btn) return;
+    const tap = (ev) => { ev.preventDefault(); ev.stopPropagation(); handler(); };
+    btn.addEventListener('click', tap);
+    btn.addEventListener('touchend', tap, { passive: false });
+  }
+  bind(closeBtn, () => withRetry((sc) => { if (sc.buildMode) sc.toggleBuildMode(); }));
+  bind(rotBtn, () => withRetry((sc) => {
+    if (!sc.buildMode) return;
+    sc.placeRotation = ((sc.placeRotation || 0) + 90) % 360;
+    if (typeof sc._refreshPlaceGhost === 'function')   sc._refreshPlaceGhost();
+    if (typeof sc._refreshRotationLabel === 'function') sc._refreshRotationLabel();
+  }));
+})();
+
+// === minimap-toggle (Mobile: Karte einklappen → 36×36 Icon, ausklappen → volle Map) ===
+(function () {
+  const map = document.getElementById('minimap');
+  const btn = document.getElementById('minimap-toggle');
+  if (!map || !btn) return;
+  function positionToggle() {
+    // Toggle-Button oben rechts auf der Map platzieren — folgt der Map-Größe
+    const r = map.getBoundingClientRect();
+    btn.style.top  = (r.top - 2) + 'px';
+    btn.style.left = (r.right - 22) + 'px';
+  }
+  function toggle(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    map.classList.toggle('collapsed');
+    btn.textContent = map.classList.contains('collapsed') ? '🗺' : '×';
+    setTimeout(positionToggle, 50);
+  }
+  btn.addEventListener('click', toggle);
+  btn.addEventListener('touchend', toggle, { passive: false });
+  window.addEventListener('resize', positionToggle);
+  window.addEventListener('orientationchange', () => setTimeout(positionToggle, 250));
+  // Initial: nach Layout-Settle positionieren + erste Map-Größenwahl
+  setTimeout(positionToggle, 100);
+  setTimeout(positionToggle, 500);
+})();
+
 // === chronik-toggle (was inline IIFE) ===
   // Chronik-Toggle: robust für Mouse + Touch (kein onclick-Attribut wegen Touch-Quirks
   // auf manchen Mobile-Browsern, und +/− Indikator soll mitwechseln).
@@ -526,23 +607,51 @@ function buildItemStatsHtml(item, opts = {}) {
     const v = isPct ? d.toFixed(1) : Math.round(d * 10) / 10;
     return ` <span style="color:${col};font-size:10px">(${sign}${v})</span>`;
   };
+  // Welle 23: rolled_stats (per-instance Variance) hat Vorrang vor base+quality.
+  // Damage als Range (8-12), nicht als einzelner Wert.
+  const rs = item.rolled_stats;
+  const eqRs = eq && eq.rolled_stats;
   if (w) {
-    const dmg = w.dmg * qm;
-    const eqW = eq ? WEAPON_STATS[eq.kind] : null;
-    const eqDmg = eqW ? eqW.dmg * eqQm : 0;
-    lines.push(`⚔️ Schaden: ${Math.round(dmg)}${eqW ? delta(dmg, eqDmg) : ''}`);
-    lines.push(`⚡ Speed: ${w.speed.toFixed(2)}×${eqW ? delta(w.speed, eqW.speed) : ''}`);
-    lines.push(`💥 Crit: ${(w.crit*100).toFixed(0)}%${eqW ? delta(w.crit*100, eqW.crit*100, true) : ''}`);
-    lines.push(`🎯 Reichweite: ${w.range} Tiles${eqW ? delta(w.range, eqW.range) : ''}`);
-    if (w.two_h) lines.push(`🤲 Zweihändig`);
+    if (rs && rs.damage_min !== undefined) {
+      const lo = rs.damage_min, hi = rs.damage_max;
+      const mid = (lo + hi) / 2;
+      const eqMid = eqRs && eqRs.damage_min !== undefined
+        ? (eqRs.damage_min + eqRs.damage_max) / 2
+        : (eq ? (WEAPON_STATS[eq.kind]?.dmg || 0) * eqQm : 0);
+      lines.push(`⚔️ Schaden: ${lo}-${hi}${eq ? delta(mid, eqMid) : ''}`);
+      lines.push(`⚡ Speed: ${rs.speed.toFixed(2)}×${eq ? delta(rs.speed, eqRs?.speed ?? (WEAPON_STATS[eq.kind]?.speed || 1)) : ''}`);
+      lines.push(`💥 Crit: ${(rs.crit*100).toFixed(1)}%${eq ? delta(rs.crit*100, (eqRs?.crit ?? (WEAPON_STATS[eq.kind]?.crit || 0))*100, true) : ''}`);
+      lines.push(`🎯 Reichweite: ${rs.range} Tiles`);
+      if (rs.armor_pen) lines.push(`🪓 Panzerbrechend: ${(rs.armor_pen*100).toFixed(0)}%`);
+      if (rs.two_handed) lines.push(`🤲 Zweihändig`);
+      if (rs.cleave) lines.push(`🌀 Spaltschlag`);
+    } else {
+      const dmg = w.dmg * qm;
+      const eqW = eq ? WEAPON_STATS[eq.kind] : null;
+      const eqDmg = eqW ? eqW.dmg * eqQm : 0;
+      lines.push(`⚔️ Schaden: ${Math.round(dmg)}${eqW ? delta(dmg, eqDmg) : ''}`);
+      lines.push(`⚡ Speed: ${w.speed.toFixed(2)}×${eqW ? delta(w.speed, eqW.speed) : ''}`);
+      lines.push(`💥 Crit: ${(w.crit*100).toFixed(0)}%${eqW ? delta(w.crit*100, eqW.crit*100, true) : ''}`);
+      lines.push(`🎯 Reichweite: ${w.range} Tiles${eqW ? delta(w.range, eqW.range) : ''}`);
+      if (w.two_h) lines.push(`🤲 Zweihändig`);
+    }
   } else if (a) {
-    const def = a.defense * qm;
-    const eqA = eq ? ARMOR_STATS[eq.kind] : null;
-    const eqDef = eqA ? eqA.defense * eqQm : 0;
-    lines.push(`🛡️ Defense: ${Math.round(def)}${eqA ? delta(def, eqDef) : ''}`);
-    lines.push(`⚖️ Gewicht: ${a.weight}${eqA ? delta(a.weight, eqA.weight) : ''}`);
-    if (a.block_chance) lines.push(`🛡️ Blockchance: ${(a.block_chance*100).toFixed(0)}%`);
-    if (a.speed_bonus) lines.push(`👟 Bewegungsbonus: +${(a.speed_bonus*100).toFixed(0)}%`);
+    if (rs && rs.defense !== undefined) {
+      const eqDef = eqRs?.defense ?? (eq ? (ARMOR_STATS[eq.kind]?.defense || 0) * eqQm : 0);
+      lines.push(`🛡️ Defense: ${rs.defense}${eq ? delta(rs.defense, eqDef) : ''}`);
+      if (rs.weight !== undefined) lines.push(`⚖️ Gewicht: ${rs.weight}`);
+      if (rs.block_chance) lines.push(`🛡️ Blockchance: ${(rs.block_chance*100).toFixed(0)}%`);
+      if (rs.speed_bonus) lines.push(`👟 Bewegungsbonus: +${(rs.speed_bonus*100).toFixed(0)}%`);
+      if (rs.crit_chance_bonus) lines.push(`💥 Crit-Bonus: +${(rs.crit_chance_bonus*100).toFixed(1)}%`);
+    } else {
+      const def = a.defense * qm;
+      const eqA = eq ? ARMOR_STATS[eq.kind] : null;
+      const eqDef = eqA ? eqA.defense * eqQm : 0;
+      lines.push(`🛡️ Defense: ${Math.round(def)}${eqA ? delta(def, eqDef) : ''}`);
+      lines.push(`⚖️ Gewicht: ${a.weight}${eqA ? delta(a.weight, eqA.weight) : ''}`);
+      if (a.block_chance) lines.push(`🛡️ Blockchance: ${(a.block_chance*100).toFixed(0)}%`);
+      if (a.speed_bonus) lines.push(`👟 Bewegungsbonus: +${(a.speed_bonus*100).toFixed(0)}%`);
+    }
   }
   let html = '';
   if (lines.length > 0) {
@@ -5972,10 +6081,13 @@ const config = {
     return;
   }
 
+  // Auf Mobile: Icon-only, sonst Text. Liest MobileUI das ganz oben gesetzt wird.
+  const compactTopRight = !!(window.MobileUI && window.MobileUI.isMobile);
   if (MY_ROLE === 'admin') {
     const adminLink = document.createElement('a');
     adminLink.href = '/admin';
-    adminLink.textContent = '🛠️ Admin';
+    adminLink.textContent = compactTopRight ? '🛠️' : '🛠️ Admin';
+    adminLink.title = 'Admin';
     adminLink.id = 'top-link-admin';
     adminLink.className = 'top-right-link';
     document.body.appendChild(adminLink);
@@ -5983,7 +6095,8 @@ const config = {
 
   const logoutLink = document.createElement('a');
   logoutLink.href = '#';
-  logoutLink.textContent = '🚪 Logout';
+  logoutLink.textContent = compactTopRight ? '🚪' : '🚪 Logout';
+  logoutLink.title = 'Logout';
   logoutLink.id = 'top-link-logout';
   logoutLink.className = 'top-right-link';
   logoutLink.addEventListener('click', async (ev) => {
@@ -6131,7 +6244,10 @@ function setupChatConsole(myRole) {
 
   const miniBtn = document.createElement('div');
   miniBtn.className = 'chat-mini';
-  miniBtn.textContent = '💬 Chat öffnen';
+  // Mobile: nur Icon, sonst voller Text
+  const _mobChat = !!(window.MobileUI && window.MobileUI.isMobile);
+  miniBtn.textContent = _mobChat ? '💬' : '💬 Chat öffnen';
+  miniBtn.title = 'Chat öffnen';
   miniBtn.style.display = 'none';
   document.body.appendChild(miniBtn);
 
@@ -6501,29 +6617,42 @@ function setupTouchControls() {
 
   const actions = document.createElement('div');
   actions.id = 'touch-actions';
+  // primary=immer sichtbar (auch im Build-Mode). secondary=im Build-Mode versteckt (CSS).
+  // Reihenfolge so dass im Portrait-4×2-Grid die wichtigsten 4 in der oberen Reihe sind.
   const BUTTONS = [
-    { label: '🎒', method: 'toggleInventory', title: 'Inventar' },
-    { label: '📜', method: 'toggleQuests',    title: 'Quests' },
-    { label: '⚒️', method: 'toggleBuildMode', title: 'Bauen' },
-    { label: '🌱', method: 'toggleSkills',    title: 'Skills' },
-    { label: '🔬', method: 'toggleResearch',  title: 'Forschung' },
-    { label: '⭐', method: 'toggleTalents',   title: 'Talente' },
+    { label: '🎒', method: 'toggleInventory', title: 'Inventar',    primary: true  },
+    { label: '⚒️', method: 'toggleBuildMode', title: 'Bauen',       primary: true  },
+    { label: '📜', method: 'toggleQuests',    title: 'Quests',      primary: true  },
+    { label: '🗺',  method: 'toggleMinimap',  title: 'Karte',       primary: true  },
+    { label: '🌱', method: 'toggleSkills',    title: 'Skills',      primary: false },
+    { label: '🔬', method: 'toggleResearch',  title: 'Forschung',   primary: false },
+    { label: '⭐', method: 'toggleTalents',   title: 'Talente',     primary: false },
+    { label: '⚖️', method: 'toggleFactions',  title: 'Faktionen',   primary: false },
+    { label: '📋', method: 'toggleAttributes',title: 'Attribute',   primary: false },
   ];
   BUTTONS.forEach((b) => {
     const btn = document.createElement('div');
     btn.className = 'touch-btn';
     btn.textContent = b.label;
     btn.title = b.title;
-    btn.addEventListener('touchstart', (ev) => {
+    if (!b.primary) btn.setAttribute('data-secondary', '1');
+    const fire = (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
+      // toggleMinimap: lokaler DOM-Toggle, keine Scene-Methode
+      if (b.method === 'toggleMinimap') {
+        const map = document.getElementById('minimap');
+        const tog = document.getElementById('minimap-toggle');
+        if (map) {
+          map.classList.toggle('collapsed');
+          if (tog) tog.textContent = map.classList.contains('collapsed') ? '🗺' : '×';
+        }
+        return;
+      }
       callScene(b.method);
-    }, { passive: false });
-    // Fallback für Hybrid-Geräte (Maus + Touch)
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      callScene(b.method);
-    });
+    };
+    btn.addEventListener('touchstart', fire, { passive: false });
+    btn.addEventListener('click', fire);
     actions.appendChild(btn);
   });
   document.body.appendChild(actions);

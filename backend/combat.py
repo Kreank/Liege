@@ -195,26 +195,43 @@ def calc_player_damage(
     weapon_quality: str = "normal",
     combat_level: int = 0,
     rng_roll: float = 0.5,
+    rolled_stats: dict | None = None,
 ) -> tuple[int, bool]:
     """Vollständige Damage-Berechnung mit Quality + Skill + Crit-Roll.
     Returns (total_damage, was_crit).
 
-    Formel:
+    Welle 23: Wenn `rolled_stats` (per-instance) gesetzt ist:
+      - base wird pro swing innerhalb (damage_min, damage_max) gerollt
+      - crit/crit_mult/speed kommen aus rolled_stats statt aus WEAPON_STATS
+    Quality-Multiplier ist bereits in rolled_stats eingeflossen (Roll-Zeit)
+    und wird daher hier NICHT nochmal angewendet.
+
+    Legacy-Fallback (kein rolled_stats):
         base       = weapon_base_damage or unarmed 4
-        skill_add  = combat_level // 4   (RimWorld-style)
         quality_m  = QUALITY_MULT[quality]
-        crit?      = rng_roll < (base_crit + combat_level * 0.005)
         total      = (base + skill_add + base_player) * quality_m * (crit ? crit_mult : 1)
     """
     import item_stats
     import quality as quality_mod
+    import random as _r
 
+    skill_add = combat_level // 4
+
+    if rolled_stats and "damage_min" in rolled_stats and "damage_max" in rolled_stats:
+        base = item_stats.roll_swing_damage(rolled_stats, fallback_kind=weapon_kind)
+        crit_chance = rolled_stats.get("crit", 0.05) + combat_level * 0.005
+        crit_mult   = rolled_stats.get("crit_mult", 1.5)
+        base_total  = base + skill_add + (PLAYER_BASE_DAMAGE // 2)
+        is_crit     = rng_roll < crit_chance
+        raw         = base_total * (crit_mult if is_crit else 1.0)
+        return int(round(raw)), is_crit
+
+    # Legacy-Pfad für Items ohne rolled_stats (Pre-Welle-23-Inventar)
     base = item_stats.weapon_base_damage(weapon_kind)
     cfg = item_stats.WEAPON_STATS.get(weapon_kind) if weapon_kind else None
     crit_chance = (cfg["crit"] if cfg else 0.05) + combat_level * 0.005
     crit_mult   = (cfg["crit_mult"] if cfg else 1.5)
     quality_m   = quality_mod.QUALITY_MULT.get(weapon_quality, 1.0)
-    skill_add   = combat_level // 4
     base_total  = base + skill_add + (PLAYER_BASE_DAMAGE // 2)
     is_crit     = rng_roll < crit_chance
     raw         = base_total * quality_m
@@ -472,3 +489,72 @@ def weapon_damage_type(weapon_kind: str | None) -> str:
     except Exception:
         return "physical"
     return "magic" if cls == "magic" else "physical"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ESO-Style Player-Scaling (Welle 23, 2026-05-27)
+#
+# Normale Mobs (Tier 1-3) skalieren mit Player-Level. Bosse (Tier 4) skalieren
+# auch, haben aber zusätzlich Boss-Bonus + Floor (siehe power_budget).
+#
+# Die existierenden NPC_HP_BY_KIND/CREATURE_DAMAGE-Werte werden zu FLAVOR-
+# Gewichten innerhalb des Tiers umgedeutet:
+#     final_hp = tier_baseline(tier, lvl) × (NPC_HP_BY_KIND[kind] / tier_avg_hp)
+# Ein wolf (50 HP, Tier 2, Tier-Avg ~50) bleibt also = baseline. wolf_alpha
+# (85 HP, Tier 2) = baseline × 1.7. fae_mite (14 HP, Tier 1) = T1-baseline × 0.6.
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _compute_tier_averages():
+    """Einmal beim Import: durchschnittliches base_hp und base_dmg pro Tier."""
+    hp_by_tier:  dict[int, list[int]] = {}
+    dmg_by_tier: dict[int, list[int]] = {}
+    # Iteriere über alle Kinds mit Stat-Daten — friendly NPCs ignorieren
+    for kind in CREATURE_KINDS:
+        tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
+        if kind in NPC_HP_BY_KIND:
+            hp_by_tier.setdefault(tier, []).append(NPC_HP_BY_KIND[kind])
+        if kind in CREATURE_DAMAGE:
+            dmg_by_tier.setdefault(tier, []).append(CREATURE_DAMAGE[kind])
+    avg_hp  = {t: sum(v) / len(v) for t, v in hp_by_tier.items()}
+    avg_dmg = {t: sum(v) / len(v) for t, v in dmg_by_tier.items()}
+    return avg_hp, avg_dmg
+
+
+_TIER_AVG_HP, _TIER_AVG_DMG = _compute_tier_averages()
+
+
+def flavor_mult_hp(kind: str) -> float:
+    """Wie zäh ist dieser Mob im Vergleich zum Tier-Durchschnitt?"""
+    tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
+    base = NPC_HP_BY_KIND.get(kind, 35)
+    avg = _TIER_AVG_HP.get(tier) or 35
+    # Clamp 0.5-1.6 — zu extreme Werte ergeben kein gutes Game-Feel
+    return max(0.5, min(1.6, base / avg))
+
+
+def flavor_mult_dmg(kind: str) -> float:
+    """Wie hart haut dieser Mob im Vergleich zum Tier-Durchschnitt?"""
+    tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
+    base = CREATURE_DAMAGE.get(kind, 8)
+    avg = _TIER_AVG_DMG.get(tier) or 8
+    return max(0.5, min(1.5, base / avg))
+
+
+def kalibrated_npc_hp(kind: str, player_level: int) -> int:
+    """ESO-Style scaling: HP folgt Player-Level + Tier + per-kind Flavor.
+
+    Tier 1-3 sind „adaptive" (entspricht Spieler ± Flavor). Tier 4 (Boss) hat
+    festen Floor + zusätzlichen Per-Level-Bonus, damit er immer fies bleibt.
+    """
+    import power_budget
+    tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
+    base = power_budget.tier_baseline_hp(tier, player_level)
+    return max(1, int(round(base * flavor_mult_hp(kind))))
+
+
+def kalibrated_creature_damage(kind: str, player_level: int) -> int:
+    """ESO-Style scaling: DMG folgt Player-Level + Tier + per-kind Flavor."""
+    import power_budget
+    tier = _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
+    base = power_budget.tier_baseline_dmg(tier, player_level)
+    return max(1, int(round(base * flavor_mult_dmg(kind))))

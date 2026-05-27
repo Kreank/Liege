@@ -207,6 +207,15 @@ def _row_to_dict(row) -> dict:
             out["material"] = row["material"]
     except (KeyError, IndexError):
         pass
+    # Welle 23: Per-Instance rolled_stats (damage_min/max, speed, crit, …)
+    try:
+        if "rolled_stats" in row.keys():
+            rs = row["rolled_stats"]
+            if rs:
+                import json as _json
+                out["rolled_stats"] = _json.loads(rs) if isinstance(rs, str) else rs
+    except (KeyError, IndexError, TypeError):
+        pass
     return out
 
 
@@ -219,21 +228,21 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "INSERT INTO items (kind, name, category, x, y, material) "
             "VALUES ($1, $2, $3, $4, $5, $6) "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             kind, cfg["name"], cfg["category"], x, y, material,
         )
         return _row_to_dict(row)
 
     async def get_on_ground(self) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
             "FROM items WHERE owner IS NULL"
         )
         return [_row_to_dict(r) for r in rows]
 
     async def get_at(self, x: int, y: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
             "FROM items WHERE x = $1 AND y = $2 AND owner IS NULL",
             x, y,
         )
@@ -241,7 +250,7 @@ class ItemManager:
 
     async def get_inventory(self, player_name: str) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
             "FROM items WHERE owner = $1 ORDER BY id",
             player_name,
         )
@@ -266,7 +275,7 @@ class ItemManager:
                 "  AND quantity + $3 <= $4 "
                 "  ORDER BY id LIMIT 1) "
                 "RETURNING id, kind, name, category, quality, x, y, owner, "
-                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material",
+                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
                 player_name, ground["kind"], int(ground["quantity"] or 1), limit,
             )
             if existing:
@@ -278,7 +287,7 @@ class ItemManager:
             "UPDATE items SET x = NULL, y = NULL, owner = $2 "
             "WHERE id = $1 AND owner IS NULL "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
             item_id, player_name,
         )
         return _row_to_dict(row) if row else None
@@ -287,7 +296,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = NULL, equipped_slot = NULL, x = $3, y = $4 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, player_name, x, y,
         )
         return _row_to_dict(row) if row else None
@@ -313,7 +322,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET equipped_slot = $3 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, player_name, slot,
         )
         return _row_to_dict(row) if row else None
@@ -322,7 +331,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET equipped_slot = NULL "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, player_name,
         )
         return _row_to_dict(row) if row else None
@@ -339,7 +348,7 @@ class ItemManager:
             "AND category IN ('consumable', 'food') "
             "AND quantity > 1 "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
             item_id, player_name,
         )
         if row:
@@ -351,7 +360,7 @@ class ItemManager:
             "DELETE FROM items WHERE id = $1 AND owner = $2 "
             "AND category IN ('consumable', 'food') "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, material",
+            "created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, player_name,
         )
         if row:
@@ -381,7 +390,7 @@ class ItemManager:
         updated = await db.pool().fetchrow(
             "UPDATE items SET quantity = quantity - $2 WHERE id = $1 "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
             item_id, amount,
         )
         new_row = await db.pool().fetchrow(
@@ -389,7 +398,7 @@ class ItemManager:
             "material, affixes, unique_name, flavor) "
             "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
             row["kind"], row["name"], row["category"], player_name, row["quality"],
             amount, row["material"], row["affixes"], row["unique_name"], row["flavor"],
         )
@@ -462,7 +471,7 @@ class ItemManager:
 
     async def get_chest_contents(self, chest_id: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
             "FROM items WHERE owner = $1 ORDER BY id",
             f"chest:{chest_id}",
         )
@@ -472,7 +481,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = $3, equipped_slot = NULL "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, player_name, f"chest:{chest_id}",
         )
         return _row_to_dict(row) if row else None
@@ -481,7 +490,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = $3 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
             item_id, f"chest:{chest_id}", player_name,
         )
         return _row_to_dict(row) if row else None
@@ -543,17 +552,22 @@ class ItemManager:
                 "  AND quantity < $3 "
                 "  ORDER BY id LIMIT 1) "
                 "RETURNING id, kind, name, category, quality, x, y, owner, "
-                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material",
+                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, rolled_stats",
                 player_name, kind, limit,
             )
             if existing:
                 return _row_to_dict(existing)
+        # Welle 23: pro Equipment-Instanz Basis-Stats rollen.
+        import item_stats as _istats
+        import json as _json
+        rolled = _istats.roll_base_stats(kind, quality_kind)
+        rolled_json = _json.dumps(rolled) if rolled else None
         row = await db.pool().fetchrow(
-            "INSERT INTO items (kind, name, category, owner, quality, quantity, material) "
-            "VALUES ($1, $2, $3, $4, $5, 1, $6) "
+            "INSERT INTO items (kind, name, category, owner, quality, quantity, material, rolled_stats) "
+            "VALUES ($1, $2, $3, $4, $5, 1, $6, $7::jsonb) "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material",
-            kind, cfg["name"], cfg["category"], player_name, quality_kind, material,
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, rolled_stats",
+            kind, cfg["name"], cfg["category"], player_name, quality_kind, material, rolled_json,
         )
         return _row_to_dict(row)
 
@@ -580,7 +594,7 @@ async def set_charges(item_id: int, owner: str, charges: int) -> dict | None:
         "UPDATE items SET charges = GREATEST(0, $1) "
         "WHERE id = $2 AND owner = $3 "
         "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-        "created_at, affixes, unique_name, flavor, quantity, material, charges",
+        "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges",
         charges, item_id, owner,
     )
     return _row_to_dict(row) if row else None

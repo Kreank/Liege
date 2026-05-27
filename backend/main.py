@@ -1059,12 +1059,18 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
                 weapon = await get_equipped_weapon_kind(player_id)
                 weapon_quality = "normal"
+                weapon_rolled_stats = None
                 if weapon:
                     qrow = await db.pool().fetchrow(
-                        "SELECT quality FROM items WHERE owner = $1 "
+                        "SELECT quality, rolled_stats FROM items WHERE owner = $1 "
                         "AND equipped_slot = 'weapon' LIMIT 1", player_id,
                     )
-                    if qrow: weapon_quality = qrow["quality"]
+                    if qrow:
+                        weapon_quality = qrow["quality"]
+                        rs = qrow["rolled_stats"]
+                        if rs:
+                            import json as _json
+                            weapon_rolled_stats = _json.loads(rs) if isinstance(rs, str) else rs
                 combat_level = await skills.get_skill_level(player_id, "combat")
                 # Range-Check: bei Ranged-Waffen größere Reichweite
                 import item_stats as _is, random as _r
@@ -1080,6 +1086,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     weapon_quality=weapon_quality,
                     combat_level=combat_level,
                     rng_roll=crit_roll,
+                    rolled_stats=weapon_rolled_stats,
                 )
                 # Damage-Modifier durch Talente
                 wclass = _is.weapon_class(weapon)
