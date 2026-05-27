@@ -531,3 +531,204 @@ class StructureManager:
             "DELETE FROM structures WHERE id = $1", struct["id"]
         )
         return struct
+
+
+# ─── Asset-Drop 2026-05-27c: World-Detail (260 items / 7 packs) ─────────────
+# Wayfinding-Schilder, Trade-Schilder, Transport, Farm-Strukturen, Farm-Props.
+# Tiere (livestock/poultry/wildlife) und Produkte sind NICHT hier als
+# Strukturen registriert — Tiere wandern als NPCs in ANIMAL_KINDS, Produkte
+# sind reine Inventar-Items (eigenes Item-System). Sprite-Variants mit
+# Richtungs-Suffix (cow_south, horse_cart_single_east, ...) sind reine
+# Rendering-Hilfen und gehören NICHT in STRUCTURE_TYPES.
+_WORLD_DETAIL_2026_05_27 = {
+    # Wayfinding-Schilder (16)
+    "crossroads_signpost":      {"blocking": True},
+    "signpost_village":         {"blocking": True},
+    "signpost_market":          {"blocking": True},
+    "signpost_inn":             {"blocking": True},
+    "signpost_church":          {"blocking": True},
+    "signpost_mill":            {"blocking": True},
+    "signpost_mine":            {"blocking": True},
+    "warning_bandits":          {"blocking": True},
+    "signpost_town":            {"blocking": True},
+    "signpost_farm":            {"blocking": True},
+    "signpost_forest":          {"blocking": True},
+    "signpost_docks":           {"blocking": True},
+    "signpost_graveyard":       {"blocking": True},
+    "road_marker_stone":        {"blocking": True},
+    "boundary_post":            {"blocking": True},
+    "blank_weathered_signpost": {"blocking": True},
+    # Trade-Schilder (16)
+    "bakery_sign":              {"blocking": True},
+    "blacksmith_sign":          {"blocking": True},
+    "tailor_sign":              {"blocking": True},
+    "inn_sign":                 {"blocking": True},
+    "stable_sign":              {"blocking": True},
+    "market_sign":              {"blocking": True},
+    "apothecary_sign":          {"blocking": True},
+    "carpenter_sign":           {"blocking": True},
+    "miller_sign":              {"blocking": True},
+    "dairy_sign":               {"blocking": True},
+    "butcher_sign":             {"blocking": True},
+    "fishmonger_sign":          {"blocking": True},
+    "tanner_sign":              {"blocking": True},
+    "weaver_sign":              {"blocking": True},
+    "tavern_red_lion_sign":     {"blocking": True},
+    "scribe_sign":              {"blocking": True},
+    # Transport (16) — Karren/Wagen/Hitching-Post etc.
+    "handcart_empty":           {"blocking": True},
+    "handcart_crates":          {"blocking": True},
+    "farm_cart_empty":          {"blocking": True},
+    "farm_cart_hay":            {"blocking": True},
+    "farm_cart_barrels":        {"blocking": True},
+    "market_wagon_covered":     {"blocking": True},
+    "merchant_wagon_closed":    {"blocking": True},
+    "horse_cart_single":        {"blocking": True},
+    "horse_cart_pair":          {"blocking": True},
+    "ox_cart":                  {"blocking": True},
+    "donkey_pack_cart":         {"blocking": True},
+    "broken_wagon_large":       {"blocking": True},
+    "wagon_wheel_loose":        {"blocking": True},
+    "wagon_harness":            {"blocking": True},
+    "hitching_post":            {"blocking": True},
+    "wheelbarrow_tools":        {"blocking": True},
+    # Neue Farm-Props (die übrigen 6 — Rest war bereits registriert)
+    "feed_sack":                {"blocking": True},
+    "animal_bedding_straw":     {"blocking": True},
+    "pitchfork":                {"blocking": True},
+    "shovel":                   {"blocking": True},
+    "wooden_bucket":            {"blocking": True},
+    "rope_coil":                {"blocking": True},
+    # Farm-Strukturen sind ALLE schon im 2026-05-27b-Block oben registriert —
+    # keine neuen Einträge hier (skip via dict-Lookup unten).
+}
+for _k, _v in _WORLD_DETAIL_2026_05_27.items():
+    if _k not in STRUCTURE_TYPES:
+        STRUCTURE_TYPES[_k] = _v
+del _k, _v
+
+# Listen-Konstanten — Frontend/Backend nutzen das für Spawning, World-Building
+# und Sign-/Transport-Logik. Die Listen enthalten ALLE item.ids einer Kategorie,
+# unabhängig davon ob neu oder schon vorher registriert (z.B. barn_large war
+# schon im Farming-Drop, ist aber natürlich Teil von FARM_STRUCTURE_TYPES).
+WAYFINDING_SIGN_TYPES = [
+    "crossroads_signpost",
+    "signpost_village",
+    "signpost_market",
+    "signpost_inn",
+    "signpost_church",
+    "signpost_mill",
+    "signpost_mine",
+    "warning_bandits",
+    "signpost_town",
+    "signpost_farm",
+    "signpost_forest",
+    "signpost_docks",
+    "signpost_graveyard",
+    "road_marker_stone",
+    "boundary_post",
+    "blank_weathered_signpost",
+]
+
+TRADE_SIGN_TYPES = [
+    "bakery_sign",
+    "blacksmith_sign",
+    "tailor_sign",
+    "inn_sign",
+    "stable_sign",
+    "market_sign",
+    "apothecary_sign",
+    "carpenter_sign",
+    "miller_sign",
+    "dairy_sign",
+    "butcher_sign",
+    "fishmonger_sign",
+    "tanner_sign",
+    "weaver_sign",
+    "tavern_red_lion_sign",
+    "scribe_sign",
+]
+
+WORLD_TRANSPORT_TYPES = [
+    "handcart_empty",
+    "handcart_crates",
+    "farm_cart_empty",
+    "farm_cart_hay",
+    "farm_cart_barrels",
+    "market_wagon_covered",
+    "merchant_wagon_closed",
+    "horse_cart_single",
+    "horse_cart_pair",
+    "ox_cart",
+    "donkey_pack_cart",
+    "broken_wagon_large",
+    "wagon_wheel_loose",
+    "wagon_harness",
+    "hitching_post",
+    "wheelbarrow_tools",
+]
+
+FARM_STRUCTURE_TYPES = [
+    "barn_small",
+    "barn_large",
+    "stable",
+    "cow_shed",
+    "sheepfold",
+    "goat_pen",
+    "pigsty",
+    "henhouse",
+    "duck_pond",
+    "goose_pasture_marker",
+    "dovecote",
+    "cart_shed",
+    "dairy_house",
+    "smokehouse",
+    "hayloft",
+    "granary",
+]
+
+FARM_PROP_TYPES = [
+    "water_trough",
+    "feed_trough",
+    "hay_bale",
+    "hay_stack",
+    "straw_bale",
+    "feed_sack",
+    "fence_gate_farm",
+    "wooden_fence_segment",
+    "milking_stool",
+    "cheese_press",
+    "nesting_box_egg",
+    "animal_bedding_straw",
+    "pitchfork",
+    "shovel",
+    "wooden_bucket",
+    "rope_coil",
+]
+
+# Tiere = NPCs, KEIN Teil von STRUCTURE_TYPES. Hier nur die unique
+# species-IDs aus livestock + poultry_small + wildlife_small. Directional-
+# Sprites (cow_south, ...) und Animation-States (sleeping_cow, ...) sind
+# Render-Hilfen und gehören nicht in diese Liste.
+ANIMAL_KINDS = [
+    # livestock (20)
+    "cow", "bull", "calf",
+    "sheep", "ram", "lamb",
+    "goat", "buck_goat", "kid_goat",
+    "pig", "boar_domestic", "piglet",
+    "horse", "draft_horse", "foal",
+    "ox", "donkey", "mule",
+    "sheared_sheep", "sleeping_cow",
+    # poultry_small (16)
+    "chicken_hen", "rooster", "chick",
+    "duck", "drake", "duckling",
+    "goose", "gander", "gosling",
+    "mouse", "rat_brown", "frog", "toad",
+    "sparrow", "crow", "cat_mouser",
+    # wildlife_small (16)
+    "rat_black", "mouse_white", "raven",
+    "pigeon", "dove", "farm_dog",
+    "fox", "rabbit", "hare", "deer",
+    "badger", "hedgehog", "bee_swarm",
+    "swan", "turkey", "bat",
+]

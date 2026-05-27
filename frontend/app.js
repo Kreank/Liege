@@ -313,6 +313,87 @@ const STRUCTURE = {
   ruin_pillar:   { key: '', name: 'Säule',       icon: '🏛️', blocking: true,  sprite: 'prop_ruin_pillar' },
   rubble:        { key: '', name: 'Trümmer',     icon: '⛏️', blocking: false, sprite: 'prop_rubble' },
   statue_broken: { key: '', name: 'Statue',      icon: '🗿', blocking: true,  sprite: 'prop_statue_broken' },
+  // Welle 24 — World-Detail Asset-Drop (sign/transport/farm)
+  crossroads_signpost: { key: '', name: 'Crossroads Signpost', icon: '🪧', blocking: true, sprite: 'struct_crossroads_signpost', notBuildable: true },
+  signpost_village: { key: '', name: 'Signpost Village', icon: '🪧', blocking: true, sprite: 'struct_signpost_village', notBuildable: true },
+  signpost_market: { key: '', name: 'Signpost Market', icon: '🪧', blocking: true, sprite: 'struct_signpost_market', notBuildable: true },
+  signpost_inn: { key: '', name: 'Signpost Inn', icon: '🪧', blocking: true, sprite: 'struct_signpost_inn', notBuildable: true },
+  signpost_church: { key: '', name: 'Signpost Church', icon: '🪧', blocking: true, sprite: 'struct_signpost_church', notBuildable: true },
+  signpost_mill: { key: '', name: 'Signpost Mill', icon: '🪧', blocking: true, sprite: 'struct_signpost_mill', notBuildable: true },
+  signpost_mine: { key: '', name: 'Signpost Mine', icon: '🪧', blocking: true, sprite: 'struct_signpost_mine', notBuildable: true },
+  warning_bandits: { key: '', name: 'Warning Bandits', icon: '🪧', blocking: true, sprite: 'struct_warning_bandits', notBuildable: true },
+  signpost_town: { key: '', name: 'Signpost Town', icon: '🪧', blocking: true, sprite: 'struct_signpost_town', notBuildable: true },
+  signpost_farm: { key: '', name: 'Signpost Farm', icon: '🪧', blocking: true, sprite: 'struct_signpost_farm', notBuildable: true },
+  signpost_forest: { key: '', name: 'Signpost Forest', icon: '🪧', blocking: true, sprite: 'struct_signpost_forest', notBuildable: true },
+  signpost_docks: { key: '', name: 'Signpost Docks', icon: '🪧', blocking: true, sprite: 'struct_signpost_docks', notBuildable: true },
+  signpost_graveyard: { key: '', name: 'Signpost Graveyard', icon: '🪧', blocking: true, sprite: 'struct_signpost_graveyard', notBuildable: true },
+  road_marker_stone: { key: '', name: 'Road Marker Stone', icon: '🪧', blocking: true, sprite: 'struct_road_marker_stone', notBuildable: true },
+  boundary_post: { key: '', name: 'Boundary Post', icon: '🪧', blocking: true, sprite: 'struct_boundary_post', notBuildable: true },
+  blank_weathered_signpost: { key: '', name: 'Blank Weathered Signpost', icon: '🪧', blocking: true, sprite: 'struct_blank_weathered_signpost', notBuildable: true },
+  bakery_sign: { key: '', name: 'Bakery Sign', icon: '🏪', blocking: true, sprite: 'struct_bakery_sign', notBuildable: true },
+  blacksmith_sign: { key: '', name: 'Blacksmith Sign', icon: '🏪', blocking: true, sprite: 'struct_blacksmith_sign', notBuildable: true },
+  tailor_sign: { key: '', name: 'Tailor Sign', icon: '🏪', blocking: true, sprite: 'struct_tailor_sign', notBuildable: true },
+  inn_sign: { key: '', name: 'Inn Sign', icon: '🏪', blocking: true, sprite: 'struct_inn_sign', notBuildable: true },
+  stable_sign: { key: '', name: 'Stable Sign', icon: '🏪', blocking: true, sprite: 'struct_stable_sign', notBuildable: true },
+  market_sign: { key: '', name: 'Market Sign', icon: '🏪', blocking: true, sprite: 'struct_market_sign', notBuildable: true },
+  apothecary_sign: { key: '', name: 'Apothecary Sign', icon: '🏪', blocking: true, sprite: 'struct_apothecary_sign', notBuildable: true },
+  carpenter_sign: { key: '', name: 'Carpenter Sign', icon: '🏪', blocking: true, sprite: 'struct_carpenter_sign', notBuildable: true },
+  miller_sign: { key: '', name: 'Miller Sign', icon: '🏪', blocking: true, sprite: 'struct_miller_sign', notBuildable: true },
+  dairy_sign: { key: '', name: 'Dairy Sign', icon: '🏪', blocking: true, sprite: 'struct_dairy_sign', notBuildable: true },
+  butcher_sign: { key: '', name: 'Butcher Sign', icon: '🏪', blocking: true, sprite: 'struct_butcher_sign', notBuildable: true },
+  fishmonger_sign: { key: '', name: 'Fishmonger Sign', icon: '🏪', blocking: true, sprite: 'struct_fishmonger_sign', notBuildable: true },
+  tanner_sign: { key: '', name: 'Tanner Sign', icon: '🏪', blocking: true, sprite: 'struct_tanner_sign', notBuildable: true },
+  weaver_sign: { key: '', name: 'Weaver Sign', icon: '🏪', blocking: true, sprite: 'struct_weaver_sign', notBuildable: true },
+  tavern_red_lion_sign: { key: '', name: 'Tavern Red Lion Sign', icon: '🏪', blocking: true, sprite: 'struct_tavern_red_lion_sign', notBuildable: true },
+  scribe_sign: { key: '', name: 'Scribe Sign', icon: '🏪', blocking: true, sprite: 'struct_scribe_sign', notBuildable: true },
+  handcart_empty: { key: '', name: 'Handcart Empty', icon: '🛒', blocking: true, sprite: 'struct_handcart_empty', notBuildable: true },
+  handcart_crates: { key: '', name: 'Handcart Crates', icon: '🛒', blocking: true, sprite: 'struct_handcart_crates', notBuildable: true },
+  farm_cart_empty: { key: '', name: 'Farm Cart Empty', icon: '🛒', blocking: true, sprite: 'struct_farm_cart_empty', notBuildable: true },
+  farm_cart_hay: { key: '', name: 'Farm Cart Hay', icon: '🛒', blocking: true, sprite: 'struct_farm_cart_hay', notBuildable: true },
+  farm_cart_barrels: { key: '', name: 'Farm Cart Barrels', icon: '🛒', blocking: true, sprite: 'struct_farm_cart_barrels', notBuildable: true },
+  market_wagon_covered: { key: '', name: 'Market Wagon Covered', icon: '🛒', blocking: true, sprite: 'struct_market_wagon_covered', notBuildable: true },
+  merchant_wagon_closed: { key: '', name: 'Merchant Wagon Closed', icon: '🛒', blocking: true, sprite: 'struct_merchant_wagon_closed', notBuildable: true },
+  horse_cart_single: { key: '', name: 'Horse Cart Single', icon: '🐎', blocking: true, sprite: 'struct_horse_cart_single', notBuildable: true },
+  horse_cart_pair: { key: '', name: 'Horse Cart Pair', icon: '🐎', blocking: true, sprite: 'struct_horse_cart_pair', notBuildable: true },
+  ox_cart: { key: '', name: 'Ox Cart', icon: '🐎', blocking: true, sprite: 'struct_ox_cart', notBuildable: true },
+  donkey_pack_cart: { key: '', name: 'Donkey Pack Cart', icon: '🐎', blocking: true, sprite: 'struct_donkey_pack_cart', notBuildable: true },
+  broken_wagon_large: { key: '', name: 'Broken Wagon Large', icon: '🛒', blocking: true, sprite: 'struct_broken_wagon_large', notBuildable: true },
+  wagon_wheel_loose: { key: '', name: 'Wagon Wheel Loose', icon: '🛒', blocking: true, sprite: 'struct_wagon_wheel_loose', notBuildable: true },
+  wagon_harness: { key: '', name: 'Wagon Harness', icon: '🛒', blocking: true, sprite: 'struct_wagon_harness', notBuildable: true },
+  hitching_post: { key: '', name: 'Hitching Post', icon: '🛒', blocking: true, sprite: 'struct_hitching_post', notBuildable: true },
+  wheelbarrow_tools: { key: '', name: 'Wheelbarrow Tools', icon: '🛒', blocking: true, sprite: 'struct_wheelbarrow_tools', notBuildable: true },
+  barn_small: { key: '', name: 'Barn Small', icon: '🏚️', blocking: true, sprite: 'struct_barn_small', notBuildable: true },
+  barn_large: { key: '', name: 'Barn Large', icon: '🏚️', blocking: true, sprite: 'struct_barn_large', notBuildable: true },
+  stable: { key: '', name: 'Stable', icon: '🏚️', blocking: true, sprite: 'struct_stable', notBuildable: true },
+  cow_shed: { key: '', name: 'Cow Shed', icon: '🏚️', blocking: true, sprite: 'struct_cow_shed', notBuildable: true },
+  sheepfold: { key: '', name: 'Sheepfold', icon: '🏚️', blocking: true, sprite: 'struct_sheepfold', notBuildable: true },
+  goat_pen: { key: '', name: 'Goat Pen', icon: '🏚️', blocking: true, sprite: 'struct_goat_pen', notBuildable: true },
+  pigsty: { key: '', name: 'Pigsty', icon: '🏚️', blocking: true, sprite: 'struct_pigsty', notBuildable: true },
+  henhouse: { key: '', name: 'Henhouse', icon: '🏚️', blocking: true, sprite: 'struct_henhouse', notBuildable: true },
+  duck_pond: { key: '', name: 'Duck Pond', icon: '🏚️', blocking: true, sprite: 'struct_duck_pond', notBuildable: true },
+  goose_pasture_marker: { key: '', name: 'Goose Pasture Marker', icon: '🏚️', blocking: true, sprite: 'struct_goose_pasture_marker', notBuildable: true },
+  dovecote: { key: '', name: 'Dovecote', icon: '🏚️', blocking: true, sprite: 'struct_dovecote', notBuildable: true },
+  cart_shed: { key: '', name: 'Cart Shed', icon: '🏚️', blocking: true, sprite: 'struct_cart_shed', notBuildable: true },
+  dairy_house: { key: '', name: 'Dairy House', icon: '🏚️', blocking: true, sprite: 'struct_dairy_house', notBuildable: true },
+  smokehouse: { key: '', name: 'Smokehouse', icon: '🏚️', blocking: true, sprite: 'struct_smokehouse', notBuildable: true },
+  hayloft: { key: '', name: 'Hayloft', icon: '🏚️', blocking: true, sprite: 'struct_hayloft', notBuildable: true },
+  granary: { key: '', name: 'Granary', icon: '🏚️', blocking: true, sprite: 'struct_granary', notBuildable: true },
+  water_trough: { key: '', name: 'Water Trough', icon: '🪵', blocking: true, sprite: 'struct_water_trough', notBuildable: true },
+  feed_trough: { key: '', name: 'Feed Trough', icon: '🪵', blocking: true, sprite: 'struct_feed_trough', notBuildable: true },
+  hay_bale: { key: '', name: 'Hay Bale', icon: '🪵', blocking: true, sprite: 'struct_hay_bale', notBuildable: true },
+  hay_stack: { key: '', name: 'Hay Stack', icon: '🪵', blocking: true, sprite: 'struct_hay_stack', notBuildable: true },
+  straw_bale: { key: '', name: 'Straw Bale', icon: '🪵', blocking: true, sprite: 'struct_straw_bale', notBuildable: true },
+  feed_sack: { key: '', name: 'Feed Sack', icon: '🪵', blocking: true, sprite: 'struct_feed_sack', notBuildable: true },
+  fence_gate_farm: { key: '', name: 'Fence Gate Farm', icon: '🪵', blocking: true, sprite: 'struct_fence_gate_farm', notBuildable: true },
+  wooden_fence_segment: { key: '', name: 'Wooden Fence Segment', icon: '🪵', blocking: true, sprite: 'struct_wooden_fence_segment', notBuildable: true },
+  milking_stool: { key: '', name: 'Milking Stool', icon: '🪵', blocking: true, sprite: 'struct_milking_stool', notBuildable: true },
+  cheese_press: { key: '', name: 'Cheese Press', icon: '🪵', blocking: true, sprite: 'struct_cheese_press', notBuildable: true },
+  nesting_box_egg: { key: '', name: 'Nesting Box Egg', icon: '🪵', blocking: true, sprite: 'struct_nesting_box_egg', notBuildable: true },
+  animal_bedding_straw: { key: '', name: 'Animal Bedding Straw', icon: '🪵', blocking: true, sprite: 'struct_animal_bedding_straw', notBuildable: true },
+  pitchfork: { key: '', name: 'Pitchfork', icon: '🪵', blocking: true, sprite: 'struct_pitchfork', notBuildable: true },
+  shovel: { key: '', name: 'Shovel', icon: '🪵', blocking: true, sprite: 'struct_shovel', notBuildable: true },
+  wooden_bucket: { key: '', name: 'Wooden Bucket', icon: '🪵', blocking: true, sprite: 'struct_wooden_bucket', notBuildable: true },
+  rope_coil: { key: '', name: 'Rope Coil', icon: '🪵', blocking: true, sprite: 'struct_rope_coil', notBuildable: true },
   // Welle 23 — Gilden + Tempel + Quest-Board (Capital/Town-Distrikte)
   mage_guild:     { key: '', name: 'Magiergilde',    icon: '🔮', blocking: true,  sprite: 'struct_mage_guild',     notBuildable: true },
   fighters_guild: { key: '', name: 'Kriegergilde',   icon: '⚔️', blocking: true,  sprite: 'struct_fighters_guild', notBuildable: true },
@@ -1170,6 +1251,55 @@ const WORLD_POLISH_ANIMS = [
   { key:'campfire_embers',       frames:16, fps:12, looping:true,  category:'ambient'  },
 ];
 
+// Welle world-detail-p2 (Asset-Drop 2026-05-27): Animals + Transport.
+// Pro item zwei Spritesheets (walk/roll + idle). Frame-Größen variieren pro
+// animal/vehicle (siehe assets/professional/world_detail_p2_*_animation_pack_2026_05_27/manifest.json).
+// Keys: animal_<animal>_<dir>_walk|idle, transport_<vehicle>_<dir>_roll|idle.
+const WORLD_DETAIL_P2_ANIMAL_ANIMS = [
+  {"animal": "cow", "direction": "south", "walk_sheet": "/assets/animations/animals/cow/south/walk_sheet.png", "idle_sheet": "/assets/animations/animals/cow/south/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "cow", "direction": "east", "walk_sheet": "/assets/animations/animals/cow/east/walk_sheet.png", "idle_sheet": "/assets/animations/animals/cow/east/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "cow", "direction": "north", "walk_sheet": "/assets/animations/animals/cow/north/walk_sheet.png", "idle_sheet": "/assets/animations/animals/cow/north/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "cow", "direction": "west", "walk_sheet": "/assets/animations/animals/cow/west/walk_sheet.png", "idle_sheet": "/assets/animations/animals/cow/west/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "sheep", "direction": "south", "walk_sheet": "/assets/animations/animals/sheep/south/walk_sheet.png", "idle_sheet": "/assets/animations/animals/sheep/south/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "sheep", "direction": "east", "walk_sheet": "/assets/animations/animals/sheep/east/walk_sheet.png", "idle_sheet": "/assets/animations/animals/sheep/east/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "sheep", "direction": "north", "walk_sheet": "/assets/animations/animals/sheep/north/walk_sheet.png", "idle_sheet": "/assets/animations/animals/sheep/north/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "sheep", "direction": "west", "walk_sheet": "/assets/animations/animals/sheep/west/walk_sheet.png", "idle_sheet": "/assets/animations/animals/sheep/west/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "goat", "direction": "south", "walk_sheet": "/assets/animations/animals/goat/south/walk_sheet.png", "idle_sheet": "/assets/animations/animals/goat/south/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "goat", "direction": "east", "walk_sheet": "/assets/animations/animals/goat/east/walk_sheet.png", "idle_sheet": "/assets/animations/animals/goat/east/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "goat", "direction": "north", "walk_sheet": "/assets/animations/animals/goat/north/walk_sheet.png", "idle_sheet": "/assets/animations/animals/goat/north/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "goat", "direction": "west", "walk_sheet": "/assets/animations/animals/goat/west/walk_sheet.png", "idle_sheet": "/assets/animations/animals/goat/west/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "pig", "direction": "south", "walk_sheet": "/assets/animations/animals/pig/south/walk_sheet.png", "idle_sheet": "/assets/animations/animals/pig/south/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "pig", "direction": "east", "walk_sheet": "/assets/animations/animals/pig/east/walk_sheet.png", "idle_sheet": "/assets/animations/animals/pig/east/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "pig", "direction": "north", "walk_sheet": "/assets/animations/animals/pig/north/walk_sheet.png", "idle_sheet": "/assets/animations/animals/pig/north/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "pig", "direction": "west", "walk_sheet": "/assets/animations/animals/pig/west/walk_sheet.png", "idle_sheet": "/assets/animations/animals/pig/west/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 64, "walk_fh": 64, "idle_fw": 64, "idle_fh": 64},
+  {"animal": "horse", "direction": "south", "walk_sheet": "/assets/animations/animals/horse/south/walk_sheet.png", "idle_sheet": "/assets/animations/animals/horse/south/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "horse", "direction": "east", "walk_sheet": "/assets/animations/animals/horse/east/walk_sheet.png", "idle_sheet": "/assets/animations/animals/horse/east/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "horse", "direction": "north", "walk_sheet": "/assets/animations/animals/horse/north/walk_sheet.png", "idle_sheet": "/assets/animations/animals/horse/north/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "horse", "direction": "west", "walk_sheet": "/assets/animations/animals/horse/west/walk_sheet.png", "idle_sheet": "/assets/animations/animals/horse/west/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "farm_dog", "direction": "south", "walk_sheet": "/assets/animations/animals/farm_dog/south/walk_sheet.png", "idle_sheet": "/assets/animations/animals/farm_dog/south/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "farm_dog", "direction": "east", "walk_sheet": "/assets/animations/animals/farm_dog/east/walk_sheet.png", "idle_sheet": "/assets/animations/animals/farm_dog/east/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "farm_dog", "direction": "north", "walk_sheet": "/assets/animations/animals/farm_dog/north/walk_sheet.png", "idle_sheet": "/assets/animations/animals/farm_dog/north/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+  {"animal": "farm_dog", "direction": "west", "walk_sheet": "/assets/animations/animals/farm_dog/west/walk_sheet.png", "idle_sheet": "/assets/animations/animals/farm_dog/west/idle_sheet.png", "walk_frames": 4, "idle_frames": 2, "walk_fw": 96, "walk_fh": 96, "idle_fw": 96, "idle_fh": 96},
+];
+const WORLD_DETAIL_P2_TRANSPORT_ANIMS = [
+  {"vehicle": "handcart_empty", "direction": "south", "roll_sheet": "/assets/animations/transport/handcart_empty/south/roll_sheet.png", "idle_sheet": "/assets/animations/transport/handcart_empty/south/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "handcart_empty", "direction": "east", "roll_sheet": "/assets/animations/transport/handcart_empty/east/roll_sheet.png", "idle_sheet": "/assets/animations/transport/handcart_empty/east/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "handcart_empty", "direction": "north", "roll_sheet": "/assets/animations/transport/handcart_empty/north/roll_sheet.png", "idle_sheet": "/assets/animations/transport/handcart_empty/north/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "handcart_empty", "direction": "west", "roll_sheet": "/assets/animations/transport/handcart_empty/west/roll_sheet.png", "idle_sheet": "/assets/animations/transport/handcart_empty/west/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "farm_cart_hay", "direction": "south", "roll_sheet": "/assets/animations/transport/farm_cart_hay/south/roll_sheet.png", "idle_sheet": "/assets/animations/transport/farm_cart_hay/south/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "farm_cart_hay", "direction": "east", "roll_sheet": "/assets/animations/transport/farm_cart_hay/east/roll_sheet.png", "idle_sheet": "/assets/animations/transport/farm_cart_hay/east/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "farm_cart_hay", "direction": "north", "roll_sheet": "/assets/animations/transport/farm_cart_hay/north/roll_sheet.png", "idle_sheet": "/assets/animations/transport/farm_cart_hay/north/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "farm_cart_hay", "direction": "west", "roll_sheet": "/assets/animations/transport/farm_cart_hay/west/roll_sheet.png", "idle_sheet": "/assets/animations/transport/farm_cart_hay/west/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 128, "roll_fh": 128, "idle_fw": 128, "idle_fh": 128},
+  {"vehicle": "horse_cart_single", "direction": "south", "roll_sheet": "/assets/animations/transport/horse_cart_single/south/roll_sheet.png", "idle_sheet": "/assets/animations/transport/horse_cart_single/south/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "horse_cart_single", "direction": "east", "roll_sheet": "/assets/animations/transport/horse_cart_single/east/roll_sheet.png", "idle_sheet": "/assets/animations/transport/horse_cart_single/east/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "horse_cart_single", "direction": "north", "roll_sheet": "/assets/animations/transport/horse_cart_single/north/roll_sheet.png", "idle_sheet": "/assets/animations/transport/horse_cart_single/north/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "horse_cart_single", "direction": "west", "roll_sheet": "/assets/animations/transport/horse_cart_single/west/roll_sheet.png", "idle_sheet": "/assets/animations/transport/horse_cart_single/west/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "market_wagon_covered", "direction": "south", "roll_sheet": "/assets/animations/transport/market_wagon_covered/south/roll_sheet.png", "idle_sheet": "/assets/animations/transport/market_wagon_covered/south/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "market_wagon_covered", "direction": "east", "roll_sheet": "/assets/animations/transport/market_wagon_covered/east/roll_sheet.png", "idle_sheet": "/assets/animations/transport/market_wagon_covered/east/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "market_wagon_covered", "direction": "north", "roll_sheet": "/assets/animations/transport/market_wagon_covered/north/roll_sheet.png", "idle_sheet": "/assets/animations/transport/market_wagon_covered/north/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+  {"vehicle": "market_wagon_covered", "direction": "west", "roll_sheet": "/assets/animations/transport/market_wagon_covered/west/roll_sheet.png", "idle_sheet": "/assets/animations/transport/market_wagon_covered/west/idle_sheet.png", "roll_frames": 4, "idle_frames": 2, "roll_fw": 160, "roll_fh": 160, "idle_fw": 160, "idle_fh": 160},
+];
+
 function _equipDir(category) {
   if (category === 'weapon')  return 'weapons';
   if (category === 'armor')   return 'armor';
@@ -1632,6 +1762,87 @@ class WorldScene extends Phaser.Scene {
     this.load.image('struct_floor',    '/assets/structures/floor.png');
     this.load.image('struct_campfire', '/assets/structures/campfire.png');
     this.load.image('struct_marker',   '/assets/structures/marker.png');
+    // Welle 24 — World-Detail Asset-Drop (sign/transport/farm)
+    this.load.image('struct_crossroads_signpost', '/assets/props/settlement/signs/wayfinding/crossroads_signpost.png');
+    this.load.image('struct_signpost_village', '/assets/props/settlement/signs/wayfinding/signpost_village.png');
+    this.load.image('struct_signpost_market', '/assets/props/settlement/signs/wayfinding/signpost_market.png');
+    this.load.image('struct_signpost_inn', '/assets/props/settlement/signs/wayfinding/signpost_inn.png');
+    this.load.image('struct_signpost_church', '/assets/props/settlement/signs/wayfinding/signpost_church.png');
+    this.load.image('struct_signpost_mill', '/assets/props/settlement/signs/wayfinding/signpost_mill.png');
+    this.load.image('struct_signpost_mine', '/assets/props/settlement/signs/wayfinding/signpost_mine.png');
+    this.load.image('struct_warning_bandits', '/assets/props/settlement/signs/wayfinding/warning_bandits.png');
+    this.load.image('struct_signpost_town', '/assets/props/settlement/signs/wayfinding/signpost_town.png');
+    this.load.image('struct_signpost_farm', '/assets/props/settlement/signs/wayfinding/signpost_farm.png');
+    this.load.image('struct_signpost_forest', '/assets/props/settlement/signs/wayfinding/signpost_forest.png');
+    this.load.image('struct_signpost_docks', '/assets/props/settlement/signs/wayfinding/signpost_docks.png');
+    this.load.image('struct_signpost_graveyard', '/assets/props/settlement/signs/wayfinding/signpost_graveyard.png');
+    this.load.image('struct_road_marker_stone', '/assets/props/settlement/signs/wayfinding/road_marker_stone.png');
+    this.load.image('struct_boundary_post', '/assets/props/settlement/signs/wayfinding/boundary_post.png');
+    this.load.image('struct_blank_weathered_signpost', '/assets/props/settlement/signs/wayfinding/blank_weathered_signpost.png');
+    this.load.image('struct_bakery_sign', '/assets/props/settlement/signs/trade/bakery_sign.png');
+    this.load.image('struct_blacksmith_sign', '/assets/props/settlement/signs/trade/blacksmith_sign.png');
+    this.load.image('struct_tailor_sign', '/assets/props/settlement/signs/trade/tailor_sign.png');
+    this.load.image('struct_inn_sign', '/assets/props/settlement/signs/trade/inn_sign.png');
+    this.load.image('struct_stable_sign', '/assets/props/settlement/signs/trade/stable_sign.png');
+    this.load.image('struct_market_sign', '/assets/props/settlement/signs/trade/market_sign.png');
+    this.load.image('struct_apothecary_sign', '/assets/props/settlement/signs/trade/apothecary_sign.png');
+    this.load.image('struct_carpenter_sign', '/assets/props/settlement/signs/trade/carpenter_sign.png');
+    this.load.image('struct_miller_sign', '/assets/props/settlement/signs/trade/miller_sign.png');
+    this.load.image('struct_dairy_sign', '/assets/props/settlement/signs/trade/dairy_sign.png');
+    this.load.image('struct_butcher_sign', '/assets/props/settlement/signs/trade/butcher_sign.png');
+    this.load.image('struct_fishmonger_sign', '/assets/props/settlement/signs/trade/fishmonger_sign.png');
+    this.load.image('struct_tanner_sign', '/assets/props/settlement/signs/trade/tanner_sign.png');
+    this.load.image('struct_weaver_sign', '/assets/props/settlement/signs/trade/weaver_sign.png');
+    this.load.image('struct_tavern_red_lion_sign', '/assets/props/settlement/signs/trade/tavern_red_lion_sign.png');
+    this.load.image('struct_scribe_sign', '/assets/props/settlement/signs/trade/scribe_sign.png');
+    this.load.image('struct_handcart_empty', '/assets/props/transport/handcart_empty.png');
+    this.load.image('struct_handcart_crates', '/assets/props/transport/handcart_crates.png');
+    this.load.image('struct_farm_cart_empty', '/assets/props/transport/farm_cart_empty.png');
+    this.load.image('struct_farm_cart_hay', '/assets/props/transport/farm_cart_hay.png');
+    this.load.image('struct_farm_cart_barrels', '/assets/props/transport/farm_cart_barrels.png');
+    this.load.image('struct_market_wagon_covered', '/assets/props/transport/market_wagon_covered.png');
+    this.load.image('struct_merchant_wagon_closed', '/assets/props/transport/merchant_wagon_closed.png');
+    this.load.image('struct_horse_cart_single', '/assets/props/transport/horse_cart_single.png');
+    this.load.image('struct_horse_cart_pair', '/assets/props/transport/horse_cart_pair.png');
+    this.load.image('struct_ox_cart', '/assets/props/transport/ox_cart.png');
+    this.load.image('struct_donkey_pack_cart', '/assets/props/transport/donkey_pack_cart.png');
+    this.load.image('struct_broken_wagon_large', '/assets/props/transport/broken_wagon_large.png');
+    this.load.image('struct_wagon_wheel_loose', '/assets/props/transport/wagon_wheel_loose.png');
+    this.load.image('struct_wagon_harness', '/assets/props/transport/wagon_harness.png');
+    this.load.image('struct_hitching_post', '/assets/props/transport/hitching_post.png');
+    this.load.image('struct_wheelbarrow_tools', '/assets/props/transport/wheelbarrow_tools.png');
+    this.load.image('struct_barn_small', '/assets/structures/farm/barn_small.png');
+    this.load.image('struct_barn_large', '/assets/structures/farm/barn_large.png');
+    this.load.image('struct_stable', '/assets/structures/farm/stable.png');
+    this.load.image('struct_cow_shed', '/assets/structures/farm/cow_shed.png');
+    this.load.image('struct_sheepfold', '/assets/structures/farm/sheepfold.png');
+    this.load.image('struct_goat_pen', '/assets/structures/farm/goat_pen.png');
+    this.load.image('struct_pigsty', '/assets/structures/farm/pigsty.png');
+    this.load.image('struct_henhouse', '/assets/structures/farm/henhouse.png');
+    this.load.image('struct_duck_pond', '/assets/structures/farm/duck_pond.png');
+    this.load.image('struct_goose_pasture_marker', '/assets/structures/farm/goose_pasture_marker.png');
+    this.load.image('struct_dovecote', '/assets/structures/farm/dovecote.png');
+    this.load.image('struct_cart_shed', '/assets/structures/farm/cart_shed.png');
+    this.load.image('struct_dairy_house', '/assets/structures/farm/dairy_house.png');
+    this.load.image('struct_smokehouse', '/assets/structures/farm/smokehouse.png');
+    this.load.image('struct_hayloft', '/assets/structures/farm/hayloft.png');
+    this.load.image('struct_granary', '/assets/structures/farm/granary.png');
+    this.load.image('struct_water_trough', '/assets/structures/farm/water_trough.png');
+    this.load.image('struct_feed_trough', '/assets/structures/farm/feed_trough.png');
+    this.load.image('struct_hay_bale', '/assets/structures/farm/hay_bale.png');
+    this.load.image('struct_hay_stack', '/assets/structures/farm/hay_stack.png');
+    this.load.image('struct_straw_bale', '/assets/structures/farm/straw_bale.png');
+    this.load.image('struct_feed_sack', '/assets/resources/animal_products/feed_sack.png');
+    this.load.image('struct_fence_gate_farm', '/assets/structures/farm/fence_gate_farm.png');
+    this.load.image('struct_wooden_fence_segment', '/assets/structures/farm/wooden_fence_segment.png');
+    this.load.image('struct_milking_stool', '/assets/structures/farm/milking_stool.png');
+    this.load.image('struct_cheese_press', '/assets/structures/farm/cheese_press.png');
+    this.load.image('struct_nesting_box_egg', '/assets/structures/farm/nesting_box_egg.png');
+    this.load.image('struct_animal_bedding_straw', '/assets/resources/animal_products/animal_bedding_straw.png');
+    this.load.image('struct_pitchfork', '/assets/tools/pitchfork.png');
+    this.load.image('struct_shovel', '/assets/tools/shovel.png');
+    this.load.image('struct_wooden_bucket', '/assets/tools/wooden_bucket.png');
+    this.load.image('struct_rope_coil', '/assets/tools/rope_coil.png');
     this.load.image('struct_chest',    '/assets/structures/chest.png');
     this.load.image('struct_workbench','/assets/structures/workbench.png');
     this.load.image('struct_furnace',  '/assets/structures/furnace.png');
@@ -2002,6 +2213,36 @@ class WorldScene extends Phaser.Scene {
         { frameWidth: 192, frameHeight: 192 }
       );
     }
+    // Welle world-detail-p2 (Asset-Drop 2026-05-27): Animal-Animations
+    // 24 animals × 2 sheets (walk + idle) = 48 Spritesheets. Frame-Größen
+    // variieren pro Tier (64×64 für sheep/goat/pig, 96×96 für cow/horse/farm_dog).
+    for (const a of WORLD_DETAIL_P2_ANIMAL_ANIMS) {
+      this.load.spritesheet(
+        `animal_${a.animal}_${a.direction}_walk`,
+        a.walk_sheet,
+        { frameWidth: a.walk_fw, frameHeight: a.walk_fh }
+      );
+      this.load.spritesheet(
+        `animal_${a.animal}_${a.direction}_idle`,
+        a.idle_sheet,
+        { frameWidth: a.idle_fw, frameHeight: a.idle_fh }
+      );
+    }
+    // Welle world-detail-p2: Transport-Animations
+    // 16 vehicles × 2 sheets (roll + idle) = 32 Spritesheets. Frame-Größen
+    // 128×128 (handcart/farm_cart) bzw. 160×160 (horse_cart/market_wagon).
+    for (const t of WORLD_DETAIL_P2_TRANSPORT_ANIMS) {
+      this.load.spritesheet(
+        `transport_${t.vehicle}_${t.direction}_roll`,
+        t.roll_sheet,
+        { frameWidth: t.roll_fw, frameHeight: t.roll_fh }
+      );
+      this.load.spritesheet(
+        `transport_${t.vehicle}_${t.direction}_idle`,
+        t.idle_sheet,
+        { frameWidth: t.idle_fw, frameHeight: t.idle_fh }
+      );
+    }
     // Welle 51 — Settlement-Schilder (icons_64 für Game-View, 1 Tile = 64px)
     for (const [slug] of SIGN_VARIANTS) {
       this.load.image(
@@ -2026,6 +2267,49 @@ class WorldScene extends Phaser.Scene {
         frameRate: a.fps,
         repeat: a.looping ? -1 : 0,
       });
+    }
+    // Welle world-detail-p2: Animal-Animations registrieren (48 anims)
+    // walk = -1 (loop), idle = -1 (loop). Beide @ 8 fps.
+    for (const a of WORLD_DETAIL_P2_ANIMAL_ANIMS) {
+      const walkKey = `animal_${a.animal}_${a.direction}_walk`;
+      if (!this.anims.exists(walkKey) && this.textures.exists(walkKey)) {
+        this.anims.create({
+          key: walkKey,
+          frames: this.anims.generateFrameNumbers(walkKey, { start: 0, end: a.walk_frames - 1 }),
+          frameRate: 8,
+          repeat: -1,
+        });
+      }
+      const idleKey = `animal_${a.animal}_${a.direction}_idle`;
+      if (!this.anims.exists(idleKey) && this.textures.exists(idleKey)) {
+        this.anims.create({
+          key: idleKey,
+          frames: this.anims.generateFrameNumbers(idleKey, { start: 0, end: a.idle_frames - 1 }),
+          frameRate: 8,
+          repeat: -1,
+        });
+      }
+    }
+    // Welle world-detail-p2: Transport-Animations registrieren (32 anims)
+    for (const t of WORLD_DETAIL_P2_TRANSPORT_ANIMS) {
+      const rollKey = `transport_${t.vehicle}_${t.direction}_roll`;
+      if (!this.anims.exists(rollKey) && this.textures.exists(rollKey)) {
+        this.anims.create({
+          key: rollKey,
+          frames: this.anims.generateFrameNumbers(rollKey, { start: 0, end: t.roll_frames - 1 }),
+          frameRate: 8,
+          repeat: -1,
+        });
+      }
+      const idleKey = `transport_${t.vehicle}_${t.direction}_idle`;
+      if (!this.anims.exists(idleKey) && this.textures.exists(idleKey)) {
+        this.anims.create({
+          key: idleKey,
+          frames: this.anims.generateFrameNumbers(idleKey, { start: 0, end: t.idle_frames - 1 }),
+          frameRate: 8,
+          repeat: -1,
+        });
+      }
     }
     // Welle 50: Ambient leaf_rustle — alle 7s ein zufälliges Wald-Tile in Sicht
     // (Forest=3, Jungle=6) bekommt einen kurzen Rascheleffekt. Subtil, kein Loop.
