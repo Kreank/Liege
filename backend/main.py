@@ -2643,6 +2643,41 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_json({
                     "type": "toast", "text": f"📜 {new_q['title']}",
                 })
+                # Welle 23: Quest-Spawn-Garantie — bei kill-Quests sicherstellen
+                # dass mindestens N target-creatures in erreichbarer Distanz sind.
+                if new_q["quest_type"] == "kill":
+                    obj = new_q["objective"] or {}
+                    target_kind = obj.get("creature_kind")
+                    need_count = int(obj.get("count", 1))
+                    if target_kind:
+                        try:
+                            player = manager.get_players().get(player_id, {})
+                            px = player.get("x", 60)
+                            py = player.get("y", 40)
+                            # Wie viele matching creatures in Player-Radius 35?
+                            existing = sum(
+                                1 for n in npcs.all()
+                                if n["kind"] == target_kind
+                                and abs(n["x"] - px) <= 35
+                                and abs(n["y"] - py) <= 35
+                            )
+                            deficit = need_count - existing
+                            if deficit > 0:
+                                # On-demand spawn — Cluster außerhalb Safe-Zone
+                                logging.info("Quest-Spawn: %d × %s für Quest %d",
+                                              deficit, target_kind, new_q["id"])
+                                await npc_worker.spawn_cluster(
+                                    world, npcs, manager,
+                                    kind=target_kind,
+                                    count=deficit,
+                                    jitter=4,
+                                )
+                                await websocket.send_json({
+                                    "type": "toast",
+                                    "text": f"💢 {deficit} {target_kind}-Spuren in der Nähe entdeckt …",
+                                })
+                        except Exception:
+                            logging.exception("Quest-Spawn-Garantie fehlgeschlagen")
                 sxp = await skills.gain_xp(player_id, "social", 6)
                 if sxp:
                     await websocket.send_json({"type": "skill_xp", **sxp})

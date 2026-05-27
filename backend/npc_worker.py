@@ -607,10 +607,27 @@ async def respawn_loop(world, npc_manager, connection_manager,
             deficit = MIN_CREATURE_COUNT - len(creatures)
             if deficit <= 0:
                 continue
-            # Erst Position finden (irgendwo nahe Spieler) — danach Region/Tier
-            # bestimmen, dann passenden Kind aus dem erlaubten Pool wählen.
-            # Center für Gruppe finden (strict biome + safe-zones)
-            kind = random.choice(wild_kinds)
+            # Welle 23: Quest-Aware-Bias — kinds aus aktiven kill-Quests
+            # bekommen 70% Priorität. So muss Spieler nicht weit reisen für
+            # seltene Mobs.
+            kind = None
+            try:
+                import db
+                if random.random() < 0.70:
+                    quest_kinds = await db.pool().fetch(
+                        "SELECT DISTINCT objective->>'creature_kind' AS k FROM quests "
+                        "WHERE status = 'active' AND quest_type = 'kill' "
+                        "AND objective->>'creature_kind' IS NOT NULL"
+                    )
+                    eligible = [r["k"] for r in quest_kinds
+                                if r["k"] in wild_kinds]
+                    if eligible:
+                        kind = random.choice(eligible)
+                        log.info("Respawn-Bias: %s (Quest-Ziel)", kind)
+            except Exception:
+                pass
+            if kind is None:
+                kind = random.choice(wild_kinds)
             profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
             group_min, group_max = profile["group"]
             group_size = min(random.randint(group_min, group_max), deficit)
