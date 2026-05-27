@@ -2557,8 +2557,8 @@ async def websocket_endpoint(websocket: WebSocket):
                     player_id, preset, _json.dumps(cleaned),
                     remaining_points, display_name,
                 )
-                log.info("Character created: %s preset=%s name=%s alloc=%s",
-                         player_id, preset, display_name, cleaned)
+                logging.info("Character created: %s preset=%s name=%s alloc=%s",
+                              player_id, preset, display_name, cleaned)
                 await websocket.send_json({
                     "type": "character_created",
                     "preset": preset,
