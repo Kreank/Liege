@@ -671,7 +671,12 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         # blockt den Angriff. Gebäude sind dadurch echter Schutz.
         if not _has_attack_los(npc, nearest_data["x"], nearest_data["y"],
                                 world, structures_mgr):
-            return False
+            # Welle 25: Wenn LoS geblockt UND Spieler nahe, greife die
+            # blockierende Wand an. Wütende Banditen werden zu Wreckern.
+            await _try_attack_blocking_structure(
+                npc, nearest_data["x"], nearest_data["y"],
+                structures_mgr, connection_manager)
+            return True
         # Welle 23: ESO-Style — DMG folgt Player-Power + Tier + Flavor + Region.
         # Hier nehmen wir den Power-Score des angegriffenen Spielers (nicht der
         # Gruppe), weil DMG individuell zugefügt wird.
@@ -728,6 +733,60 @@ def _can_walk(x: int, y: int, world, structures_mgr) -> bool:
         return False
     if structures_mgr is not None and structures_mgr.blocks(x, y):
         return False
+    return True
+
+
+async def _try_attack_blocking_structure(npc, target_x: int, target_y: int,
+                                           structures_mgr, connection_manager) -> bool:
+    """Welle 25: Wenn NPC den Spieler nicht direkt erreichen kann, weil eine
+    Combat-Struktur (Wand/Tür/Fence) blockiert, schlage diese Struktur kaputt.
+    Banditen werden so zu Belagerern. DMG = creature_damage / 2 (halb), damit
+    Mauern auch bei längeren Auseinandersetzungen noch Schutz bieten."""
+    if structures_mgr is None:
+        return False
+    import structures as _struct_mod
+    # Suche die nächste blockierende Combat-Struktur in Richtung Spieler
+    dx = target_x - npc["x"]
+    dy = target_y - npc["y"]
+    steps = max(abs(dx), abs(dy), 1)
+    candidate = None
+    for i in range(1, min(steps + 1, 8)):
+        ix = npc["x"] + round(dx * i / steps)
+        iy = npc["y"] + round(dy * i / steps)
+        s = structures_mgr.object_at(ix, iy)
+        if s is None:
+            continue
+        if not _struct_mod.is_combat_structure(s["type"]):
+            continue
+        # Adjacent? NPC darf nur Strukturen treffen die direkt benachbart sind
+        if abs(ix - npc["x"]) + abs(iy - npc["y"]) > 1:
+            continue
+        candidate = s
+        break
+    if candidate is None:
+        return False
+    # Damage anwenden — Material-DR vereinfacht: NPC = "blunt" damage class
+    raw = max(1, combat.creature_damage(npc["kind"]) // 2)
+    final_dmg = _struct_mod.apply_material_resist(candidate["material"], raw, "blunt")
+    result = await structures_mgr.damage_structure(candidate["x"], candidate["y"],
+                                                     amount=final_dmg)
+    if result is None:
+        # Kollabiert
+        await connection_manager.broadcast({
+            "type": "structure_removed",
+            "x": candidate["x"], "y": candidate["y"],
+        })
+        log.info("NPC %s zerschlug %s @(%d,%d)",
+                 npc["kind"], candidate["type"], candidate["x"], candidate["y"])
+    else:
+        await connection_manager.broadcast({
+            "type": "structure_damaged",
+            "x": result["x"], "y": result["y"],
+            "durability":     result["durability"],
+            "max_durability": result["max_durability"],
+            "dmg":            final_dmg,
+            "by_npc":         npc["id"],
+        })
     return True
 
 

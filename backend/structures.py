@@ -282,6 +282,50 @@ def apply_material_resist(material: str, raw_dmg: int, dmg_class: str) -> int:
     dr = resists.get(dmg_class, 0.2)
     return max(1, int(round(raw_dmg * (1 - dr))))
 
+
+# ─── Welle 25: Material-Upgrade-Hierarchie ─────────────────────────────────
+# Aufsteigende Reihenfolge — Spieler können hochgraden, kein Downgrade.
+MATERIAL_TIER_ORDER = ["straw", "wood", "stone"]
+
+# Material-Kosten fürs Upgrade: 2× das neue (höhere) Material pro Klick.
+UPGRADE_MATERIAL_COST = 2
+
+
+def material_tier(material: str) -> int:
+    """Tier 0=straw, 1=wood, 2=stone. -1 wenn unbekannt."""
+    try:
+        return MATERIAL_TIER_ORDER.index(material)
+    except ValueError:
+        return -1
+
+
+def next_material(material: str) -> str | None:
+    """Liefert das nächst-höhere Material oder None wenn schon top-tier."""
+    t = material_tier(material)
+    if t < 0 or t + 1 >= len(MATERIAL_TIER_ORDER):
+        return None
+    return MATERIAL_TIER_ORDER[t + 1]
+
+
+# ─── Welle 25: Zentrale Permission-Logik ───────────────────────────────────
+# Heute: nur Owner darf eigene Strukturen modifizieren (repair/upgrade/remove).
+# Forward-compat: wenn das Allianzen/Gruppen-System kommt, wird HIER erweitert
+# (NICHT in jedem WS-Handler einzeln). Erwartete Erweiterung sowas wie:
+#   if struct["owner"] in alliance_members_of(player_id): return True
+def can_modify(player_id: str, struct: dict) -> bool:
+    """Darf dieser Spieler diese Struktur modifizieren (repair/upgrade)?
+
+    Aktuell: True nur wenn player_id == struct['owner']. System-Strukturen
+    (owner='system' oder None) sind für niemanden modifizierbar. Spielerbauten
+    fremder Spieler sind erst nach Allianzen-System für Verbündete freigegeben.
+    """
+    if struct is None:
+        return False
+    owner = struct.get("owner")
+    if not owner or owner == "system":
+        return False
+    return owner == player_id
+
 # Welche Strukturen ins floor-Layer gehören (Rest geht ins object-Layer).
 # Floors blockieren nie und ein Object kann oben drauf platziert werden.
 FLOOR_TYPES = {"floor"}
@@ -405,6 +449,33 @@ class StructureManager:
         }
         layer_map[(x, y)] = struct
         return struct
+
+    async def upgrade_material(self, x: int, y: int,
+                                 layer: str | None = None) -> dict | None:
+        """Welle 25: Strukturen-Material auf nächste Tier-Stufe hochsetzen.
+        max_durability wird neu berechnet, durability = max (frisch).
+        Returns Struktur, oder None wenn nicht upgradebar."""
+        if layer is None:
+            s = self._object_by_coord.get((x, y)) or self._floor_by_coord.get((x, y))
+        else:
+            s = self._layer_map(layer).get((x, y))
+        if s is None:
+            return None
+        new_mat = next_material(s["material"])
+        if new_mat is None:
+            return None  # bereits top-tier (stone)
+        new_max = structure_max_hp(s["type"], new_mat)
+        if new_max <= 0:
+            return None  # nicht Combat-fähig — sollte nie passieren wenn caller is_combat_structure prüft
+        await db.pool().execute(
+            "UPDATE structures SET material = $1, durability = $2, max_durability = $2 "
+            "WHERE id = $3",
+            new_mat, new_max, s["id"],
+        )
+        s["material"] = new_mat
+        s["durability"] = new_max
+        s["max_durability"] = new_max
+        return s
 
     async def repair_structure(self, x: int, y: int, amount: int = 8,
                                 layer: str | None = None) -> dict | None:

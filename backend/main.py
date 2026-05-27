@@ -1476,6 +1476,11 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
                 if not structures.is_combat_structure(s["type"]):
                     continue
+                if not structures.can_modify(player_id, s):
+                    await websocket.send_json({
+                        "type": "toast", "text": "🔒 Du bist nicht der Eigentümer.",
+                    })
+                    continue
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
@@ -1521,6 +1526,91 @@ async def websocket_endpoint(websocket: WebSocket):
                 except Exception:
                     pass
 
+            elif mtype == "upgrade_structure":
+                # Welle 25: Wand-Material aufwerten (straw→wood→stone).
+                # Voraussetzungen: eigene Struktur (can_modify), Combat-fähig,
+                # Hammer ausgerüstet, voll HP (kein Upgrade beschädigter Wände),
+                # 2× neues Material im Inventar.
+                x, y = int(data.get("x", -1)), int(data.get("y", -1))
+                s = structures.object_at(x, y) or structures.floor_at(x, y)
+                if s is None:
+                    continue
+                if not structures.is_combat_structure(s["type"]):
+                    continue
+                if not structures.can_modify(player_id, s):
+                    await websocket.send_json({
+                        "type": "toast", "text": "🔒 Du bist nicht der Eigentümer.",
+                    })
+                    continue
+                player = manager.get_players().get(player_id)
+                if player is None:
+                    continue
+                if combat.manhattan(player["x"], player["y"], x, y) > 1:
+                    await websocket.send_json({"type": "toast", "text": "🤚 Zu weit weg."})
+                    continue
+                new_mat = structures.next_material(s["material"])
+                if new_mat is None:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"⛰️ Bereits höchstes Material ({s['material']}).",
+                    })
+                    continue
+                if s["durability"] < s.get("max_durability", s["durability"]):
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": "🔨 Erst reparieren — beschädigte Wände können nicht aufgewertet werden.",
+                    })
+                    continue
+                # Hammer-Check
+                tool = await db.pool().fetchrow(
+                    "SELECT id FROM items WHERE owner = $1 AND equipped_slot = 'tool' "
+                    "AND kind = 'hammer' LIMIT 1", player_id,
+                )
+                if not tool:
+                    await websocket.send_json({"type": "toast", "text": "🔨 Hammer ausrüsten."})
+                    continue
+                # Materialkosten: 2× das neue (höhere) Material.
+                cost = structures.UPGRADE_MATERIAL_COST
+                # Prüf-only: gibt es genug? consume_one() consumed jeweils 1.
+                consumed_count = 0
+                for _ in range(cost):
+                    if await items.consume_one(player_id, new_mat):
+                        consumed_count += 1
+                    else:
+                        break
+                if consumed_count < cost:
+                    # Rollback: zurückgeben was schon consumed wurde
+                    for _ in range(consumed_count):
+                        try:
+                            await items.create_for_player(new_mat, player_id,
+                                                           quality_kind="normal")
+                        except Exception:
+                            log.exception("Upgrade-Rollback fehlgeschlagen")
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"📦 Du brauchst {cost}× {new_mat} zum Aufwerten.",
+                    })
+                    continue
+                result = await structures.upgrade_material(x, y)
+                if result is not None:
+                    await manager.broadcast({
+                        "type": "structure_upgraded",
+                        "x": x, "y": y,
+                        "material":       result["material"],
+                        "durability":     result["durability"],
+                        "max_durability": result["max_durability"],
+                        "by":             player_id,
+                    })
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"⬆️ {s['type']} aufgewertet: {new_mat} ({result['max_durability']} HP)",
+                    })
+                # Construction-XP — höher als Repair, weil's eine Verbesserung ist
+                try:
+                    await skills.gain_xp(player_id, "construction", 5)
+                except Exception:
+                    pass
+
             elif mtype == "use_structure":
                 # Klick auf Bed/Well/Anvil etc. — heilt oder anderes je nach Typ
                 x, y = int(data.get("x", -1)), int(data.get("y", -1))
@@ -1539,6 +1629,43 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type":     "chest_open",
                         "chest_id": s["id"],
                         "items":    contents,
+                    })
+                    continue
+                # Welle 23: Quest-Board zeigt eine Auswahl Welt-Quests an.
+                # Wird vom Frontend gerendert wie ein NPC-Quest-Dialog.
+                if s["type"] == "quest_board":
+                    import quest_templates as qt
+                    combat_lvl = await skills.get_skill_level(player_id, "combat")
+                    # Quests die Player schon hat
+                    taken_rows = await db.pool().fetch(
+                        "SELECT template_id FROM quests "
+                        "WHERE player_name = $1 "
+                        "AND status IN ('active','completed','closed') "
+                        "AND template_id IS NOT NULL",
+                        player_id,
+                    )
+                    taken = {r["template_id"] for r in taken_rows}
+                    # Quest-Board zeigt die ersten 6 passenden Templates
+                    pool = [
+                        t for t in qt.QUEST_TEMPLATES
+                        if t["min_level"] <= combat_lvl <= t["max_level"]
+                        and t["id"] not in taken
+                    ]
+                    import random as _rb
+                    pool = _rb.sample(pool, min(6, len(pool)))
+                    offers_ui = [{
+                        "template_id": t["id"],
+                        "title": t["title_template"].format(**t["objective"]),
+                        "description": t["desc_template"].format(**t["objective"]),
+                        "quest_type": t["type"],
+                        "objective": t["objective"],
+                        "reward": t["reward"],
+                        "tier": t.get("tier", 1),
+                    } for t in pool]
+                    await websocket.send_json({
+                        "type":     "quest_board_open",
+                        "board_id": s["id"],
+                        "offers":   offers_ui,
                     })
                     continue
                 if harvest.is_harvestable(s["type"]):
@@ -2306,7 +2433,115 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif mtype == "list_quests":
                 qs = await quests.list_for_player(player_id)
-                await websocket.send_json({"type": "quests_update", "quests": qs})
+                rep = await quests.all_reputation(player_id)
+                await websocket.send_json({"type": "quests_update", "quests": qs,
+                                            "reputation": rep})
+
+            elif mtype == "query_npc_quests":
+                # Welle 23: Frontend fragt was dieser NPC anbietet / wo abgeben
+                npc_id = int(data.get("npc_id", 0))
+                npc = npcs.get(npc_id)
+                if npc is None or npc["kind"] in combat.CREATURE_KINDS:
+                    await websocket.send_json({"type": "npc_quest_status",
+                                                "npc_id": npc_id,
+                                                "offers": [], "turnins": []})
+                    continue
+                combat_lvl = await skills.get_skill_level(player_id, "combat")
+                offers = await quests.offers_for_npc(npc, player_id, combat_lvl)
+                turnins = await quests.turnin_targets_for_npc(npc, player_id)
+                # Schlanke Versionen für UI (offers = template-shape)
+                offers_ui = [{
+                    "template_id": t["id"],
+                    "title": t["title_template"].format(**t["objective"]),
+                    "description": t["desc_template"].format(**t["objective"]),
+                    "quest_type": t["type"],
+                    "objective": t["objective"],
+                    "reward": t["reward"],
+                    "tier": t.get("tier", 1),
+                } for t in offers]
+                await websocket.send_json({
+                    "type": "npc_quest_status",
+                    "npc_id": npc_id,
+                    "offers":  offers_ui,
+                    "turnins": turnins,
+                })
+
+            elif mtype == "accept_quest_template":
+                # Welle 23: template-basierte Annahme (statt LLM-Generator)
+                template_id = str(data.get("template_id", ""))
+                npc_id = int(data.get("npc_id", 0))
+                npc = npcs.get(npc_id)
+                if npc is None or not template_id:
+                    continue
+                # 3-Aktive-Quests-Limit beibehalten
+                active_qs = await quests.list_for_player(player_id, ("active",))
+                if len(active_qs) >= 3:
+                    await websocket.send_json({
+                        "type": "toast", "text": "Du hast bereits 3 aktive Quests!",
+                    })
+                    continue
+                new_q = await quests.accept_template(player_id, template_id, npc_id)
+                if new_q is None:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": "Quest konnte nicht angenommen werden.",
+                    })
+                    continue
+                await websocket.send_json({"type": "quest_new", "quest": new_q})
+                await websocket.send_json({
+                    "type": "toast", "text": f"📜 {new_q['title']}",
+                })
+                sxp = await skills.gain_xp(player_id, "social", 6)
+                if sxp:
+                    await websocket.send_json({"type": "skill_xp", **sxp})
+
+            elif mtype == "quest_turn_in":
+                # Welle 23: Quest beim NPC abgeben (Faction-Reward + Item-Reward)
+                quest_id = int(data.get("quest_id", 0))
+                npc_id = int(data.get("npc_id", 0))
+                result = await quests.turn_in(quest_id, player_id)
+                if result is None:
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": "Diese Quest ist nicht abschließbar.",
+                    })
+                    continue
+                reward = result.get("reward_granted") or {}
+                # Items
+                for item_kind, count in (reward.get("items") or {}).items():
+                    for _ in range(int(count)):
+                        created = await items.create_for_player(item_kind, player_id)
+                        if created is not None:
+                            await websocket.send_json({"type": "inventory_add",
+                                                        "item": created})
+                # XP
+                if "xp" in reward:
+                    xp_res = await skills.gain_xp(player_id, "combat", int(reward["xp"]))
+                    if xp_res:
+                        await websocket.send_json({"type": "skill_xp", **xp_res})
+                # Gold (als copper_coin-Stack)
+                gold = int(reward.get("gold", 0))
+                if gold > 0:
+                    created = await items.create_for_player("copper_coin", player_id)
+                    if created and gold > 1:
+                        # quantity hochsetzen
+                        await db.pool().execute(
+                            "UPDATE items SET quantity = quantity + $2 WHERE id = $1",
+                            created["id"], gold - 1,
+                        )
+                # Faction-Reputation-Toast
+                for fac, delta in (reward.get("faction") or {}).items():
+                    new_rep = await quests.get_reputation(player_id, fac)
+                    sign = "+" if delta >= 0 else ""
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"🤝 {fac}: {sign}{delta} (Ruf: {new_rep})",
+                    })
+                await websocket.send_json({"type": "quest_closed",
+                                            "quest_id": quest_id})
+                await websocket.send_json({
+                    "type": "toast", "text": "✅ Quest abgegeben!",
+                })
 
             elif mtype == "accept_quest_from_npc":
                 npc_id = int(data.get("npc_id", 0))

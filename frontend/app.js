@@ -2962,6 +2962,9 @@ class WorldScene extends Phaser.Scene {
     document.getElementById('dialog-history').innerHTML = '';
     document.getElementById('dialog-input').value = '';
     document.getElementById('dialog-overlay').classList.add('active');
+    // Welle 23: Quest-Offers/Turnins anzeigen (frisch abrufen)
+    this._refreshDialogQuestSection(npc.id);
+    this._queryNPCQuests(npc.id);
     // Quest-Button nur bei NPC-Kinds die Quests vergeben können
     const QUEST_GIVING_KINDS = new Set([
       'quest_giver','merchant','blacksmith','mage','scholar',
@@ -2985,7 +2988,88 @@ class WorldScene extends Phaser.Scene {
   closeDialog() {
     this.activeDialog = null;
     document.getElementById('dialog-overlay').classList.remove('active');
+    // Welle 23: Reset für Quest-Board-Fallthrough
+    const inputRow = document.getElementById('dialog-input-row');
+    if (inputRow) inputRow.style.display = '';
     this.input.keyboard.enabled = true;
+  }
+
+  _refreshDialogQuestSection(npcId) {
+    const section = document.getElementById('dialog-quest-section');
+    if (!section) return;
+    const data = (this._npcQuestData || {})[npcId];
+    if (!data || (data.offers.length === 0 && data.turnins.length === 0)) {
+      section.style.display = 'none';
+      section.innerHTML = '';
+      return;
+    }
+    let html = '';
+    // Turn-ins zuerst (wichtiger!)
+    if (data.turnins.length > 0) {
+      html += `<div style="color:#ffd060;font-weight:bold;margin-bottom:3px">❗ Abzugebende Aufträge:</div>`;
+      for (const q of data.turnins) {
+        const reward = q.reward || {};
+        const rewardText = this._formatQuestReward(reward);
+        html += `<div style="margin:2px 0;padding:3px 5px;background:rgba(80,60,20,0.4);border-radius:2px">
+          <b>${q.title}</b><br>
+          <span style="opacity:0.8;font-size:10px">${q.description}</span><br>
+          <span style="color:#9fc890;font-size:10px">Belohnung: ${rewardText}</span><br>
+          <button data-act="turnin" data-qid="${q.id}" style="margin-top:3px;background:#5a8a4a;border:1px solid #8fc88f;color:#fff;padding:3px 10px;border-radius:2px;cursor:pointer;font-size:11px">✅ Abgeben</button>
+        </div>`;
+      }
+    }
+    // Offers
+    if (data.offers.length > 0) {
+      html += `<div style="color:#ffe080;font-weight:bold;margin:6px 0 3px">❓ Verfügbare Aufträge:</div>`;
+      for (const o of data.offers) {
+        const rewardText = this._formatQuestReward(o.reward || {});
+        const tierIcon = '★'.repeat(o.tier || 1);
+        html += `<div style="margin:2px 0;padding:3px 5px;background:rgba(40,30,15,0.4);border-radius:2px">
+          <b>${o.title}</b> <span style="color:#c8a868;font-size:10px">${tierIcon}</span><br>
+          <span style="opacity:0.8;font-size:10px">${o.description}</span><br>
+          <span style="color:#9fc890;font-size:10px">Belohnung: ${rewardText}</span><br>
+          <button data-act="accept" data-tid="${o.template_id}" style="margin-top:3px;background:#5a6a8a;border:1px solid #8fa8c8;color:#fff;padding:3px 10px;border-radius:2px;cursor:pointer;font-size:11px">📜 Annehmen</button>
+        </div>`;
+      }
+    }
+    section.style.display = 'block';
+    section.innerHTML = html;
+    // Bind buttons
+    section.querySelectorAll('button[data-act]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const act = btn.dataset.act;
+        if (act === 'accept') {
+          this.ws.send(JSON.stringify({
+            type: 'accept_quest_template',
+            template_id: btn.dataset.tid,
+            npc_id: npcId,
+          }));
+        } else if (act === 'turnin') {
+          this.ws.send(JSON.stringify({
+            type: 'quest_turn_in',
+            quest_id: parseInt(btn.dataset.qid, 10),
+            npc_id: npcId,
+          }));
+        }
+        // Nach Aktion neu laden
+        setTimeout(() => this._queryNPCQuests(npcId), 200);
+      });
+    });
+  }
+
+  _formatQuestReward(reward) {
+    const parts = [];
+    if (reward.gold) parts.push(`${reward.gold} Gold`);
+    if (reward.xp) parts.push(`${reward.xp} XP`);
+    for (const [k, v] of Object.entries(reward.items || {})) {
+      const name = (ITEM[k] && ITEM[k].name) || k;
+      parts.push(`${v}× ${name}`);
+    }
+    for (const [fac, delta] of Object.entries(reward.faction || {})) {
+      const sign = delta >= 0 ? '+' : '';
+      parts.push(`${sign}${delta} Ruf (${fac})`);
+    }
+    return parts.join(' · ') || '—';
   }
 
   appendDialogBubble(role, text, isTyping = false) {
@@ -3319,12 +3403,41 @@ class WorldScene extends Phaser.Scene {
           delete this.structures[key];
         }
         this.removeStructureSprite(msg.x, msg.y, layer);
+        // Welle 25: HP-Bar mit aufräumen
+        this._removeStructureHpBar(msg.x, msg.y);
         break;
       }
 
-      case 'structure_damaged':
+      case 'structure_damaged': {
+        // Welle 25: HP-Update + Tint + HP-Bar
+        const key = `${msg.x},${msg.y}`;
+        const s = this.structures[key] || this.floors[key];
+        if (s && msg.durability != null) {
+          s.durability = msg.durability;
+          if (msg.max_durability != null) s.max_durability = msg.max_durability;
+          this._refreshStructureHpVisual(s);
+        }
         this.shakeStructure(msg.x, msg.y);
+        // Floating-Damage-Number
+        if (msg.dmg != null) {
+          const px = msg.x * TILE_SIZE + TILE_SIZE / 2;
+          const py = msg.y * TILE_SIZE + TILE_SIZE / 2;
+          this._floatingDamage(px, py, msg.dmg, { color: '#c0c0c0' });
+        }
         break;
+      }
+
+      case 'structure_repaired': {
+        // Welle 25: durability hoch + Tint/Bar refresh
+        const key = `${msg.x},${msg.y}`;
+        const s = this.structures[key] || this.floors[key];
+        if (s && msg.durability != null) {
+          s.durability = msg.durability;
+          if (msg.max_durability != null) s.max_durability = msg.max_durability;
+          this._refreshStructureHpVisual(s);
+        }
+        break;
+      }
 
       case 'event':
         this.addEventToChronik(msg.event);
@@ -3628,8 +3741,51 @@ class WorldScene extends Phaser.Scene {
 
       case 'quests_update':
         this.myQuests = msg.quests || [];
+        this.myReputation = msg.reputation || {};
         if (this.questsOpen) this.refreshQuestsUI();
         break;
+
+      case 'quest_board_open': {
+        // Welle 23: Quest-Board zeigt verfügbare Welt-Quests via Quest-Dialog
+        const offers = msg.offers || [];
+        // Fake NPC-Entry für die Dialog-UI
+        const boardId = msg.board_id;
+        this.activeDialog = { npc_id: -boardId, waiting: false, isBoard: true };
+        document.getElementById('dialog-npc-name').textContent = '📜 Aufgabentafel';
+        document.getElementById('dialog-npc-kind').textContent = ' — Königreich';
+        document.getElementById('dialog-npc-bg').textContent =
+          'Aushänge mit offenen Aufträgen aus der ganzen Region.';
+        document.getElementById('dialog-history').innerHTML = '';
+        document.getElementById('dialog-overlay').classList.add('active');
+        // dialog-input-row + quest-btn ausblenden (kein Talk auf Board)
+        const inputRow = document.getElementById('dialog-input-row');
+        if (inputRow) inputRow.style.display = 'none';
+        const qb = document.getElementById('dialog-quest-btn');
+        if (qb) qb.style.display = 'none';
+        // Quest-Section direkt füllen mit board-offers
+        this._npcQuestData = this._npcQuestData || {};
+        this._npcQuestData[-boardId] = { offers, turnins: [] };
+        this._refreshDialogQuestSection(-boardId);
+        this.input.keyboard.enabled = false;
+        break;
+      }
+
+      case 'npc_quest_status': {
+        // Welle 23: Backend hat Quest-Offers + Turnins für einen NPC geschickt
+        const offers = msg.offers || [];
+        const turnins = msg.turnins || [];
+        this._npcQuestData = this._npcQuestData || {};
+        this._npcQuestData[msg.npc_id] = { offers, turnins };
+        // Marker setzen: ❗ wenn turn-in vorhanden, sonst ❓ wenn offers
+        const marker = turnins.length > 0 ? '❗'
+          : offers.length > 0 ? '❓' : '';
+        this._setNPCQuestMarker(msg.npc_id, marker);
+        // Offenen Dialog refreshen wenn dieser NPC
+        if (this.activeDialog && this.activeDialog.npc_id === msg.npc_id) {
+          this._refreshDialogQuestSection(msg.npc_id);
+        }
+        break;
+      }
 
       case 'quest_new':
         this.myQuests.push(msg.quest);
@@ -4745,8 +4901,23 @@ class WorldScene extends Phaser.Scene {
     const list = document.getElementById('quests-list');
     if (!list) return;
     list.innerHTML = '';
+    // Welle 23: Faction-Reputation-Übersicht oben
+    const rep = this.myReputation || {};
+    if (Object.keys(rep).length > 0) {
+      const repBox = document.createElement('div');
+      repBox.style.cssText = 'padding:6px 10px;background:rgba(40,30,15,0.6);border-radius:3px;margin-bottom:8px;font-size:11px';
+      const entries = Object.entries(rep).map(([fac, val]) => {
+        const col = val >= 10 ? '#9fc890' : val <= -10 ? '#e85040' : '#c8b878';
+        return `<span style="color:${col};margin-right:10px">${fac}: ${val >= 0 ? '+' : ''}${val}</span>`;
+      });
+      repBox.innerHTML = `<b style="color:#c8a868">🤝 Ruf:</b> ${entries.join('')}`;
+      list.appendChild(repBox);
+    }
     if (!this.myQuests || this.myQuests.length === 0) {
-      list.innerHTML = '<div style="padding:14px;color:#807060">Keine aktiven Quests. Sprich mit Bewohnern, um Aufträge zu erhalten.</div>';
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:14px;color:#807060';
+      empty.textContent = 'Keine aktiven Quests. Sprich mit Bewohnern (❓), um Aufträge zu erhalten.';
+      list.appendChild(empty);
       return;
     }
     for (const q of this.myQuests) {
@@ -4772,6 +4943,26 @@ class WorldScene extends Phaser.Scene {
         const have = q.progress?.killed || 0;
         const need = q.objective?.count || 0;
         obj.textContent = `⚔️ Erlege ${q.objective?.creature_kind}: ${have}/${need}`;
+      } else if (q.quest_type === 'deliver') {
+        const ok = q.progress?.delivered;
+        const toKind = q.objective?.to_kind || 'NPC';
+        obj.textContent = `📦 Bring Item zu ${toKind}: ${ok ? '✓ erledigt' : '○ offen'}`;
+      } else if (q.quest_type === 'talk') {
+        const ok = q.progress?.talked;
+        const toKind = q.objective?.to_kind || 'NPC';
+        obj.textContent = `💬 Sprich mit ${toKind}: ${ok ? '✓ erledigt' : '○ offen'}`;
+      } else if (q.quest_type === 'visit') {
+        const ok = q.progress?.visited;
+        const where = q.objective?.location_struct || 'Ort';
+        obj.textContent = `🗺️ Besuche ${where}: ${ok ? '✓ erledigt' : '○ offen'}`;
+      } else if (q.quest_type === 'defend') {
+        const elapsed = q.progress?.elapsed_s || 0;
+        const need = q.objective?.duration_s || 60;
+        obj.textContent = `🛡️ Halte Position: ${elapsed}/${need}s`;
+      } else if (q.quest_type === 'escort') {
+        const dist = q.progress?.distance || 0;
+        const need = q.objective?.distance_min || 20;
+        obj.textContent = `🚶 Eskortiere ${q.objective?.npc_kind}: ${dist}/${need} Tiles`;
       } else if (q.quest_type === 'multi_stage') {
         // Welle 28: Stages anzeigen
         const stages = q.objective?.stages || [];
@@ -5609,18 +5800,44 @@ class WorldScene extends Phaser.Scene {
     const goalIcon = this.add.text(-12, -TILE_SIZE * 0.78, '', {
       fontSize: '13px',
     }).setOrigin(0.5);
+    // Welle 23: Quest-Marker rechts vom Mood-Icon. Wird via _setNPCQuestMarker
+    // dynamisch befüllt (❓ = Offer verfügbar, ❗ = Turn-In wartet).
+    const questIcon = this.add.text(12, -TILE_SIZE * 0.78, '', {
+      fontSize: '15px',
+    }).setOrigin(0.5);
 
-    const container = this.add.container(cx, cy, [shadow, body, label, moodIcon, goalIcon]);
+    const container = this.add.container(cx, cy,
+      [shadow, body, label, moodIcon, goalIcon, questIcon]);
     container.setDepth(3);
 
     this.npcs[npc.id] = {
-      container, body, shadow, label, moodIcon, goalIcon,
+      container, body, shadow, label, moodIcon, goalIcon, questIcon,
       speech: null,    // ephemeral speech bubble (created on demand)
       tween: null,
       tileX: npc.x, tileY: npc.y,
       npc,  // raw data für späteren Dialog-Kontext
     };
     this.refreshNPCMood(npc.id);
+    // Welle 23: Quest-Status nachfragen falls Friendly-NPC
+    if (npc.kind && !CREATURE_KINDS.has(npc.kind)) {
+      this._queryNPCQuests(npc.id);
+    }
+  }
+
+  _queryNPCQuests(npcId) {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    try {
+      this.ws.send(JSON.stringify({type: 'query_npc_quests', npc_id: npcId}));
+    } catch (e) { /* ignore */ }
+  }
+
+  _setNPCQuestMarker(npcId, marker) {
+    const entry = this.npcs[npcId];
+    if (!entry || !entry.questIcon) return;
+    entry.questIcon.setText(marker || '');
+    if (marker) {
+      entry.questIcon.setColor(marker === '❗' ? '#ffd060' : '#fff080');
+    }
   }
 
   _updateNPCGoalIcon(npcId, emoji) {
@@ -5894,6 +6111,67 @@ class WorldScene extends Phaser.Scene {
         this.updateWallOrientation(s.x, s.y - 1);
         this.updateWallOrientation(s.x, s.y + 1);
       }
+    }
+    // Welle 25: HP-Damage-Visualisierung
+    this._refreshStructureHpVisual(s);
+  }
+
+  // Rote Tint bei < 30% HP + HP-Bar über Struktur wenn dur < max.
+  _refreshStructureHpVisual(s) {
+    if (s.max_durability == null || s.durability == null) return;
+    const max = s.max_durability, cur = s.durability;
+    if (max <= 0 || cur >= max) {
+      // Heile — tint cleanen + HP-Bar entfernen
+      const sprite = this.structSprites[`${s.x},${s.y}`] || this.floorSprites[`${s.x},${s.y}`];
+      if (sprite) sprite.clearTint();
+      this._removeStructureHpBar(s.x, s.y);
+      return;
+    }
+    const sprite = this.structSprites[`${s.x},${s.y}`] || this.floorSprites[`${s.x},${s.y}`];
+    if (sprite) {
+      // Damage-Tint: 30% HP = sichtbar rot, 100% HP = nicht getintet
+      const pct = cur / max;
+      if (pct < 0.3) {
+        sprite.setTint(0xff5050);
+      } else if (pct < 0.6) {
+        sprite.setTint(0xffaa70);
+      } else {
+        sprite.clearTint();
+      }
+    }
+    // HP-Bar darüber
+    this._renderStructureHpBar(s);
+  }
+
+  _renderStructureHpBar(s) {
+    const key = `${s.x},${s.y}`;
+    if (!this._structHpBars) this._structHpBars = {};
+    let bar = this._structHpBars[key];
+    const cx = s.x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = s.y * TILE_SIZE - 4;
+    const w = TILE_SIZE * 0.85;
+    const h = 4;
+    const pct = Math.max(0, Math.min(1, s.durability / s.max_durability));
+    if (!bar) {
+      const bg = this.add.rectangle(cx, cy, w, h, 0x000000, 0.65).setDepth(2.5);
+      const fg = this.add.rectangle(cx - w/2, cy, w * pct, h, 0x60c060)
+        .setOrigin(0, 0.5).setDepth(2.6);
+      bar = { bg, fg, w };
+      this._structHpBars[key] = bar;
+    } else {
+      bar.fg.width = bar.w * pct;
+    }
+    // Farbe: grün > orange > rot
+    bar.fg.fillColor = pct > 0.5 ? 0x60c060 : (pct > 0.25 ? 0xe8a040 : 0xe04030);
+  }
+
+  _removeStructureHpBar(x, y) {
+    if (!this._structHpBars) return;
+    const key = `${x},${y}`;
+    const bar = this._structHpBars[key];
+    if (bar) {
+      bar.bg.destroy(); bar.fg.destroy();
+      delete this._structHpBars[key];
     }
   }
 
