@@ -145,6 +145,76 @@ GROUP_XP_BONUS_FACTOR = 1.2  # +20% Gesamt-XP wenn Kill in Gruppe geht
 LOOT_ROLL_RADIUS = 15        # Tiles um den Drop, in denen Need/Greed-Roll greift
 
 
+async def _drop_loot_for_npc(killer_id: str, npc: dict,
+                              drop_x: int, drop_y: int) -> None:
+    """Tier-aware Loot-Drop für einen NPC-Kill. Ersetzt die alte Inline-Logik
+    aus loot.roll_loot + roll_boss_equipment in den 3 Kill-Pfaden.
+
+    - Overworld-Mob: alte loot.roll_loot + boss-equip wenn BOSS_KIND
+    - Dungeon-Mob: tier+role-skalierte loot.roll_dungeon_loot mit Quality
+    Broadcastet item_spawned + triggert Loot-Rolls + Key-Items."""
+    import npc_worker as _nw
+    npc_kind = npc["kind"]
+    npc_world = (npc.get("world_id") or "overworld")
+    is_dungeon = npc_world.startswith("dungeon:")
+
+    if is_dungeon:
+        # Dungeon-Tier + Theme aus DB lesen
+        try:
+            parts = npc_world.split(":")
+            dungeon_id = int(parts[1])
+            dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+        except Exception:
+            dungeon = None
+        tier = (dungeon or {}).get("tier", dungeon_tiers.TIER_SMALL)
+        theme = (dungeon or {}).get("theme", "cave")
+        import dungeon_themes as _dth
+        theme_data = _dth.THEMES.get(theme, {})
+        # Role bestimmen
+        if npc_kind in _nw.BOSS_KINDS:
+            role = "boss"
+        elif npc_kind in loot.PACK_LEADER_KINDS:
+            role = "leader"
+        else:
+            role = "trash"
+        drops = loot.roll_dungeon_loot(npc_kind, tier, role, theme_data)
+        for kind, quality in drops:
+            d = await items.spawn_on_ground(kind, drop_x, drop_y,
+                                             quality_kind=quality)
+            if d is not None:
+                await manager.broadcast({"type": "item_spawned", "item": d})
+                try: await _maybe_start_loot_roll(killer_id, d)
+                except Exception: logging.exception("loot-roll start failed")
+    else:
+        # Overworld: bisherige Logik
+        for drop_kind in loot.roll_loot(npc_kind):
+            d = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
+            if d is not None:
+                await manager.broadcast({"type": "item_spawned", "item": d})
+                try: await _maybe_start_loot_roll(killer_id, d)
+                except Exception: logging.exception("loot-roll start failed")
+        if npc_kind in _nw.BOSS_KINDS:
+            boss_eq = loot.roll_boss_equipment()
+            if boss_eq:
+                eq_kind, eq_q = boss_eq
+                d = await items.spawn_on_ground(eq_kind, drop_x, drop_y,
+                                                 quality_kind=eq_q)
+                if d is not None:
+                    await manager.broadcast({"type": "item_spawned", "item": d})
+                    try: await _maybe_start_loot_roll(killer_id, d)
+                    except Exception: logging.exception("loot-roll start failed")
+
+    # Key-Item-Drops (Boss + Pack-Leader) — gilt in beiden Welten
+    try:
+        _kl = await skills.get_skill_level(killer_id, "combat")
+        for _key in loot.roll_dungeon_key_drops(npc_kind, _kl):
+            d = await items.spawn_on_ground(_key, drop_x, drop_y)
+            if d is not None:
+                await manager.broadcast({"type": "item_spawned", "item": d})
+    except Exception:
+        logging.exception("key-item drop failed")
+
+
 async def _maybe_start_loot_roll(killer_id: str, dropped: dict) -> None:
     """Wenn der Killer in einer Gruppe mit loot_rule='need_greed' ist und der
     Drop rollwürdig (Equipment/Magic/Affix/Unique), starte einen Roll unter
@@ -861,25 +931,8 @@ async def _apply_spell_effects(player_id: str, spell_id: str,
                 final = combat.apply_creature_resists(n["kind"], amount, dmg_type=dmg_type)
                 result = await npcs.damage(n["id"], final)
                 if result is None:
-                    # NPC tot — Drop + Broadcast
                     drop_x, drop_y = await _find_drop_xy(n["x"], n["y"])
-                    for drop_kind in loot.roll_loot(n["kind"]):
-                        dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
-                        if dropped:
-                            await manager.broadcast({"type": "item_spawned", "item": dropped})
-                            try: await _maybe_start_loot_roll(player_id, dropped)
-                            except Exception: logging.exception("loot-roll start failed")
-                    # Welle 32: Key-Item-Drops (Boss / Pack-Leader)
-                    try:
-                        _kl = await skills.get_skill_level(player_id, "combat")
-                        for _key in loot.roll_dungeon_key_drops(n["kind"], _kl):
-                            _d = await items.spawn_on_ground(_key, drop_x, drop_y)
-                            if _d is not None:
-                                await manager.broadcast({
-                                    "type": "item_spawned", "item": _d,
-                                })
-                    except Exception:
-                        logging.exception("key-item drop (spell-aoe) failed")
+                    await _drop_loot_for_npc(player_id, n, drop_x, drop_y)
                     await manager.broadcast({
                         "type": "npc_died", "npc_id": n["id"],
                         "killed_by": player_id, "name": n["name"],
@@ -2148,43 +2201,9 @@ async def websocket_endpoint(websocket: WebSocket):
                 )
                 result = await npcs.damage(npc_id, dmg)
                 if result is None:
-                    # Loot droppen — wenn NPC-Tile durch Struktur geblockt ist,
-                    # weiche auf den ersten freien Nachbar aus.
                     drop_x, drop_y = await _find_drop_xy(npc["x"], npc["y"])
-                    for drop_kind in loot.roll_loot(npc["kind"]):
-                        dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
-                        if dropped is not None:
-                            await manager.broadcast({
-                                "type": "item_spawned", "item": dropped,
-                            })
-                            try: await _maybe_start_loot_roll(player_id, dropped)
-                            except Exception: logging.exception("loot-roll start failed")
-                    # Welle 23: Boss-Garantie-Equipment-Drop (high quality)
+                    await _drop_loot_for_npc(player_id, npc, drop_x, drop_y)
                     import npc_worker as _nw
-                    if npc["kind"] in _nw.BOSS_KINDS:
-                        boss_eq = loot.roll_boss_equipment()
-                        if boss_eq:
-                            eq_kind, eq_q = boss_eq
-                            dropped = await items.spawn_on_ground(
-                                eq_kind, drop_x, drop_y, quality_kind=eq_q,
-                            )
-                            if dropped is not None:
-                                await manager.broadcast({
-                                    "type": "item_spawned", "item": dropped,
-                                })
-                                try: await _maybe_start_loot_roll(player_id, dropped)
-                                except Exception: logging.exception("loot-roll start failed")
-                    # Welle 32: Dungeon-Key-Item-Drops aus Boss + Pack-Leader
-                    try:
-                        _kl = await skills.get_skill_level(player_id, "combat")
-                        for _key in loot.roll_dungeon_key_drops(npc["kind"], _kl):
-                            _d = await items.spawn_on_ground(_key, drop_x, drop_y)
-                            if _d is not None:
-                                await manager.broadcast({
-                                    "type": "item_spawned", "item": _d,
-                                })
-                    except Exception:
-                        logging.exception("key-item drop failed")
                     # Welle 23-F: Camp-Cooldown — wenn der letzte
                     # Bandit/Robber/Thief im chunk tot ist, mark als cleared.
                     if npc["kind"] in _nw.CAMP_ONLY_KINDS:
@@ -2417,40 +2436,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                 result = await npcs.damage(t["id"], _final)
                                 if result is None:
                                     drop_x, drop_y = await _find_drop_xy(t["x"], t["y"])
-                                    for drop_kind in loot.roll_loot(t["kind"]):
-                                        dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
-                                        if dropped:
-                                            await manager.broadcast({
-                                                "type": "item_spawned", "item": dropped,
-                                            })
-                                            try: await _maybe_start_loot_roll(player_id, dropped)
-                                            except Exception: logging.exception("loot-roll start failed")
-                                    # Welle 32: Key-Item-Drops (Boss / Pack-Leader)
-                                    try:
-                                        _kl = await skills.get_skill_level(player_id, "combat")
-                                        for _key in loot.roll_dungeon_key_drops(t["kind"], _kl):
-                                            _d = await items.spawn_on_ground(_key, drop_x, drop_y)
-                                            if _d is not None:
-                                                await manager.broadcast({
-                                                    "type": "item_spawned", "item": _d,
-                                                })
-                                    except Exception:
-                                        logging.exception("key-item drop (direct-spell) failed")
-                                    # Welle 23: Boss-Garantie-Equipment auch via Spell-Kill
-                                    import npc_worker as _nw2
-                                    if t["kind"] in _nw2.BOSS_KINDS:
-                                        boss_eq2 = loot.roll_boss_equipment()
-                                        if boss_eq2:
-                                            eq_kind2, eq_q2 = boss_eq2
-                                            dropped = await items.spawn_on_ground(
-                                                eq_kind2, drop_x, drop_y, quality_kind=eq_q2,
-                                            )
-                                            if dropped:
-                                                await manager.broadcast({
-                                                    "type": "item_spawned", "item": dropped,
-                                                })
-                                                try: await _maybe_start_loot_roll(player_id, dropped)
-                                                except Exception: logging.exception("loot-roll start failed")
+                                    await _drop_loot_for_npc(player_id, t, drop_x, drop_y)
                                     await manager.broadcast({
                                         "type": "npc_died", "npc_id": t["id"],
                                         "killed_by": player_id, "name": t["name"],

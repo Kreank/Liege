@@ -290,6 +290,54 @@ DUNGEON_KEY_DROPS = [
 ]
 
 
+def roll_dungeon_loot(npc_kind: str, tier: int, role: str,
+                       theme_data: dict | None) -> list[tuple[str, str]]:
+    """Tier-aware Dungeon-Loot. Returns liste (item_kind, quality_kind).
+
+    role: "trash" | "leader" | "boss" — bestimmt Drop-Anzahl, Quality-Verteilung
+    und Equipment-Drop-Chance.
+
+    Resourcen/Food: aus theme_data["loot_kinds"] (mit "rare_loot" als Premium-
+    Pool dazu wenn vorhanden) — gewichtet, Quality = "normal".
+
+    Equipment: aus BOSS_EQUIPMENT_POOL für Boss/Leader, sonst seltener leichter
+    Mix. Quality kommt aus dungeon_tiers.roll_quality().
+    """
+    import dungeon_tiers as _dt
+    out: list[tuple[str, str]] = []
+
+    # 1) Resource-Drops aus theme_data
+    if theme_data:
+        rcount = _dt.resource_drop_count(tier, role)
+        # Pool: alle theme.loot_kinds + bei boss/leader auch rare_loot
+        kinds: list[str] = list(theme_data.get("loot_kinds", []) or [])
+        if role in ("leader", "boss"):
+            kinds.extend(theme_data.get("rare_loot", []) or [])
+        if kinds:
+            picked: set[str] = set()
+            attempts = 0
+            while len(picked) < rcount and attempts < rcount * 3:
+                attempts += 1
+                k = random.choice(kinds)
+                if k in picked:
+                    continue
+                picked.add(k)
+                out.append((k, "normal"))
+
+    # 2) Equipment-Drops mit Tier-skalierter Quality
+    eq_drops = _dt.equipment_drop_rolls(tier, role)
+    if eq_drops > 0:
+        # Pool: Boss-Equipment-Pool ist generischer (Waffe/Rüstung/Schmuck)
+        for _ in range(eq_drops):
+            kind = _pick_weighted(BOSS_EQUIPMENT_POOL)
+            if not kind:
+                continue
+            quality = _dt.roll_quality(tier, role)
+            out.append((kind, quality))
+
+    return out
+
+
 def roll_dungeon_key_drops(npc_kind: str, killer_combat_level: int) -> list[str]:
     """Würfelt Key-Item-Drops für einen NPC-Kill. Nur bei Boss-Kinds
     (BOSS_KINDS) und Pack-Leader-Kinds (PACK_LEADER_KINDS).

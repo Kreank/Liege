@@ -130,3 +130,120 @@ def tier_for_key_item(item_kind: str) -> Optional[int]:
         if key == item_kind:
             return tier
     return None
+
+
+# ───────────────────────────────────────────────────────────────────────
+# Loot-Design — Tier × Role Quality-Distribution
+# ───────────────────────────────────────────────────────────────────────
+#
+# Recherche aus WoW/Diablo/PoE: Loot ist Item-Level/Tier-gelockt + Quality
+# folgt einer Verteilung die mit Tier nach oben schiebt. Boss-Kills haben
+# eigene Tabelle (deutlich besser). Legendaries nur ab T3 möglich.
+#
+# Rolle:
+#   "trash"  — normale Mob-Kills
+#   "leader" — Pack-Leader / Elite (wolf_alpha, dire_wolf, etc.)
+#   "boss"   — letzter-Floor-Boss eines Dungeons
+#
+# Verteilung: (rough, normal, fine, masterwork, legendary). Summe = 100.
+
+QUALITY_DISTRIBUTION = {
+    (TIER_SMALL,  "trash"):  (25, 60, 15,  0,  0),
+    (TIER_SMALL,  "leader"): (10, 55, 30,  5,  0),
+    (TIER_SMALL,  "boss"):   ( 0, 45, 40, 15,  0),
+
+    (TIER_MEDIUM, "trash"):  (10, 60, 25,  5,  0),
+    (TIER_MEDIUM, "leader"): ( 0, 40, 40, 18,  2),
+    (TIER_MEDIUM, "boss"):   ( 0, 20, 45, 30,  5),
+
+    (TIER_LARGE,  "trash"):  ( 0, 40, 40, 18,  2),
+    (TIER_LARGE,  "leader"): ( 0, 15, 35, 40, 10),
+    (TIER_LARGE,  "boss"):   ( 0,  5, 30, 45, 20),
+
+    (TIER_RAID20, "trash"):  ( 0, 10, 35, 45, 10),
+    (TIER_RAID20, "leader"): ( 0,  0, 15, 55, 30),
+    (TIER_RAID20, "boss"):   ( 0,  0,  5, 50, 45),
+
+    (TIER_RAID40, "trash"):  ( 0,  0, 20, 55, 25),
+    (TIER_RAID40, "leader"): ( 0,  0,  5, 45, 50),
+    (TIER_RAID40, "boss"):   ( 0,  0,  0, 30, 70),
+}
+
+# Chance dass ein Equipment-Item droppt (zusätzlich zu Resource-Loot).
+# Boss ist GARANTIERT (≥100%).
+EQUIPMENT_DROP_CHANCE = {
+    (TIER_SMALL,  "trash"):  0.05,
+    (TIER_SMALL,  "leader"): 0.25,
+    (TIER_SMALL,  "boss"):   1.00,
+    (TIER_MEDIUM, "trash"):  0.10,
+    (TIER_MEDIUM, "leader"): 0.40,
+    (TIER_MEDIUM, "boss"):   1.00,
+    (TIER_LARGE,  "trash"):  0.15,
+    (TIER_LARGE,  "leader"): 0.60,
+    (TIER_LARGE,  "boss"):   1.50,   # garantiert + 50% Chance auf 2.
+    (TIER_RAID20, "trash"):  0.20,
+    (TIER_RAID20, "leader"): 0.75,
+    (TIER_RAID20, "boss"):   2.00,   # 2 Equipment garantiert
+    (TIER_RAID40, "trash"):  0.30,
+    (TIER_RAID40, "leader"): 0.90,
+    (TIER_RAID40, "boss"):   2.50,   # 2 garantiert + 50% Chance auf 3.
+}
+
+# Resource/Food/Consumable-Drop-Anzahl pro Mob (separat vom Equipment)
+RESOURCE_DROP_COUNT = {
+    (TIER_SMALL,  "trash"):  (1, 2),
+    (TIER_SMALL,  "leader"): (1, 3),
+    (TIER_SMALL,  "boss"):   (2, 3),
+    (TIER_MEDIUM, "trash"):  (1, 2),
+    (TIER_MEDIUM, "leader"): (2, 3),
+    (TIER_MEDIUM, "boss"):   (2, 4),
+    (TIER_LARGE,  "trash"):  (2, 3),
+    (TIER_LARGE,  "leader"): (2, 4),
+    (TIER_LARGE,  "boss"):   (3, 5),
+    (TIER_RAID20, "trash"):  (2, 3),
+    (TIER_RAID20, "leader"): (3, 4),
+    (TIER_RAID20, "boss"):   (3, 6),
+    (TIER_RAID40, "trash"):  (2, 4),
+    (TIER_RAID40, "leader"): (3, 5),
+    (TIER_RAID40, "boss"):   (4, 7),
+}
+
+
+def quality_distribution(tier: int, role: str) -> tuple[int, int, int, int, int]:
+    """Returns (rough, normal, fine, masterwork, legendary)-Weights."""
+    return QUALITY_DISTRIBUTION.get((tier, role),
+                                     QUALITY_DISTRIBUTION[(TIER_SMALL, "trash")])
+
+
+def roll_quality(tier: int, role: str) -> str:
+    """Würfelt eine Quality basierend auf Tier × Role."""
+    import random as _r
+    weights = quality_distribution(tier, role)
+    return _r.choices(
+        ["rough", "normal", "fine", "masterwork", "legendary"],
+        weights=weights, k=1,
+    )[0]
+
+
+def equipment_drop_rolls(tier: int, role: str) -> int:
+    """Wie viele Equipment-Items soll dieser Mob droppen?
+    Bei chance > 1.0 ist 1 garantiert + Chance auf nächstes (= chance - 1)."""
+    import random as _r
+    chance = EQUIPMENT_DROP_CHANCE.get((tier, role), 0.0)
+    drops = 0
+    while chance > 0:
+        if chance >= 1.0:
+            drops += 1
+            chance -= 1.0
+        else:
+            if _r.random() < chance:
+                drops += 1
+            chance = 0
+    return drops
+
+
+def resource_drop_count(tier: int, role: str) -> int:
+    """Wie viele Resource/Food-Items soll dieser Mob droppen?"""
+    import random as _r
+    lo, hi = RESOURCE_DROP_COUNT.get((tier, role), (1, 2))
+    return _r.randint(lo, hi)
