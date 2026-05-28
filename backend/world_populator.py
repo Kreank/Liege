@@ -162,13 +162,26 @@ def _pick_for_tile(world, x: int, y: int, tile_id: int) -> str | None:
 # Trees/Rocks/Ruinen kommen NUR über Encounter-Templates — die sollen nicht
 # einzeln im Nirgendwo stehen.
 AMBIENT_PROPS_BY_BIOME = {
-    GRASS:  [("tall_grass", 0.025), ("flowers", 0.010), ("bush", 0.008)],
-    FOREST: [("tall_grass", 0.030), ("bush", 0.012), ("flowers", 0.008)],
-    DESERT: [("dry_bush", 0.010), ("desert_skull", 0.002)],
-    JUNGLE: [("tall_grass", 0.030), ("jungle_flower", 0.015),
-             ("jungle_vines", 0.012)],
-    SWAMP:  [("reeds", 0.025), ("lily_pads", 0.012), ("tall_grass", 0.015)],
-    SNOW:   [("frozen_bush", 0.010)],
+    # Bäume + Felsen sind nun auch sparse über die Fläche verteilt — vorher
+    # nur über Encounter-Templates (Sites), wodurch sich >95% leerer Welt-Tiles
+    # ergeben hatten. Diese Chancen bewusst niedrig: Sites bleiben die dichten
+    # Cluster, Ambient ist der ruhige Hintergrund.
+    GRASS:  [("tall_grass", 0.025), ("flowers", 0.010), ("bush", 0.008),
+             ("tree_oak", 0.012), ("rock_small", 0.006)],
+    FOREST: [("tree_oak", 0.060), ("tree_pine", 0.045),
+             ("tall_grass", 0.030), ("bush", 0.012), ("flowers", 0.008),
+             ("rock_mossy", 0.006), ("fallen_log", 0.005)],
+    DESERT: [("dry_bush", 0.010), ("desert_skull", 0.002),
+             ("rock_small", 0.012), ("cactus", 0.010),
+             ("tree_dead", 0.005)],
+    JUNGLE: [("tree_oak", 0.040), ("tree_pine", 0.035),
+             ("palm_tree", 0.018),
+             ("tall_grass", 0.030), ("jungle_flower", 0.015),
+             ("jungle_vines", 0.012), ("bush", 0.022)],
+    SWAMP:  [("reeds", 0.025), ("lily_pads", 0.012), ("tall_grass", 0.015),
+             ("tree_dead", 0.018), ("mushrooms", 0.012)],
+    SNOW:   [("frozen_bush", 0.010), ("tree_pine", 0.025),
+             ("rock_small", 0.010), ("snow_rock", 0.012)],
     SAND:   [],  # plus WATERSIDE für küsten-Sand
 }
 
@@ -482,6 +495,46 @@ def _can_place_at(world, structure_manager, x: int, y: int) -> bool:
     if structure_manager.at(x, y) is not None:
         return False
     return True
+
+
+async def reset_chunks_without_player_structures(world) -> int:
+    """Setzt populated=false für alle Chunks die KEINE Spieler-platzierten
+    Strukturen enthalten. Erst beim nächsten Betreten wird der Chunk dann
+    mit der aktuellen Populator-Logik neu befüllt. System-Strukturen werden
+    vor dem Reset gelöscht damit es keine Doppel-Spawns gibt.
+
+    Returns: Anzahl der zurückgesetzten Chunks."""
+    # 1) Chunks finden: populated=true UND keine player-Strukturen drin
+    rows = await db.pool().fetch(
+        "SELECT DISTINCT wc.chunk_x, wc.chunk_y "
+        "FROM world_chunks wc "
+        "WHERE wc.world_seed = $1 AND wc.populated = TRUE "
+        "  AND NOT EXISTS ("
+        "    SELECT 1 FROM structures s "
+        "    WHERE s.owner != 'system' "
+        "      AND s.x / $2 = wc.chunk_x AND s.y / $2 = wc.chunk_y"
+        "  )",
+        world.seed, CHUNK_SIZE,
+    )
+    if not rows:
+        return 0
+    # 2) Alle system-Strukturen in diesen Chunks löschen
+    chunk_keys = [(r["chunk_x"], r["chunk_y"]) for r in rows]
+    for cx, cy in chunk_keys:
+        x0, x1 = cx * CHUNK_SIZE, (cx + 1) * CHUNK_SIZE
+        y0, y1 = cy * CHUNK_SIZE, (cy + 1) * CHUNK_SIZE
+        await db.pool().execute(
+            "DELETE FROM structures WHERE owner = 'system' "
+            "AND x >= $1 AND x < $2 AND y >= $3 AND y < $4",
+            x0, x1, y0, y1,
+        )
+        await db.pool().execute(
+            "UPDATE world_chunks SET populated = FALSE "
+            "WHERE world_seed = $1 AND chunk_x = $2 AND chunk_y = $3",
+            world.seed, cx, cy,
+        )
+    log.info("Welt-Repopulate: %d Chunks zurückgesetzt", len(chunk_keys))
+    return len(chunk_keys)
 
 
 async def populate_chunk_if_needed(world, structure_manager, connection_manager,

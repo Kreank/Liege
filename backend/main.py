@@ -1335,6 +1335,19 @@ async def websocket_endpoint(websocket: WebSocket):
                 await _push_group_state_to_all_members(g["id"])
                 continue
 
+            if mtype == "dev_world_repopulate":
+                # Admin-only: setzt populated=false für leere Chunks, löscht
+                # System-Strukturen darin. Beim nächsten Betreten neu gespawnt.
+                if user.get("role") != "admin":
+                    await websocket.send_json({"type": "toast",
+                                                "text": "⛔ Admin only"})
+                    continue
+                import world_populator as _wp
+                count = await _wp.reset_chunks_without_player_structures(world)
+                await websocket.send_json({"type": "toast",
+                                            "text": f"♻️ {count} Chunks zurückgesetzt"})
+                continue
+
             if mtype == "loot_vote":
                 roll_id = int(data.get("roll_id", 0))
                 vote_kind = (data.get("vote") or "").strip().lower()

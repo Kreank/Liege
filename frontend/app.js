@@ -9449,6 +9449,11 @@ function setupChatConsole(myRole) {
         if (!arg) { addMessage('error', null, `${cmd} TEXT — Nachricht an die Gruppe`); return true; }
         ws.send(JSON.stringify({ type: 'group_chat', text: arg }));
         return true;
+      case '/repopulate':
+      case '/refreshworld':
+        if (!confirm('Welt zurücksetzen? Alle leeren Chunks neu populiert beim nächsten Betreten.')) return true;
+        ws.send(JSON.stringify({ type: 'dev_world_repopulate' }));
+        return true;
       case '/lootrule': {
         const rule = (arg || '').trim().toLowerCase();
         if (!['ffa', 'need_greed'].includes(rule)) {
