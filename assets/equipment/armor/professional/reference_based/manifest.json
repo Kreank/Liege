@@ -56,9 +56,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/ornate_guard_shield.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/ornate_guard_shield.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/ornate_guard_shield.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/ornate_guard_shield.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/shield/ornate_guard_shield.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/ornate_guard_shield.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/ornate_guard_shield.png"
     },
     {
       "id": "mercenary_plate_cuirass",
@@ -76,9 +74,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/mercenary_plate_cuirass.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/mercenary_plate_cuirass.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/mercenary_plate_cuirass.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/mercenary_plate_cuirass.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/mercenary_plate_cuirass.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/mercenary_plate_cuirass.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/mercenary_plate_cuirass.png"
     },
     {
       "id": "black_iron_greaves",
@@ -91,9 +87,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/black_iron_greaves.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/black_iron_greaves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/black_iron_greaves.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_iron_greaves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/boots/black_iron_greaves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/black_iron_greaves.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_iron_greaves.png"
     },
     {
       "id": "ember_wolf_greaves",
@@ -107,8 +101,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/ember_wolf_greaves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/ember_wolf_greaves.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/ember_wolf_greaves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/boots/ember_wolf_greaves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/legendary/ember_wolf_greaves.png",
       "manual_cleanup": "light mask override for clean inventory asset"
     },
     {
@@ -127,9 +119,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/grey_landsknecht_armor.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/grey_landsknecht_armor.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/grey_landsknecht_armor.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/grey_landsknecht_armor.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/grey_landsknecht_armor.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/grey_landsknecht_armor.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/grey_landsknecht_armor.png"
     },
     {
       "id": "winged_crusader_helm",
@@ -142,9 +132,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/winged_crusader_helm.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/winged_crusader_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/winged_crusader_helm.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/winged_crusader_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/winged_crusader_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/winged_crusader_helm.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/winged_crusader_helm.png"
     },
     {
       "id": "stone_guard_gauntlets",
@@ -162,9 +150,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/stone_guard_gauntlets.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/stone_guard_gauntlets.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/stone_guard_gauntlets.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/stone_guard_gauntlets.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/stone_guard_gauntlets.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/stone_guard_gauntlets.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/stone_guard_gauntlets.png"
     },
     {
       "id": "black_tactical_armor",
@@ -183,8 +169,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/black_tactical_armor.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/black_tactical_armor.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_tactical_armor.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/black_tactical_armor.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/black_tactical_armor.png",
       "manual_cleanup": "black_light mask override for clean inventory asset"
     },
     {
@@ -198,9 +182,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/wrapped_ranger_boots.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/wrapped_ranger_boots.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/wrapped_ranger_boots.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/wrapped_ranger_boots.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/boots/wrapped_ranger_boots.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/wrapped_ranger_boots.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/wrapped_ranger_boots.png"
     },
     {
       "id": "winged_knight_helm",
@@ -213,9 +195,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/winged_knight_helm.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/winged_knight_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/winged_knight_helm.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/winged_knight_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/winged_knight_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/winged_knight_helm.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/winged_knight_helm.png"
     },
     {
       "id": "runeplate_greaves",
@@ -229,8 +209,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/runeplate_greaves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/runeplate_greaves.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/runeplate_greaves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/boots/runeplate_greaves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/runeplate_greaves.png",
       "manual_cleanup": "light mask override for clean inventory asset"
     },
     {
@@ -250,8 +228,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/spiked_war_cuirass.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/spiked_war_cuirass.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/spiked_war_cuirass.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/spiked_war_cuirass.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/spiked_war_cuirass.png",
       "manual_cleanup": "gray mask override for clean inventory asset"
     },
     {
@@ -265,9 +241,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/crested_hoplite_helm.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/crested_hoplite_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/crested_hoplite_helm.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/crested_hoplite_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/crested_hoplite_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/crested_hoplite_helm.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/crested_hoplite_helm.png"
     },
     {
       "id": "dwarven_field_boots",
@@ -280,9 +254,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/dwarven_field_boots.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/dwarven_field_boots.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/dwarven_field_boots.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/dwarven_field_boots.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/boots/dwarven_field_boots.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/dwarven_field_boots.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/dwarven_field_boots.png"
     },
     {
       "id": "green_hooded_mantle",
@@ -295,9 +267,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/green_hooded_mantle.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/green_hooded_mantle.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/green_hooded_mantle.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/green_hooded_mantle.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/green_hooded_mantle.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/green_hooded_mantle.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/green_hooded_mantle.png"
     },
     {
       "id": "black_leather_glove",
@@ -310,9 +280,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/black_leather_glove.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/black_leather_glove.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/black_leather_glove.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_leather_glove.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/black_leather_glove.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/poor/black_leather_glove.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_leather_glove.png"
     },
     {
       "id": "fur_cuffed_brawler_gloves",
@@ -326,8 +294,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/fur_cuffed_brawler_gloves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/fur_cuffed_brawler_gloves.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/fur_cuffed_brawler_gloves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/fur_cuffed_brawler_gloves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/fur_cuffed_brawler_gloves.png",
       "manual_cleanup": "light mask override for clean inventory asset"
     },
     {
@@ -341,9 +307,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/void_claw_gauntlets.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/void_claw_gauntlets.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/void_claw_gauntlets.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/void_claw_gauntlets.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/void_claw_gauntlets.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/legendary/void_claw_gauntlets.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/void_claw_gauntlets.png"
     },
     {
       "id": "templar_visor_helm",
@@ -356,9 +320,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/templar_visor_helm.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/templar_visor_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/templar_visor_helm.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/templar_visor_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/templar_visor_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/legendary/templar_visor_helm.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/templar_visor_helm.png"
     },
     {
       "id": "thief_buckled_gloves",
@@ -371,9 +333,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/thief_buckled_gloves.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/thief_buckled_gloves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/thief_buckled_gloves.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/thief_buckled_gloves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/thief_buckled_gloves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/thief_buckled_gloves.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/thief_buckled_gloves.png"
     },
     {
       "id": "black_knight_helm",
@@ -392,8 +352,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/black_knight_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/black_knight_helm.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_knight_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/black_knight_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/black_knight_helm.png",
       "manual_cleanup": "black_light mask override for clean inventory asset"
     },
     {
@@ -413,8 +371,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/linothorax_cuirass.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/linothorax_cuirass.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/linothorax_cuirass.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/linothorax_cuirass.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/linothorax_cuirass.png",
       "manual_cleanup": "light mask override for clean inventory asset"
     },
     {
@@ -429,8 +385,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/middle_earth_plate_boots.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/middle_earth_plate_boots.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/middle_earth_plate_boots.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/boots/middle_earth_plate_boots.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/middle_earth_plate_boots.png",
       "manual_cleanup": "gray mask override for clean inventory asset"
     },
     {
@@ -444,9 +398,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/noble_gilded_gloves.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/noble_gilded_gloves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/noble_gilded_gloves.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/noble_gilded_gloves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/noble_gilded_gloves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/noble_gilded_gloves.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/noble_gilded_gloves.png"
     },
     {
       "id": "plague_doctor_helm",
@@ -459,16 +411,14 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/plague_doctor_helm.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/plague_doctor_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/plague_doctor_helm.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/plague_doctor_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/plague_doctor_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/legendary/plague_doctor_helm.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/plague_doctor_helm.png"
     },
     {
       "id": "samurai_war_armor",
       "slot": "chestplate",
       "rarity": "very_rare",
       "rarity_label": "Sehr selten",
-      "source_template": "Vorlagen/neue vorlagen/Samurai\u2019s Katana.jpeg",
+      "source_template": "Vorlagen/neue vorlagen/Samurai’s Katana.jpeg",
       "crop": [
         0.02,
         0.02,
@@ -480,8 +430,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/samurai_war_armor.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/samurai_war_armor.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/samurai_war_armor.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/samurai_war_armor.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/samurai_war_armor.png",
       "manual_cleanup": "gray mask override for clean inventory asset"
     },
     {
@@ -495,9 +443,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/heavy_iron_gauntlet.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/heavy_iron_gauntlet.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/heavy_iron_gauntlet.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/heavy_iron_gauntlet.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/heavy_iron_gauntlet.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/heavy_iron_gauntlet.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/heavy_iron_gauntlet.png"
     },
     {
       "id": "crowned_steel_helm",
@@ -516,8 +462,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/crowned_steel_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/crowned_steel_helm.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/crowned_steel_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/crowned_steel_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/very_rare/crowned_steel_helm.png",
       "manual_cleanup": "gray mask override for clean inventory asset"
     },
     {
@@ -531,9 +475,7 @@
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/black_thievery_gloves.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/black_thievery_gloves.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/black_thievery_gloves.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_thievery_gloves.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/gloves/black_thievery_gloves.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/rare/black_thievery_gloves.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/black_thievery_gloves.png"
     },
     {
       "id": "wandering_knight_armor",
@@ -552,8 +494,6 @@
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/wandering_knight_armor.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/wandering_knight_armor.png",
       "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/wandering_knight_armor.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/chestplate/wandering_knight_armor.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/common/wandering_knight_armor.png",
       "manual_cleanup": "light mask override for clean inventory asset"
     },
     {
@@ -561,15 +501,13 @@
       "slot": "helmet",
       "rarity": "legendary",
       "rarity_label": "Legendaer",
-      "source_template": "Vorlagen/neue vorlagen/\ud83e\udde1 fantasy \u2022 ev ganin \u2022 Helmet, Dark Souls Inspired.jpeg",
+      "source_template": "Vorlagen/neue vorlagen/🧡 fantasy • ev ganin • Helmet, Dark Souls Inspired.jpeg",
       "crop": null,
       "component_keep": 1,
       "master_512": "assets/equipment/armor/professional/reference_based/masters_512/antlered_dark_helm.png",
       "icon_256": "assets/equipment/armor/professional/reference_based/icons_256/antlered_dark_helm.png",
       "icon_128": "assets/equipment/armor/professional/reference_based/icons_128/antlered_dark_helm.png",
-      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/antlered_dark_helm.png",
-      "by_slot": "assets/equipment/armor/professional/reference_based/by_slot/helmet/antlered_dark_helm.png",
-      "by_rarity": "assets/equipment/armor/professional/reference_based/by_rarity/legendary/antlered_dark_helm.png"
+      "icon_64": "assets/equipment/armor/professional/reference_based/icons_64/antlered_dark_helm.png"
     }
   ]
 }

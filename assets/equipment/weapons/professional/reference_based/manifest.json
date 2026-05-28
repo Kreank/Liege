@@ -58,8 +58,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/hooked_ritual_dagger.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/hooked_ritual_dagger.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/hooked_ritual_dagger.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/hooked_ritual_dagger.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/hooked_ritual_dagger.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/hooked_ritual_dagger.png"
     },
     {
       "id": "void_reaper_scythe",
@@ -70,8 +69,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/void_reaper_scythe.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/void_reaper_scythe.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/void_reaper_scythe.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/void_reaper_scythe.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/void_reaper_scythe.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/void_reaper_scythe.png"
     },
     {
       "id": "ashwood_recurve_bow",
@@ -82,8 +80,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/ashwood_recurve_bow.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/ashwood_recurve_bow.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/ashwood_recurve_bow.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ashwood_recurve_bow.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/ashwood_recurve_bow.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ashwood_recurve_bow.png"
     },
     {
       "id": "iron_hook_sickle",
@@ -94,8 +91,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/iron_hook_sickle.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/iron_hook_sickle.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/iron_hook_sickle.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/iron_hook_sickle.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/iron_hook_sickle.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/iron_hook_sickle.png"
     },
     {
       "id": "ebony_longbow",
@@ -106,8 +102,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/ebony_longbow.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/ebony_longbow.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/ebony_longbow.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ebony_longbow.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/ebony_longbow.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ebony_longbow.png"
     },
     {
       "id": "black_guard_longsword",
@@ -118,8 +113,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/black_guard_longsword.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/black_guard_longsword.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/black_guard_longsword.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/black_guard_longsword.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/black_guard_longsword.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/black_guard_longsword.png"
     },
     {
       "id": "azure_glaive",
@@ -130,8 +124,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/azure_glaive.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/azure_glaive.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/azure_glaive.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/azure_glaive.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/azure_glaive.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/azure_glaive.png"
     },
     {
       "id": "bloodtalon_throwers",
@@ -142,8 +135,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/bloodtalon_throwers.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/bloodtalon_throwers.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/bloodtalon_throwers.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/bloodtalon_throwers.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/bloodtalon_throwers.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/bloodtalon_throwers.png"
     },
     {
       "id": "chain_reaper",
@@ -154,8 +146,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/chain_reaper.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/chain_reaper.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/chain_reaper.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/chain_reaper.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/chain_reaper.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/chain_reaper.png"
     },
     {
       "id": "plain_war_spear",
@@ -167,7 +158,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/plain_war_spear.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/plain_war_spear.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/poor/plain_war_spear.png",
       "manual_cleanup": "background/sheet/logo cleanup pass applied for usable inventory asset"
     },
     {
@@ -180,7 +170,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/crimson_twinblade.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/crimson_twinblade.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/crimson_twinblade.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/crimson_twinblade.png",
       "manual_cleanup": "tight custom extraction reapplied after visual review"
     },
     {
@@ -192,8 +181,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/bloodpoint_lance.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/bloodpoint_lance.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/bloodpoint_lance.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/bloodpoint_lance.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/bloodpoint_lance.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/bloodpoint_lance.png"
     },
     {
       "id": "steel_katana",
@@ -204,8 +192,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/steel_katana.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/steel_katana.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/steel_katana.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/steel_katana.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/steel_katana.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/steel_katana.png"
     },
     {
       "id": "sunspike_lance",
@@ -216,8 +203,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/sunspike_lance.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/sunspike_lance.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/sunspike_lance.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/sunspike_lance.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/sunspike_lance.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/sunspike_lance.png"
     },
     {
       "id": "amethyst_trident",
@@ -228,8 +214,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/amethyst_trident.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/amethyst_trident.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/amethyst_trident.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/amethyst_trident.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/amethyst_trident.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/amethyst_trident.png"
     },
     {
       "id": "blackthorn_shard",
@@ -240,8 +225,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/blackthorn_shard.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/blackthorn_shard.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/blackthorn_shard.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/blackthorn_shard.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/blackthorn_shard.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/blackthorn_shard.png"
     },
     {
       "id": "ice_and_night_blades",
@@ -253,7 +237,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/ice_and_night_blades.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/ice_and_night_blades.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ice_and_night_blades.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/ice_and_night_blades.png",
       "manual_cleanup": "background/sheet/logo cleanup pass applied for usable inventory asset"
     },
     {
@@ -265,8 +248,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/silver_straightsword.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/silver_straightsword.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/silver_straightsword.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/silver_straightsword.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/poor/silver_straightsword.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/silver_straightsword.png"
     },
     {
       "id": "plain_aruming_sword",
@@ -277,8 +259,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/plain_aruming_sword.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/plain_aruming_sword.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/plain_aruming_sword.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/plain_aruming_sword.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/poor/plain_aruming_sword.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/plain_aruming_sword.png"
     },
     {
       "id": "rose_glass_sword",
@@ -289,8 +270,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/rose_glass_sword.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/rose_glass_sword.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/rose_glass_sword.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/rose_glass_sword.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/rose_glass_sword.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/rose_glass_sword.png"
     },
     {
       "id": "cleaver_greatsword",
@@ -301,8 +281,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/cleaver_greatsword.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/cleaver_greatsword.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/cleaver_greatsword.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/cleaver_greatsword.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/cleaver_greatsword.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/cleaver_greatsword.png"
     },
     {
       "id": "goldleaf_bow",
@@ -313,8 +292,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/goldleaf_bow.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/goldleaf_bow.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/goldleaf_bow.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/goldleaf_bow.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/goldleaf_bow.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/goldleaf_bow.png"
     },
     {
       "id": "raven_halberd",
@@ -325,8 +303,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/raven_halberd.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/raven_halberd.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/raven_halberd.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/raven_halberd.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/raven_halberd.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/raven_halberd.png"
     },
     {
       "id": "thorn_blackblade",
@@ -337,8 +314,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/thorn_blackblade.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/thorn_blackblade.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/thorn_blackblade.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/thorn_blackblade.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/thorn_blackblade.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/thorn_blackblade.png"
     },
     {
       "id": "white_magus_staff",
@@ -349,8 +325,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/white_magus_staff.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/white_magus_staff.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/white_magus_staff.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/white_magus_staff.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/white_magus_staff.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/white_magus_staff.png"
     },
     {
       "id": "stormbow",
@@ -361,8 +336,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/stormbow.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/stormbow.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/stormbow.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/stormbow.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/stormbow.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/stormbow.png"
     },
     {
       "id": "hunter_bow_set",
@@ -374,7 +348,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/hunter_bow_set.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/hunter_bow_set.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/hunter_bow_set.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/hunter_bow_set.png",
       "manual_cleanup": "background/sheet/logo cleanup pass applied for usable inventory asset"
     },
     {
@@ -387,7 +360,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/demon_slayer_lance.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/demon_slayer_lance.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/demon_slayer_lance.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/demon_slayer_lance.png",
       "manual_cleanup": "background/sheet/logo cleanup pass applied for usable inventory asset"
     },
     {
@@ -400,7 +372,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/weapon_silhouette_sheet.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/weapon_silhouette_sheet.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/weapon_silhouette_sheet.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/weapon_silhouette_sheet.png",
       "manual_cleanup": "background/sheet/logo cleanup pass applied for usable inventory asset"
     },
     {
@@ -412,8 +383,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/old_execution_axe.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/old_execution_axe.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/old_execution_axe.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/old_execution_axe.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/old_execution_axe.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/old_execution_axe.png"
     },
     {
       "id": "blue_crescent_axe",
@@ -425,7 +395,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/blue_crescent_axe.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/blue_crescent_axe.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/blue_crescent_axe.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/blue_crescent_axe.png",
       "manual_cleanup": "transparent usable remake based on the provided blue axe reference, because source background cannot be cleanly keyed"
     },
     {
@@ -438,7 +407,6 @@
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/flame_cleaver_axe.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/flame_cleaver_axe.png",
       "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/flame_cleaver_axe.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/flame_cleaver_axe.png",
       "manual_cleanup": "background/sheet/logo cleanup pass applied for usable inventory asset"
     },
     {
@@ -450,8 +418,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/gandiva_bow.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/gandiva_bow.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/gandiva_bow.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/gandiva_bow.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/gandiva_bow.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/gandiva_bow.png"
     },
     {
       "id": "ruby_spear",
@@ -462,8 +429,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/ruby_spear.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/ruby_spear.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/ruby_spear.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ruby_spear.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/very_rare/ruby_spear.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/ruby_spear.png"
     },
     {
       "id": "crescent_saber",
@@ -474,8 +440,7 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/crescent_saber.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/crescent_saber.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/crescent_saber.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/crescent_saber.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/crescent_saber.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/crescent_saber.png"
     },
     {
       "id": "wolf_end_redblade",
@@ -486,68 +451,62 @@
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/wolf_end_redblade.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/wolf_end_redblade.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/wolf_end_redblade.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/wolf_end_redblade.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/wolf_end_redblade.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/wolf_end_redblade.png"
     },
     {
       "id": "graveyard_scythe",
       "weapon_type": "scythe",
       "rarity": "rare",
       "rarity_label": "Selten",
-      "source_template": "Vorlagen/guada\u00f1a \ud83e\udd40.jpeg",
+      "source_template": "Vorlagen/guadaña 🥀.jpeg",
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/graveyard_scythe.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/graveyard_scythe.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/graveyard_scythe.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/graveyard_scythe.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/rare/graveyard_scythe.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/graveyard_scythe.png"
     },
     {
       "id": "iron_hatchet",
       "weapon_type": "axe",
       "rarity": "poor",
       "rarity_label": "Schlecht",
-      "source_template": "Vorlagen/\u0421\u0435\u043a\u0438\u0440\u0430.jpeg",
+      "source_template": "Vorlagen/Секира.jpeg",
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/iron_hatchet.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/iron_hatchet.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/iron_hatchet.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/iron_hatchet.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/poor/iron_hatchet.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/iron_hatchet.png"
     },
     {
       "id": "obsidian_runeblade",
       "weapon_type": "sword",
       "rarity": "legendary",
       "rarity_label": "Legendaer",
-      "source_template": "Vorlagen/\u300eEl sekiryuutei definitivo\u300f(remake).jpeg",
+      "source_template": "Vorlagen/『El sekiryuutei definitivo』(remake).jpeg",
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/obsidian_runeblade.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/obsidian_runeblade.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/obsidian_runeblade.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/obsidian_runeblade.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/legendary/obsidian_runeblade.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/obsidian_runeblade.png"
     },
     {
       "id": "red_oak_staff",
       "weapon_type": "staff",
       "rarity": "common",
       "rarity_label": "Normal",
-      "source_template": "Vorlagen/\u5b89\u5168\u9a8c\u8bc1.jpeg",
+      "source_template": "Vorlagen/安全验证.jpeg",
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/red_oak_staff.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/red_oak_staff.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/red_oak_staff.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/red_oak_staff.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/common/red_oak_staff.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/red_oak_staff.png"
     },
     {
       "id": "woodcutter_hatchet",
       "weapon_type": "axe",
       "rarity": "poor",
       "rarity_label": "Schlecht",
-      "source_template": "Vorlagen/\u6e38\u620f\u767e\u79d1\u653b\u7565.jpeg",
+      "source_template": "Vorlagen/游戏百科攻略.jpeg",
       "master_512": "assets/equipment/weapons/professional/reference_based/masters_512/woodcutter_hatchet.png",
       "icon_256": "assets/equipment/weapons/professional/reference_based/icons_256/woodcutter_hatchet.png",
       "icon_128": "assets/equipment/weapons/professional/reference_based/icons_128/woodcutter_hatchet.png",
-      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/woodcutter_hatchet.png",
-      "rarity_v2": "assets/equipment/weapons/professional/reference_based/rarity_v2/poor/woodcutter_hatchet.png"
+      "icon_64": "assets/equipment/weapons/professional/reference_based/icons_64/woodcutter_hatchet.png"
     }
   ]
 }
