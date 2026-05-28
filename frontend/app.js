@@ -4928,11 +4928,90 @@ class WorldScene extends Phaser.Scene {
           if (id !== MY_ID) this.spawnOther(id, data.x, data.y);
         }
         this.updatePlayerCount();
+        // Welle 31: Gruppen-State aus Init übernehmen
+        this.groupState = msg.group || null;
+        this.refreshPartyFrame();
+        const pendingInvites = msg.group_invites || [];
+        if (pendingInvites.length > 0) this.showGroupInvite(pendingInvites[0]);
         break;
 
       case 'chat':
         if (window.chatConsole) {
           window.chatConsole.addMessage('player', msg.from, msg.text);
+        }
+        break;
+
+      // — Welle 31: Spielergruppen ——————————————————————————————
+      case 'group_state':
+        this.groupState = msg.group;
+        this.refreshPartyFrame();
+        break;
+      case 'group_invite_received':
+        this.showGroupInvite({
+          id: msg.invite_id,
+          group_id: msg.group_id,
+          from_player: msg.from,
+          kind: msg.kind,
+          expires_at: msg.expires_at,
+        });
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('system', null,
+            `📜 ${msg.from} lädt dich in eine ${msg.kind === 'party' ? 'Party' : 'Raid-Gruppe'} ein`);
+        }
+        break;
+      case 'group_invite_sent':
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('system', null,
+            `📨 Einladung an ${msg.target} gesendet`);
+        }
+        break;
+      case 'group_error':
+        if (window.chatConsole) {
+          const reasonText = {
+            already_in_group: 'Du bist bereits in einer Gruppe',
+            target_in_other_group: 'Spieler ist bereits in einer Gruppe',
+            target_is_self: 'Du kannst dich nicht selbst einladen',
+            group_full: 'Gruppe ist voll',
+            already_invited: 'Einladung läuft bereits',
+            no_permission: 'Keine Berechtigung',
+            not_in_group: 'Du bist in keiner Gruppe',
+            invite_not_found: 'Einladung nicht gefunden',
+            invite_expired: 'Einladung abgelaufen',
+          }[msg.reason] || `Fehler: ${msg.reason}`;
+          window.chatConsole.addMessage('error', null, `⚠️ ${reasonText}`);
+        }
+        break;
+      case 'group_disbanded':
+        this.groupState = null;
+        this.refreshPartyFrame();
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('system', null, '🛑 Gruppe wurde aufgelöst');
+        }
+        break;
+      case 'group_kicked':
+        this.groupState = null;
+        this.refreshPartyFrame();
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('error', null,
+            `🚪 Du wurdest von ${msg.by} aus der Gruppe entfernt`);
+        }
+        break;
+      case 'group_member_left':
+        if (window.chatConsole) {
+          let txt = `👋 ${msg.player_name} hat die Gruppe verlassen`;
+          if (msg.new_leader) txt += ` — neuer Leader: ${msg.new_leader}`;
+          window.chatConsole.addMessage('system', null, txt);
+        }
+        break;
+      case 'group_member_online':
+      case 'group_member_offline':
+        // optional: subtle update — Frame holt sich beim nächsten refresh den Status
+        break;
+      case 'group_converted':
+        if (window.chatConsole) {
+          const lbl = { raid_small: 'Raid (20)', raid_large: 'Raid (40)' };
+          window.chatConsole.addMessage('system', null,
+            `⚔️ Gruppe wurde zu ${lbl[msg.to_kind] || msg.to_kind} umgewandelt`);
         }
         break;
 
@@ -6274,6 +6353,91 @@ class WorldScene extends Phaser.Scene {
       const label = { torso: 'Torso', arms: 'Arme', legs: 'Beine' }[part];
       text.textContent = `${icon} ${label} ${val}/100`;
     }
+  }
+
+  // Welle 31: Party / Raid Frame
+  refreshPartyFrame() {
+    const frame = document.getElementById('party-frame');
+    const list  = document.getElementById('party-frame-members');
+    const cnt   = document.getElementById('party-frame-count');
+    const title = document.getElementById('party-frame-title');
+    if (!frame || !list) return;
+    const g = this.groupState;
+    if (!g) {
+      frame.style.display = 'none';
+      return;
+    }
+    const KIND_LABEL = { party: 'Party', raid_small: 'Raid (klein)', raid_large: 'Raid (groß)' };
+    const KIND_MAX   = { party: 5, raid_small: 20, raid_large: 40 };
+    title.textContent = KIND_LABEL[g.kind] || 'Gruppe';
+    cnt.textContent   = `${g.members.length}/${KIND_MAX[g.kind] || g.members.length}`;
+    list.innerHTML = '';
+    // Sortieren: Leader → Assist → Members, je nach sub_party gruppieren bei Raids
+    const sorted = [...g.members].sort((a, b) => {
+      const r = (x) => x.role === 'leader' ? 0 : x.role === 'assist' ? 1 : 2;
+      if (a.sub_party !== b.sub_party) return a.sub_party - b.sub_party;
+      return r(a) - r(b);
+    });
+    let lastSub = null;
+    for (const m of sorted) {
+      if (g.kind !== 'party' && m.sub_party !== lastSub) {
+        const sep = document.createElement('div');
+        sep.className = 'pf-sub';
+        sep.textContent = `— Sub-Party ${m.sub_party} —`;
+        list.appendChild(sep);
+        lastSub = m.sub_party;
+      }
+      const row = document.createElement('div');
+      row.className = 'pf-member' + (m.online ? '' : ' offline') + (m.name === MY_ID ? ' you' : '');
+      const role = document.createElement('span');
+      role.className = 'pf-role ' + m.role;
+      role.textContent = m.role === 'leader' ? '★' : m.role === 'assist' ? '◆' : '·';
+      role.title = m.role;
+      const name = document.createElement('span');
+      name.className = 'pf-name';
+      name.textContent = m.name === MY_ID ? `${m.name.substr(0,12)} (Du)` : m.name.substr(0,16);
+      row.appendChild(role);
+      row.appendChild(name);
+      list.appendChild(row);
+    }
+    frame.style.display = 'block';
+  }
+
+  showGroupInvite(invite) {
+    const ov = document.getElementById('group-invite-overlay');
+    const body = document.getElementById('group-invite-body');
+    const acc = document.getElementById('group-invite-accept');
+    const dec = document.getElementById('group-invite-decline');
+    if (!ov || !body) return;
+    const kindTxt = invite.kind === 'party' ? 'Party' :
+                    invite.kind === 'raid_small' ? 'kleiner Raid-Gruppe' :
+                    invite.kind === 'raid_large' ? 'großer Raid-Gruppe' : 'Gruppe';
+    body.innerHTML = `<b>${invite.from_player}</b> lädt dich in eine <b>${kindTxt}</b> ein.<br>` +
+                     `<span style="color:#888;font-size:11px">Einladung läuft in 60s ab</span>`;
+    this._pendingInviteId = invite.id;
+    acc.onclick = () => {
+      if (window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
+        window.GAME_WS.send(JSON.stringify({
+          type: 'group_accept', invite_id: this._pendingInviteId
+        }));
+      }
+      this.hideGroupInvite();
+    };
+    dec.onclick = () => {
+      if (window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
+        window.GAME_WS.send(JSON.stringify({
+          type: 'group_decline', invite_id: this._pendingInviteId
+        }));
+      }
+      this.hideGroupInvite();
+    };
+    ov.style.display = 'flex';
+  }
+
+  hideGroupInvite() {
+    const ov = document.getElementById('group-invite-overlay');
+    if (ov) ov.style.display = 'none';
+    this._pendingInviteId = null;
   }
 
   refreshNeedsBars() {
@@ -8397,9 +8561,13 @@ class WorldScene extends Phaser.Scene {
       // Idle
       entry.moving = false;
       entry.walkTimer = 0;
+      // gleiche left/right-Inversion wie im Walk-Pfad (siehe unten)
+      const idleFacing = entry.facing || 'down';
+      const idleDir = idleFacing === 'left' ? 'right'
+                    : (idleFacing === 'right' ? 'left' : idleFacing);
       const key = usesIdleFrame
         ? `${prefix}_idle_1`
-        : `${prefix}_walk_${entry.facing || 'down'}_1`;
+        : `${prefix}_walk_${idleDir}_1`;
       if (this.textures.exists(key)) {
         entry.body.setTexture(key);
         entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
@@ -8422,7 +8590,12 @@ class WorldScene extends Phaser.Scene {
       entry.walkFrame = entry.walkFrame === 1 ? 2 : 1;
     }
     const frame = entry.walkFrame || 1;
-    const key = `${prefix}_walk_${dir}_${frame}`;
+    // Asset-Konvention dieses Packs hat walk_left/walk_right invertiert
+    // (walk_left_*.png zeigt Profil nach Osten und umgekehrt). Auf Sprite-Ebene
+    // tauschen statt File-Rename — wenn ein Pack mal korrekt orientiert kommt,
+    // muss nur dieser Swap raus statt 60+ Files umbenannt zu werden.
+    const fileDir = dir === 'left' ? 'right' : (dir === 'right' ? 'left' : dir);
+    const key = `${prefix}_walk_${fileDir}_${frame}`;
     if (this.textures.exists(key)) {
       entry.body.setTexture(key);
       entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
@@ -9076,10 +9249,72 @@ function setupChatConsole(myRole) {
   function updateSendDisabled() {
     sendBtn.disabled = (activeMode === 'dev' && devBusy);
   }
+  // Welle 31: Slash-Commands. Return true = behandelt (Text nicht weitersenden).
+  function handleGroupSlashCommand(text) {
+    const ws = window.GAME_WS;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
+    const parts = text.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const arg = parts.slice(1).join(' ').trim();
+    const HELP = {
+      '/invite': 'Spielernamen angeben: /invite Name',
+      '/kick': 'Spielernamen angeben: /kick Name',
+      '/promote': 'Spielernamen angeben: /promote Name',
+      '/lead': 'Spielernamen angeben: /lead Name',
+    };
+    switch (cmd) {
+      case '/invite':
+      case '/inv':
+        if (!arg) { addMessage('error', null, HELP['/invite']); return true; }
+        ws.send(JSON.stringify({ type: 'group_invite', target: arg }));
+        return true;
+      case '/leave':
+        ws.send(JSON.stringify({ type: 'group_leave' }));
+        return true;
+      case '/disband':
+        if (!confirm('Gruppe wirklich auflösen?')) return true;
+        ws.send(JSON.stringify({ type: 'group_disband' }));
+        return true;
+      case '/kick':
+        if (!arg) { addMessage('error', null, HELP['/kick']); return true; }
+        ws.send(JSON.stringify({ type: 'group_kick', target: arg }));
+        return true;
+      case '/promote':
+      case '/prom':
+        if (!arg) { addMessage('error', null, HELP['/promote']); return true; }
+        ws.send(JSON.stringify({ type: 'group_promote', target: arg }));
+        return true;
+      case '/lead':
+        if (!arg) { addMessage('error', null, HELP['/lead']); return true; }
+        ws.send(JSON.stringify({ type: 'group_transfer_leader', target: arg }));
+        return true;
+      case '/party':
+        ws.send(JSON.stringify({ type: 'group_create_party' }));
+        return true;
+      case '/raid':
+      case '/raid20':
+        ws.send(JSON.stringify({ type: 'group_convert_to_raid', kind: 'raid_small' }));
+        return true;
+      case '/raid40':
+      case '/largeraid':
+        ws.send(JSON.stringify({ type: 'group_convert_to_raid', kind: 'raid_large' }));
+        return true;
+      case '/help':
+        addMessage('system', null,
+          '/invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband · /party · /raid (→20) · /raid40');
+        return true;
+    }
+    return false;
+  }
   function send() {
     const text = inputEl.value.trim();
     if (!text) return;
     if (activeMode === 'player') {
+      // Welle 31: Slash-Commands für Gruppen
+      if (text.startsWith('/') && handleGroupSlashCommand(text)) {
+        inputEl.value = '';
+        return;
+      }
       if (window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
         window.GAME_WS.send(JSON.stringify({ type: 'chat', text }));
       } else {

@@ -437,6 +437,31 @@ async def promote(group_id: int, by_player: str, target: str) -> dict:
     return {"ok": True, "promoted": target}
 
 
+async def convert_to_raid(group_id: int, by_player: str, new_kind: str) -> dict:
+    """Wandelt eine Gruppe in einen größeren Container um. Nur Leader.
+    Erlaubte Up-Konvertierungen: party → raid_small → raid_large.
+    Down-Konvertierung ist nicht erlaubt (zu viele Edge-Cases mit Members
+    außerhalb der neuen Max-Grenze)."""
+    if new_kind not in ("raid_small", "raid_large"):
+        return {"ok": False, "reason": "invalid_kind"}
+    if not await can_promote(group_id, by_player):
+        return {"ok": False, "reason": "no_permission"}
+    g = await get_group(group_id)
+    if not g:
+        return {"ok": False, "reason": "no_group"}
+    # Down-Konvertierung ausschließen
+    order = {"party": 0, "raid_small": 1, "raid_large": 2}
+    if order[new_kind] <= order[g["kind"]]:
+        return {"ok": False, "reason": "no_downgrade"}
+    await db.pool().execute(
+        "UPDATE player_groups SET kind = $2, last_active_at = NOW() WHERE id = $1",
+        group_id, new_kind,
+    )
+    log.info("Gruppe %d konvertiert: %s → %s (by=%s)",
+             group_id, g["kind"], new_kind, by_player)
+    return {"ok": True, "from_kind": g["kind"], "to_kind": new_kind}
+
+
 async def transfer_leader(group_id: int, by_player: str, target: str) -> dict:
     """Leader übergibt seine Rolle an `target`. Vorheriger Leader wird Assist."""
     if not await can_promote(group_id, by_player):

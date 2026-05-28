@@ -35,6 +35,30 @@
   👥 <span id="player-count">0 Spieler</span>
 </div>
 
+<!-- Welle 31: Party / Raid Frame (hidden bis in Gruppe) -->
+<div id="party-frame" style="display:none">
+  <div id="party-frame-header">
+    <span id="party-frame-title">Gruppe</span>
+    <span id="party-frame-count">0/5</span>
+  </div>
+  <div id="party-frame-members"></div>
+  <div id="party-frame-hint">
+    /invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband
+  </div>
+</div>
+
+<!-- Welle 31: Eingehende Gruppen-Einladung -->
+<div id="group-invite-overlay" style="display:none">
+  <div id="group-invite-box">
+    <div id="group-invite-title">📜 Gruppen-Einladung</div>
+    <div id="group-invite-body">…</div>
+    <div id="group-invite-actions">
+      <button id="group-invite-accept" type="button">✓ Annehmen</button>
+      <button id="group-invite-decline" type="button">✗ Ablehnen</button>
+    </div>
+  </div>
+</div>
+
 <div id="screen-damage"></div>
 
 <div id="hp-bar">
