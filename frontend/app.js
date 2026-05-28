@@ -6834,11 +6834,38 @@ class WorldScene extends Phaser.Scene {
       row.appendChild(obj);
       const rwd = document.createElement('div');
       rwd.className = 'quest-reward';
-      rwd.textContent = '🎁 ' + Object.entries(q.reward || {}).map(([k, v]) => {
-        if (k === 'xp') return `${v} XP`;
-        const name = (ITEM[k] || { name: k }).name;
-        return `${v}× ${name}`;
-      }).join(', ');
+      // Reward-Struktur: { items: {kind: count}, gold: N, xp: N, faction: {name: delta}, research: N }
+      // Defensiv parsen falls Legacy-Daten den Reward noch als JSON-String halten.
+      let reward = q.reward || {};
+      if (typeof reward === 'string') {
+        try { reward = JSON.parse(reward); } catch { reward = {}; }
+      }
+      const parts = [];
+      for (const [k, v] of Object.entries(reward)) {
+        if (k === 'items' && v && typeof v === 'object') {
+          for (const [ik, ic] of Object.entries(v)) {
+            const name = (ITEM[ik] || { name: ik }).name;
+            parts.push(`${ic}× ${name}`);
+          }
+        } else if (k === 'gold') {
+          parts.push(`${v} Gold`);
+        } else if (k === 'xp') {
+          parts.push(`${v} XP`);
+        } else if (k === 'research') {
+          parts.push(`${v} Forschung`);
+        } else if (k === 'faction' && v && typeof v === 'object') {
+          for (const [fname, delta] of Object.entries(v)) {
+            const sign = (delta >= 0) ? '+' : '';
+            parts.push(`${sign}${delta} Ruf @ ${fname}`);
+          }
+        } else if (typeof v === 'object') {
+          // Unbekannte verschachtelte Struktur — als JSON anzeigen
+          parts.push(`${k}: ${JSON.stringify(v)}`);
+        } else {
+          parts.push(`${v}× ${k}`);
+        }
+      }
+      rwd.textContent = '🎁 ' + (parts.length ? parts.join(', ') : '—');
       row.appendChild(rwd);
       if (q.status === 'completed') {
         const claim = document.createElement('button');

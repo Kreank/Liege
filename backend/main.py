@@ -691,6 +691,21 @@ async def _apply_spell_effects(player_id: str, spell_id: str,
                         "type": "npc_died", "npc_id": n["id"],
                         "killed_by": player_id, "name": n["name"],
                     })
+                    # Quest-Hook auch bei Spell-Kills
+                    try:
+                        updated_q = await quests.on_creature_killed(player_id, n["kind"], 1)
+                        for q in updated_q:
+                            await _send_to_player(player_id,
+                                                  {"type": "quest_progress", "quest": q})
+                        stage_q = await quest_stages.on_player_event(
+                            player_id, "kill",
+                            {"creature_kind": n["kind"], "count": 1},
+                        )
+                        for q in stage_q:
+                            await _send_to_player(player_id,
+                                                  {"type": "quest_progress", "quest": q})
+                    except Exception:
+                        logging.exception("quest hook (spell-kill) failed")
                 else:
                     await manager.broadcast({
                         "type": "npc_damaged", "npc_id": n["id"],
@@ -1778,6 +1793,22 @@ async def websocket_endpoint(websocket: WebSocket):
                                         "type": "npc_died", "npc_id": t["id"],
                                         "killed_by": player_id, "name": t["name"],
                                     })
+                                    # Quest-Hook auch bei Direct-Spell-Kills
+                                    try:
+                                        updated_q = await quests.on_creature_killed(
+                                            player_id, t["kind"], 1)
+                                        for q in updated_q:
+                                            await websocket.send_json(
+                                                {"type": "quest_progress", "quest": q})
+                                        stage_q = await quest_stages.on_player_event(
+                                            player_id, "kill",
+                                            {"creature_kind": t["kind"], "count": 1},
+                                        )
+                                        for q in stage_q:
+                                            await websocket.send_json(
+                                                {"type": "quest_progress", "quest": q})
+                                    except Exception:
+                                        logging.exception("quest hook (direct-spell-kill) failed")
                                 else:
                                     await manager.broadcast({
                                         "type": "npc_damaged", "npc_id": t["id"],
@@ -3189,19 +3220,40 @@ async def websocket_endpoint(websocket: WebSocket):
                 target_q = next((q for q in qs if q["id"] == quest_id), None)
                 if target_q is None:
                     continue
-                # Reward verteilen
+                # Reward-Struktur: { items: {kind:count}, gold:N, xp:N, research:N,
+                # faction: {fac:delta} }. _row_to_dict hat schon defensiv geparsed.
                 reward = target_q.get("reward") or {}
-                for item_kind, count in reward.items():
-                    if item_kind == "xp":
-                        # XP wird an Combat-Skill verteilt (pragmatisch)
-                        xp_result = await skills.gain_xp(player_id, "combat", int(count))
-                        if xp_result:
-                            await websocket.send_json({"type": "skill_xp", **xp_result})
-                        continue
+                # Items entfalten
+                for item_kind, count in (reward.get("items") or {}).items():
                     for _ in range(int(count)):
                         created = await items.create_for_player(item_kind, player_id)
                         if created is not None:
                             await websocket.send_json({"type": "inventory_add", "item": created})
+                # Gold
+                gold = int(reward.get("gold", 0) or 0)
+                for _ in range(gold):
+                    created = await items.create_for_player("gold_coin", player_id)
+                    if created is not None:
+                        await websocket.send_json({"type": "inventory_add", "item": created})
+                # XP → Combat-Skill (pragmatisch)
+                xp = int(reward.get("xp", 0) or 0)
+                if xp > 0:
+                    xp_result = await skills.gain_xp(player_id, "combat", xp)
+                    if xp_result:
+                        await websocket.send_json({"type": "skill_xp", **xp_result})
+                # Research-Pool
+                rp = int(reward.get("research", 0) or 0)
+                if rp > 0:
+                    try:
+                        await research.award_points(player_id, rp, reason="quest")
+                    except Exception:
+                        logging.exception("quest research-reward failed")
+                # Faction-Reputation
+                for fac, delta in (reward.get("faction") or {}).items():
+                    try:
+                        await quests.add_reputation(player_id, fac, int(delta))
+                    except Exception:
+                        logging.exception("quest faction-reward failed")
                 await quests.mark_closed(quest_id)
                 await websocket.send_json({"type": "quest_closed", "quest_id": quest_id})
                 await websocket.send_json({"type": "toast", "text": "✅ Quest abgegeben!"})

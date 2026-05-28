@@ -98,6 +98,18 @@ QUEST_TEMPLATES = [
 
 # — DB-Layer ——————————————————————————————————————————————————————————————————
 
+def _maybe_parse(value):
+    # Legacy-Daten in der DB sind teilweise doppelt JSON-encoded (json.dumps +
+    # jsonb-codec encoder=json.dumps). Decoder liefert dann den JSON-String
+    # statt eines dict. Hier defensiv nachparsen.
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except Exception:
+            return value
+    return value
+
+
 def _row_to_dict(row) -> dict:
     return {
         "id":             row["id"],
@@ -107,9 +119,9 @@ def _row_to_dict(row) -> dict:
         "quest_type":     row["quest_type"],
         "title":          row["title"],
         "description":    row["description"],
-        "objective":      row["objective"],
-        "progress":       row["progress"],
-        "reward":         row["reward"],
+        "objective":      _maybe_parse(row["objective"]),
+        "progress":       _maybe_parse(row["progress"]),
+        "reward":         _maybe_parse(row["reward"]),
         "status":         row["status"],
         "created_at":     row["created_at"].isoformat(),
     }
