@@ -4936,6 +4936,17 @@ class WorldScene extends Phaser.Scene {
         this.myTileY = msg.spawn.y;
         this.myPx = msg.spawn.x * TILE_SIZE + TILE_SIZE / 2;
         this.myPy = msg.spawn.y * TILE_SIZE + TILE_SIZE / 2;
+        // Bei Reconnect: alten Player-Sprite + alle Other-Players aufräumen,
+        // sonst stapeln sich Phantom-Sprites bei jedem init-Empfang.
+        // (NPCs werden schon von loadNPCs() oben gecleant.)
+        if (this.mySprite && this.mySprite.container) {
+          try { this.mySprite.container.destroy(); } catch (e) {}
+          this.mySprite = null;
+        }
+        for (const id in (this.otherPlayers || {})) {
+          try { this.otherPlayers[id].container?.destroy(); } catch (e) {}
+        }
+        this.otherPlayers = {};
         this.mySprite = this.spawnSprite(MY_ID, msg.spawn.x, msg.spawn.y, true);
         this.cameras.main.startFollow(this.mySprite.container, true, 0.15, 0.15);
         // Welle 23: Sprite unsichtbar bis Character-Creation abgeschlossen

@@ -2524,7 +2524,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 s = structures.object_at(x, y) or structures.floor_at(x, y)
                 if s is None:
                     continue
-                if not structures.is_combat_structure(s["type"]):
+                from structures import is_combat_structure as _is_cs
+                if not _is_cs(s["type"]):
                     await websocket.send_json({
                         "type": "toast", "text": "Diese Struktur kann nicht angegriffen werden.",
                     })
@@ -2596,7 +2597,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 s = structures.object_at(x, y) or structures.floor_at(x, y)
                 if s is None:
                     continue
-                if not structures.is_combat_structure(s["type"]):
+                from structures import is_combat_structure as _is_cs
+                if not _is_cs(s["type"]):
                     continue
                 if not structures.can_modify(player_id, s):
                     await websocket.send_json({
@@ -2657,7 +2659,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 s = structures.object_at(x, y) or structures.floor_at(x, y)
                 if s is None:
                     continue
-                if not structures.is_combat_structure(s["type"]):
+                from structures import is_combat_structure as _is_cs
+                if not _is_cs(s["type"]):
                     continue
                 if not structures.can_modify(player_id, s):
                     await websocket.send_json({

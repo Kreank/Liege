@@ -44,7 +44,7 @@ async def run(world, structure_manager, connection_manager) -> None:
                     continue
                 if structure_manager.at(wx, wy) is not None:
                     continue
-                chosen = world_populator._pick_for_biome(tile)
+                chosen = world_populator._pick_for_tile(world, wx, wy, tile)
                 if chosen is None:
                     continue
                 dur = harvest_module.initial_durability(chosen)
