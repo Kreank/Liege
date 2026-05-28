@@ -1,0 +1,120 @@
+{
+  "generated": "2026-05-28",
+  "asset_type": "tech_print_inventory_icons_2026_05_28",
+  "policy": "additive pack only; no existing assets replaced; generated as isolated transparent inventory icons",
+  "count": 8,
+  "items": [
+    {
+      "id": "mithril_plans",
+      "name": "Mithril Plans",
+      "game_kind_hint": "tech_print",
+      "description": "rolled architecture blueprint with silver mithril markings and forge hammer symbol",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/mithril_plans.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/mithril_plans.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/mithril_plans.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/mithril_plans.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/mithril_plans_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "dragon_skull",
+      "name": "Dragon Skull",
+      "game_kind_hint": "tech_print",
+      "description": "weathered dragon skull research artifact, no trophy stand",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/dragon_skull.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/dragon_skull.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/dragon_skull.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/dragon_skull.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/dragon_skull_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "ancient_scroll",
+      "name": "Ancient Scroll",
+      "game_kind_hint": "tech_print",
+      "description": "yellowed parchment scroll with golden seal and ancient script marks",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/ancient_scroll.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/ancient_scroll.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/ancient_scroll.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/ancient_scroll.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/ancient_scroll_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "gods_tablet",
+      "name": "Gods Tablet",
+      "game_kind_hint": "tech_print",
+      "description": "damaged stone tablet with carved runes and warm golden aura",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/gods_tablet.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/gods_tablet.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/gods_tablet.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/gods_tablet.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/gods_tablet_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "alchemy_codex",
+      "name": "Alchemy Codex",
+      "game_kind_hint": "tech_print",
+      "description": "open alchemy book with green glowing formula diagrams",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/alchemy_codex.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/alchemy_codex.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/alchemy_codex.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/alchemy_codex.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/alchemy_codex_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "runic_tablet",
+      "name": "Runic Tablet",
+      "game_kind_hint": "tech_print",
+      "description": "small dark basalt tablet with blue glowing runes",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/runic_tablet.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/runic_tablet.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/runic_tablet.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/runic_tablet.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/runic_tablet_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "healing_codex",
+      "name": "Healing Codex",
+      "game_kind_hint": "tech_print",
+      "description": "open healer book with white glowing holy symbols",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/healing_codex.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/healing_codex.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/healing_codex.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/healing_codex.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/healing_codex_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    },
+    {
+      "id": "trade_ledger",
+      "name": "Trade Ledger",
+      "game_kind_hint": "tech_print",
+      "description": "thick merchant ledger with leather strap and gold coin marks",
+      "paths": {
+        "master_512": "assets/magic/professional/tech_prints_2026_05_28/masters_512/trade_ledger.png",
+        "icon_256": "assets/magic/professional/tech_prints_2026_05_28/icons_256/trade_ledger.png",
+        "icon_128": "assets/magic/professional/tech_prints_2026_05_28/icons_128/trade_ledger.png",
+        "icon_64": "assets/magic/professional/tech_prints_2026_05_28/icons_64/trade_ledger.png"
+      },
+      "source_chromakey": "assets/magic/professional/tech_prints_2026_05_28/source_chromakey/trade_ledger_chroma.png",
+      "originality_note": "Generated as a new original design from prompt; reference packs used only for style and scale pattern."
+    }
+  ]
+}

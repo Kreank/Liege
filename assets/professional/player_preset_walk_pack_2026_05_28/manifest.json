@@ -1,0 +1,608 @@
+{
+  "generated": "2026-05-28",
+  "asset_type": "player_preset_walk_cycles",
+  "policy": "additive 64x64 walk frames for existing player preset UI portraits; portraits left unchanged",
+  "count": 60,
+  "items": [
+    {
+      "kind": "wanderer_cloak",
+      "frame": "idle_1",
+      "path": "assets/animations/player_presets/wanderer_cloak/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "idle_2",
+      "path": "assets/animations/player_presets/wanderer_cloak/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_down_1",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_down_2",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_up_1",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_up_2",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_left_1",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_left_2",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_right_1",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer_cloak",
+      "frame": "walk_right_2",
+      "path": "assets/animations/player_presets/wanderer_cloak/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wanderer_cloak_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "idle_1",
+      "path": "assets/animations/player_presets/iron_delver/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "idle_2",
+      "path": "assets/animations/player_presets/iron_delver/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_down_1",
+      "path": "assets/animations/player_presets/iron_delver/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_down_2",
+      "path": "assets/animations/player_presets/iron_delver/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_up_1",
+      "path": "assets/animations/player_presets/iron_delver/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_up_2",
+      "path": "assets/animations/player_presets/iron_delver/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_left_1",
+      "path": "assets/animations/player_presets/iron_delver/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_left_2",
+      "path": "assets/animations/player_presets/iron_delver/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_right_1",
+      "path": "assets/animations/player_presets/iron_delver/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "iron_delver",
+      "frame": "walk_right_2",
+      "path": "assets/animations/player_presets/iron_delver/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/iron_delver_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "idle_1",
+      "path": "assets/animations/player_presets/ember_mage/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "idle_2",
+      "path": "assets/animations/player_presets/ember_mage/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_down_1",
+      "path": "assets/animations/player_presets/ember_mage/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_down_2",
+      "path": "assets/animations/player_presets/ember_mage/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_up_1",
+      "path": "assets/animations/player_presets/ember_mage/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_up_2",
+      "path": "assets/animations/player_presets/ember_mage/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_left_1",
+      "path": "assets/animations/player_presets/ember_mage/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_left_2",
+      "path": "assets/animations/player_presets/ember_mage/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_right_1",
+      "path": "assets/animations/player_presets/ember_mage/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "ember_mage",
+      "frame": "walk_right_2",
+      "path": "assets/animations/player_presets/ember_mage/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/ember_mage_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "idle_1",
+      "path": "assets/animations/player_presets/knife_runner/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "idle_2",
+      "path": "assets/animations/player_presets/knife_runner/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_down_1",
+      "path": "assets/animations/player_presets/knife_runner/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_down_2",
+      "path": "assets/animations/player_presets/knife_runner/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_up_1",
+      "path": "assets/animations/player_presets/knife_runner/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_up_2",
+      "path": "assets/animations/player_presets/knife_runner/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_left_1",
+      "path": "assets/animations/player_presets/knife_runner/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_left_2",
+      "path": "assets/animations/player_presets/knife_runner/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_right_1",
+      "path": "assets/animations/player_presets/knife_runner/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "knife_runner",
+      "frame": "walk_right_2",
+      "path": "assets/animations/player_presets/knife_runner/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/knife_runner_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "idle_1",
+      "path": "assets/animations/player_presets/shieldbearer/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "idle_2",
+      "path": "assets/animations/player_presets/shieldbearer/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_down_1",
+      "path": "assets/animations/player_presets/shieldbearer/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_down_2",
+      "path": "assets/animations/player_presets/shieldbearer/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_up_1",
+      "path": "assets/animations/player_presets/shieldbearer/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_up_2",
+      "path": "assets/animations/player_presets/shieldbearer/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_left_1",
+      "path": "assets/animations/player_presets/shieldbearer/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_left_2",
+      "path": "assets/animations/player_presets/shieldbearer/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_right_1",
+      "path": "assets/animations/player_presets/shieldbearer/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "shieldbearer",
+      "frame": "walk_right_2",
+      "path": "assets/animations/player_presets/shieldbearer/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/shieldbearer_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "idle_1",
+      "path": "assets/animations/player_presets/wild_ranger/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "idle_2",
+      "path": "assets/animations/player_presets/wild_ranger/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_down_1",
+      "path": "assets/animations/player_presets/wild_ranger/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_down_2",
+      "path": "assets/animations/player_presets/wild_ranger/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_up_1",
+      "path": "assets/animations/player_presets/wild_ranger/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_up_2",
+      "path": "assets/animations/player_presets/wild_ranger/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_left_1",
+      "path": "assets/animations/player_presets/wild_ranger/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_left_2",
+      "path": "assets/animations/player_presets/wild_ranger/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_right_1",
+      "path": "assets/animations/player_presets/wild_ranger/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    },
+    {
+      "kind": "wild_ranger",
+      "frame": "walk_right_2",
+      "path": "assets/animations/player_presets/wild_ranger/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/player_preset_walk_pack_2026_05_28/source_sheets/wild_ranger_sheet_chroma.png"
+    }
+  ]
+}
