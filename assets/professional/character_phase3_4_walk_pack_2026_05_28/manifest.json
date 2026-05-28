@@ -1,0 +1,2674 @@
+{
+  "generated": "2026-05-28",
+  "asset_type": "character_phase3_4_walk_cycles",
+  "policy": "replacement walk frames for remaining core NPC roles and female variants; static fallbacks updated from idle_1",
+  "count": 240,
+  "kinds": [
+    "wanderer",
+    "farmer_female",
+    "baker",
+    "carpenter",
+    "tailor",
+    "miner",
+    "woodcutter",
+    "hunter",
+    "fisher",
+    "innkeeper",
+    "bard",
+    "scholar",
+    "scribe",
+    "healer",
+    "hermit",
+    "village_elder",
+    "quest_giver",
+    "robber",
+    "thief",
+    "villager_female",
+    "merchant_female",
+    "guard_female",
+    "healer_female",
+    "mage_female"
+  ],
+  "items": [
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/wanderer/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/wanderer/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/wanderer/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/wanderer/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/wanderer/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/wanderer/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/wanderer/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/wanderer/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/wanderer/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "wanderer",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/wanderer/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/wanderer_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/farmer_female/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/farmer_female/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/farmer_female/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/farmer_female/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/farmer_female/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/farmer_female/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/farmer_female/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/farmer_female/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/farmer_female/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "farmer_female",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/farmer_female/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/farmer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/baker/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/baker/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/baker/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/baker/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/baker/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/baker/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/baker/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/baker/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/baker/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "baker",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/baker/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/baker_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/carpenter/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/carpenter/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/carpenter/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/carpenter/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/carpenter/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/carpenter/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/carpenter/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/carpenter/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/carpenter/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "carpenter",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/carpenter/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/carpenter_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/tailor/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/tailor/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/tailor/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/tailor/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/tailor/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/tailor/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/tailor/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/tailor/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/tailor/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "tailor",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/tailor/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/tailor_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/miner/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/miner/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/miner/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/miner/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/miner/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/miner/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/miner/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/miner/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/miner/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "miner",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/miner/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/miner_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/woodcutter/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/woodcutter/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/woodcutter/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/woodcutter/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/woodcutter/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/woodcutter/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/woodcutter/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/woodcutter/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/woodcutter/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "woodcutter",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/woodcutter/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/woodcutter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/hunter/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/hunter/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/hunter/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/hunter/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/hunter/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/hunter/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/hunter/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/hunter/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/hunter/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "hunter",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/hunter/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hunter_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/fisher/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/fisher/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/fisher/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/fisher/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/fisher/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/fisher/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/fisher/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/fisher/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/fisher/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "fisher",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/fisher/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/fisher_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/innkeeper/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/innkeeper/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/innkeeper/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/innkeeper/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/innkeeper/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/innkeeper/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/innkeeper/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/innkeeper/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/innkeeper/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "innkeeper",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/innkeeper/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/innkeeper_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/bard/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/bard/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/bard/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/bard/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/bard/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/bard/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/bard/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/bard/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/bard/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "bard",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/bard/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/bard_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/scholar/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/scholar/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/scholar/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/scholar/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/scholar/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/scholar/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/scholar/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/scholar/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/scholar/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scholar",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/scholar/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scholar_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/scribe/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/scribe/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/scribe/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/scribe/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/scribe/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/scribe/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/scribe/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/scribe/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/scribe/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "scribe",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/scribe/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/scribe_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/healer/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/healer/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/healer/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/healer/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/healer/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/healer/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/healer/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/healer/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/healer/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "healer",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/healer/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/hermit/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/hermit/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/hermit/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/hermit/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/hermit/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/hermit/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/hermit/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/hermit/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/hermit/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "hermit",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/hermit/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/hermit_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/village_elder/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/village_elder/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/village_elder/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/village_elder/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/village_elder/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/village_elder/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/village_elder/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/village_elder/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/village_elder/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "village_elder",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/village_elder/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/village_elder_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/quest_giver/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/quest_giver/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/quest_giver/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/quest_giver/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/quest_giver/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/quest_giver/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/quest_giver/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/quest_giver/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/quest_giver/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "quest_giver",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/quest_giver/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/quest_giver_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/robber/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/robber/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/robber/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/robber/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/robber/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/robber/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/robber/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/robber/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/robber/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "robber",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/robber/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/robber_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/thief/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/thief/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/thief/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/thief/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/thief/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/thief/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/thief/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/thief/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/thief/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "thief",
+      "phase": "phase3",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/thief/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/thief_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/villager_female/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/villager_female/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/villager_female/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/villager_female/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/villager_female/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/villager_female/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/villager_female/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/villager_female/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/villager_female/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "villager_female",
+      "phase": "phase4",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/villager_female/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/villager_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/merchant_female/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/merchant_female/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/merchant_female/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/merchant_female/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/merchant_female/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/merchant_female/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/merchant_female/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/merchant_female/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/merchant_female/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "merchant_female",
+      "phase": "phase4",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/merchant_female/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/merchant_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/guard_female/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/guard_female/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/guard_female/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/guard_female/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/guard_female/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/guard_female/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/guard_female/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/guard_female/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/guard_female/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "guard_female",
+      "phase": "phase4",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/guard_female/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/guard_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/healer_female/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/healer_female/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/healer_female/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/healer_female/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/healer_female/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/healer_female/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/healer_female/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/healer_female/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/healer_female/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "healer_female",
+      "phase": "phase4",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/healer_female/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/healer_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "idle_1",
+      "path": "assets/animations/characters/mage_female/idle_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "idle_2",
+      "path": "assets/animations/characters/mage_female/idle_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_down_1",
+      "path": "assets/animations/characters/mage_female/walk_down_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_down_2",
+      "path": "assets/animations/characters/mage_female/walk_down_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_up_1",
+      "path": "assets/animations/characters/mage_female/walk_up_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_up_2",
+      "path": "assets/animations/characters/mage_female/walk_up_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_left_1",
+      "path": "assets/animations/characters/mage_female/walk_left_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_left_2",
+      "path": "assets/animations/characters/mage_female/walk_left_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_right_1",
+      "path": "assets/animations/characters/mage_female/walk_right_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    },
+    {
+      "kind": "mage_female",
+      "phase": "phase4",
+      "frame": "walk_right_2",
+      "path": "assets/animations/characters/mage_female/walk_right_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "source": "assets/professional/character_phase3_4_walk_pack_2026_05_28/source_sheets/mage_female_sheet_chroma.png"
+    }
+  ]
+}

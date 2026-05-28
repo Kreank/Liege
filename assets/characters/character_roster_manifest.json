@@ -52,5 +52,28 @@
     "shieldbearer",
     "wanderer_cloak",
     "wild_ranger"
+  ],
+  "replacement_packs": [
+    {
+      "id": "player_preset_walk_pack_2026_05_28",
+      "count": 60,
+      "manifest": "assets/professional/player_preset_walk_pack_2026_05_28/manifest.json",
+      "contact_sheet": "assets/professional/player_preset_walk_pack_2026_05_28/contacts/player_preset_walk_contact.jpg",
+      "note": "64x64 walk frames for player presets; 128x128 UI portraits remain unchanged."
+    },
+    {
+      "id": "character_phase2_walk_pack_2026_05_28",
+      "count": 220,
+      "manifest": "assets/professional/character_phase2_walk_pack_2026_05_28/manifest.json",
+      "contact_sheet": "assets/professional/character_phase2_walk_pack_2026_05_28/contacts/character_phase2_walk_contact.jpg",
+      "note": "Phase 2 replacement walk frames for frequent NPC kinds and equip variants."
+    },
+    {
+      "id": "character_phase3_4_walk_pack_2026_05_28",
+      "count": 240,
+      "manifest": "assets/professional/character_phase3_4_walk_pack_2026_05_28/manifest.json",
+      "contact_sheet": "assets/professional/character_phase3_4_walk_pack_2026_05_28/contacts/character_phase3_4_walk_contact.jpg",
+      "note": "Phase 3/4 replacement walk frames for remaining NPC kinds and female variants."
+    }
   ]
 }
