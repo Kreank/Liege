@@ -33,6 +33,9 @@ SPRITE_VARIANTS_BY_KIND = {
 # biomes=None bedeutet "überall walkable". Group-Size (min, max) inklusiv.
 CREATURE_SPAWN_PROFILE = {
     "boar":         {"group": (3, 5),  "biomes": {GRASS, FOREST, JUNGLE}},
+    # Welle 28: Wald-Tiere mit Pro-Walk-Cycles
+    "fox":          {"group": (1, 2),  "biomes": {GRASS, FOREST}},
+    "rabbit":       {"group": (3, 6),  "biomes": {GRASS, FOREST}},
     # bandit/robber/thief: CAMP_ONLY_KINDS (siehe respawn_loop) — biomes nur
     # für Bandit-Camp-Spawning informativ, der Loop skipt sie sowieso.
     "bandit":       {"group": (2, 6),  "biomes": {GRASS, FOREST, DESERT, JUNGLE}},
@@ -135,7 +138,9 @@ FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier"
                   # Asset-Drop 2026-05-27c: Karawanen-Wagen (passive NPCs die
                   # mit Händler-Konvois mitlaufen; kein direkter Player-Interakt)
                   "farm_cart_hay", "handcart_empty",
-                  "horse_cart_single", "market_wagon_covered"]
+                  "horse_cart_single", "market_wagon_covered",
+                  # Welle 29e: Disaster-Mobs
+                  "locust_swarm"]
 
 # Welle 25: Nutztiere — können nicht reden, später Streichen/Melken/Scheren/etc.
 LIVESTOCK_KINDS = {
@@ -156,12 +161,18 @@ CART_KINDS = {
     "farm_cart_hay", "handcart_empty",
     "horse_cart_single", "market_wagon_covered",
 }
+
+# Welle 29e: Disaster-Mobs — sind technisch NPCs aber mit Sonderlogik.
+# Wandern durch die Welt + ziehen Damage-Halo hinter sich her.
+DISASTER_MOB_KINDS = {"locust_swarm"}
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",
     "rat", "bat", "zombie", "bandit", "boar", "bear",
     # Asset-Drop 2026-05-27: hostile Humans (Räuber-Typen)
     "robber", "thief",
+    # Welle 28: Wald-Tiere mit Pro-Walk-Cycles
+    "fox", "rabbit",
     # Welle 13 — neue Tiere
     "stag", "lynx", "cougar", "wolverine", "dire_wolf", "wolf_alpha",
     "cave_bear", "polar_bear", "crocodile", "cobra",
@@ -221,6 +232,8 @@ NPC_MOVE_CHANCE = {
     # Karawanen-Wagen — bewegen sich langsam mit Händler-Konvoi
     "farm_cart_hay":         0.18, "handcart_empty":         0.20,
     "horse_cart_single":     0.18, "market_wagon_covered":   0.15,
+    # Welle 29e: Heuschreckenschwarm — wandert konstant (hohe Chance), driftet
+    "locust_swarm":          0.65,
     # Asset-Drop 2026-05-26
     "miner":        0.20,  # gräbt in einer Region
     "village_elder":0.05,  # bleibt fast immer
@@ -583,6 +596,11 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
 # scripted Sources (village_spawner bandit_camp, event_worker ambush etc.).
 CAMP_ONLY_KINDS = {"bandit", "robber", "thief"}
 
+# Welle 25: Heiler-Threat. Wenn ein Spieler einen Heal-Spell castet, werden
+# Mobs in seiner Nähe vorrangig auf den Caster aggro'd (auch über kürzere
+# Distanz hinweg). Map: npc_id → (player_name, expires_at_epoch).
+HEAL_THREAT: dict[int, tuple] = {}
+
 
 async def respawn_loop(world, npc_manager, connection_manager,
                        structure_manager=None) -> None:
@@ -734,6 +752,20 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         d = combat.manhattan(npc["x"], npc["y"], pdata["x"], pdata["y"])
         if d < nearest_dist:
             nearest_name, nearest_dist, nearest_data = pname, d, pdata
+    # Welle 25: Heiler-Threat — wenn ein Spieler Heal castet, präferieren Mobs
+    # in der Nähe diesen Spieler (auch wenn er nicht der nächste ist).
+    import time as _time
+    threat = HEAL_THREAT.get(npc["id"])
+    if threat:
+        target_player, expires_at = threat
+        if _time.time() < expires_at and target_player in players:
+            tdata = players[target_player]
+            td = combat.manhattan(npc["x"], npc["y"], tdata["x"], tdata["y"])
+            _kind_aggro = combat.creature_stats(npc["kind"]).get("aggro_range", combat.AGGRO_RANGE)
+            if td <= _kind_aggro * 1.5:   # erweiterter Range für threat
+                nearest_name, nearest_dist, nearest_data = target_player, td, tdata
+        else:
+            HEAL_THREAT.pop(npc["id"], None)
     # Welle 15: per-Kind Aggro-Range (Stalker sehen weiter, Scheue weniger)
     _kind_aggro = combat.creature_stats(npc["kind"]).get("aggro_range", combat.AGGRO_RANGE)
     if nearest_name is None or nearest_dist > _kind_aggro:

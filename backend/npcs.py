@@ -32,6 +32,14 @@ def _row_to_dict(row) -> dict:
             d["personality"] = row["personality"]
     except (KeyError, IndexError):
         pass
+    # Welle 25: Tier + Display-Scale für Schwierigkeits-Anzeige (Color + Size)
+    try:
+        import combat as _c
+        d["tier"] = _c.npc_tier(d["kind"])
+        d["display_scale"] = _c.npc_display_scale(d["kind"])
+    except Exception:
+        d["tier"] = 2
+        d["display_scale"] = 1.0
     return d
 
 

@@ -109,6 +109,27 @@ def invalidate_power_cache(player_name: str | None = None) -> None:
         _POWER_CACHE.pop(player_name, None)
 
 
+# Welle 25 — Spieler-Tier (1-4) abgeleitet aus dem kontinuierlichen Score.
+# Wird ans Frontend gesendet damit Mob-Schwierigkeit als Color-Code (grau/
+# weiß/gelb/rot) im Nameplate angezeigt werden kann.
+#
+# Schwellen sind grob am Tier-Baseline ausgerichtet: Tier-2 Mobs sind ab
+# Score ~10 ausgewogen, Tier-3 ab ~25, Tier-4 ab ~50.
+def score_to_tier(score: float) -> int:
+    if score >= 50:
+        return 4
+    if score >= 25:
+        return 3
+    if score >= 10:
+        return 2
+    return 1
+
+
+async def player_power_tier(player_name: str) -> int:
+    """Bequemer Wrapper: liefert Tier (1-4) für UI-Vergleich gegen NPC.tier."""
+    return score_to_tier(await player_power_score(player_name))
+
+
 # ─── Sublineare Scaling-Kurven (kein Cap) ────────────────────────────────────
 
 def power_to_hp_mult(score: float) -> float:

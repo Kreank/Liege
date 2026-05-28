@@ -23,6 +23,9 @@ import random
 EQUIPMENT_WEAPONS = [
     "sword", "axe", "bow", "staff", "wand", "greatsword", "spear",
     "crossbow", "throwing_knife", "mace", "dagger",
+    # Welle 27 — neue Waffen-Kinds
+    "katana", "halberd", "trident", "lance", "runeblade",
+    "twinblade", "sickle_weapon",
 ]
 EQUIPMENT_ARMOR = ["helmet", "chestplate", "gloves", "shield", "boots"]
 EQUIPMENT_JEWELRY = ["ring", "amulet"]

@@ -52,6 +52,36 @@
 <div id="stamina-bar"><div id="stamina-fill"></div><div id="stamina-text">100/100</div></div>
 <div id="status-effects-row"></div>
 <div id="hotbar"></div>
+<!-- Welle 25: Down-State Overlay -->
+<div id="downed-overlay">
+  <div id="downed-box">
+    <div id="downed-title">💀 Du bist gefallen</div>
+    <div id="downed-sub">Ein Heiler kann dich wiederbeleben — oder du respawnst sofort.</div>
+    <div id="downed-timer">30s</div>
+    <button id="downed-respawn-btn" type="button">⮕ Sofort respawnen</button>
+  </div>
+</div>
+<!-- Welle 25: Cast-Bar (sichtbar nur während Cast) -->
+<div id="cast-bar">
+  <div id="cast-bar-icon"></div>
+  <div id="cast-bar-progress"><div id="cast-bar-fill"></div></div>
+  <div id="cast-bar-label">Zauber</div>
+</div>
+<!-- Welle 25: Spellbook-Overlay (Taste P) -->
+<div id="spellbook-overlay">
+  <div id="spellbook-box">
+    <div id="spellbook-header">
+      <span>✦ Zauberbuch</span>
+      <button id="spellbook-close" type="button">P / Esc</button>
+    </div>
+    <div id="spellbook-tabs">
+      <button class="sb-tab active" data-school="healer">⚕ Heiler</button>
+      <button class="sb-tab" data-school="mage">🔥 Magier</button>
+    </div>
+    <div id="spellbook-grid"></div>
+    <div id="spellbook-detail"></div>
+  </div>
+</div>
 <div id="item-tooltip"></div>
 <div id="time-tint"></div>
 <div id="time-display">☀️ 08:00</div>

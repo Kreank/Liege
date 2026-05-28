@@ -110,6 +110,56 @@ WEAPON_STATS = {
         "range": 4, "class": "magic", "two_handed": True,
         "mana_bonus": 12,
     },
+
+    # ─── Welle 27 (2026-05-27): Neue Waffen-Kinds ───────────────────────────
+    "katana": {
+        # Schnelles 2H-Schwert mit hoher Crit. Zwischen Sword und Greatsword.
+        # DPS 18×0.95=17.1, Crit ~16% × 2.2x = ähnliche Spitze wie Greatsword
+        # aber mit mehr Hits pro Zeiteinheit → bessere Skill-XP-Rate.
+        "damage": 18, "speed": 0.95, "crit": 0.16, "crit_mult": 2.2,
+        "range": 1, "class": "physical", "two_handed": True,
+    },
+    "halberd": {
+        # 2H-Stange mit Cleave + Range 2. Langsamer als Spear, dafür AOE.
+        # DPS 19×0.65=12.35, mit cleave-multi-target deutlich höher.
+        "damage": 19, "speed": 0.65, "crit": 0.06, "crit_mult": 1.7,
+        "range": 2, "class": "physical", "two_handed": True,
+        "cleave": True,
+    },
+    "trident": {
+        # 1H Stechwaffe mit Range 2 — kompakter als Spear (1H statt 2H).
+        # DPS 11×1.1=12.1. Stichwaffen-Bonus gegen ungerüstete Gegner via leichtem
+        # armor_pen. Spätere Wasserwelt-Bonus möglich.
+        "damage": 11, "speed": 1.1, "crit": 0.08, "crit_mult": 1.7,
+        "range": 2, "class": "physical", "two_handed": False,
+        "armor_pen": 0.10,
+    },
+    "lance": {
+        # 2H langer Stoßspeer mit großer Reichweite + Charge-Damage-Potenzial.
+        # DPS 21×0.55=11.55 — slow heavy striker. Range 3 ist Highlight.
+        "damage": 21, "speed": 0.55, "crit": 0.10, "crit_mult": 2.0,
+        "range": 3, "class": "physical", "two_handed": True,
+        "armor_pen": 0.15,
+    },
+    "runeblade": {
+        # Magisches Schwert — Hybrid: melee + magic damage class.
+        # DPS 12×1.0=12. Skill-XP geht an Magic statt Combat (siehe class).
+        "damage": 12, "speed": 1.0, "crit": 0.10, "crit_mult": 2.0,
+        "range": 1, "class": "magic", "two_handed": False,
+        "mana_bonus": 8,
+    },
+    "twinblade": {
+        # Dual-Wield — sehr schnell + hohe Crit, niedrige Base.
+        # DPS 7×1.7=11.9. Mit Crit-Spikes vergleichbar zu Dagger aber mehr base.
+        "damage": 7, "speed": 1.7, "crit": 0.20, "crit_mult": 2.3,
+        "range": 1, "class": "finesse", "two_handed": True,
+    },
+    "sickle_weapon": {
+        # Kampf-Sichel — 1H Finesse mit Bleeding-Potenzial.
+        # DPS 9×1.25=11.25. Class finesse → Combat-XP.
+        "damage": 9, "speed": 1.25, "crit": 0.14, "crit_mult": 1.9,
+        "range": 1, "class": "finesse", "two_handed": False,
+    },
 }
 
 # Rüstung: Defense pro Slot (Welle 19 — höhere Werte für meaningful protection).

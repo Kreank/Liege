@@ -180,6 +180,32 @@ RECIPES = {
          "inputs": [("steel_ingot", 1), ("wood", 1)], "requires": "smithing_advanced"},
         {"id": "make_hoe",     "name": "Hacke schmieden",      "output": "hoe",     "category": "tool",
          "inputs": [("steel_ingot", 1), ("wood", 2)], "requires": "smithing_advanced"},
+
+        # ── Welle 27: neue Waffen-Kinds ─────────────────────────────────────
+        # Tier 2-3 Iron/Steel verfügbar via smithing_basics/advanced
+        {"id": "iron_katana",  "name": "Eisen-Katana", "output": "katana", "category": "weapon",
+         "material": "iron", "inputs": [("iron_ingot", 3), ("wood", 1)], "requires": "smithing_basics"},
+        {"id": "iron_halberd", "name": "Eisen-Hellebarde", "output": "halberd", "category": "weapon",
+         "material": "iron", "inputs": [("iron_ingot", 2), ("wood", 3)], "requires": "smithing_basics"},
+        {"id": "iron_trident", "name": "Eisen-Dreizack", "output": "trident", "category": "weapon",
+         "material": "iron", "inputs": [("iron_ingot", 2), ("wood", 2)], "requires": "smithing_basics"},
+        {"id": "iron_lance",   "name": "Eisen-Lanze",   "output": "lance",   "category": "weapon",
+         "material": "iron", "inputs": [("iron_ingot", 2), ("wood", 4)], "requires": "smithing_basics"},
+        {"id": "iron_twinblade","name": "Eisen-Doppelklinge","output": "twinblade","category": "weapon",
+         "material": "iron", "inputs": [("iron_ingot", 3), ("wood", 1), ("leather", 1)],
+         "requires": "smithing_basics"},
+        {"id": "iron_sickle",  "name": "Kampf-Sichel",  "output": "sickle_weapon", "category": "weapon",
+         "material": "iron", "inputs": [("iron_ingot", 1), ("wood", 1)], "requires": "smithing_basics"},
+        # Tier 4+ Runeblade: Mithril + magic_basics-Forschung
+        {"id": "mithril_runeblade", "name": "Mithril-Runenklinge", "output": "runeblade",
+         "category": "weapon", "material": "mithril",
+         "inputs": [("mithril_ingot", 2), ("wood", 1), ("crystal", 1)],
+         "requires": "mastersmithing"},
+        # Steel-Variants als Upgrade-Tier (smithing_advanced)
+        {"id": "steel_katana", "name": "Stahl-Katana", "output": "katana", "category": "weapon",
+         "material": "steel", "inputs": [("steel_ingot", 3), ("wood", 1)], "requires": "smithing_advanced"},
+        {"id": "steel_halberd","name": "Stahl-Hellebarde","output": "halberd","category": "weapon",
+         "material": "steel", "inputs": [("steel_ingot", 2), ("wood", 3)], "requires": "smithing_advanced"},
     ],
 }
 

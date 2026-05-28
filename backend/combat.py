@@ -19,6 +19,9 @@ NPC_HP_BY_KIND = {
     "bat":      20,
     "zombie":   60,
     "bandit":   45,
+    # Welle 28: Wald-Tiere
+    "fox":      28,
+    "rabbit":   10,
     "robber":   55,    # robuster als bandit
     "thief":    30,    # schwächer, fokussiert auf flinke Angriffe
     "boar":     70,
@@ -104,6 +107,10 @@ NPC_HP_BY_KIND = {
     # Karawanen-Wagen — leicht zerstörbar aber nicht im Fokus
     "farm_cart_hay":          25, "handcart_empty":         20,
     "horse_cart_single":      30, "market_wagon_covered":   40,
+    # Welle 29e: Heuschreckenschwarm — schwer zu töten, "untötbar" da nicht
+    # eigentlich ein einzelner Mob. HP sehr hoch damit der Schwarm 5min lang
+    # wandert ohne zerfallen zu können.
+    "locust_swarm":           500,
     # — Welle 14 — professional monster asset-drop (2026-05-26b) —
     # Vermin / Larva (15–35 HP)
     "razorback_vermin":      20,
@@ -150,6 +157,8 @@ CREATURE_DAMAGE = {
     "bat":      4,
     "zombie":   10,
     "bandit":   14,    # bewaffnet
+    "fox":       6,
+    "rabbit":    2,
     "robber":   16,    # stärkerer Hieb
     "thief":    9,     # weniger Damage, schnell
     "boar":     11,
@@ -330,12 +339,35 @@ SPELLS = {
         "self_effect": {"effect": "blessed", "magnitude": 4, "duration": 20},
         "learnable": True,
     },
+    # Welle 29d — neue Spells aus spell_expansion_pack_2026_05_27
+    "ice_scroll": {
+        "name": "Eis-Sturm", "icon": "❄️",
+        "damage": 22, "range": 6, "aoe_radius": 1,
+        "mana": 18, "consume": True,
+        "damage_type": "ice",
+        "learnable": True,
+    },
+    "wind_slash_scroll": {
+        "name": "Wind-Klinge", "icon": "🌪",
+        "damage": 28, "range": 5, "aoe_radius": 0,
+        "mana": 14, "consume": True,
+        "damage_type": "magic",
+        "learnable": True,
+    },
+    "holy_shield_scroll": {
+        "name": "Heiliger Schild", "icon": "🛡️",
+        "damage": 0, "heal_self": 0, "range": 0, "aoe_radius": 0,
+        "mana": 25, "consume": True,
+        "self_effect": {"effect": "shielded", "magnitude": 15, "duration": 30},
+        "learnable": True,
+    },
 }
 
 # Heal-Strukturen (Klick → HP-Boost)
 STRUCTURE_HEAL = {
-    "bed":  100,   # voll heilen
-    "well": 20,
+    "bed":      100,   # voll heilen
+    "well":     20,
+    "campfire": 15,    # Welle 25: kleines Wärmen am Lagerfeuer
 }
 STRUCTURE_HEAL_COOLDOWN = 30  # Sekunden pro Spieler pro Struktur
 
@@ -587,3 +619,51 @@ def kalibrated_creature_damage(kind: str, player_power, group_mult: float = 1.0,
     except Exception:
         pass
     return max(1, int(round(val)))
+
+
+# ─── Welle 25 — Schwierigkeits-Anzeige (Color + Size) ─────────────────────────
+# Statischer Tier-Lookup pro creature_kind (1-4) und Display-Scale-Faktor für
+# Mob-Sprite. Werden vom NPC-Serializer fürs Frontend genutzt.
+
+def npc_tier(kind: str) -> int:
+    """Tier 1-4 für einen creature_kind. Default 2 (normal)."""
+    return _NPC_STAT_OVERRIDES.get(kind, {}).get("tier", 2)
+
+
+# Kinds die als "Rudelführer" gelten (etwas größer als normale Mobs).
+_PACK_LEADER_KINDS = {
+    "wolf_alpha", "dire_wolf",         # Wolfsrudel
+    "frost_rune_boar_prime",           # Eber-Anführer (eigentlich Tier 4 Boss)
+}
+
+# Kinds die explizit Bosse sind (deutlich größer dargestellt).
+# Werden zusätzlich zur Tier-Erkennung berücksichtigt; alle Tier 4 sind Bosse,
+# aber manche Tier 3 sind ebenfalls Solo-Bosse (chimera, manticore etc.).
+_BOSS_KINDS = {
+    "ogre", "necromancer", "dragon_whelp", "minotaur", "harpy",
+    "basilisk", "chimera", "griffin", "hydra", "manticore",
+    "kaiju_thornback", "void_eye_brute", "frost_rune_boar_prime",
+    "magma_shell_devourer", "rockshell_colossus",
+    "blood_antler_drake", "dendroid_guardian",
+}
+
+
+def npc_display_scale(kind: str) -> float:
+    """Sprite-Größen-Multiplier basierend auf Rolle.
+    Boss        → 1.60x  (deutlich imposant)
+    Pack-leader → 1.25x  (sichtbar größer als normale Rudel-Mitglieder)
+    Tier 1      → 0.90x  (kleine Vermin)
+    Sonst       → 1.00x  (normale Mobs)
+    """
+    if kind in _BOSS_KINDS:
+        return 1.60
+    tier = npc_tier(kind)
+    if tier >= 4:
+        return 1.60
+    if kind in _PACK_LEADER_KINDS:
+        return 1.25
+    if tier == 3:
+        return 1.10
+    if tier == 1:
+        return 0.90
+    return 1.0

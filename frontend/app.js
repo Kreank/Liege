@@ -1,3 +1,351 @@
+// === SoundManager (Welle 29) — Lazy-Load + Volume + Mute + 3D-Positioning ===
+// Nutzt HTML5 Audio direkt (kein Phaser-Scene-Dep) damit es von überall im
+// Code aus rufbar ist: window.playSfx('sword_swing', {x, y}) → spielt Sound
+// am Tile (x,y), lauter wenn nah am Spieler, leiser/aus wenn weit weg.
+//
+// SFX-Files: assets/sounds/sfx/<category>/<name>.ogg (.mp3 als Fallback).
+// Wenn ein File 404 ist, schluckt der Manager den Fehler still — kein Crash.
+// Wenn AudioContext blockiert ist (Browser-Auto-Play-Policy), wartet er auf
+// die erste Spieler-Interaktion und unmutet danach.
+window.SoundManager = (function () {
+  const LS_KEY = 'liege_sound_settings';
+  const REGISTRY = {
+    // Combat
+    sword_swing:     'sfx/combat/sword_swing',
+    axe_chop:        'sfx/combat/axe_chop',
+    bow_release:     'sfx/combat/bow_release',
+    crossbow_release:'sfx/combat/crossbow_release',
+    hit_flesh:       'sfx/combat/hit_flesh',
+    hit_metal:       'sfx/combat/hit_metal',
+    hit_wood:        'sfx/combat/hit_wood',
+    crit:            'sfx/combat/crit',
+    death:           'sfx/combat/death',
+    // Movement
+    footstep_grass:  'sfx/footstep/footstep_grass',
+    footstep_stone:  'sfx/footstep/footstep_stone',
+    footstep_water:  'sfx/footstep/footstep_water',
+    footstep_sand:   'sfx/footstep/footstep_sand',
+    // Build/Craft
+    hammer_strike:   'sfx/craft/hammer_strike',
+    place_block:     'sfx/craft/place_block',
+    chop_wood:       'sfx/craft/chop_wood',
+    mine_rock:       'sfx/craft/mine_rock',
+    craft_complete:  'sfx/craft/craft_complete',
+    // Interaktion
+    door_open:       'sfx/interact/door_open',
+    door_close:      'sfx/interact/door_close',
+    chest_open:      'sfx/interact/chest_open',
+    item_pickup:     'sfx/interact/item_pickup',
+    drink_water:     'sfx/interact/drink_water',
+    // UI
+    menu_click:      'sfx/ui/menu_click',
+    menu_open:       'sfx/ui/menu_open',
+    inventory_open:  'sfx/ui/inventory_open',
+    level_up:        'sfx/ui/level_up',
+    low_health_warn: 'sfx/ui/low_health_warn',
+    // World/Events
+    thunder:         'sfx/world/thunder',
+    lightning_strike:'sfx/world/lightning_strike',
+    blood_moon_drone:'sfx/world/blood_moon_drone',
+    earthquake_rumble:'sfx/world/earthquake_rumble',
+    fire_crackle:    'sfx/world/fire_crackle',
+    forest_ambient:  'sfx/world/forest_ambient',
+  };
+  // Loaded Audio-Elements pro key
+  const cache = {};
+  // 3D-Positioning: Spieler-Position als Audio-Listener
+  let listenerX = 0, listenerY = 0;
+  const MAX_DISTANCE_TILES = 20;   // weiter weg → silent
+
+  // Defaults + LocalStorage
+  let settings = {
+    master: 0.7, sfx: 0.9, music: 0.5, muted: false,
+  };
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) Object.assign(settings, JSON.parse(raw));
+  } catch (e) {}
+
+  function _save() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(settings)); } catch (e) {}
+  }
+
+  function _resolveUrl(key) {
+    const rel = REGISTRY[key];
+    if (!rel) return null;
+    // Format-Reihenfolge: .wav (primär — Sound-Pack-Format), .ogg, .mp3
+    return [`/assets/sounds/${rel}.wav`,
+            `/assets/sounds/${rel}.ogg`,
+            `/assets/sounds/${rel}.mp3`];
+  }
+
+  // Lazy-Load: erstellt Audio-Element beim ersten Aufruf. Pool von 3 Instances
+  // pro Sound erlaubt Überlappung (mehrere swings hintereinander).
+  function _getInstance(key) {
+    if (!cache[key]) {
+      const urls = _resolveUrl(key);
+      if (!urls) return null;
+      const audios = [];
+      for (let i = 0; i < 3; i++) {
+        const a = new Audio();
+        // Multi-Source via type-hint (Browser pickt das erste passende)
+        a.preload = 'none';
+        a.onerror = () => { /* swallow - file fehlt evtl. */ };
+        a.src = urls[0];   // primär .ogg
+        audios.push(a);
+      }
+      cache[key] = { audios, idx: 0 };
+    }
+    const slot = cache[key];
+    const a = slot.audios[slot.idx];
+    slot.idx = (slot.idx + 1) % slot.audios.length;
+    return a;
+  }
+
+  // 3D-Volume-Berechnung. Sounds mit x/y in opts werden distance-attenuated.
+  function _spatialVolume(opts) {
+    if (!opts || opts.x == null || opts.y == null) return 1.0;
+    const dx = opts.x - listenerX;
+    const dy = opts.y - listenerY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist >= MAX_DISTANCE_TILES) return 0;
+    // Linear falloff für Einfachheit
+    return Math.max(0, 1 - (dist / MAX_DISTANCE_TILES));
+  }
+
+  function playSfx(key, opts = {}) {
+    if (settings.muted) return;
+    const a = _getInstance(key);
+    if (!a) return;
+    const spatial = _spatialVolume(opts);
+    if (spatial <= 0) return;   // außer Reichweite, gar nicht abspielen
+    const vol = (opts.volume != null ? opts.volume : 1.0)
+                * spatial * settings.sfx * settings.master;
+    try {
+      a.volume = Math.max(0, Math.min(1, vol));
+      a.currentTime = 0;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => { /* autoplay blocked, ignore */ });
+    } catch (e) { /* ignore */ }
+  }
+
+  // Music: 1 Track aktiv, fadet vorheriges aus
+  let currentMusic = null;
+  function playMusic(key, opts = {}) {
+    if (settings.muted) {
+      if (currentMusic) { try { currentMusic.pause(); } catch(e){} currentMusic = null; }
+      return;
+    }
+    const urls = _resolveUrl(key);
+    if (!urls) return;
+    // Fadeout vorheriges
+    if (currentMusic) {
+      const old = currentMusic;
+      let v = old.volume;
+      const fade = setInterval(() => {
+        v -= 0.05;
+        if (v <= 0) { try { old.pause(); } catch(e){} clearInterval(fade); }
+        else { try { old.volume = v; } catch(e){} }
+      }, 50);
+    }
+    const a = new Audio(urls[0]);
+    a.loop = !!opts.loop;
+    a.volume = (opts.volume != null ? opts.volume : 1.0) * settings.music * settings.master;
+    a.onerror = () => { /* music file fehlt */ };
+    a.play().catch(() => {});
+    currentMusic = a;
+  }
+
+  function stopMusic() {
+    if (currentMusic) {
+      try { currentMusic.pause(); } catch(e){}
+      currentMusic = null;
+    }
+  }
+
+  function setListener(x, y) { listenerX = x; listenerY = y; }
+
+  function setVolume(channel, value) {
+    settings[channel] = Math.max(0, Math.min(1, value));
+    _save();
+    if (currentMusic && channel !== 'sfx') {
+      try { currentMusic.volume = settings.music * settings.master; } catch(e){}
+    }
+  }
+  function setMute(value) {
+    settings.muted = !!value;
+    _save();
+    if (settings.muted && currentMusic) {
+      try { currentMusic.pause(); } catch(e){}
+    }
+  }
+  function getSettings() { return Object.assign({}, settings); }
+
+  // Erste User-Interaction unblockt AudioContext (browser autoplay policy)
+  let unblocked = false;
+  function _unblock() {
+    if (unblocked) return;
+    unblocked = true;
+    // Spiele einen stummen Sound um den AudioContext zu authorizieren
+    try {
+      const silent = new Audio();
+      silent.volume = 0;
+      silent.play().catch(() => {});
+    } catch(e) {}
+  }
+  document.addEventListener('click', _unblock, { once: true });
+  document.addEventListener('touchstart', _unblock, { once: true });
+  document.addEventListener('keydown', _unblock, { once: true });
+
+  return {
+    playSfx, playMusic, stopMusic,
+    setListener, setVolume, setMute, getSettings,
+    _registry: REGISTRY,   // exposed für Settings-UI
+  };
+})();
+
+// Convenience-Globals
+window.playSfx   = (k, o) => window.SoundManager.playSfx(k, o);
+window.playMusic = (k, o) => window.SoundManager.playMusic(k, o);
+
+// === Settings-Overlay (Welle 29) — Sound-Volume-Sliders + Mute ============
+// Knopf oben rechts (⚙️) öffnet kleines Panel mit Master/SFX/Music + Mute.
+// Werte werden live an SoundManager weitergegeben + in localStorage persistiert.
+(function () {
+  if (!window.SoundManager) return;
+  const css = `
+    #settings-btn {
+      position: fixed; top: 10px; right: 240px; z-index: 200;
+      width: 32px; height: 32px; line-height: 28px; text-align: center;
+      background: rgba(0,0,0,0.55); border: 1px solid #6e5e3a; border-radius: 4px;
+      color: #c8b88a; font-size: 18px; cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    #settings-btn:hover { border-color: #c8b88a; background: rgba(40,30,15,0.85); }
+    body.is-mobile #settings-btn { right: 134px; width: 28px; height: 28px; font-size: 15px; }
+    #settings-overlay {
+      position: fixed; inset: 0; z-index: 250;
+      background: rgba(0,0,0,0.5); display: none;
+      justify-content: center; align-items: center;
+    }
+    #settings-overlay.active { display: flex; }
+    #settings-box {
+      background: rgba(18,16,12,0.97); border: 1px solid #6e5e3a;
+      color: #c8b88a; padding: 0; min-width: 320px; max-width: 90vw;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.7);
+      font-family: monospace;
+    }
+    #settings-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.55);
+      border-bottom: 1px solid #6e5e3a;
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: bold; color: #e8d870;
+    }
+    #settings-close {
+      background: #402020; border: 1px solid #a05050; color: #fff;
+      padding: 2px 10px; border-radius: 3px; cursor: pointer;
+      font-family: monospace;
+    }
+    #settings-body { padding: 16px 18px; }
+    .settings-row { margin-bottom: 14px; }
+    .settings-row label { display: block; margin-bottom: 4px; color: #d8c89a; }
+    .settings-row input[type=range] { width: 100%; }
+    .settings-row .val { color: #e8d870; float: right; }
+    .settings-row.mute-row { display: flex; align-items: center; gap: 8px; }
+    .settings-row.mute-row input { transform: scale(1.4); }
+  `;
+  const styleEl = document.createElement('style');
+  styleEl.textContent = css;
+  document.head.appendChild(styleEl);
+
+  const btn = document.createElement('div');
+  btn.id = 'settings-btn';
+  btn.textContent = '⚙️';
+  btn.title = 'Einstellungen';
+  document.body.appendChild(btn);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'settings-overlay';
+  overlay.innerHTML = `
+    <div id="settings-box">
+      <div id="settings-header">
+        <span>⚙️ Einstellungen — Sound</span>
+        <button id="settings-close" type="button">×</button>
+      </div>
+      <div id="settings-body">
+        <div class="settings-row">
+          <label>🔊 Gesamtlautstärke <span class="val" id="vol-master-val">70%</span></label>
+          <input type="range" id="vol-master" min="0" max="100" value="70">
+        </div>
+        <div class="settings-row">
+          <label>⚔️ Effekte (SFX) <span class="val" id="vol-sfx-val">90%</span></label>
+          <input type="range" id="vol-sfx" min="0" max="100" value="90">
+        </div>
+        <div class="settings-row">
+          <label>🎵 Musik <span class="val" id="vol-music-val">50%</span></label>
+          <input type="range" id="vol-music" min="0" max="100" value="50">
+        </div>
+        <div class="settings-row mute-row">
+          <input type="checkbox" id="mute-toggle">
+          <label for="mute-toggle" style="margin:0;">🔇 Alles stummschalten</label>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Aktuelle Settings vom SoundManager holen + UI-Sync
+  function syncUI() {
+    const s = window.SoundManager.getSettings();
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = Math.round(val * 100);
+    };
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = Math.round(val * 100) + '%';
+    };
+    set('vol-master', s.master);  setVal('vol-master-val', s.master);
+    set('vol-sfx',    s.sfx);     setVal('vol-sfx-val',    s.sfx);
+    set('vol-music',  s.music);   setVal('vol-music-val',  s.music);
+    const m = document.getElementById('mute-toggle');
+    if (m) m.checked = s.muted;
+  }
+
+  function open() { overlay.classList.add('active'); syncUI(); }
+  function close() { overlay.classList.remove('active'); }
+  btn.addEventListener('click', open);
+  document.getElementById('settings-close').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  // Slider-Listener
+  function wire(id, channel, valId) {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    inp.addEventListener('input', (e) => {
+      const v = e.target.value / 100;
+      window.SoundManager.setVolume(channel, v);
+      const valEl = document.getElementById(valId);
+      if (valEl) valEl.textContent = Math.round(v * 100) + '%';
+    });
+  }
+  wire('vol-master', 'master', 'vol-master-val');
+  wire('vol-sfx',    'sfx',    'vol-sfx-val');
+  wire('vol-music',  'music',  'vol-music-val');
+
+  document.getElementById('mute-toggle').addEventListener('change', (e) => {
+    window.SoundManager.setMute(e.target.checked);
+  });
+
+  // Esc schließt
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) close();
+  });
+})();
+
 // === MobileUI: single source of truth für Mobile/Orientation-State ===
 // Setzt body-Klassen (is-mobile/is-portrait/is-landscape/is-narrow) die CSS-Regeln
 // ansprechen können. Reagiert auf resize + orientationchange.
@@ -430,6 +778,14 @@ const STRUCTURE = {
   corn_plant:     { key:'', name:'Maisfeld',        icon:'🌽', blocking:false, sprite:'prop_corn_plant' },
   wheat_seedling: { key:'', name:'Weizenkeimling',  icon:'🌱', blocking:false, sprite:'prop_wheat_seedling' },
   wheat_grown:    { key:'', name:'Weizenfeld',      icon:'🌾', blocking:false, sprite:'prop_wheat_grown' },
+  // Welle 29e — Waldbrand-Strukturen
+  fire_tile:           { key:'', name:'Brennender Baum', icon:'🔥', blocking:false, sprite:'fire_flame_lick',  notBuildable:true },
+  burned_stump:        { key:'', name:'Verkohlter Stumpf',icon:'🪨', blocking:true,  sprite:'prop_burned_stump_01', notBuildable:true },
+  burned_tree_oak:     { key:'', name:'Verkohlte Eiche', icon:'🌲', blocking:true,  sprite:'prop_burned_tree_oak', notBuildable:true },
+  burned_tree_pine:    { key:'', name:'Verkohlter Nadelbaum',icon:'🌲', blocking:true,  sprite:'prop_burned_tree_pine',notBuildable:true },
+  burned_tree_birch:   { key:'', name:'Verkohlte Birke', icon:'🌲', blocking:true,  sprite:'prop_burned_tree_birch',notBuildable:true },
+  ash_pile_small:      { key:'', name:'Aschehaufen',     icon:'🌫', blocking:false, sprite:'prop_ash_pile_small', notBuildable:true },
+  ash_pile_large:      { key:'', name:'Aschehaufen',     icon:'🌫', blocking:false, sprite:'prop_ash_pile_large', notBuildable:true },
   // — Asset-Drop 2026-05-27b: Farm-Gebäude (groß, baubar) —
   barn_large:           { key:'', name:'Große Scheune',     icon:'🏚️', blocking:true,  sprite:'farm_barn_large' },
   barn_small:           { key:'', name:'Kleine Scheune',    icon:'🏚️', blocking:true,  sprite:'farm_barn_small' },
@@ -529,6 +885,38 @@ const STRUCTURE_DISPLAY_SCALE = {
   furnace:       1.3,
   workbench:     1.2,
 };
+
+// Welle 25: Multi-Tile-Footprint pro Strukturtyp (mirror of backend
+// STRUCTURE_FOOTPRINT). Default 1×1.
+const STRUCTURE_FOOTPRINT = {
+  // Farm-Gebäude
+  barn_large:     [4, 4],
+  barn_small:     [3, 3],
+  stable:         [4, 3],
+  granary:        [3, 3],
+  cow_shed:       [3, 2],
+  sheepfold:      [3, 2],
+  goat_pen:       [3, 2],
+  pigsty:         [2, 2],
+  henhouse:       [2, 2],
+  dovecote:       [2, 2],
+  dairy_house:    [3, 2],
+  hayloft:        [3, 2],
+  smokehouse:     [2, 2],
+  cart_shed:      [3, 2],
+  duck_pond:      [3, 3],
+  goose_pasture_marker: [2, 2],
+  // Gilden / Tempel
+  mage_guild:     [4, 4],
+  fighters_guild: [4, 4],
+  healers_guild:  [4, 4],
+  thieves_guild:  [4, 4],
+  temple:         [5, 5],
+};
+
+function footprintFor(type) {
+  return STRUCTURE_FOOTPRINT[type] || [1, 1];
+}
 
 // ─── Event-Konfiguration ──────────────────────────────────────────────────────
 const EVENT_ICON = {
@@ -924,6 +1312,11 @@ const NPC_SPRITE = {
   bandit:    { sprite: 'npc_bandit',  tint: 0xffffff, label: 'Bandit' },
   robber:    { sprite: 'npc_robber',  tint: 0xffffff, label: 'Räuber' },
   thief:     { sprite: 'npc_thief',   tint: 0xffffff, label: 'Dieb' },
+  // Welle 28: Wald-Tiere (wild_beasts) mit Pro-Walk-Cycles
+  fox:       { sprite: 'animal_fox',    tint: 0xffffff, label: 'Fuchs' },
+  rabbit:    { sprite: 'animal_rabbit', tint: 0xffffff, label: 'Hase' },
+  // Welle 29e: Disaster-Mob (wandernder Schwarm)
+  locust_swarm: { sprite: 'mob_locust_swarm_idle_1', tint: 0xffffff, label: 'Heuschreckenschwarm' },
   // Creatures — eigenes Sprite, kein Tint
   goblin:   { sprite: 'monster_goblin',   tint: 0xffffff, label: 'Goblin' },
   wolf:     { sprite: 'monster_wolf',     tint: 0xffffff, label: 'Wolf' },
@@ -1005,11 +1398,12 @@ const CREATURE_KINDS = new Set([
 // Nicht enthalten: farmer + merchant (alter Top-Down-Stil, nicht kompatibel mit
 // neuem Front-View aus /npcs/), neue Rollen (baker, bard, ...) ohne Animation.
 const ANIMATED_NPC_KINDS = [
-  // Welle 23 — alle character-Animations die Front-View sind (refreshed
-  // im upstream-Commit 4d2af6e). villager_male/_female bleiben raus,
-  // weil noch im alten Top-Down-Stil.
+  // Welle 23 — alle character-Animations die Front-View sind.
   'bandit', 'blacksmith', 'farmer', 'guard', 'healer',
   'mage', 'merchant', 'quest_giver', 'soldier', 'villager',
+  // Welle 29d — 8 neue Walks aus character_walk_pack_2026_05_27
+  'bard', 'hermit', 'miner', 'scholar', 'village_elder',
+  'watchman', 'villager_female', 'villager_male',
 ];
 const ANIMATED_MONSTER_KINDS = [
   // bandit raus — nutzt characters/bandit/ via ANIMATED_NPC_KINDS für Stil-Konsistenz
@@ -1044,6 +1438,14 @@ const ITEM = {
   mace:          { name: 'Streitkolben',  sprite: 'item_mace',          category: 'weapon', slot: 'weapon', path: `${OP}/iron_mace.png` },
   scythe:        { name: 'Sense',         sprite: 'item_scythe',        category: 'weapon', slot: 'weapon', path: `${OP}/graveyard_scythe.png` },
   dagger:        { name: 'Dolch',         sprite: 'item_dagger',        category: 'weapon', slot: 'weapon', path: `${OP}/hooked_ritual_dagger.png` },
+  // Welle 27 — neue Waffen-Kinds
+  katana:        { name: 'Katana',        sprite: 'item_katana',        category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/steel_katana.png' },
+  halberd:       { name: 'Hellebarde',    sprite: 'item_halberd',       category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/raven_halberd.png' },
+  trident:       { name: 'Dreizack',      sprite: 'item_trident',       category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/amethyst_trident.png' },
+  lance:         { name: 'Stoßlanze',     sprite: 'item_lance',         category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/demon_slayer_lance.png' },
+  runeblade:     { name: 'Runenklinge',   sprite: 'item_runeblade',     category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/obsidian_runeblade.png' },
+  twinblade:     { name: 'Doppelklinge',  sprite: 'item_twinblade',     category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/ice_and_night_blades.png' },
+  sickle_weapon: { name: 'Kampfsichel',   sprite: 'item_sickle_weapon', category: 'weapon', slot: 'weapon', path: '/assets/equipment/weapons/professional/reference_based/icons_128/iron_hook_sickle.png' },
   helmet:        { name: 'Helm',          sprite: 'item_helmet',        category: 'armor',  slot: 'helmet',     path: `${OP}/crested_hoplite_helm.png` },
   chestplate:    { name: 'Brustpanzer',   sprite: 'item_chestplate',    category: 'armor',  slot: 'chestplate', path: `${OP}/wandering_knight_armor.png` },
   gloves:        { name: 'Handschuhe',    sprite: 'item_gloves',        category: 'armor',  slot: 'gloves',     path: `${OP}/thief_buckled_gloves.png` },
@@ -1338,6 +1740,11 @@ function itemAssetPath(item, materialOpt) {
   const quality = (typeof item === 'string') ? null : item?.quality;
   const cfg = ITEM[kind];
   if (!cfg) return '';
+  // Welle 25: cosmetic_skin (Backend-gerollt, persistiert) hat Vorrang vor allem.
+  // Selbe Sprite-Datei wie ANCIENT_BLADE_POOL (from_neu_pro/icons_128).
+  if (typeof item !== 'string' && item && item.cosmetic_skin) {
+    return `/assets/equipment/weapons/professional/from_neu_pro/icons_128/${item.cosmetic_skin}.png`;
+  }
   // Pro-Sprite-Set hat Vorrang (Asset-Drop 2026-05-26b)
   if (RARITY_WEAPONS.has(kind)) {
     const r = QUALITY_TO_RARITY[quality || 'normal'] || 'common';
@@ -1396,9 +1803,23 @@ function itemSpriteKey(scene, item) {
   const quality = (typeof item === 'string') ? null : item?.quality;
   const cfg = ITEM[kind];
   if (!cfg) return null;
+  // Welle 25: cosmetic_skin (Backend-gerollt) hat höchste Priorität. Re-uses
+  // den ANCIENT_BLADE_POOL-Preload (selbe Sprite-Files unter ancient_blade_<slug>).
+  if (typeof item !== 'string' && item && item.cosmetic_skin) {
+    const aKey = `ancient_blade_${item.cosmetic_skin}`;
+    if (scene && scene.textures && scene.textures.exists(aKey)) return aKey;
+  }
   // Pro-Weapon-Sprite (rarity-spezifisch)
   if (RARITY_WEAPONS.has(kind)) {
     const r = QUALITY_TO_RARITY[quality || 'normal'] || 'common';
+    // Welle 27: Ancient-Blade-Pool für legendary sword-likes via per-item Hash
+    if (r === 'legendary' && item && item.id != null && ANCIENT_BLADE_KINDS.has(kind)) {
+      const slug = _ancientBladeForItem(item.id);
+      if (slug) {
+        const aKey = `ancient_blade_${slug}`;
+        if (scene && scene.textures && scene.textures.exists(aKey)) return aKey;
+      }
+    }
     const rkey = `weapon_rarity_${r}_${kind}`;
     if (scene && scene.textures && scene.textures.exists(rkey)) return rkey;
   }
@@ -1431,7 +1852,10 @@ function effectiveQuality(item) {
   return q || 'normal';
 }
 const RARITY_WEAPONS = new Set(['sword','greatsword','axe','spear','bow','crossbow',
-                                 'dagger','mace','staff','wand','scythe','throwing_knife']);
+                                 'dagger','mace','staff','wand','scythe','throwing_knife',
+                                 // Welle 27 — neue Kinds
+                                 'katana','halberd','trident','lance','runeblade',
+                                 'twinblade','sickle_weapon']);
 
 // Pro-Sprite-Set (Asset-Drop 2026-05-26b). Mapping pro Spiel-Kind × Rarity auf
 // konkrete Pro-Sprite-IDs aus dem rarity_v2-Manifest. `default` ist der Fallback
@@ -1439,103 +1863,160 @@ const RARITY_WEAPONS = new Set(['sword','greatsword','axe','spear','bow','crossb
 const PRO_RARITIES = ['poor','common','rare','very_rare','legendary'];
 const PRO_WEAPON_MAP = {
   sword: {
-    default: 'black_guard_longsword',
+    default: 'iron_vigil_longsword',
     poor: 'silver_straightsword',
-    common: 'black_guard_longsword',
+    common: 'iron_vigil_longsword',   // Welle 29c — Inspired-Pack
     rare: 'crescent_saber',
     very_rare: 'thorn_blackblade',
     legendary: 'wolf_end_redblade',
   },
   greatsword: {
-    default: 'cleaver_greatsword',
+    default: 'quarry_cleaver_greatsword',
     poor: 'cleaver_greatsword',
-    common: 'cleaver_greatsword',
+    common: 'quarry_cleaver_greatsword',   // Inspired-Pack
     rare: 'rose_glass_sword',
     very_rare: 'azure_glaive',
     legendary: 'crimson_twinblade',
   },
   axe: {
-    default: 'old_execution_axe',
+    default: 'oxhide_execution_axe',
     poor: 'iron_hatchet',
-    common: 'old_execution_axe',
+    common: 'oxhide_execution_axe',   // Inspired-Pack
     rare: 'blue_crescent_axe',
     very_rare: 'flame_cleaver_axe',
     legendary: 'flame_cleaver_axe',
   },
   bow: {
-    default: 'ashwood_recurve_bow',
+    default: 'thornwood_recurve_bow',
     poor: 'ashwood_recurve_bow',
-    common: 'hunter_bow_set',
+    common: 'thornwood_recurve_bow',   // Inspired-Pack
     rare: 'ebony_longbow',
     very_rare: 'goldleaf_bow',
     legendary: 'gandiva_bow',
   },
   crossbow: {
-    // kein dediziertes Crossbow im Pro-Set — Bow-Sprites als Fallback
-    default: 'stormbow',
+    // Welle 29c: jetzt eigenes Crossbow-Sprite aus Inspired-Pack
+    default: 'siegewood_crossbow',
     poor: 'ashwood_recurve_bow',
-    common: 'hunter_bow_set',
+    common: 'siegewood_crossbow',   // Inspired-Pack — endlich dedicated!
     rare: 'stormbow',
     very_rare: 'goldleaf_bow',
     legendary: 'gandiva_bow',
   },
   spear: {
-    default: 'plain_war_spear',
+    default: 'duskpoint_war_spear',
     poor: 'plain_war_spear',
-    common: 'plain_war_spear',
+    common: 'duskpoint_war_spear',   // Inspired-Pack
     rare: 'raven_halberd',
     very_rare: 'bloodpoint_lance',
     legendary: 'amethyst_trident',
   },
   staff: {
-    default: 'red_oak_staff',
+    default: 'emberroot_staff',
     poor: 'red_oak_staff',
-    common: 'red_oak_staff',
+    common: 'emberroot_staff',   // Inspired-Pack
     rare: 'white_magus_staff',
     very_rare: 'white_magus_staff',
     legendary: 'white_magus_staff',
   },
   wand: {
-    // kein Wand im Pro-Set — Staff-Sprites
-    default: 'red_oak_staff',
+    // Welle 29c: jetzt eigenes Wand-Sprite aus Inspired-Pack
+    default: 'bramble_witch_wand',
     poor: 'red_oak_staff',
-    common: 'red_oak_staff',
-    rare: 'white_magus_staff',
+    common: 'bramble_witch_wand',   // Inspired-Pack — endlich dedicated!
+    rare: 'bramble_witch_wand',
     very_rare: 'white_magus_staff',
     legendary: 'white_magus_staff',
   },
   scythe: {
-    default: 'graveyard_scythe',
+    default: 'gravebriar_scythe',
     poor: 'iron_hook_sickle',
-    common: 'iron_hook_sickle',
+    common: 'gravebriar_scythe',   // Inspired-Pack
     rare: 'graveyard_scythe',
     very_rare: 'chain_reaper',
     legendary: 'void_reaper_scythe',
   },
   dagger: {
-    default: 'hooked_ritual_dagger',
+    default: 'crescent_hook_dagger',
     poor: 'hooked_ritual_dagger',
-    common: 'hooked_ritual_dagger',
-    rare: 'hooked_ritual_dagger',
+    common: 'crescent_hook_dagger',   // Inspired-Pack
+    rare: 'crescent_hook_dagger',
     very_rare: 'blackthorn_shard',
     legendary: 'ice_and_night_blades',
   },
   throwing_knife: {
-    default: 'bloodtalon_throwers',
+    default: 'paired_ravencut_knives',
     poor: 'bloodtalon_throwers',
-    common: 'bloodtalon_throwers',
-    rare: 'bloodtalon_throwers',
+    common: 'paired_ravencut_knives',   // Inspired-Pack
+    rare: 'paired_ravencut_knives',
     very_rare: 'bloodtalon_throwers',
     legendary: 'bloodtalon_throwers',
   },
   mace: {
-    // kein Mace im Pro-Set — Axe-Sprites als nächstbester Blunt/Heavy-Look
-    default: 'iron_hatchet',
+    // Welle 29c: jetzt eigenes Mace-Sprite aus Inspired-Pack
+    default: 'oathbound_iron_mace',
     poor: 'iron_hatchet',
-    common: 'old_execution_axe',
-    rare: 'blue_crescent_axe',
+    common: 'oathbound_iron_mace',   // Inspired-Pack — endlich dedicated!
+    rare: 'oathbound_iron_mace',
     very_rare: 'flame_cleaver_axe',
     legendary: 'flame_cleaver_axe',
+  },
+  // ── Welle 27 — Neue Waffen-Kinds ──────────────────────────────────────
+  katana: {
+    default: 'steel_katana',
+    poor: 'plain_aruming_sword',
+    common: 'steel_katana',
+    rare: 'crescent_saber',
+    very_rare: 'thorn_blackblade',
+    legendary: 'wolf_end_redblade',
+  },
+  halberd: {
+    default: 'raven_halberd',
+    poor: 'plain_war_spear',
+    common: 'raven_halberd',
+    rare: 'azure_glaive',
+    very_rare: 'raven_halberd',
+    legendary: 'azure_glaive',
+  },
+  trident: {
+    default: 'amethyst_trident',
+    poor: 'plain_war_spear',
+    common: 'ruby_spear',
+    rare: 'amethyst_trident',
+    very_rare: 'amethyst_trident',
+    legendary: 'amethyst_trident',
+  },
+  lance: {
+    default: 'demon_slayer_lance',
+    poor: 'plain_war_spear',
+    common: 'sunspike_lance',
+    rare: 'bloodpoint_lance',
+    very_rare: 'demon_slayer_lance',
+    legendary: 'demon_slayer_lance',
+  },
+  runeblade: {
+    default: 'obsidian_runeblade',
+    poor: 'plain_aruming_sword',
+    common: 'silver_straightsword',
+    rare: 'obsidian_runeblade',
+    very_rare: 'obsidian_runeblade',
+    legendary: 'obsidian_runeblade',
+  },
+  twinblade: {
+    default: 'ice_and_night_blades',
+    poor: 'hooked_ritual_dagger',
+    common: 'blackthorn_shard',
+    rare: 'ice_and_night_blades',
+    very_rare: 'ice_and_night_blades',
+    legendary: 'crimson_twinblade',
+  },
+  sickle_weapon: {
+    default: 'iron_hook_sickle',
+    poor: 'iron_hook_sickle',
+    common: 'iron_hook_sickle',
+    rare: 'iron_hook_sickle',
+    very_rare: 'chain_reaper',
+    legendary: 'void_reaper_scythe',
   },
 };
 const PRO_ARMOR_SLOTS = ['helmet','chestplate','shield','boots','gloves'];
@@ -1610,11 +2091,72 @@ const PRO_WEAPON_RARITY_FILES = new Set([
   'very_rare|sunspike_lance','very_rare|thorn_blackblade',
 ]);
 
-function proWeaponPath(kind, rarity) {
+// Welle 27 — from_neu_pro Ancient-Blade-Pool: 26 stylized Schwerter von
+// Arthur Malagon (swordtember/stylized_blades) + ev_ganin + black_knight.
+// Bei legendary-Drops von sword/greatsword/katana/runeblade wird mit 40%
+// Chance ein zufälliger Blade aus diesem Pool gepickt — Per-Item deterministisch
+// via item.id-Hash, damit derselbe Sword nach Reload genauso aussieht.
+const ANCIENT_BLADE_POOL = [
+  'black_knight_wespon', 'fantasy_ev_ganin_sword_dark_souls_inspired',
+  'stylized_blades_arthur_malagon_01', 'stylized_blades_arthur_malagon_02',
+  'stylized_blades_arthur_malagon_03', 'stylized_blades_arthur_malagon_04',
+  'stylized_blades_arthur_malagon_05', 'stylized_blades_arthur_malagon_06',
+  'stylized_blades_arthur_malagon_07', 'stylized_blades_arthur_malagon_08',
+  'stylized_blades_arthur_malagon_09', 'stylized_blades_arthur_malagon_10',
+  'swordtember_final_five_arthur_malagon_01', 'swordtember_final_five_arthur_malagon_03',
+  'swordtember_final_five_arthur_malagon_09', 'swordtember_final_five_arthur_malagon_10',
+  'swordtember_final_five_arthur_malagon_15', 'swordtember_final_five_arthur_malagon_16',
+  'swordtember_final_five_arthur_malagon_17', 'swordtember_final_five_arthur_malagon_18',
+  'swordtember_final_five_arthur_malagon_19', 'swordtember_final_five_arthur_malagon_20',
+  'swordtember_final_five_arthur_malagon_21', 'swordtember_final_five_arthur_malagon_22',
+  'swordtember_final_five_arthur_malagon_23', 'swordtember_final_five_arthur_malagon_24',
+  // Welle 25: cosmetic_skin-Pool — komplette Swordtember-Serie 25-30 ergänzt.
+  'swordtember_final_five_arthur_malagon_25', 'swordtember_final_five_arthur_malagon_26',
+  'swordtember_final_five_arthur_malagon_27', 'swordtember_final_five_arthur_malagon_28',
+  'swordtember_final_five_arthur_malagon_29', 'swordtember_final_five_arthur_malagon_30',
+];
+// Welche Kinds dürfen Ancient-Blades als Legendary-Sprite haben (sword-like)
+const ANCIENT_BLADE_KINDS = new Set(['sword', 'greatsword', 'katana', 'runeblade', 'twinblade']);
+const ANCIENT_BLADE_CHANCE = 0.40;
+
+// Deterministischer Hash: item.id → pool-Index. Gleicher Item → gleicher Blade.
+function _ancientBladeForItem(itemId) {
+  let h = 0;
+  const s = String(itemId);
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  // Chance-Gate: ersten Bit-Bereich als 0-1 für Chance-Roll
+  const roll = ((h >>> 16) & 0xff) / 256;
+  if (roll >= ANCIENT_BLADE_CHANCE) return null;
+  // Pool-Index aus unterem Hash-Bereich
+  const idx = Math.abs(h) % ANCIENT_BLADE_POOL.length;
+  return ANCIENT_BLADE_POOL[idx];
+}
+
+// Welle 29c: Inspired-Pack-Slugs (assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/)
+const INSPIRED_WEAPON_SLUGS = new Set([
+  'iron_vigil_longsword', 'quarry_cleaver_greatsword', 'oxhide_execution_axe',
+  'thornwood_recurve_bow', 'siegewood_crossbow', 'duskpoint_war_spear',
+  'emberroot_staff', 'bramble_witch_wand', 'gravebriar_scythe',
+  'crescent_hook_dagger', 'paired_ravencut_knives', 'oathbound_iron_mace',
+]);
+
+function proWeaponPath(kind, rarity, itemId) {
+  // Welle 27: Bei legendary sword-likes mit 40% Chance Ancient-Blade-Variant
+  if (rarity === 'legendary' && itemId != null && ANCIENT_BLADE_KINDS.has(kind)) {
+    const slug = _ancientBladeForItem(itemId);
+    if (slug) {
+      return `/assets/equipment/weapons/professional/from_neu_pro/icons_128/${slug}.png`;
+    }
+  }
   const m = PRO_WEAPON_MAP[kind];
   if (!m) return null;
   const id = m[rarity] || m.default;
   if (!id) return null;
+  // Welle 29c: Inspired-Pack hat eigene icons_128/ — wenn Slug daraus stammt,
+  // nutze diesen Pfad direkt (rarity_v2 hat keine Inspired-Variants).
+  if (INSPIRED_WEAPON_SLUGS.has(id)) {
+    return `/assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/${id}.png`;
+  }
   // Wenn rarity_v2-File existiert: nutze es. Sonst Fallback auf icons_128
   // (Basis-Sprite ohne Rarity-Tinting).
   if (rarity && rarity !== 'default'
@@ -1955,6 +2497,35 @@ class WorldScene extends Phaser.Scene {
     }
     // fence_gate_farm hat einen abweichenden Filename
     this.load.image('farm_fence_gate', '/assets/structures/farm/fence_gate_farm.png');
+    // Welle 29e — Waldbrand-Strukturen (burned-trees + ash + flame)
+    this.load.image('prop_burned_stump_01',   '/assets/props/disasters/forest_fire/burned_stump_01.png');
+    this.load.image('prop_burned_stump_02',   '/assets/props/disasters/forest_fire/burned_stump_02.png');
+    this.load.image('prop_burned_stump_03',   '/assets/props/disasters/forest_fire/burned_stump_03.png');
+    this.load.image('prop_burned_tree_oak',   '/assets/props/disasters/forest_fire/burned_tree_oak.png');
+    this.load.image('prop_burned_tree_pine',  '/assets/props/disasters/forest_fire/burned_tree_pine.png');
+    this.load.image('prop_burned_tree_birch', '/assets/props/disasters/forest_fire/burned_tree_birch.png');
+    this.load.image('prop_ash_pile_small',    '/assets/props/disasters/forest_fire/ash_pile_small.png');
+    this.load.image('prop_ash_pile_large',    '/assets/props/disasters/forest_fire/ash_pile_large.png');
+    // fire_tile zeigt die flame_lick-Animation — wir laden alle 6 Frames
+    for (let f = 1; f <= 6; f++) {
+      const ff = String(f).padStart(2, '0');
+      this.load.image(`fire_flame_lick_${ff}`,
+        `/assets/animations/disasters/forest_fire/flame_lick_anim_${ff}.png`);
+    }
+    // fire_tile-Sprite: erstes Frame als statisches Standard-Sprite
+    this.load.image('fire_flame_lick',
+      '/assets/animations/disasters/forest_fire/flame_lick_anim_01.png');
+    // Welle 29e — locust_swarm NPC-Sprite + Animation
+    for (let f = 1; f <= 6; f++) {
+      const ff = String(f).padStart(2, '0');
+      this.load.image(`mob_locust_swarm_idle_${ff}`,
+        `/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_${ff}.png`);
+    }
+    // Erstes Frame als Default-Sprite
+    this.load.image('mob_locust_swarm_idle_1',
+      '/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_01.png');
+    this.load.image('mob_locust_swarm_idle_2',
+      '/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_03.png');
     // butter_churn + cheese_rack liegen unter food/dairy/ statt structures/farm/
     this.load.image('farm_butter_churn', '/assets/food/dairy/butter_churn.png');
     this.load.image('farm_cheese_rack',  '/assets/food/dairy/cheese_rack.png');
@@ -2052,6 +2623,12 @@ class WorldScene extends Phaser.Scene {
       goat: 'goat', buck_goat: 'goat', kid_goat: 'goat',
       horse: 'horse', draft_horse: 'horse', foal: 'horse', donkey: 'horse', mule: 'horse',
       dog: 'farm_dog',
+      // Welle 28: Geflügel-Variants auf base-animation mappen
+      chicken_hen: 'chicken_hen', rooster: 'chicken_hen', chick: 'chicken_hen',
+      duck: 'duck', drake: 'duck', duckling: 'duck',
+      goose: 'goose', gander: 'goose', gosling: 'goose',
+      // Wild-Tiere (neue Backend-Kinds — Wald-Bewohner)
+      fox: 'fox', rabbit: 'rabbit',
     };
     for (const [variant, base] of Object.entries(ANIMAL_VARIANTS)) {
       // Idle (2 frames, aus south-Ordner)
@@ -2094,18 +2671,46 @@ class WorldScene extends Phaser.Scene {
         }
       }
     }
-    // Spell-Animationen (Welle 40)
-    for (const f of [1, 2, 3]) {
-      this.load.image(`fx_fireball_${f}`, `/assets/animations/spells/fireball_explosion_${f}.png`);
+    // Welle 28: Pro-Spell-Spritesheets ersetzen alte 2-3-Frame-PNGs durch
+    // hochauflösende Animations (256×256 frames, 8-12 fps, smooth).
+    // 7 Animationen × 12 frames + 1 × 8 frames + 1 × 12@512 (poison_cloud).
+    const PRO_SPELLS_256 = {
+      fireball_explosion: 12,
+      heal_pulse:         12,
+      hit_spark:          12,
+      ice_impact:         12,
+      lightning_strike:    8,
+      magic_circle:       12,
+      sword_slash_arc:    12,
+    };
+    for (const [name, frameCount] of Object.entries(PRO_SPELLS_256)) {
+      this.load.spritesheet(`spell_${name}`,
+        `/assets/animations/professional/combat_magic/${name}/${name}_sheet.png`,
+        { frameWidth: 256, frameHeight: 256, endFrame: frameCount - 1 });
     }
+    // poison_cloud ist 512×512 — eigener Sheet-Loader
+    this.load.spritesheet('spell_poison_cloud',
+      '/assets/animations/professional/combat_magic/poison_cloud/poison_cloud_sheet.png',
+      { frameWidth: 512, frameHeight: 512, endFrame: 11 });
+    // Projektile (Einzelsprites, keine Sheets) — bleiben als statische image-Loads
     this.load.image('fx_fireball_projectile', '/assets/animations/spells/fireball_projectile.png');
-    for (const f of [1, 2]) {
-      this.load.image(`fx_heal_${f}`, `/assets/animations/spells/heal_pulse_${f}.png`);
-      this.load.image(`fx_lightning_${f}`, `/assets/animations/spells/lightning_strike_${f}.png`);
-      this.load.image(`fx_magic_circle_${f}`, `/assets/animations/spells/magic_circle_${f}.png`);
+    this.load.image('fx_ice_shard',           '/assets/animations/spells/ice_shard_projectile.png');
+    this.load.image('fx_lightning_bolt_projectile', '/assets/animations/spells/lightning_bolt_projectile.png');
+    this.load.image('fx_lightning_spark_impact',    '/assets/animations/spells/lightning_spark_impact.png');
+    // Welle 29d — Spell-Expansion-Pack (einzelne PNG-Frames, kein Sheet).
+    // ice_spell 12 frames, wind_slash_spell 8 frames, holy_shield_aura 4 frames.
+    const PRO_SPELLS_EXPANSION = {
+      ice_spell:        { count: 12 },
+      wind_slash_spell: { count: 8 },
+      holy_shield_aura: { count: 4 },
+    };
+    for (const [name, cfg] of Object.entries(PRO_SPELLS_EXPANSION)) {
+      for (let f = 1; f <= cfg.count; f++) {
+        const ff = String(f).padStart(2, '0');
+        this.load.image(`spell_${name}_${ff}`,
+          `/assets/animations/spells/${name}_${ff}.png`);
+      }
     }
-    this.load.image('fx_ice_shard', '/assets/animations/spells/ice_shard_projectile.png');
-    this.load.image('fx_ice_impact', '/assets/animations/spells/ice_impact.png');
     // Attack-Animationen (Welle 40)
     for (const f of [1, 2, 3]) {
       this.load.image(`fx_sword_slash_${f}`, `/assets/animations/attacks/sword_slash_${f}.png`);
@@ -2166,11 +2771,18 @@ class WorldScene extends Phaser.Scene {
     }
     // Pro-Weapon-Variants (Asset-Drop 2026-05-26b): pro Spiel-Kind × Rarity
     // ein Pro-Sprite. Lädt nur die im PRO_WEAPON_MAP referenzierten Files.
+    // itemId=null beim Preload → kein Ancient-Pool-Pick (default proWeapon)
     for (const r of PRO_RARITIES) {
       for (const kind of Object.keys(PRO_WEAPON_MAP)) {
-        const url = proWeaponPath(kind, r);
+        const url = proWeaponPath(kind, r, null);
         if (url) this.load.image(`weapon_rarity_${r}_${kind}`, url);
       }
+    }
+    // Welle 27: Ancient-Blades aus from_neu_pro werden alle preload damit
+    // der Per-Item Hash-Pick direkt rendern kann ohne Late-Load-Lag.
+    for (const slug of ANCIENT_BLADE_POOL) {
+      this.load.image(`ancient_blade_${slug}`,
+        `/assets/equipment/weapons/professional/from_neu_pro/icons_128/${slug}.png`);
     }
     // Pro-Armor-Variants: 5 Slots × 5 Rarities
     for (const r of PRO_RARITIES) {
@@ -2284,6 +2896,48 @@ class WorldScene extends Phaser.Scene {
   }
 
   create() {
+    // Welle 28: Pro-Spell-Animationen registrieren. 7 Animationen @ 256×256
+    // + 1 @ 512×512. fps 14 für smooth playback.
+    const PRO_SPELL_FRAMES = {
+      fireball_explosion: 12, heal_pulse: 12, hit_spark: 12,
+      ice_impact: 12, lightning_strike: 8, magic_circle: 12,
+      sword_slash_arc: 12, poison_cloud: 12,
+    };
+    for (const [name, frames] of Object.entries(PRO_SPELL_FRAMES)) {
+      const key = `spell_${name}`;
+      if (this.anims.exists(key)) continue;
+      if (!this.textures.exists(key)) continue;
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNumbers(key, { start: 0, end: frames - 1 }),
+        frameRate: 14,
+        repeat: 0,   // one-shot
+      });
+    }
+    // Welle 29d — Spell-Expansion-Pack als Frame-Sequenzen (kein Sheet).
+    // Erstellt anim aus einzelnen image-keys spell_<name>_NN.
+    const PRO_SPELL_EXPANSION_FRAMES = {
+      ice_spell:        12,
+      wind_slash_spell:  8,
+      holy_shield_aura:  4,
+    };
+    for (const [name, count] of Object.entries(PRO_SPELL_EXPANSION_FRAMES)) {
+      const key = `spell_${name}`;
+      if (this.anims.exists(key)) continue;
+      const frameList = [];
+      for (let f = 1; f <= count; f++) {
+        const ff = String(f).padStart(2, '0');
+        const fkey = `${key}_${ff}`;
+        if (this.textures.exists(fkey)) frameList.push({ key: fkey });
+      }
+      if (frameList.length === 0) continue;
+      this.anims.create({
+        key,
+        frames: frameList,
+        frameRate: name === 'holy_shield_aura' ? 8 : 14,   // shield loopt langsamer
+        repeat: name === 'holy_shield_aura' ? -1 : 0,      // shield-aura loopt
+      });
+    }
     // Welle 50: World-Polish-Animations registrieren (idempotent über Scene-Reloads)
     for (const a of WORLD_POLISH_ANIMS) {
       const key = `wp_${a.key}`;
@@ -2402,6 +3056,8 @@ class WorldScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-T',     () => { if (!this.activeDialog) this.toggleTalents(); });
     this.input.keyboard.on('keydown-F',     () => { if (!this.activeDialog && !this.buildMode) this.toggleFactions(); });
     this.input.keyboard.on('keydown-C',     () => { if (!this.activeDialog) this.toggleAttributes(); });
+    // Welle 25: Spellbook
+    this.input.keyboard.on('keydown-P',     () => { if (!this.activeDialog) this.toggleSpellbook(); });
 
     // Click-Handler für Bauen/Abreißen / NPC-Talk
     this.input.mouse.disableContextMenu();
@@ -2441,6 +3097,8 @@ class WorldScene extends Phaser.Scene {
       else if (e.key.toLowerCase() === 't' && this.talentsOpen) this.toggleTalents();
       else if (e.key.toLowerCase() === 'f' && this.factionsOpen) this.toggleFactions();
       else if (e.key.toLowerCase() === 'c' && this.attributesOpen) this.toggleAttributes();
+      else if (e.key === 'Escape' && this.spellbookOpen) this.toggleSpellbook(false);
+      else if (e.key.toLowerCase() === 'p' && this.spellbookOpen) this.toggleSpellbook(false);
     });
     // Welle 51 — Sign-Inspect schließen (X, Esc, Klick außerhalb)
     document.getElementById('sign-inspect-close').addEventListener('click', () => this.closeSignInspect());
@@ -2467,6 +3125,26 @@ class WorldScene extends Phaser.Scene {
     document.getElementById('talents-close').addEventListener('click', () => this.toggleTalents());
     document.getElementById('factions-close').addEventListener('click', () => this.toggleFactions());
     document.getElementById('attributes-close').addEventListener('click', () => this.toggleAttributes());
+    // Welle 25: Spellbook-Close + Tab-Switch
+    const sbClose = document.getElementById('spellbook-close');
+    if (sbClose) sbClose.addEventListener('click', () => this.toggleSpellbook(false));
+    const sbOverlay = document.getElementById('spellbook-overlay');
+    if (sbOverlay) sbOverlay.addEventListener('click', (ev) => {
+      if (ev.target.id === 'spellbook-overlay' && this.spellbookOpen)
+        this.toggleSpellbook(false);
+    });
+    // Welle 25: Sofort-Respawn-Button
+    const respBtn = document.getElementById('downed-respawn-btn');
+    if (respBtn) respBtn.addEventListener('click', () => this.forceRespawn());
+
+    document.querySelectorAll('.sb-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.sb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this.spellbookSchool = tab.dataset.school;
+        this._refreshSpellbook();
+      });
+    });
 
     // Pinned-Tooltip: ESC oder Click-outside schließt
     document.addEventListener('keydown', (e) => {
@@ -2813,6 +3491,14 @@ class WorldScene extends Phaser.Scene {
 
   attackNPC(npcId) {
     this.ws.send(JSON.stringify({ type: 'attack_npc', npc_id: npcId }));
+    // Welle 29: Waffen-Swing-Sound nach equipped weapon
+    const w = (this.inventory || []).find(it => it.equipped_slot === 'weapon');
+    const wk = w ? w.kind : null;
+    let sfx = 'sword_swing';
+    if (wk === 'axe' || wk === 'greatsword') sfx = 'axe_chop';
+    else if (wk === 'bow') sfx = 'bow_release';
+    else if (wk === 'crossbow') sfx = 'crossbow_release';
+    window.playSfx(sfx);
   }
 
   // Welle 33: Reichweite der aktuell ausgerüsteten Waffe
@@ -2887,6 +3573,23 @@ class WorldScene extends Phaser.Scene {
       this.assignToHotbar(dst.slot, src.kind);
       return;
     }
+    // Welle 25: Spellbook → Hotbar: Spell-Slot zuweisen
+    if (src.from === 'spellbook' && dst.to === 'hotbar') {
+      this.hotbar[dst.slot] = { type: 'spell', id: src.spell_id };
+      this._saveHotbar();
+      this.refreshHotbar();
+      return;
+    }
+    // Welle 25: Hotbar (Spell) → Hotbar: swap mit anderem slot
+    if (src.from === 'hotbar' && dst.to === 'hotbar' && src.spell_id) {
+      if (src.slot === dst.slot) return;
+      const tmp = this.hotbar[src.slot];
+      this.hotbar[src.slot] = this.hotbar[dst.slot];
+      this.hotbar[dst.slot] = tmp;
+      this._saveHotbar();
+      this.refreshHotbar();
+      return;
+    }
     // Hotbar → Inventory: Slot leeren
     if (src.from === 'hotbar' && dst.to === 'inventory') {
       this.assignToHotbar(src.slot, null);
@@ -2914,7 +3617,47 @@ class WorldScene extends Phaser.Scene {
       key.className = 'hotbar-key';
       key.textContent = (i + 1);
       slot.appendChild(key);
-      const kind = this.hotbar[i];
+      const entry = this.hotbar[i];
+      // Welle 25: Spell-Slot (Object {type:'spell', id:'fireball'})
+      if (entry && typeof entry === 'object' && entry.type === 'spell') {
+        const spell = this.spellCatalog[entry.id];
+        slot.classList.add('spell-slot');
+        if (spell) {
+          const img = document.createElement('img');
+          img.src = spell.icon_path;
+          slot.appendChild(img);
+          const schoolIcon = document.createElement('div');
+          schoolIcon.className = 'spell-school';
+          schoolIcon.textContent = spell.school === 'healer' ? '⚕' : '🔥';
+          slot.appendChild(schoolIcon);
+          // Mana-Check → grau
+          if ((this.myMana || 0) < (spell.mana_cost || 0)) slot.classList.add('no-mana');
+          // Cooldown-Overlay
+          const cdRemaining = this._spellCooldownRemaining(entry.id);
+          if (cdRemaining > 0) {
+            slot.classList.add('cooldown');
+            const cd = document.createElement('div');
+            cd.className = 'spell-cd';
+            cd.textContent = cdRemaining < 10 ? cdRemaining.toFixed(1) : Math.ceil(cdRemaining);
+            slot.appendChild(cd);
+          }
+          // Tooltip
+          slot.title = `${spell.name}\n${spell.description}\nMana: ${spell.mana_cost} | CD: ${(spell.cooldown_ms/1000).toFixed(1)}s`;
+        } else {
+          slot.textContent = '?';
+        }
+        this._dndAttach(slot, {
+          dragData: () => ({ from: 'hotbar', slot: i, spell_id: entry.id }),
+          onDrop:   (src) => this._handleDndDrop(src, { to: 'hotbar', slot: i }),
+        });
+        slot.addEventListener('click', () => this.activateHotbarSlot(i));
+        slot.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault(); this.assignToHotbar(i, null);
+        });
+        root.appendChild(slot);
+        continue;
+      }
+      const kind = entry;   // Legacy item string
       // Drag-and-Drop: jeder Hotbar-Slot ist Drop-Target; besetzte sind auch
       // Drag-Source. Inventar→Hotbar = zuweisen, Hotbar→Hotbar = swap.
       this._dndAttach(slot, {
@@ -2981,7 +3724,14 @@ class WorldScene extends Phaser.Scene {
   activateHotbarSlot(idx) {
     if (idx < 0 || idx >= 9) return;
     this.activeHotbar = idx;
-    const kind = this.hotbar[idx];
+    const entry = this.hotbar[idx];
+    // Welle 25: Spell-Slot
+    if (entry && typeof entry === 'object' && entry.type === 'spell') {
+      this.castSpellById(entry.id);
+      this.refreshHotbar();
+      return;
+    }
+    const kind = entry;
     if (!kind) { this.refreshHotbar(); return; }
     const cfg = ITEM[kind] || {};
     // Toggle für equippable: schon equipped → ablegen; sonst anlegen
@@ -3014,6 +3764,200 @@ class WorldScene extends Phaser.Scene {
       this.castSpell(item.id);
     }
     this.refreshHotbar();
+  }
+
+  // ─── Welle 25 — Down-State Overlay ───────────────────────────────────────
+  _showDownedOverlay(durationS) {
+    const overlay = document.getElementById('downed-overlay');
+    const timer = document.getElementById('downed-timer');
+    if (!overlay || !timer) return;
+    overlay.classList.add('active');
+    this.amDowned = true;
+    this._downedExpiresAt = Date.now() + durationS * 1000;
+    if (this._downedTickIv) clearInterval(this._downedTickIv);
+    const tick = () => {
+      const rem = Math.max(0, (this._downedExpiresAt - Date.now()) / 1000);
+      timer.textContent = rem.toFixed(1) + 's';
+      if (rem <= 0 && this._downedTickIv) {
+        clearInterval(this._downedTickIv);
+        this._downedTickIv = null;
+      }
+    };
+    tick();
+    this._downedTickIv = setInterval(tick, 100);
+  }
+
+  _hideDownedOverlay() {
+    const overlay = document.getElementById('downed-overlay');
+    if (overlay) overlay.classList.remove('active');
+    if (this._downedTickIv) {
+      clearInterval(this._downedTickIv);
+      this._downedTickIv = null;
+    }
+    this.amDowned = false;
+  }
+
+  forceRespawn() {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    try { this.ws.send(JSON.stringify({ type: 'force_respawn' })); }
+    catch (e) { /* ignore */ }
+  }
+
+  // ─── Welle 25 — Spell-System ─────────────────────────────────────────────
+  _spellCooldownRemaining(spellId) {
+    const readyAt = this.spellCooldowns[spellId] || 0;
+    const rem = (readyAt - Date.now()) / 1000;
+    return Math.max(0, rem);
+  }
+
+  _pickSpellTarget(spell) {
+    const tk = spell.target_kind;
+    if (tk === 'self' || tk === 'group') {
+      return { x: this.myTileX, y: this.myTileY };
+    }
+    // single / aoe / ground → nächster hostiler NPC in Range
+    const range = spell.range || 6;
+    let best = null, bestDist = Infinity;
+    for (const id in this.npcs) {
+      const entry = this.npcs[id];
+      if (!entry || !entry.npc) continue;
+      if (!CREATURE_KINDS.has(entry.npc.kind)) continue;
+      const dx = entry.tileX - this.myTileX;
+      const dy = entry.tileY - this.myTileY;
+      const dist = Math.abs(dx) + Math.abs(dy);
+      if (dist > range) continue;
+      if (dist < bestDist) { best = entry.npc; bestDist = dist; }
+    }
+    if (best) {
+      return { x: best.x, y: best.y, npc_id: best.id };
+    }
+    return null;
+  }
+
+  castSpellById(spellId) {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    const spell = this.spellCatalog[spellId];
+    if (!spell) return;
+    if (this.activeCast) {
+      this.showEvent('⚡ Du wirkst bereits einen Zauber');
+      return;
+    }
+    if (this._spellCooldownRemaining(spellId) > 0.1) {
+      this.showEvent(`⏳ Noch ${this._spellCooldownRemaining(spellId).toFixed(1)}s`);
+      return;
+    }
+    if ((this.myMana || 0) < (spell.mana_cost || 0)) {
+      this.showEvent(`💧 Nicht genug Mana (${spell.mana_cost} benötigt)`);
+      return;
+    }
+    const target = this._pickSpellTarget(spell);
+    if (target == null && spell.target_kind !== 'self') {
+      this.showEvent('🎯 Kein Ziel in Reichweite');
+      return;
+    }
+    const payload = { type: 'cast_spell', spell_id: spellId };
+    if (target) {
+      if (target.x != null) payload.target_x = target.x;
+      if (target.y != null) payload.target_y = target.y;
+      if (target.npc_id != null) payload.target_npc_id = target.npc_id;
+    }
+    try { this.ws.send(JSON.stringify(payload)); }
+    catch (e) { /* ignore */ }
+  }
+
+  _startCastBar(spellId, durationMs) {
+    const spell = this.spellCatalog[spellId];
+    if (!spell) return;
+    this.activeCast = { spell_id: spellId, start_ms: Date.now(),
+                        duration_ms: durationMs };
+    const bar = document.getElementById('cast-bar');
+    const icon = document.getElementById('cast-bar-icon');
+    const label = document.getElementById('cast-bar-label');
+    if (bar && icon && label) {
+      icon.style.backgroundImage = `url(${spell.icon_path})`;
+      label.textContent = spell.name;
+      bar.classList.add('active');
+    }
+    if (durationMs <= 0) {
+      this._endCastBar();   // instant
+    }
+  }
+
+  _updateCastBar() {
+    if (!this.activeCast) return;
+    const ms = Date.now() - this.activeCast.start_ms;
+    const pct = Math.min(100, (ms / this.activeCast.duration_ms) * 100);
+    const fill = document.getElementById('cast-bar-fill');
+    if (fill) fill.style.width = pct + '%';
+    if (ms >= this.activeCast.duration_ms) {
+      // Backend sendet cast_finished — bis dahin Bar auf 100% halten
+      if (fill) fill.style.width = '100%';
+    }
+  }
+
+  _endCastBar() {
+    this.activeCast = null;
+    const bar = document.getElementById('cast-bar');
+    if (bar) bar.classList.remove('active');
+    const fill = document.getElementById('cast-bar-fill');
+    if (fill) fill.style.width = '0%';
+  }
+
+  // Welle 25 — Spellbook-UI
+  toggleSpellbook(forceOpen) {
+    const overlay = document.getElementById('spellbook-overlay');
+    if (!overlay) return;
+    const shouldOpen = (forceOpen !== undefined) ? forceOpen
+                                                  : !this.spellbookOpen;
+    this.spellbookOpen = shouldOpen;
+    overlay.classList.toggle('active', shouldOpen);
+    if (shouldOpen) this._refreshSpellbook();
+  }
+
+  _refreshSpellbook() {
+    const grid = document.getElementById('spellbook-grid');
+    const detail = document.getElementById('spellbook-detail');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (detail) detail.textContent =
+      'Ziehe einen Zauber in einen Hotbar-Slot, um ihn dort zu binden.';
+    const school = this.spellbookSchool;
+    const magicLvl = (this.mySkills?.magic?.level) || 0;
+    for (const [sid, spell] of Object.entries(this.spellCatalog)) {
+      if (spell.school !== school) continue;
+      const cell = document.createElement('div');
+      cell.className = 'sb-spell';
+      const learned = this.learnedSpells.includes(sid);
+      const meetsReq = magicLvl >= (spell.skill_req || 0);
+      if (!learned || !meetsReq) cell.classList.add('locked');
+      const img = document.createElement('img');
+      img.src = spell.icon_path;
+      cell.appendChild(img);
+      const name = document.createElement('div');
+      name.className = 'sb-name';
+      name.textContent = spell.name;
+      cell.appendChild(name);
+      if (!meetsReq) {
+        const sk = document.createElement('div');
+        sk.className = 'sb-skill';
+        sk.textContent = `Lvl ${spell.skill_req}`;
+        cell.appendChild(sk);
+      }
+      if (learned && meetsReq) {
+        this._dndAttach(cell, {
+          dragData: () => ({ from: 'spellbook', spell_id: sid }),
+        });
+      }
+      cell.addEventListener('click', () => {
+        if (detail) detail.innerHTML =
+          `<strong>${spell.name}</strong> — ${spell.description}<br>` +
+          `<span style="opacity:0.8">Mana ${spell.mana_cost} · ` +
+          `Cast ${(spell.cast_time_ms/1000).toFixed(1)}s · ` +
+          `Abklingzeit ${(spell.cooldown_ms/1000).toFixed(1)}s · ` +
+          `Magie-Level ${spell.skill_req}</span>`;
+      });
+      grid.appendChild(cell);
+    }
   }
 
   // Welle 35: Item-Stats-Tooltip
@@ -3710,15 +4654,19 @@ class WorldScene extends Phaser.Scene {
   _updatePlaceGhost(tx, ty) {
     if (!this.buildMode || !this.selectedStruct) {
       if (this.placeGhost) { this.placeGhost.destroy(); this.placeGhost = null; }
+      if (this.placeGhostFrame) { this.placeGhostFrame.destroy(); this.placeGhostFrame = null; }
       return;
     }
     const key = this._spriteKeyForStruct(this.selectedStruct, this.selectedMaterial);
     if (!key) {
       if (this.placeGhost) { this.placeGhost.destroy(); this.placeGhost = null; }
+      if (this.placeGhostFrame) { this.placeGhostFrame.destroy(); this.placeGhostFrame = null; }
       return;
     }
-    const cx = tx * TILE_SIZE + TILE_SIZE / 2;
-    const cy = ty * TILE_SIZE + TILE_SIZE / 2;
+    // Welle 25: Multi-Tile-Footprint
+    const [fw, fh] = footprintFor(this.selectedStruct);
+    const cx = (tx + fw / 2) * TILE_SIZE;
+    const cy = (ty + fh / 2) * TILE_SIZE;
     if (!this.placeGhost || this.placeGhost.texture.key !== key) {
       if (this.placeGhost) this.placeGhost.destroy();
       this.placeGhost = this.add.image(cx, cy, key).setOrigin(0.5);
@@ -3728,8 +4676,22 @@ class WorldScene extends Phaser.Scene {
       this.placeGhost.setPosition(cx, cy);
     }
     const structScale = STRUCTURE_DISPLAY_SCALE[this.selectedStruct] || 1.0;
-    this.placeGhost.setDisplaySize(TILE_SIZE * structScale, TILE_SIZE * structScale);
+    this.placeGhost.setDisplaySize(TILE_SIZE * fw * structScale,
+                                    TILE_SIZE * fh * structScale);
     this.placeGhost.setAngle(this.placeRotation || 0);
+    // Footprint-Rahmen (bei Multi-Tile sichtbar machen wieviele Felder belegt sind)
+    if (!this.placeGhostFrame) {
+      this.placeGhostFrame = this.add.graphics();
+      this.placeGhostFrame.setDepth(4.6);
+    }
+    this.placeGhostFrame.clear();
+    if (fw > 1 || fh > 1) {
+      this.placeGhostFrame.lineStyle(2, 0xffd060, 0.85);
+      this.placeGhostFrame.strokeRect(
+        tx * TILE_SIZE, ty * TILE_SIZE,
+        fw * TILE_SIZE, fh * TILE_SIZE
+      );
+    }
   }
 
   _refreshPlaceGhost() {
@@ -3848,13 +4810,17 @@ class WorldScene extends Phaser.Scene {
         this.myMaxStamina = msg.max_stamina ?? 100;
         this.mySkills    = msg.skills || {};
         this.myBodyParts = msg.body_parts || { legs: 100, arms: 100, torso: 100 };
-        // Welle 22: research kommt jetzt als {nodes, pool} statt direkt nodes-dict
+        // Welle 22: research kommt als {nodes, pool, branches, ages} statt direkt nodes-dict
         if (msg.research && msg.research.nodes) {
           this.myResearch = msg.research.nodes;
           this.myResearchPool = msg.research.pool || 0;
+          this.myResearchBranches = msg.research.branches || [];
+          this.myResearchAges = msg.research.ages || [];
         } else {
           this.myResearch = msg.research || {};
           this.myResearchPool = 0;
+          this.myResearchBranches = [];
+          this.myResearchAges = [];
         }
         if (msg.time) this.updateTimeOfDay(msg.time);
         this.myQuests = msg.quests || [];
@@ -3864,11 +4830,24 @@ class WorldScene extends Phaser.Scene {
         // Welle 24: Aktive Disaster-Overlays bei Verbindung anzeigen
         if (Array.isArray(msg.active_disasters)) {
           for (const d of msg.active_disasters) {
-            try { this._onDisasterStarted(d.kind, d.metadata || {}); } catch (e) {}
+            // Welle 29e: Pass remaining_s als duration_s + metadata an HUD weiter
+            const initMsg = Object.assign({}, d.metadata || {}, {
+              duration_s: d.remaining_s,
+              label: d.kind,
+            });
+            try { this._onDisasterStarted(d.kind, initMsg); } catch (e) {}
           }
         }
         this.statSheet = msg.stats || null;   // Welle 15: vollständiges Char-Sheet
+        // Welle 25: Power-Tier (1-4) für Mob-Color-Coding
+        this.myPowerTier = msg.power_tier || 1;
+        // Welle 25: Spell-System — Catalog + learned + State
+        this.spellCatalog = msg.spell_catalog || {};
         this.learnedSpells = msg.learned_spells || [];
+        this.activeCast = null;        // {spell_id, start_ms, duration_ms}
+        this.spellCooldowns = {};      // spell_id → ready_at_ms (Date.now())
+        this.spellbookOpen = false;
+        this.spellbookSchool = 'healer';
         this.refreshHpBar();
         this.refreshManaBar();
         this.refreshNeedsBars();
@@ -3939,6 +4918,8 @@ class WorldScene extends Phaser.Scene {
         const target = (s.layer === 'floor') ? this.floors : this.structures;
         target[`${s.x},${s.y}`] = s;
         this.addStructureSprite(s);
+        // Welle 29: Build-Sound an der Tile-Position
+        window.playSfx('hammer_strike', { x: s.x, y: s.y });
         break;
       }
 
@@ -4063,6 +5044,7 @@ class WorldScene extends Phaser.Scene {
         const sp = this.itemSprites[msg.item_id];
         if (sp && msg.by === MY_ID) {
           this.playOverlayAnim('item_pickup_pop', sp.x, sp.y, { scale: 0.75, depth: 6 });
+          window.playSfx('item_pickup');   // Welle 29
         }
         this.removeItemSprite(msg.item_id);
         break;
@@ -4123,14 +5105,25 @@ class WorldScene extends Phaser.Scene {
           // Welle 18: Floating-Damage-Number über dem Player
           this._floatingDamage(this.myPx, this.myPy, msg.dmg, { color: '#ff4040' });
         }
+        // Welle 29: Hit-Sound + Low-HP-Warnung
+        window.playSfx('hit_flesh');
+        if (this.myHp > 0 && this.myHp / this.myMaxHp < 0.25) {
+          window.playSfx('low_health_warn');
+        }
         break;
 
       case 'player_respawned':
+        // Welle 25: Downed-Overlay ausblenden, Position + HP aktualisieren
+        this._hideDownedOverlay();
         this.myHp = msg.hp;
         this.myMaxHp = msg.max_hp;
         this.setLocalPositionFromTile(msg.x, msg.y);
         this.refreshHpBar();
-        this.showStoryEvent({ kind: 'natural', title: '💀 Du bist gefallen', body: 'Die Welt setzt dich wieder am Spawn ab.' });
+        if (msg.in_place) {
+          this.showEvent('✨ Wiederbelebt');
+        } else {
+          this.showStoryEvent({ kind: 'natural', title: '💀 Du bist gefallen', body: 'Du wurdest am Spawn-Punkt wieder zum Leben erweckt.' });
+        }
         break;
 
       case 'player_died':
@@ -4150,6 +5143,8 @@ class WorldScene extends Phaser.Scene {
             this._floatingDamage(n.container.x, n.container.y, msg.dmg,
               { color: msg.by === MY_ID ? '#ffe070' : '#d8c89a' });
           }
+          // Welle 29: 3D-Hit-Sound mit Mob-Position
+          window.playSfx('hit_flesh', { x: n.tileX, y: n.tileY });
         }
         break;
 
@@ -4158,6 +5153,8 @@ class WorldScene extends Phaser.Scene {
           const n = this.npcs[msg.npc_id];
           if (n.tween) n.tween.stop();
           if (n.speech && n.speech.timer) clearTimeout(n.speech.timer);
+          // Welle 29: Death-Sound an Mob-Position
+          window.playSfx('death', { x: n.tileX, y: n.tileY });
           n.container.destroy();
           delete this.npcs[msg.npc_id];
           this.drawMinimap();
@@ -4212,22 +5209,60 @@ class WorldScene extends Phaser.Scene {
         this.showEvent(msg.text);
         break;
 
+      // ─── Welle 25 — Spell-Casting Events ────────────────────────────────
+      case 'cast_started':
+        this._startCastBar(msg.spell_id, msg.cast_time_ms || 0);
+        break;
+      case 'cast_interrupted':
+        this.showEvent(`⚡ Cast unterbrochen (${msg.reason})`);
+        this._endCastBar();
+        break;
+      case 'cast_finished':
+        this._endCastBar();
+        if (msg.spell_id && msg.cooldown_ms) {
+          this.spellCooldowns[msg.spell_id] = Date.now() + msg.cooldown_ms;
+        }
+        this.refreshHotbar();
+        break;
+      case 'spell_learned':
+        this.learnedSpells = msg.learned || this.learnedSpells;
+        if (this.spellbookOpen) this._refreshSpellbook();
+        break;
+
+      // ─── Welle 25 — Down-State (player_respawned ist oben gemerged) ─
+      case 'player_downed':
+        this._showDownedOverlay(msg.duration_s || 30);
+        break;
+      case 'player_downed_visible':
+        // anderer Spieler ist gefallen (Visual nur informativ; kein Overlay bei uns)
+        break;
+      case 'player_revived_visible':
+        // anderer Spieler ist wieder da
+        break;
+
       // ─── Welle 24 — Disaster-Effekte ────────────────────────────────────
       case 'disaster_started':
         this._onDisasterStarted(msg.kind, msg);
+        // Welle 29: Disaster-spezifische Sounds + Music-Layer
+        if (msg.kind === 'blood_moon')        window.playMusic('blood_moon_drone', { loop: true });
         break;
       case 'disaster_ended':
         this._onDisasterEnded(msg.kind);
+        if (msg.kind === 'blood_moon') window.SoundManager.stopMusic();
         break;
       case 'earthquake_shake':
         this._onEarthquakeShake(msg.duration_ms || 6000, msg.magnitude || 6);
+        window.playSfx('earthquake_rumble');
         break;
       case 'lightning_strike':
         this._onLightningStrike(msg.x, msg.y);
+        window.playSfx('thunder', { x: msg.x, y: msg.y });
+        window.playSfx('lightning_strike', { x: msg.x, y: msg.y });
         break;
 
       case 'chest_open':
         this.openChest(msg.chest_id, msg.items);
+        window.playSfx('chest_open');   // Welle 29
         break;
 
       case 'chest_add':
@@ -4459,7 +5494,7 @@ class WorldScene extends Phaser.Scene {
       }
 
       case 'research_pool_update':
-        // Welle 22: Pool-Update (Skill-XP / Craft / Item-Use / Time-Tick)
+        // Welle 30: Pool-Update (Quest / Skill-Level-Up / Item-Use / 2h-Tick)
         this.myResearchPool = msg.pool || 0;
         if (msg.gained > 0 && msg.reason) {
           this.showEvent(`🔬 +${msg.gained} (${msg.reason})`);
@@ -4531,11 +5566,26 @@ class WorldScene extends Phaser.Scene {
         this.mySkills[msg.skill] = { xp: msg.xp, level: msg.level };
         if (msg.leveled_up) {
           this.showEvent(`🎉 ${msg.skill} Level ${msg.level}!`);
+          window.playSfx('level_up');  // Welle 29
           // Welle 50: Level-Up-Ring am Player (einmalig, kein Loop)
           if (this.mySprite) {
             this.playOverlayAnim('level_up_ring', this.mySprite.x, this.mySprite.y,
                                  { scale: 1.3, depth: 12, once: true });
           }
+        }
+        // Welle 25: Power-Tier-Update aus skill_xp übernehmen + Mob-Color refreshen
+        if (msg.power_tier != null && msg.power_tier !== this.myPowerTier) {
+          this.myPowerTier = msg.power_tier;
+          this._recolorAllNPCs();
+        }
+        // Welle 25: neue Spells durch Level-Up — Liste mergen + Toast
+        if (Array.isArray(msg.unlocked_spells) && msg.unlocked_spells.length) {
+          for (const sid of msg.unlocked_spells) {
+            if (!this.learnedSpells.includes(sid)) this.learnedSpells.push(sid);
+            const sp = this.spellCatalog[sid];
+            if (sp) this.showEvent(`✨ Neuer Zauber: ${sp.name}`);
+          }
+          if (this.spellbookOpen) this._refreshSpellbook();
         }
         if (this.skillsOpen) this.refreshSkillsUI();
         break;
@@ -5055,20 +6105,50 @@ class WorldScene extends Phaser.Scene {
       this.playOverlayAnim(animName, cx, cy, { scale: 1.0, depth: 8, once: true });
       return;
     }
-    // Welle 40: Multi-Frame-Sequenzen für Spell-Effekte
+    // Welle 28: Pro-Spell-Sheet-Mapping (256×256 oder 512×512 frames).
+    // Wenn ein Pro-Anim existiert, wird das verwendet — der alte SEQUENCES-Pfad
+    // bleibt für Attack-FX (sword/axe/mace/arrow) die noch alte Frame-PNGs nutzen.
+    const PRO_SPELL_ANIM_MAP = {
+      fireball_explosion: 'spell_fireball_explosion',
+      heal_glow:          'spell_heal_pulse',
+      heal_pulse:         'spell_heal_pulse',
+      lightning_strike:   'spell_lightning_strike',
+      magic_circle:       'spell_magic_circle',
+      ice_impact:         'spell_ice_impact',
+      ice_shard:          'spell_ice_impact',   // Welle 25: Frostbolt
+      hit_spark:          'spell_hit_spark',
+      poison_cloud:       'spell_poison_cloud',
+      sword_slash_arc:    'spell_sword_slash_arc',
+      // Welle 29d — neue Spell-Animations aus spell_expansion_pack
+      ice_spell:          'spell_ice_spell',
+      wind_slash_spell:   'spell_wind_slash_spell',
+      holy_shield_aura:   'spell_holy_shield_aura',
+    };
+    const cx = x * TILE_SIZE + TILE_SIZE / 2;
+    const cy = y * TILE_SIZE + TILE_SIZE / 2;
+    const proAnimKey = PRO_SPELL_ANIM_MAP[kind];
+    if (proAnimKey && this.anims.exists(proAnimKey)) {
+      // Pro-Animation: einmalige Wiedergabe + auto-destroy
+      const scale = kind === 'poison_cloud' ? 1.6 : 1.4;
+      const sprite = this.add.sprite(cx, cy, proAnimKey).setOrigin(0.5).setDepth(8);
+      sprite.setDisplaySize(TILE_SIZE * scale, TILE_SIZE * scale);
+      sprite.play(proAnimKey);
+      sprite.on('animationcomplete', () => {
+        this.tweens.add({
+          targets: sprite, alpha: 0, duration: 180,
+          onComplete: () => sprite.destroy(),
+        });
+      });
+      return;
+    }
+    // Legacy-SEQUENCES-Fallback für Attack-FX (sword/axe/mace/arrow). Spell-
+    // Keys (fireball/heal/lightning/etc.) sind oben durch Pro abgedeckt.
     const SEQUENCES = {
-      fireball_explosion: ['fx_fireball_1','fx_fireball_2','fx_fireball_3'],
-      heal_glow:          ['fx_heal_1','fx_heal_2'],
-      lightning_strike:   ['fx_lightning_1','fx_lightning_2'],
-      magic_circle:       ['fx_magic_circle_1','fx_magic_circle_2'],
       sword_slash:        ['fx_sword_slash_1','fx_sword_slash_2','fx_sword_slash_3'],
       axe_swing:          ['fx_axe_swing_1','fx_axe_swing_2','fx_axe_swing_3'],
       mace_hit:           ['fx_mace_hit_1','fx_mace_hit_2'],
       arrow_hit:          ['fx_arrow_hit'],
-      ice_impact:         ['fx_ice_impact'],
     };
-    const cx = x * TILE_SIZE + TILE_SIZE / 2;
-    const cy = y * TILE_SIZE + TILE_SIZE / 2;
     const seq = SEQUENCES[kind];
     if (seq) {
       // Frame-Sequenz abspielen
@@ -5241,62 +6321,160 @@ class WorldScene extends Phaser.Scene {
     const list = document.getElementById('research-list');
     if (!list) return;
     list.innerHTML = '';
-    // Welle 22: Pool-Banner oben
+    // Welle 30c — Pool-Banner
     const pool = this.myResearchPool || 0;
     const banner = document.createElement('div');
-    banner.style.cssText = 'background:rgba(60,40,15,0.6);border:1px solid #a07840;padding:8px 12px;margin-bottom:8px;font-size:14px;';
+    banner.style.cssText = 'background:rgba(60,40,15,0.7);border:1px solid #a07840;padding:8px 12px;margin-bottom:8px;font-size:14px;';
     banner.innerHTML = `<b style="color:#ffd060">🔬 Forschungs-Pool: ${pool}</b> ` +
-      `<span style="color:#a09060;font-size:11px">  · gefüllt durch Skill-XP (1/10), Crafting (+1), Forschungs-Items, alle 5min +1</span>`;
+      `<span style="color:#a09060;font-size:11px">  · Quests, Skill-Level-Ups, Forschungs-Items, alle 2h +1</span>`;
     list.appendChild(banner);
-    const order = Object.entries(this.myResearch || {});
-    if (order.length === 0) {
+
+    const nodes = this.myResearch || {};
+    const branches = this.myResearchBranches || [];
+    const ages = this.myResearchAges || [];
+    if (Object.keys(nodes).length === 0 || branches.length === 0) {
       list.innerHTML += '<div style="padding:14px;color:#807060">Noch keine Forschungs-Knoten verfügbar.</div>';
       return;
     }
-    for (const [nodeId, node] of order) {
-      const row = document.createElement('div');
-      row.className = 'research-row';
-      if (!node.available) row.classList.add('locked');
-      if (node.done) row.classList.add('done');
-      const icon = document.createElement('div');
-      icon.className = 'research-icon';
-      icon.textContent = node.icon || '🔬';
-      row.appendChild(icon);
-      const info = document.createElement('div');
-      const prereqText = node.prereq && !node.available
-        ? `<div class="research-desc">benötigt: ${node.prereq}</div>` : '';
-      const unlocksText = node.unlocks?.length
-        ? `<div class="research-desc">schaltet frei: ${node.unlocks.join(', ')}</div>` : '';
-      info.innerHTML = `<div class="research-name">${node.name}</div>${prereqText}${unlocksText}`;
-      row.appendChild(info);
-      const bar = document.createElement('div');
-      bar.className = 'research-bar';
-      const fill = document.createElement('div');
-      fill.className = 'research-bar-fill';
-      const ratio = node.points_max > 0 ? Math.min(1, node.points / node.points_max) : 0;
-      fill.style.width = (ratio * 100) + '%';
-      const txt = document.createElement('div');
-      txt.className = 'research-bar-text';
-      txt.textContent = node.done ? '✓ fertig' : `${node.points}/${node.points_max}`;
-      bar.appendChild(fill); bar.appendChild(txt);
-      row.appendChild(bar);
-      const acts = document.createElement('div');
-      acts.className = 'research-actions';
-      const b1 = document.createElement('button');
-      b1.textContent = '+1';
-      b1.disabled = node.done || !node.available || pool < 1;
-      b1.title = pool < 1 ? 'Nicht genug Pool-Punkte' : `Investiere 1 Pool-Punkt`;
-      b1.addEventListener('click', () => this.investResearch(nodeId, 1));
-      acts.appendChild(b1);
-      const b5 = document.createElement('button');
-      b5.textContent = '+5';
-      b5.disabled = node.done || !node.available || pool < 5;
-      b5.title = pool < 5 ? 'Nicht genug Pool-Punkte' : `Investiere 5 Pool-Punkte`;
-      b5.addEventListener('click', () => this.investResearch(nodeId, 5));
-      acts.appendChild(b5);
-      row.appendChild(acts);
-      list.appendChild(row);
+
+    // Branch-Tabs zum Filtern (alle/smithing/alchemy/...)
+    if (!this._activeResearchBranch) this._activeResearchBranch = 'all';
+    const tabs = document.createElement('div');
+    tabs.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;';
+    const tabAll = document.createElement('button');
+    tabAll.textContent = '🌳 Alle';
+    tabAll.style.cssText = `padding:6px 10px;font-size:12px;cursor:pointer;
+      background:${this._activeResearchBranch === 'all' ? '#604030' : '#302418'};
+      color:#c8b88a;border:1px solid #6e5e3a;border-radius:3px;`;
+    tabAll.addEventListener('click', () => {
+      this._activeResearchBranch = 'all';
+      this.refreshResearchUI();
+    });
+    tabs.appendChild(tabAll);
+    for (const b of branches) {
+      const tab = document.createElement('button');
+      tab.textContent = `${b.icon} ${b.label}`;
+      tab.style.cssText = `padding:6px 10px;font-size:12px;cursor:pointer;
+        background:${this._activeResearchBranch === b.id ? b.color : '#302418'};
+        color:#c8b88a;border:1px solid #6e5e3a;border-radius:3px;
+        opacity:${this._activeResearchBranch === b.id ? '1' : '0.75'};`;
+      tab.addEventListener('click', () => {
+        this._activeResearchBranch = b.id;
+        this.refreshResearchUI();
+      });
+      tabs.appendChild(tab);
     }
+    list.appendChild(tabs);
+
+    // Tree-Layout: Ages vertikal (Stammeszeit → Legendär), Branches als
+    // Spalten falls "Alle" aktiv, sonst nur eine Spalte für gewählten Branch.
+    const tree = document.createElement('div');
+    tree.style.cssText = 'display:flex;flex-direction:column;gap:14px;';
+    const activeBranches = this._activeResearchBranch === 'all'
+      ? branches.map(b => b.id)
+      : [this._activeResearchBranch];
+
+    for (const age of ages) {
+      // Sammele Nodes dieser Age aus aktiven Branches
+      const ageNodes = Object.entries(nodes).filter(([nodeId, n]) =>
+        n.age === age.id && activeBranches.includes(n.branch)
+      );
+      if (ageNodes.length === 0) continue;
+
+      const ageBlock = document.createElement('div');
+      ageBlock.style.cssText = 'border:1px solid #443524;border-radius:4px;padding:8px;background:rgba(20,16,10,0.55);';
+
+      const ageHeader = document.createElement('div');
+      ageHeader.style.cssText = 'color:#e8d870;font-size:13px;font-weight:bold;margin-bottom:6px;';
+      ageHeader.textContent = `${age.icon} ${age.label} (Tier ${age.tier})`;
+      ageBlock.appendChild(ageHeader);
+
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;';
+
+      for (const [nodeId, n] of ageNodes) {
+        const card = document.createElement('div');
+        const branchColor = (branches.find(b => b.id === n.branch) || {}).color || '#6e5e3a';
+        // Status-Farben
+        let bg = 'rgba(40,32,20,0.85)', border = branchColor, opacity = '1';
+        if (n.done) { bg = 'rgba(40,100,40,0.6)'; border = '#60c060'; }
+        else if (!n.available) { bg = 'rgba(30,30,30,0.7)'; opacity = '0.55'; }
+        else if (n.points > 0) { bg = 'rgba(80,60,20,0.7)'; border = '#e8a040'; }
+        card.style.cssText = `background:${bg};border:1px solid ${border};
+          border-radius:4px;padding:6px 8px;opacity:${opacity};
+          display:flex;flex-direction:column;gap:4px;`;
+
+        // Header: Icon + Name
+        const head = document.createElement('div');
+        head.style.cssText = 'display:flex;align-items:center;gap:6px;';
+        head.innerHTML = `<span style="font-size:18px">${n.icon || '🔬'}</span>`
+          + `<b style="color:#e8d870">${n.name}</b>`;
+        if (n.done) head.innerHTML += ' <span style="color:#60e060">✓</span>';
+        card.appendChild(head);
+
+        // Desc
+        if (n.desc) {
+          const desc = document.createElement('div');
+          desc.style.cssText = 'font-size:11px;color:#a09060;line-height:1.3;';
+          desc.textContent = n.desc;
+          card.appendChild(desc);
+        }
+
+        // Tech-Print-Hinweis
+        if (n.tech_print) {
+          const tp = document.createElement('div');
+          tp.style.cssText = `font-size:11px;color:${n.has_tech_print ? '#60c060' : '#c08040'};`;
+          tp.textContent = (n.has_tech_print ? '✓ ' : '⚠️ benötigt: ') + n.tech_print;
+          card.appendChild(tp);
+        }
+
+        // Prereq-Hinweis (nur wenn locked)
+        if (!n.available && n.prereq && n.prereq.length > 0) {
+          const pr = document.createElement('div');
+          pr.style.cssText = 'font-size:10px;color:#808080;';
+          pr.textContent = '🔒 nach: ' + n.prereq.join(', ');
+          card.appendChild(pr);
+        }
+
+        // Progress-Bar
+        const bar = document.createElement('div');
+        bar.style.cssText = 'background:#1a1410;border:1px solid #443524;height:12px;position:relative;border-radius:2px;overflow:hidden;';
+        const fill = document.createElement('div');
+        const ratio = n.points_max > 0 ? Math.min(1, n.points / n.points_max) : 0;
+        fill.style.cssText = `background:${branchColor};height:100%;width:${ratio * 100}%;transition:width 0.2s;`;
+        bar.appendChild(fill);
+        const txt = document.createElement('div');
+        txt.style.cssText = 'position:absolute;inset:0;text-align:center;font-size:10px;line-height:12px;color:#fff;text-shadow:1px 1px 1px #000;';
+        txt.textContent = n.done ? '✓ erforscht' : `${n.points}/${n.points_max}`;
+        bar.appendChild(txt);
+        card.appendChild(bar);
+
+        // Actions
+        if (!n.done) {
+          const acts = document.createElement('div');
+          acts.style.cssText = 'display:flex;gap:4px;';
+          const blockedByTP = n.tech_print && !n.has_tech_print;
+          for (const v of [1, 5, 25]) {
+            const b = document.createElement('button');
+            b.textContent = `+${v}`;
+            b.disabled = !n.available || pool < v || blockedByTP;
+            b.style.cssText = `padding:3px 8px;font-size:11px;flex:1;cursor:pointer;
+              background:#503018;color:#c8b88a;border:1px solid #6e5e3a;border-radius:2px;`;
+            if (b.disabled) b.style.opacity = '0.4';
+            b.title = blockedByTP ? `Benötigt ${n.tech_print}`
+              : (pool < v ? 'Nicht genug Pool' : `Investiere ${v} Punkte`);
+            b.addEventListener('click', () => this.investResearch(nodeId, v));
+            acts.appendChild(b);
+          }
+          card.appendChild(acts);
+        }
+
+        grid.appendChild(card);
+      }
+      ageBlock.appendChild(grid);
+      tree.appendChild(ageBlock);
+    }
+    list.appendChild(tree);
   }
 
   investResearch(nodeId, points) {
@@ -5998,8 +7176,19 @@ class WorldScene extends Phaser.Scene {
       }
     };
     this.scale.on('resize', state.onResize);
+    // Welle 29b: Per-Type Frame-Delay statt fix 60ms. Nebel/Mist driften träge,
+    // Schnee fällt mittel, Regen tropft schnell, Sturm-Cell bleibt schnell.
+    // delay in ms: kleiner = schneller. 60ms ≈ 16fps, 250ms ≈ 4fps.
+    let delay = 60;
+    if (name.startsWith('fog_') || name === 'swamp_mist'
+        || name === 'jungle_humidity' || name === 'desert_heat_haze') {
+      delay = 220;   // ~4.5 fps — driftet langsam
+    } else if (name.startsWith('snow_')) {
+      delay = 110;   // ~9 fps — Flocken fallen gemächlich
+    }
+    // rain_*, storm_cell bleiben bei 60ms
     const timer = this.time.addEvent({
-      delay: 60, loop: true,
+      delay, loop: true,
       callback: () => {
         if (!state.img.active) return;
         state.frame = state.frame % state.count + 1;
@@ -6085,6 +7274,7 @@ class WorldScene extends Phaser.Scene {
       this.input.keyboard.enabled = false;
       this.input.keyboard.clearCaptures();
       this.refreshInventoryUI();
+      window.playSfx('inventory_open');   // Welle 29
     } else {
       overlay.classList.remove('active');
       this.input.keyboard.enabled = true;
@@ -6404,22 +7594,58 @@ class WorldScene extends Phaser.Scene {
     return 'monster_unknown';
   }
 
+  // Welle 25: Difficulty-Color für Nameplate basierend auf relativem Tier.
+  //   diff <= -1  → grau    (weit unter Spieler)
+  //   diff == 0   → weiß    (normal)
+  //   diff == +1  → gelb    (stärker als Spieler)
+  //   diff >= +2  → rot     (viel stärker)
+  _tierColor(npcTier) {
+    const playerTier = this.myPowerTier || 1;
+    const diff = (npcTier || 2) - playerTier;
+    if (diff <= -1) return '#a0a0a0';
+    if (diff === 0) return '#ffffff';
+    if (diff === 1) return '#ffd040';
+    return '#ff5050';
+  }
+
+  // Welle 25: alle hostile-NPC-Labels neu einfärben — z.B. nach Player-Level-Up.
+  _recolorAllNPCs() {
+    if (!this.npcs) return;
+    for (const id in this.npcs) {
+      const entry = this.npcs[id];
+      if (!entry || !entry.npc || !entry.label) continue;
+      if (!CREATURE_KINDS.has(entry.npc.kind)) continue;
+      entry.label.setColor(this._tierColor(entry.npc.tier || 2));
+    }
+  }
+
   spawnNPCSprite(npc) {
     if (this.npcs[npc.id]) return;
     const cfg = NPC_SPRITE[npc.kind] || NPC_SPRITE.wanderer;
     const cx = npc.x * TILE_SIZE + TILE_SIZE / 2;
     const cy = npc.y * TILE_SIZE + TILE_SIZE / 2;
 
+    // Welle 25: Display-Scale für Boss/Pack-Leader/Trash — nur Creatures.
+    const isCreature = CREATURE_KINDS.has(npc.kind);
+    const scale = (isCreature && npc.display_scale) ? npc.display_scale : 1.0;
+
     const shadow = this.add.image(0, 14, 'fx_shadow')
       .setOrigin(0.5)
       .setAlpha(0.55);
+    // Shadow ebenfalls skalieren damit Bosse einen passenden Schatten haben.
+    shadow.setScale(scale);
 
     const body = this.add.image(0, 0, this._npcSpriteKey(npc)).setOrigin(0.5, 0.55);
-    body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+    body.setDisplaySize(TILE_SIZE * 0.95 * scale, TILE_SIZE * 0.95 * scale);
     body.setTint(cfg.tint);
 
-    const label = this.add.text(0, -TILE_SIZE * 0.55, npc.name.substr(0, 20), {
-      fontSize: '10px', color: '#ffeec0', stroke: '#000', strokeThickness: 2,
+    // Welle 25: Nameplate-Farbe basierend auf Difficulty-Tier vs. Player-Tier
+    // (nur für Creatures; Friendly NPCs bleiben warm-beige).
+    const labelColor = isCreature
+      ? this._tierColor(npc.tier || 2)
+      : '#ffeec0';
+    const label = this.add.text(0, -TILE_SIZE * 0.55 * scale, npc.name.substr(0, 20), {
+      fontSize: '10px', color: labelColor, stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
 
     // Mental-State-Icon (über NPC) — Welle 4
@@ -6633,8 +7859,12 @@ class WorldScene extends Phaser.Scene {
   addStructureSprite(s, refreshNeighbors = true) {
     const cfg = STRUCTURE[s.type];
     if (!cfg) return;
-    const cx = s.x * TILE_SIZE + TILE_SIZE / 2;
-    const cy = s.y * TILE_SIZE + TILE_SIZE / 2;
+    // Welle 25: Multi-Tile-Strukturen werden über (footprint w × h) gerendert.
+    // Backend liefert width/height (default 1); Fallback auf statisches Map.
+    const fw = s.width || (STRUCTURE_FOOTPRINT[s.type] && STRUCTURE_FOOTPRINT[s.type][0]) || 1;
+    const fh = s.height || (STRUCTURE_FOOTPRINT[s.type] && STRUCTURE_FOOTPRINT[s.type][1]) || 1;
+    const cx = (s.x + fw / 2) * TILE_SIZE;
+    const cy = (s.y + fh / 2) * TILE_SIZE;
 
     // Sprite-Key bestimmen — material-spezifisch für walls/floor, fix für andere
     const material = s.material || 'stone';
@@ -6680,7 +7910,8 @@ class WorldScene extends Phaser.Scene {
     // Größen-Override für Strukturen die größer als ein Tile aussehen sollen
     // (Zelte, Schiffe, große Statuen). Default = 1.0 × TILE_SIZE.
     const structScale = STRUCTURE_DISPLAY_SCALE[s.type] || 1.0;
-    img.setDisplaySize(TILE_SIZE * structScale, TILE_SIZE * structScale);
+    // Welle 25: Multi-Tile-Strukturen füllen ihren ganzen Footprint aus.
+    img.setDisplaySize(TILE_SIZE * fw * structScale, TILE_SIZE * fh * structScale);
     // User-gesetzte Rotation hat Vorrang. Nur wenn keine (rotation==0) UND es ist
     // eine Tür → fällt's auf die automatische Door-Wand-Orientation zurück.
     const userRot = Number(s.rotation || 0);
@@ -7182,12 +8413,16 @@ class WorldScene extends Phaser.Scene {
   }
 
   showEvent(text) {
+    // Welle 25: Toast oberhalb der Hotbar damit Pickup-Texte lesbar bleiben.
+    // Hotbar sitzt bei bottom:12px mit ~60px Höhe → bottom:90px gibt Puffer.
     const el = document.createElement('div');
     el.style.cssText = `
-      position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-      background:rgba(0,0,0,0.7); color:#c8b88a; padding:6px 16px;
-      border:1px solid #555; font-family:monospace; font-size:13px;
+      position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,0.8); color:#ffe8a0; padding:8px 18px;
+      border:1px solid #806040; border-radius:4px;
+      font-family:monospace; font-size:14px;
       z-index:100; animation:fadeout 3s forwards;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
     `;
     el.textContent = text;
     document.body.appendChild(el);
@@ -7196,8 +8431,14 @@ class WorldScene extends Phaser.Scene {
 
   // ─── Welle 24 — Disaster-Effekte (visuell) ──────────────────────────────
   _onDisasterStarted(kind, msg) {
-    if (!this._activeDisasters) this._activeDisasters = new Set();
-    this._activeDisasters.add(kind);
+    if (!this._activeDisasters) this._activeDisasters = new Map();
+    // Restzeit aus msg.duration_s (oder 600 als Default)
+    const dur = (msg && msg.duration_s) || 600;
+    this._activeDisasters.set(kind, {
+      kind, startedAt: Date.now(), durationMs: dur * 1000,
+      label: (msg && msg.label) || kind,
+    });
+    this._refreshDisasterHud();
     // Tint-Overlay anwenden — eigenes div per disaster
     let overlay = document.getElementById(`disaster-${kind}`);
     if (!overlay) {
@@ -7216,24 +8457,115 @@ class WorldScene extends Phaser.Scene {
       overlay.style.background = 'linear-gradient(180deg, rgba(255,140,40,0.30) 0%, rgba(200,80,20,0.15) 100%)';
       overlay.style.mixBlendMode = 'multiply';
     } else if (kind === 'tainted_well') {
-      // Kein full-screen tint; stattdessen Marker am Brunnen via existing event-marker
       if (msg.x != null && msg.y != null) {
         this.showEvent(`☠️ ${msg.label || 'Vergifteter Brunnen'} bei (${msg.x},${msg.y})`);
       }
-      return;  // kein Overlay
+      return;
     }
-    // Fade in
     requestAnimationFrame(() => { overlay.style.opacity = '1'; });
   }
 
   _onDisasterEnded(kind) {
     if (this._activeDisasters) this._activeDisasters.delete(kind);
+    this._refreshDisasterHud();
     const overlay = document.getElementById(`disaster-${kind}`);
     if (overlay) {
       overlay.style.opacity = '0';
       setTimeout(() => overlay.remove(), 4500);
     }
     this.showEvent(`✨ ${kind} ist vorbei`);
+  }
+
+  // Welle 29e — Disaster-HUD: pro aktiviertem Disaster ein Icon mit
+  // Restzeit-Countdown oben rechts (neben Time-Display).
+  _refreshDisasterHud() {
+    let hud = document.getElementById('disaster-hud');
+    if (!hud) {
+      hud = document.createElement('div');
+      hud.id = 'disaster-hud';
+      hud.style.cssText = `
+        position: fixed; top: 50px; right: 12px; z-index: 100;
+        display: flex; flex-direction: row; gap: 6px;
+        pointer-events: none;
+      `;
+      document.body.appendChild(hud);
+    }
+    // Icon-Mapping kind → file. Disaster-Kinds aus disaster_state.py.
+    const ICONS = {
+      blood_moon:    '🌑',
+      dying_sun:     '🌒',
+      tainted_well:  '☠️',
+      plague:        '🤒',
+      wildfire:      '🔥',
+      locust:        '🦗',
+      ash_rain:      '/assets/ui/icons/disasters/ash_rain_icon.png',
+      forest_fire:   '/assets/ui/icons/disasters/forest_fire_icon.png',
+      frog_plague:   '/assets/ui/icons/disasters/frog_plague_icon.png',
+      locust_swarm:  '/assets/ui/icons/disasters/locust_swarm_icon.png',
+      scorching_heat:'/assets/ui/icons/disasters/scorching_heat_icon.png',
+      thunderstorm:  '/assets/ui/icons/disasters/thunderstorm_icon.png',
+      toxic_fog:     '/assets/ui/icons/disasters/toxic_fog_icon.png',
+    };
+    const LABELS = {
+      blood_moon: 'Blutmond — Monster verstärkt',
+      dying_sun:  'Sterbende Sonne — Hunger/Durst ×2',
+      tainted_well: 'Vergifteter Brunnen',
+      plague:     'Pest — Dorfbewohner krank',
+      wildfire:   'Waldbrand — Feuer breitet sich aus',
+      locust:     'Heuschreckenschwarm',
+      forest_fire:'Waldbrand',
+      locust_swarm:'Heuschreckenschwarm',
+    };
+    hud.innerHTML = '';
+    if (!this._activeDisasters || this._activeDisasters.size === 0) return;
+    const now = Date.now();
+    for (const [kind, info] of this._activeDisasters) {
+      const remaining = Math.max(0, info.durationMs - (now - info.startedAt));
+      const remainingS = Math.ceil(remaining / 1000);
+      const mins = Math.floor(remainingS / 60);
+      const secs = remainingS % 60;
+      const timeStr = mins > 0
+        ? `${mins}m ${String(secs).padStart(2,'0')}s`
+        : `${secs}s`;
+      const slot = document.createElement('div');
+      slot.style.cssText = `
+        background: rgba(0,0,0,0.65); border: 1px solid #6e5e3a; border-radius: 4px;
+        padding: 4px 6px; display: flex; flex-direction: column; align-items: center;
+        min-width: 48px; pointer-events: auto;
+        font-family: monospace; color: #c8b88a; font-size: 11px;
+        text-shadow: 1px 1px 1px #000;
+      `;
+      const icon = ICONS[kind] || '⚠️';
+      if (icon.startsWith('/assets/')) {
+        const img = document.createElement('img');
+        img.src = icon;
+        img.style.cssText = 'width:32px; height:32px; image-rendering: pixelated;';
+        slot.appendChild(img);
+      } else {
+        const em = document.createElement('div');
+        em.textContent = icon;
+        em.style.cssText = 'font-size: 24px; line-height: 1;';
+        slot.appendChild(em);
+      }
+      const timer = document.createElement('div');
+      timer.textContent = timeStr;
+      timer.style.cssText = 'margin-top: 2px; color: #e8d870; font-weight: bold;';
+      slot.appendChild(timer);
+      slot.title = LABELS[kind] || kind;
+      hud.appendChild(slot);
+    }
+    // Auto-refresh jede Sekunde solange disasters aktiv
+    if (!this._disasterHudTimer) {
+      this._disasterHudTimer = setInterval(() => {
+        if (!this._activeDisasters || this._activeDisasters.size === 0) {
+          clearInterval(this._disasterHudTimer);
+          this._disasterHudTimer = null;
+          if (hud) hud.innerHTML = '';
+          return;
+        }
+        this._refreshDisasterHud();
+      }, 1000);
+    }
   }
 
   _onEarthquakeShake(durationMs, magnitude) {
@@ -7278,9 +8610,20 @@ class WorldScene extends Phaser.Scene {
 
   update(time, delta) {
     if (!this.mySprite) return;
+    // Welle 25: Cast-Bar Progress unabhängig vom Movement-Lock aktualisieren
+    if (this.activeCast) this._updateCastBar();
+    // Welle 25: Cooldown-Tick — Hotbar nur dann refreshen wenn Cooldown
+    // läuft und alle 250ms (Spam-Schutz). Nutzt time (Phaser-ms).
+    if (!this._lastCdTick || time - this._lastCdTick > 250) {
+      const hasCd = Object.values(this.spellCooldowns || {})
+        .some(t => t > Date.now());
+      if (hasCd) this.refreshHotbar();
+      this._lastCdTick = time;
+    }
     if (this.activeDialog || this.inventoryOpen || this.activeChest ||
         this.activeCrafting || this.activeTrade || this.skillsOpen ||
         this.researchOpen || this.questsOpen) return;
+    if (this.amDowned) return;   // Welle 25: keine Bewegung wenn down
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
 
     // Eingabe-Richtung (Keyboard + Touch-Joystick)
@@ -7344,6 +8687,16 @@ class WorldScene extends Phaser.Scene {
         this.playOverlayAnim('footstep_dust', prevPxX, prevPxY + TILE_SIZE * 0.2,
                              { scale: 0.45, depth: 2.5, alpha: 0.55, once: true });
       }
+      // Welle 29: Footstep-Sound je nach Tile-Type (jeden 2. Schritt)
+      if (this._footstepCounter % 2 === 0) {
+        let footSfx = 'footstep_grass';
+        if (prevTile === 0)      footSfx = 'footstep_water';
+        else if (prevTile === 1 || prevTile === 5) footSfx = 'footstep_sand';
+        else if (prevTile === 4 || prevTile === 7) footSfx = 'footstep_stone';
+        window.playSfx(footSfx, { volume: 0.5 });
+      }
+      // Welle 29: Listener-Position updaten für 3D-Sound
+      if (window.SoundManager) window.SoundManager.setListener(this.myTileX, this.myTileY);
     }
   }
 

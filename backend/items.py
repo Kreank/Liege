@@ -19,6 +19,14 @@ ITEM_KINDS = {
     "mace":          {"category": "weapon", "name": "Streitkolben",  "slot": "weapon", "sprite": f"{_OP}/iron_mace.png"},
     "scythe":        {"category": "weapon", "name": "Sense",         "slot": "weapon", "sprite": f"{_OP}/graveyard_scythe.png"},
     "dagger":        {"category": "weapon", "name": "Dolch",         "slot": "weapon", "sprite": f"{_OP}/hooked_ritual_dagger.png"},
+    # Welle 27 (2026-05-27) — neue Waffen-Kinds aus reference_based-Pack
+    "katana":        {"category": "weapon", "name": "Katana",        "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/steel_katana.png"},
+    "halberd":       {"category": "weapon", "name": "Hellebarde",    "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/raven_halberd.png"},
+    "trident":       {"category": "weapon", "name": "Dreizack",      "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/amethyst_trident.png"},
+    "lance":         {"category": "weapon", "name": "Stoßlanze",     "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/demon_slayer_lance.png"},
+    "runeblade":     {"category": "weapon", "name": "Runenklinge",   "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/obsidian_runeblade.png"},
+    "twinblade":     {"category": "weapon", "name": "Doppelklinge",  "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/ice_and_night_blades.png"},
+    "sickle_weapon": {"category": "weapon", "name": "Kampfsichel",   "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/iron_hook_sickle.png"},
     # Rüstung
     "helmet":     {"category": "armor", "name": "Helm",         "slot": "helmet",     "sprite": f"{_OP}/crested_hoplite_helm.png"},
     "chestplate": {"category": "armor", "name": "Brustpanzer",  "slot": "chestplate", "sprite": f"{_OP}/wandering_knight_armor.png"},
@@ -97,9 +105,24 @@ ITEM_KINDS = {
     "spell_book": {"category": "magic", "name": "Feuerball-Buch", "sprite": "/assets/magic/spell_book.png"},
     "scroll":     {"category": "magic", "name": "Schriftrolle",   "sprite": "/assets/magic/scroll.png"},
     "rune_stone": {"category": "magic", "name": "Heilrune",       "sprite": "/assets/magic/rune_stone.png"},
+    # Welle 29d — neue Spell-Items
+    "ice_scroll":         {"category": "magic", "name": "Eis-Schriftrolle",   "sprite": "/assets/animations/spells/ice_spell_impact_peak.png"},
+    "wind_slash_scroll":  {"category": "magic", "name": "Wind-Schriftrolle",  "sprite": "/assets/animations/spells/wind_slash_icon.png"},
+    "holy_shield_scroll": {"category": "magic", "name": "Heiliger Schild",    "sprite": "/assets/animations/spells/holy_shield_icon.png"},
     # Welle 22 — Forschungs-Items (geben Pool-Punkte beim Use)
     "research_scroll": {"category": "consumable", "name": "Forschungs-Schriftrolle", "sprite": "/assets/magic/scroll.png"},
     "research_tome":   {"category": "consumable", "name": "Forschungs-Folianten",    "sprite": "/assets/magic/spell_book.png"},
+    # Welle 30c — Tech-Prints für Late-Game-Research-Nodes
+    # Werden beim Node-Unlock consumed. Drop-Quellen: Boss-Loot, Quest-Rewards,
+    # Ruinen-Truhen. Sprite-Paths sind Placeholder bis User echte Icons liefert.
+    "mithril_plans":   {"category": "magic", "name": "Mithril-Pläne",      "sprite": "/assets/magic/scroll.png"},
+    "ancient_scroll":  {"category": "magic", "name": "Antike Schriftrolle","sprite": "/assets/magic/scroll.png"},
+    "dragon_skull":    {"category": "magic", "name": "Drachenschädel",     "sprite": "/assets/magic/rune_stone.png"},
+    "gods_tablet":     {"category": "magic", "name": "Götter-Tablet",      "sprite": "/assets/magic/spell_book.png"},
+    "alchemy_codex":   {"category": "magic", "name": "Alchemisten-Kodex",  "sprite": "/assets/magic/spell_book.png"},
+    "runic_tablet":    {"category": "magic", "name": "Runen-Tablet",       "sprite": "/assets/magic/rune_stone.png"},
+    "healing_codex":   {"category": "magic", "name": "Heiler-Kodex",       "sprite": "/assets/magic/spell_book.png"},
+    "trade_ledger":    {"category": "magic", "name": "Handelsbuch",        "sprite": "/assets/magic/scroll.png"},
     # Tools — skill-spezifischer Bonus beim Equipping
     "pickaxe": {"category": "tool", "name": "Spitzhacke", "slot": "tool", "sprite": "/assets/tools/pickaxe.png"},
     "shovel":  {"category": "tool", "name": "Schaufel",   "slot": "tool", "sprite": "/assets/tools/shovel.png"},
@@ -254,6 +277,12 @@ def _row_to_dict(row) -> dict:
                 out["rolled_stats"] = _json.loads(rs) if isinstance(rs, str) else rs
     except (KeyError, IndexError, TypeError):
         pass
+    # Welle 25: Cosmetic-Skin-Slug (für visuelles Variants-Pool-Rendering).
+    try:
+        if "cosmetic_skin" in row.keys() and row["cosmetic_skin"]:
+            out["cosmetic_skin"] = row["cosmetic_skin"]
+    except (KeyError, IndexError):
+        pass
     return out
 
 
@@ -278,27 +307,29 @@ class ItemManager:
         # Resources/Consumables/Food bekommen kein rolled_stats.
         import item_stats as _istats
         import json as _json
+        import skin_pools as _sp
         rolled = _istats.roll_base_stats(kind, quality_kind)
         rolled_json = _json.dumps(rolled) if rolled else None
+        cosmetic = _sp.roll_skin(kind, quality_kind)
         row = await db.pool().fetchrow(
-            "INSERT INTO items (kind, name, category, x, y, material, quality, rolled_stats) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb) "
+            "INSERT INTO items (kind, name, category, x, y, material, quality, rolled_stats, cosmetic_skin) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9) "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, material, rolled_stats",
-            kind, cfg["name"], cfg["category"], x, y, material, quality_kind, rolled_json,
+            "created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
+            kind, cfg["name"], cfg["category"], x, y, material, quality_kind, rolled_json, cosmetic,
         )
         return _row_to_dict(row)
 
     async def get_on_ground(self) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin, charges "
             "FROM items WHERE owner IS NULL"
         )
         return [_row_to_dict(r) for r in rows]
 
     async def get_at(self, x: int, y: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin, charges "
             "FROM items WHERE x = $1 AND y = $2 AND owner IS NULL",
             x, y,
         )
@@ -306,7 +337,7 @@ class ItemManager:
 
     async def get_inventory(self, player_name: str) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin, charges "
             "FROM items WHERE owner = $1 ORDER BY id",
             player_name,
         )
@@ -331,7 +362,7 @@ class ItemManager:
                 "  AND quantity + $3 <= $4 "
                 "  ORDER BY id LIMIT 1) "
                 "RETURNING id, kind, name, category, quality, x, y, owner, "
-                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
+                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
                 player_name, ground["kind"], int(ground["quantity"] or 1), limit,
             )
             if existing:
@@ -343,7 +374,7 @@ class ItemManager:
             "UPDATE items SET x = NULL, y = NULL, owner = $2 "
             "WHERE id = $1 AND owner IS NULL "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
             item_id, player_name,
         )
         return _row_to_dict(row) if row else None
@@ -352,7 +383,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = NULL, equipped_slot = NULL, x = $3, y = $4 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
             item_id, player_name, x, y,
         )
         return _row_to_dict(row) if row else None
@@ -418,7 +449,7 @@ class ItemManager:
             "UPDATE items SET equipped_slot = $3 "
             "WHERE id = $1 AND owner = $2 "
             "RETURNING id, kind, name, category, quality, x, y, owner, "
-            "equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
             item_id, player_name, slot,
         )
         return _row_to_dict(row) if row else None
@@ -427,7 +458,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET equipped_slot = NULL "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
             item_id, player_name,
         )
         return _row_to_dict(row) if row else None
@@ -444,7 +475,7 @@ class ItemManager:
             "AND category IN ('consumable', 'food') "
             "AND quantity > 1 "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
             item_id, player_name,
         )
         if row:
@@ -456,7 +487,7 @@ class ItemManager:
             "DELETE FROM items WHERE id = $1 AND owner = $2 "
             "AND category IN ('consumable', 'food') "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
             item_id, player_name,
         )
         if row:
@@ -486,7 +517,7 @@ class ItemManager:
         updated = await db.pool().fetchrow(
             "UPDATE items SET quantity = quantity - $2 WHERE id = $1 "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
             item_id, amount,
         )
         new_row = await db.pool().fetchrow(
@@ -494,7 +525,7 @@ class ItemManager:
             "material, affixes, unique_name, flavor) "
             "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats",
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
             row["kind"], row["name"], row["category"], player_name, row["quality"],
             amount, row["material"], row["affixes"], row["unique_name"], row["flavor"],
         )
@@ -567,7 +598,7 @@ class ItemManager:
 
     async def get_chest_contents(self, chest_id: int) -> list[dict]:
         rows = await db.pool().fetch(
-            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges "
+            "SELECT id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin, charges "
             "FROM items WHERE owner = $1 ORDER BY id",
             f"chest:{chest_id}",
         )
@@ -577,7 +608,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = $3, equipped_slot = NULL "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
             item_id, player_name, f"chest:{chest_id}",
         )
         return _row_to_dict(row) if row else None
@@ -617,13 +648,15 @@ class ItemManager:
                 if merged:
                     count += 1
                     continue
-            # Equipment: rolled_stats per-instance
+            # Equipment: rolled_stats per-instance + cosmetic_skin aus Pool
+            import skin_pools as _sp
             rolled = item_stats.roll_base_stats(kind, quality_k)
             rolled_json = _json.dumps(rolled) if rolled else None
+            cosmetic = _sp.roll_skin(kind, quality_k)
             await db.pool().execute(
-                "INSERT INTO items (kind, name, category, owner, quality, quantity, rolled_stats) "
-                "VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)",
-                kind, cfg["name"], cfg["category"], owner, quality_k, qty, rolled_json,
+                "INSERT INTO items (kind, name, category, owner, quality, quantity, rolled_stats, cosmetic_skin) "
+                "VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)",
+                kind, cfg["name"], cfg["category"], owner, quality_k, qty, rolled_json, cosmetic,
             )
             count += 1
         return count
@@ -632,7 +665,7 @@ class ItemManager:
         row = await db.pool().fetchrow(
             "UPDATE items SET owner = $3 "
             "WHERE id = $1 AND owner = $2 "
-            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats",
+            "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, created_at, affixes, unique_name, flavor, material, rolled_stats, cosmetic_skin",
             item_id, f"chest:{chest_id}", player_name,
         )
         return _row_to_dict(row) if row else None
@@ -694,7 +727,7 @@ class ItemManager:
                 "  AND quantity < $3 "
                 "  ORDER BY id LIMIT 1) "
                 "RETURNING id, kind, name, category, quality, x, y, owner, "
-                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, rolled_stats",
+                "equipped_slot, created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
                 player_name, kind, limit,
             )
             if existing:
@@ -702,14 +735,16 @@ class ItemManager:
         # Welle 23: pro Equipment-Instanz Basis-Stats rollen.
         import item_stats as _istats
         import json as _json
+        import skin_pools as _sp
         rolled = _istats.roll_base_stats(kind, quality_kind)
         rolled_json = _json.dumps(rolled) if rolled else None
+        cosmetic = _sp.roll_skin(kind, quality_kind)
         row = await db.pool().fetchrow(
-            "INSERT INTO items (kind, name, category, owner, quality, quantity, material, rolled_stats) "
-            "VALUES ($1, $2, $3, $4, $5, 1, $6, $7::jsonb) "
+            "INSERT INTO items (kind, name, category, owner, quality, quantity, material, rolled_stats, cosmetic_skin) "
+            "VALUES ($1, $2, $3, $4, $5, 1, $6, $7::jsonb, $8) "
             "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, rolled_stats",
-            kind, cfg["name"], cfg["category"], player_name, quality_kind, material, rolled_json,
+            "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin",
+            kind, cfg["name"], cfg["category"], player_name, quality_kind, material, rolled_json, cosmetic,
         )
         return _row_to_dict(row)
 
@@ -736,7 +771,7 @@ async def set_charges(item_id: int, owner: str, charges: int) -> dict | None:
         "UPDATE items SET charges = GREATEST(0, $1) "
         "WHERE id = $2 AND owner = $3 "
         "RETURNING id, kind, name, category, quality, x, y, owner, equipped_slot, "
-        "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, charges",
+        "created_at, affixes, unique_name, flavor, quantity, material, rolled_stats, cosmetic_skin, charges",
         charges, item_id, owner,
     )
     return _row_to_dict(row) if row else None

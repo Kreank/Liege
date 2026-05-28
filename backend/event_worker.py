@@ -321,6 +321,12 @@ async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
         elif effect == "destroy_farms":
             # Welle 24: Heuschrecken setzen plantings.last_watered_at = NULL.
             await _trigger_locust_swarm(connection_manager)
+            # Welle 29e: Plus echten wandernden Schwarm-Mob spawnen
+            await _spawn_locust_swarm_mob(world, npc_manager, connection_manager)
+
+        elif effect == "burn_area":
+            # Welle 29e: Waldbrand — 2-3 fire_tile Strukturen + Spread-Logik
+            await _trigger_wildfire(world, structure_manager, connection_manager)
 
     except Exception:
         log.exception("Event-Effekt fehlgeschlagen: %s", effect)
@@ -601,3 +607,183 @@ async def _trigger_locust_swarm(connection_manager) -> None:
     })
     log.info("Locust swarm dried %d plantings near (%d,%d)",
              len(victims), p["x"], p["y"])
+
+
+# ─── Welle 29e: Locust + Wildfire Game-Effekte ──────────────────────────────
+
+async def _spawn_locust_swarm_mob(world, npc_manager, connection_manager) -> None:
+    """Spawnt einen wandernden Heuschreckenschwarm-NPC nahe eines Spielers.
+    Lebt 5 min (DISASTER_DEFAULT_DURATION für 'locust'), wandert konstant,
+    macht 1 dmg/Tick auf Spieler in 3-Tile-Radius — Logik im npc_worker."""
+    import disaster_state, npc_worker
+    players = list(connection_manager.get_players().values())
+    if not players:
+        return
+    p = random.choice(players)
+    # Spawn-Position: 8-15 Tiles vom Spieler (sichtbar aber nicht direkt drauf)
+    for _ in range(20):
+        dx = random.randint(-15, 15)
+        dy = random.randint(-15, 15)
+        if abs(dx) < 8 and abs(dy) < 8:
+            continue
+        sx, sy = p["x"] + dx, p["y"] + dy
+        if not await world.is_walkable(sx, sy):
+            continue
+        try:
+            npc = await npc_manager.create(
+                name="Heuschreckenschwarm",
+                kind="locust_swarm", x=sx, y=sy,
+                backstory="Eine wandernde Plage aus Tausenden Insekten.",
+                max_hp=500,
+            )
+            await connection_manager.broadcast({"type": "npc_spawned", "npc": npc})
+            # Disaster-Flag aktivieren damit HUD-Icon erscheint
+            await disaster_state.activate("locust", duration_s=300,
+                                            metadata={"npc_id": npc["id"]})
+            await connection_manager.broadcast({
+                "type": "disaster_started", "kind": "locust",
+                "duration_s": 300, "label": "🦗 Heuschreckenschwarm",
+                "x": sx, "y": sy,
+            })
+            log.info("Locust-swarm-mob spawned @(%d,%d)", sx, sy)
+            return
+        except Exception:
+            log.exception("Locust-swarm-spawn fehlgeschlagen")
+            return
+
+
+async def _trigger_wildfire(world, structure_manager, connection_manager) -> None:
+    """Waldbrand-Start: spawnt 2-3 fire_tile-Strukturen auf Tree-Tiles in
+    Player-Nähe. Der wildfire_worker (in npc_worker oder eigenem Loop) handelt
+    den Spread alle 30s."""
+    import disaster_state
+    players = list(connection_manager.get_players().values())
+    if not players:
+        return
+    p = random.choice(players)
+    # Sammle Tree-Strukturen im 25-Tile-Radius
+    candidates = []
+    for s in structure_manager.all():
+        if s["type"] not in ("tree_oak", "tree_pine", "tree_dead",
+                              "apple_tree", "pear_tree", "plum_tree", "cherry_tree"):
+            continue
+        if abs(s["x"] - p["x"]) > 25 or abs(s["y"] - p["y"]) > 25:
+            continue
+        candidates.append(s)
+    if not candidates:
+        await connection_manager.broadcast({
+            "type": "toast", "text": "🔥 Waldbrand zieht durch — keine Bäume in der Nähe.",
+        })
+        return
+    # 2-3 zufällige Trees in Brand setzen
+    victims = random.sample(candidates, min(len(candidates), random.randint(2, 3)))
+    for s in victims:
+        try:
+            # Original Tree entfernen
+            await structure_manager.remove(s["x"], s["y"], layer="object")
+            await connection_manager.broadcast({
+                "type": "structure_removed", "x": s["x"], "y": s["y"], "layer": "object",
+            })
+            # fire_tile platzieren
+            fire = await structure_manager.place(
+                s["x"], s["y"], "fire_tile", "system",
+                material="wood", durability=90,   # durability=lebenszeit in ticks
+            )
+            if fire:
+                await connection_manager.broadcast({
+                    "type": "structure_placed", "structure": fire,
+                })
+        except Exception:
+            log.exception("Wildfire-Spawn fehlgeschlagen für %s", s)
+    # Disaster-Flag
+    await disaster_state.activate("wildfire", duration_s=600,
+                                    metadata={"origin_x": p["x"], "origin_y": p["y"]})
+    await connection_manager.broadcast({
+        "type": "disaster_started", "kind": "wildfire",
+        "duration_s": 600, "label": "🔥 Waldbrand", "x": p["x"], "y": p["y"],
+    })
+    await connection_manager.broadcast({
+        "type": "toast",
+        "text": f"🔥 WALDBRAND! {len(victims)} Bäume in Flammen. Greift sich aus!",
+    })
+    log.info("Wildfire ignited %d trees near (%d,%d)",
+             len(victims), p["x"], p["y"])
+
+
+async def wildfire_tick_loop(structure_manager, connection_manager) -> None:
+    """Background-Loop: alle 30s prüft alle fire_tiles, breitet aus, verwandelt
+    abgelaufene zu burned_stump. Damit der Waldbrand lebendig wirkt."""
+    import asyncio
+    log.info("Wildfire-Tick-Loop startet (tick=30s)")
+    while True:
+        try:
+            await asyncio.sleep(30)
+            fire_tiles = [s for s in structure_manager.all() if s.get("type") == "fire_tile"]
+            if not fire_tiles:
+                continue
+            # Spread: jeder fire_tile 40% Chance, einen adjacent Tree anzuzünden
+            new_fires = []
+            burned_out = []
+            for fire in fire_tiles:
+                # Durability als Lebenszeit-Counter — wir reduzieren bei jedem Tick
+                # Anfangswert 90 → ~45 min Lebenszeit pro Feuer
+                new_dur = fire["durability"] - 1
+                if new_dur <= 0:
+                    burned_out.append(fire)
+                    continue
+                # Spread
+                if random.random() < 0.40:
+                    for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
+                        nx, ny = fire["x"] + dx, fire["y"] + dy
+                        neighbor = structure_manager.object_at(nx, ny)
+                        if neighbor and neighbor["type"] in (
+                            "tree_oak", "tree_pine", "tree_dead",
+                            "apple_tree", "pear_tree", "plum_tree", "cherry_tree",
+                        ):
+                            try:
+                                await structure_manager.remove(nx, ny, layer="object")
+                                await connection_manager.broadcast({
+                                    "type": "structure_removed", "x": nx, "y": ny, "layer": "object",
+                                })
+                                new_fire = await structure_manager.place(
+                                    nx, ny, "fire_tile", "system",
+                                    material="wood", durability=90,
+                                )
+                                if new_fire:
+                                    new_fires.append(new_fire)
+                                    await connection_manager.broadcast({
+                                        "type": "structure_placed", "structure": new_fire,
+                                    })
+                            except Exception:
+                                pass
+                            break   # nur 1 spread pro tick pro fire
+                # Update durability
+                try:
+                    await structure_manager.damage_structure(fire["x"], fire["y"], amount=1)
+                except Exception:
+                    pass
+            # Abgebrannte Bäume zu burned_stump
+            for fire in burned_out:
+                try:
+                    await structure_manager.remove(fire["x"], fire["y"], layer="object")
+                    await connection_manager.broadcast({
+                        "type": "structure_removed", "x": fire["x"], "y": fire["y"], "layer": "object",
+                    })
+                    stump = await structure_manager.place(
+                        fire["x"], fire["y"], "burned_stump", "system",
+                        material="wood", durability=5,
+                    )
+                    if stump:
+                        await connection_manager.broadcast({
+                            "type": "structure_placed", "structure": stump,
+                        })
+                except Exception:
+                    pass
+            if new_fires or burned_out:
+                log.info("Wildfire tick: +%d spread, %d burned out, %d active",
+                         len(new_fires), len(burned_out), len(fire_tiles) - len(burned_out) + len(new_fires))
+        except asyncio.CancelledError:
+            log.info("Wildfire-Tick-Loop gestoppt")
+            raise
+        except Exception:
+            log.exception("Wildfire-Tick-Iteration fehlgeschlagen")

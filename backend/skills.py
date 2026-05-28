@@ -179,18 +179,52 @@ async def gain_xp(player_name: str, skill: str, amount: int) -> dict | None:
                                             points_gained * _ps.POINTS_PER_LEVEL)
             except Exception:
                 log.exception("Attr-Punkt-Vergabe schlug fehl")
-    # Welle 22: kleine Menge Forschungspunkte aus jeder XP-Aktivität
-    try:
-        import research as _research
-        # 1 Pool-Punkt pro 10 XP (mindestens 1 bei kleinen Gains)
-        pool_gain = max(1, amount // 10)
-        await _research.award_points(player_name, pool_gain, f"skill:{skill}")
-    except Exception:
-        log.debug("research-pool aus XP fehlgeschlagen", exc_info=True)
-    return {
+    # Welle 30b — Forschungspunkte sehr knapp. Nur Meilenstein-Level geben was:
+    #   alle 3 Lvl     +1  (Lvl 3, 6, 9, 12, 15, 18)
+    #   alle 5 Lvl     +1  (Lvl 5, 10, 15, 20)  — kumuliert
+    #   alle 10 Lvl    +2  (Lvl 10, 20)         — Mastery-Bonus
+    # → Lvl 1-20 kumuliert nur 14 Punkte (war 120). Forschung wird ein Luxus.
+    if leveled_up:
+        try:
+            import research as _research
+            for lvl in range(old_level + 1, new_level + 1):
+                pool_gain = 0
+                if lvl % 3  == 0: pool_gain += 1
+                if lvl % 5  == 0: pool_gain += 1
+                if lvl % 10 == 0: pool_gain += 2
+                if pool_gain > 0:
+                    await _research.award_points(
+                        player_name, pool_gain, f"levelup:{skill}:lv{lvl}")
+        except Exception:
+            log.debug("research-pool aus level-up fehlgeschlagen", exc_info=True)
+    # Welle 25: bei Level-Up ändert sich evtl. das Power-Tier — Power-Cache
+    # invalidieren und neuen Tier-Wert mitsenden damit Frontend Nameplate
+    # neu einfärbt. Bei reinem XP-Gain ohne Level-Up: Tier ändert sich nicht.
+    power_tier = None
+    if leveled_up:
+        try:
+            import power_budget as _pb
+            _pb.invalidate_power_cache(player_name)
+            power_tier = await _pb.player_power_tier(player_name)
+        except Exception:
+            log.debug("power_tier-Recalc fehlgeschlagen", exc_info=True)
+    # Welle 25: bei Magic-Level-Up evtl. neue Spells freischalten.
+    unlocked_spells: list[str] = []
+    if leveled_up and skill == "magic":
+        try:
+            import spells as _sp
+            unlocked_spells = await _sp.try_unlock_by_level(player_name, new_level)
+        except Exception:
+            log.debug("spell-unlock fehlgeschlagen", exc_info=True)
+    out = {
         "skill":          skill,
         "xp":             new_xp,
         "level":          new_level,
         "leveled_up":     leveled_up,
         "talent_points":  points_gained,
     }
+    if power_tier is not None:
+        out["power_tier"] = power_tier
+    if unlocked_spells:
+        out["unlocked_spells"] = unlocked_spells
+    return out

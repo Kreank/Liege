@@ -50,6 +50,9 @@ import dungeon_instance
 import attributes
 import trade
 import world_populator
+import power_budget
+import spells
+import spell_caster
 from ws_manager import ConnectionManager
 from world import World
 from structures import StructureManager
@@ -151,8 +154,17 @@ async def lifespan(app: FastAPI):
     )
     # Welle 22: Research-Tick-Worker (online-Player bekommen alle 5min +1 Pool)
     research_tick_task = asyncio.create_task(research.time_tick_loop(manager))
+    # Welle 25: Spell-Caster Callbacks wiren (Effects-Apply, Mana-Refund, Aggro)
+    spell_caster.set_callbacks(
+        apply_effects_cb=_apply_spell_effects,
+        refund_mana_cb=_refund_mana,
+        aggro_cb=_apply_heal_aggro,
+        send_to_player_cb=_send_to_player,
+    )
     # Welle 24: Disaster-Tick (refresht Cache, broadcastet ended-Events)
     disaster_task = asyncio.create_task(disaster_state.run(manager))
+    # Welle 29e: Wildfire-Spread-Loop (alle 30s prüft fire_tiles → spread/burn out)
+    wildfire_task = asyncio.create_task(event_worker.wildfire_tick_loop(structures, manager))
 
     yield
 
@@ -226,6 +238,31 @@ async def _populate_chunks_bg(chunks) -> None:
             )
     except Exception:
         logging.getLogger("liege.populate_bg").exception("Background-Populate fehlgeschlagen")
+
+
+async def _sync_learned_spells(player_name: str) -> list[str]:
+    """Welle 25: schaltet jeden Spell automatisch frei, dessen skill_req der
+    Spieler erreicht hat. Returns Liste neu freigeschalteter spell-IDs."""
+    magic_lvl = await skills.get_skill_level(player_name, "magic")
+    eligible = [
+        sid for sid, s in spells.SPELLS.items()
+        if magic_lvl >= int(s.get("skill_req", 0))
+    ]
+    if not eligible:
+        return []
+    existing_rows = await db.pool().fetch(
+        "SELECT spell_kind FROM learned_spells WHERE player_name = $1",
+        player_name,
+    )
+    existing = {r["spell_kind"] for r in existing_rows}
+    new_ones = [sid for sid in eligible if sid not in existing]
+    for sid in new_ones:
+        await db.pool().execute(
+            "INSERT INTO learned_spells (player_name, spell_kind) "
+            "VALUES ($1, $2) ON CONFLICT DO NOTHING",
+            player_name, sid,
+        )
+    return new_ones
 
 
 async def _list_learned_spells(player_name: str) -> list[str]:
@@ -414,6 +451,108 @@ async def heal_player(name: str, amount: int) -> None:
     })
 
 
+# ─── Welle 25 — Down-State + Respawn ─────────────────────────────────────────
+# Spieler bei HP=0 ist 30s "downed": kann nicht ziehen, nimmt keinen Damage,
+# kann von Mitspielern wiederbelebt werden (Resurrection-Spell) oder sich per
+# force_respawn-Button am Spawn-Punkt selbst respawnen.
+DOWNED_DURATION_S = 30.0
+
+# player_name → {downed_at: epoch, x, y, task: asyncio.Task}
+_downed_state: dict[str, dict] = {}
+
+
+def is_downed(player_name: str) -> bool:
+    return player_name in _downed_state
+
+
+async def _enter_downed_state(name: str) -> None:
+    if is_downed(name):
+        return
+    row = await db.pool().fetchrow(
+        "SELECT x, y FROM players WHERE name = $1", name,
+    )
+    if row is None:
+        return
+    px, py = row["x"], row["y"]
+    await db.pool().execute("UPDATE players SET hp = 0 WHERE name = $1", name)
+    # Aktiven Cast cleanen
+    spell_caster.cleanup_player(name)
+    # 30s-Timer
+    task = asyncio.create_task(_downed_timer(name))
+    _downed_state[name] = {
+        "downed_at":  time.time(),
+        "x":          px, "y": py,
+        "task":       task,
+    }
+    await _send_to_player(name, {
+        "type":       "player_downed",
+        "duration_s": DOWNED_DURATION_S,
+        "x":          px, "y": py,
+    })
+    await manager.broadcast({
+        "type": "player_downed_visible", "player_id": name,
+        "x":    px, "y": py,
+    }, exclude=name)
+
+
+async def _downed_timer(name: str) -> None:
+    try:
+        await asyncio.sleep(DOWNED_DURATION_S)
+        if is_downed(name):
+            await _do_respawn(name, in_place=False)
+    except asyncio.CancelledError:
+        pass
+    except Exception:
+        logging.exception("downed_timer failed for %s", name)
+
+
+async def _do_respawn(name: str, in_place: bool = False) -> None:
+    """Respawn am Spawn-Punkt (oder in-place bei Resurrection). Räumt
+    Down-State, setzt full HP."""
+    state = _downed_state.pop(name, None)
+    if state and state.get("task"):
+        try:
+            state["task"].cancel()
+        except Exception:
+            pass
+    row = await db.pool().fetchrow(
+        "SELECT max_hp, spawn_x, spawn_y FROM players WHERE name = $1", name,
+    )
+    if row is None:
+        return
+    if in_place and state:
+        x, y = state["x"], state["y"]
+    elif row["spawn_x"] is not None and row["spawn_y"] is not None:
+        # Welle 25: Heim-Spawn (Bett/Lagerfeuer). Falls die Position inzwischen
+        # blockiert ist, suche ein freies Nachbar-Tile.
+        hx, hy = int(row["spawn_x"]), int(row["spawn_y"])
+        if (await world.is_walkable(hx, hy)) and not structures.blocks(hx, hy):
+            x, y = hx, hy
+        else:
+            spawn = await world.find_spawn(hx, hy)
+            x, y = spawn["x"], spawn["y"]
+    else:
+        spawn = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
+        x, y = spawn["x"], spawn["y"]
+    await db.pool().execute(
+        "UPDATE players SET hp = max_hp, x = $1, y = $2 WHERE name = $3",
+        x, y, name,
+    )
+    manager.update_player(name, x, y)
+    await _send_to_player(name, {
+        "type":   "player_respawned",
+        "x":      x, "y": y,
+        "hp":     row["max_hp"], "max_hp": row["max_hp"],
+        "in_place": in_place,
+    })
+    await manager.broadcast({
+        "type": "player_moved", "player_id": name, "x": x, "y": y,
+    }, exclude=name)
+    await manager.broadcast({
+        "type": "player_revived_visible", "player_id": name,
+    }, exclude=name)
+
+
 async def restore_mana(name: str, amount: int) -> None:
     row = await db.pool().fetchrow("SELECT mana, max_mana FROM players WHERE name = $1", name)
     if row is None:
@@ -429,6 +568,162 @@ async def restore_mana(name: str, amount: int) -> None:
             "mana":     new_mana,
             "max_mana": row["max_mana"],
         })
+
+
+# ─── Welle 25 — Spell-Caster Callbacks ───────────────────────────────────────
+
+async def _send_to_player(player_id: str, payload: dict) -> None:
+    ws = manager.connections.get(player_id)
+    if ws is not None:
+        try:
+            await ws.send_json(payload)
+        except Exception:
+            logging.exception("send_to_player failed")
+
+
+async def _refund_mana(player_id: str, amount: int) -> None:
+    await restore_mana(player_id, amount)
+
+
+async def _apply_heal_aggro(player_id: str, x: int, y: int, threat: int) -> None:
+    """Heilen zieht Aggro — feindliche Mobs in 8-Tile-Radius werden auf den
+    Heiler aufmerksam (setzen ihn als preferred_target via npc_worker)."""
+    try:
+        import npc_worker as _nw
+        for n in npcs.all():
+            if n["kind"] not in combat.CREATURE_KINDS:
+                continue
+            if abs(n["x"] - x) + abs(n["y"] - y) <= 8:
+                # Mark Spieler als next target — npc_worker._try_aggression liest das
+                _nw.HEAL_THREAT[n["id"]] = (player_id, time.time() + 12)
+    except Exception:
+        logging.exception("heal-aggro failed")
+
+
+async def _apply_spell_effects(player_id: str, spell_id: str,
+                                 spell: dict, target: dict) -> None:
+    """Wendet die effects-Liste eines Spells an. Target ist ein Dict mit
+    optional x/y/npc_id. Mana ist bereits beim Cast-Start abgezogen."""
+    target_kind = spell.get("target_kind", "self")
+
+    # FX-Animation broadcasten — auf Ziel-Position (für AoE/single) oder
+    # Caster-Position (für self/group).
+    fx_kind = spell.get("fx_anim")
+    pinfo = manager.get_players().get(player_id, {})
+    fx_x = target.get("x", pinfo.get("x", 0))
+    fx_y = target.get("y", pinfo.get("y", 0))
+    if fx_kind:
+        await manager.broadcast({
+            "type": "visual_effect", "kind": fx_kind,
+            "x": fx_x, "y": fx_y,
+        })
+
+    # Sammle Affected-Targets je nach target_kind
+    affected_npcs: list[dict] = []
+    affected_players: list[str] = []
+
+    if target_kind == "self":
+        affected_players = [player_id]
+    elif target_kind == "single":
+        npc_id = target.get("npc_id")
+        if npc_id is not None:
+            n = npcs.get(int(npc_id))
+            if n is not None:
+                affected_npcs = [n]
+    elif target_kind == "aoe":
+        radius = int(spell.get("radius", 2))
+        tx, ty = int(target.get("x", 0)), int(target.get("y", 0))
+        affected_npcs = [
+            n for n in npcs.all()
+            if n["kind"] in combat.CREATURE_KINDS
+               and abs(n["x"] - tx) + abs(n["y"] - ty) <= radius
+        ]
+    elif target_kind == "ground":
+        radius = int(spell.get("radius", 4))
+        tx, ty = int(target.get("x", 0)), int(target.get("y", 0))
+        affected_npcs = [
+            n for n in npcs.all()
+            if n["kind"] in combat.CREATURE_KINDS
+               and abs(n["x"] - tx) + abs(n["y"] - ty) <= radius
+        ]
+    elif target_kind == "group":
+        radius = int(spell.get("radius", 6))
+        px, py = pinfo.get("x", 0), pinfo.get("y", 0)
+        for pname, pdata in manager.get_players().items():
+            if abs(pdata.get("x", 0) - px) + abs(pdata.get("y", 0) - py) <= radius:
+                affected_players.append(pname)
+    elif target_kind == "downed":
+        # Welle 25: Resurrection — sucht nahe gefallene Mitspieler
+        rng = int(spell.get("range", 4))
+        px, py = pinfo.get("x", 0), pinfo.get("y", 0)
+        for dname, dstate in _downed_state.items():
+            if dname == player_id:
+                continue   # Caster selbst kann nicht casten (er ist down)
+            if abs(dstate["x"] - px) + abs(dstate["y"] - py) <= rng:
+                affected_players.append(dname)
+
+    # Apply effects
+    for eff in spell.get("effects", []):
+        ekind = eff.get("kind")
+        if ekind == "revive":
+            # Welle 25: Resurrection auf affected_players (downed)
+            for pname in affected_players:
+                if is_downed(pname):
+                    await _do_respawn(pname, in_place=True)
+        elif ekind == "heal":
+            amount = int(eff.get("amount", 0))
+            for pname in affected_players:
+                await heal_player(pname, amount)
+        elif ekind == "damage":
+            amount = int(eff.get("amount", 0))
+            dmg_type = eff.get("damage_type", "magic")
+            for n in affected_npcs:
+                final = combat.apply_creature_resists(n["kind"], amount, dmg_type=dmg_type)
+                result = await npcs.damage(n["id"], final)
+                if result is None:
+                    # NPC tot — Drop + Broadcast
+                    drop_x, drop_y = await _find_drop_xy(n["x"], n["y"])
+                    for drop_kind in loot.roll_loot(n["kind"]):
+                        dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
+                        if dropped:
+                            await manager.broadcast({"type": "item_spawned", "item": dropped})
+                    await manager.broadcast({
+                        "type": "npc_died", "npc_id": n["id"],
+                        "killed_by": player_id, "name": n["name"],
+                    })
+                else:
+                    await manager.broadcast({
+                        "type": "npc_damaged", "npc_id": n["id"],
+                        "hp": result["hp"], "max_hp": result["max_hp"],
+                        "dmg": final, "by": player_id,
+                    })
+        elif ekind == "status":
+            sname = eff.get("effect")
+            mag = int(eff.get("magnitude", 0))
+            dur = int(eff.get("duration", 5))
+            if sname is None:
+                continue
+            # Auf Player (self/group) → status_effects.apply("player", ...)
+            for pname in affected_players:
+                try:
+                    await status_effects.apply("player", pname, sname, mag, dur)
+                    effs = await status_effects.list_for_target("player", pname)
+                    await _send_to_player(pname, {"type": "status_effects", "effects": effs})
+                except Exception:
+                    logging.exception("status apply player failed")
+            # Auf NPCs (single/aoe/ground) → npc-status
+            for n in affected_npcs:
+                try:
+                    await status_effects.apply("npc", str(n["id"]), sname, mag, dur)
+                except Exception:
+                    logging.exception("status apply npc failed")
+
+    # Magic-XP basierend auf Mana-Cost
+    mana_cost = int(spell.get("mana_cost", 0))
+    if mana_cost > 0:
+        xp_result = await skills.gain_xp(player_id, "magic", 5 + mana_cost // 2)
+        if xp_result:
+            await _send_to_player(player_id, {"type": "skill_xp", **xp_result})
 
 
 # Cooldown-Tracking für Heal-Strukturen: dict[(player_name, struct_id)] → timestamp
@@ -448,6 +743,12 @@ async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
     )
     if cc_row is None or not cc_row["character_created"]:
         return
+    # Welle 25: Downed-Spieler nehmen keinen Schaden mehr.
+    if is_downed(name):
+        return
+    # Welle 25: Damage unterbricht aktiven Cast (Standard-RPG-Verhalten).
+    if spell_caster.is_casting(name):
+        spell_caster.interrupt(name, "damage_taken")
     # Armor-Defense gilt nur für physical-Damage (Welle 15)
     import item_stats as _is
     if dmg_type == "physical":
@@ -490,28 +791,9 @@ async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
         return
     new_hp = max(0, row["hp"] - dmg)
     if new_hp == 0:
-        spawn = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
-        await db.pool().execute(
-            "UPDATE players SET hp = max_hp, x = $1, y = $2 WHERE name = $3",
-            spawn["x"], spawn["y"], name,
-        )
-        manager.update_player(name, spawn["x"], spawn["y"])
-        ws = manager.connections.get(name)
-        if ws is not None:
-            await ws.send_json({
-                "type":  "player_respawned",
-                "x":     spawn["x"],
-                "y":     spawn["y"],
-                "hp":    row["max_hp"],
-                "max_hp": row["max_hp"],
-            })
-        await manager.broadcast({"type": "player_died", "player_id": name}, exclude=name)
-        await manager.broadcast({
-            "type": "player_moved",
-            "player_id": name,
-            "x":   spawn["x"],
-            "y":   spawn["y"],
-        }, exclude=name)
+        # Welle 25: Spieler geht in DOWNED-State (30s) statt sofort respawn.
+        # Ressurrection-Spell oder force_respawn beenden den Zustand früher.
+        await _enter_downed_state(name)
         return
     await db.pool().execute(
         "UPDATE players SET hp = $1 WHERE name = $2", new_hp, name
@@ -595,7 +877,11 @@ async def websocket_endpoint(websocket: WebSocket):
         "attributes":   await _compute_attributes(player_id),
         "active_disasters": await disaster_state.list_active(),
         "stats":        await _build_stat_sheet(player_id),
-        "learned_spells": await _list_learned_spells(player_id),
+        "power_tier":   await power_budget.player_power_tier(player_id),
+        # Welle 25: Spells anhand Magic-Skill freischalten, dann liefern
+        "spell_catalog": spells.SPELLS,
+        "learned_spells": (await _sync_learned_spells(player_id),
+                            await _list_learned_spells(player_id))[1],
         "talents": {
             "learned":      await talents.list_learned(player_id),
             "points":       await talents.get_talent_points(player_id),
@@ -630,7 +916,19 @@ async def websocket_endpoint(websocket: WebSocket):
                     })
                 continue
 
+            # Welle 25: force_respawn — Sofort-Respawn aus dem Down-State
+            if mtype == "force_respawn":
+                if is_downed(player_id):
+                    await _do_respawn(player_id, in_place=False)
+                continue
+
             if mtype == "move":
+                # Welle 25: Down-State blockt Bewegung
+                if is_downed(player_id):
+                    continue
+                # Welle 25: Bewegung bricht aktiven Cast ab.
+                if spell_caster.is_casting(player_id):
+                    spell_caster.interrupt(player_id, "movement")
                 x, y = data["x"], data["y"]
                 # Welle 9b: bei Dungeon-Aufenthalt anders validieren
                 cur_world = await dungeon_instance.get_player_world(player_id)
@@ -1313,6 +1611,73 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json({"type": "skill_xp", **xp_result})
 
             elif mtype == "cast_spell":
+                # Welle 25: Neuer Pfad — spell_id statt item_id (Hotbar/Spellbook-Cast).
+                spell_id = data.get("spell_id")
+                if spell_id:
+                    spell = spells.get(spell_id)
+                    if not spell:
+                        continue
+                    # Spell gelernt?
+                    learned = await db.pool().fetchval(
+                        "SELECT 1 FROM learned_spells WHERE player_name = $1 AND spell_kind = $2",
+                        player_id, spell_id,
+                    )
+                    if not learned:
+                        await websocket.send_json({
+                            "type": "toast", "text": "Du beherrschst diesen Zauber nicht.",
+                        })
+                        continue
+                    # Mana + Skill-Level + Position holen
+                    pstate = await db.pool().fetchrow(
+                        "SELECT mana, max_mana FROM players WHERE name = $1", player_id,
+                    )
+                    if pstate is None:
+                        continue
+                    magic_lvl = await skills.get_skill_level(player_id, "magic")
+                    pinfo = manager.get_players().get(player_id, {})
+                    px, py = pinfo.get("x", 0), pinfo.get("y", 0)
+                    target = {
+                        "x":      data.get("target_x"),
+                        "y":      data.get("target_y"),
+                        "npc_id": data.get("target_npc_id"),
+                    }
+                    result = await spell_caster.start_cast(
+                        player_id, spell_id, target,
+                        current_mana=int(pstate["mana"]),
+                        current_x=px, current_y=py,
+                        magic_level=magic_lvl,
+                    )
+                    if not result.get("ok"):
+                        reason = result.get("reason")
+                        msg_text = {
+                            "no_mana":         f"Nicht genug Mana ({result.get('needed', 0)}).",
+                            "cooldown":        f"Noch nicht bereit ({result.get('remaining', 0):.1f}s).",
+                            "already_casting": "Du wirkst bereits einen Zauber.",
+                            "skill":           f"Magie-Level {result.get('needed', 0)} benötigt.",
+                            "out_of_range":    f"Zu weit weg (max {result.get('max', 0)} Felder).",
+                            "unknown_spell":   "Unbekannter Zauber.",
+                        }.get(reason, f"Cast fehlgeschlagen: {reason}")
+                        await websocket.send_json({"type": "toast", "text": msg_text})
+                        continue
+                    # Mana abziehen
+                    new_mana = pstate["mana"] - int(spell.get("mana_cost", 0))
+                    await db.pool().execute(
+                        "UPDATE players SET mana = $1 WHERE name = $2",
+                        new_mana, player_id,
+                    )
+                    await websocket.send_json({
+                        "type": "player_mana", "mana": new_mana,
+                        "max_mana": pstate["max_mana"],
+                    })
+                    # Cast-Started an Client → UI zeigt Cast-Bar
+                    await websocket.send_json({
+                        "type":         "cast_started",
+                        "spell_id":     spell_id,
+                        "cast_time_ms": result["cast_time_ms"],
+                    })
+                    continue  # Skip legacy item-path
+
+                # ─── Legacy item-based cast (spell_book/scroll/rune_stone) ───
                 item_id = int(data.get("item_id", 0))
                 row = await db.pool().fetchrow(
                     "SELECT kind FROM items WHERE id = $1 AND owner = $2",
@@ -1358,11 +1723,17 @@ async def websocket_endpoint(websocket: WebSocket):
                                 ]
                             else:
                                 targets = [target]
-                            # Welle 40: Spell-spezifischer Visual-Effekt
+                            # Welle 28: Spell → Pro-Animation-Kind. Map nutzt die
+                            # neuen 256×256 / 512×512 Spritesheet-Animations
+                            # aus assets/animations/professional/combat_magic/.
                             spell_fx = {
-                                "spell_book": "fireball_explosion",
-                                "scroll":     "lightning_strike",
-                                "rune_stone": "heal_glow",
+                                "spell_book":         "fireball_explosion",
+                                "scroll":             "hit_spark",
+                                "rune_stone":         "heal_pulse",
+                                # Welle 29d — neue Spell-Visuals
+                                "ice_scroll":         "ice_spell",
+                                "wind_slash_scroll":  "wind_slash_spell",
+                                "holy_shield_scroll": "holy_shield_aura",
                             }.get(row["kind"], "fireball_explosion")
                             await manager.broadcast({
                                 "type": "visual_effect", "kind": spell_fx,
@@ -1370,9 +1741,12 @@ async def websocket_endpoint(websocket: WebSocket):
                             })
                             # Welle 15: Spell-Damage-Typ je nach Spell-Item
                             _spell_dmg_type = {
-                                "spell_book": "fire",
-                                "scroll":     "lightning",
-                                "rune_stone": "magic",
+                                "spell_book":         "fire",
+                                "scroll":             "lightning",
+                                "rune_stone":         "magic",
+                                "ice_scroll":         "ice",
+                                "wind_slash_scroll":  "magic",
+                                "holy_shield_scroll": "magic",
                             }.get(row["kind"], "magic")
                             for t in targets:
                                 _final = combat.apply_creature_resists(
@@ -1922,6 +2296,18 @@ async def websocket_endpoint(websocket: WebSocket):
                         "slug": slug,
                     })
                     continue
+                # Welle 25: Bett / Lagerfeuer als Heim-Spawn setzen.
+                # Spieler-Position bei nächstem Tod / Respawn → diese Struktur.
+                if s["type"] in ("bed", "campfire"):
+                    await db.pool().execute(
+                        "UPDATE players SET spawn_x = $1, spawn_y = $2 WHERE name = $3",
+                        s["x"], s["y"], player_id,
+                    )
+                    label = "🛏️ Bett" if s["type"] == "bed" else "🔥 Lagerfeuer"
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": f"{label} als Heim-Spawn gemerkt — du erscheinst hier wieder.",
+                    })
                 heal_amount = combat.STRUCTURE_HEAL.get(s["type"])
                 if heal_amount is not None:
                     key = (player_id, s["id"])
@@ -2244,12 +2630,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 xp_result = await skills.gain_xp(player_id, "crafting", 15)
                 if xp_result:
                     await websocket.send_json({"type": "skill_xp", **xp_result})
-                # Welle 22: Crafting an Station gibt +1 Forschungs-Pool
-                _new_pool = await research.award_points(player_id, 1, f"craft:{station}")
-                await websocket.send_json({
-                    "type": "research_pool_update", "pool": _new_pool,
-                    "gained": 1, "reason": f"🔨 {station}",
-                })
+                # Welle 30: Crafting gibt KEINE Forschungspunkte mehr — nur noch
+                # Skill-Level-Up, Quests und 2h-Time-Tick füllen den Pool.
                 # Cooking-XP wenn das Rezept Food produziert
                 if recipe["output"] in ("bread", "cooked_meat"):
                     cook_xp = await skills.gain_xp(player_id, "cooking", 20)
@@ -2981,6 +3363,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 })
 
     except WebSocketDisconnect:
+        # Welle 25: aktiven Cast + Cooldowns räumen, Down-Timer canceln
+        spell_caster.cleanup_player(player_id)
+        ds = _downed_state.pop(player_id, None)
+        if ds and ds.get("task"):
+            try: ds["task"].cancel()
+            except Exception: pass
         manager.disconnect(player_id)
         await db.pool().execute(
             "UPDATE players SET last_seen = NOW() WHERE name = $1", player_id

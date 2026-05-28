@@ -54,6 +54,9 @@ ALTER TABLE structures ADD COLUMN IF NOT EXISTS rotation       INTEGER NOT NULL 
 ALTER TABLE structures ADD COLUMN IF NOT EXISTS max_durability INTEGER NOT NULL DEFAULT 1;
 UPDATE structures SET max_durability = durability WHERE max_durability < durability;
 
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS width  INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE structures ADD COLUMN IF NOT EXISTS height INTEGER NOT NULL DEFAULT 1;
+
 -- Welle 26: NPC-Persönlichkeit für variantenreicheres Chatter-System.
 ALTER TABLE npcs ADD COLUMN IF NOT EXISTS personality TEXT;
 
@@ -412,6 +415,11 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS flavor TEXT NULL;
 -- Nur für equipment-Items gesetzt, NULL für resources/consumables/food.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS rolled_stats JSONB NULL;
 
+-- Welle 25: Cosmetic-Skin-Slug. Bei Equipment-Spawn aus Skin-Pool gerollt
+-- (siehe backend/skin_pools.py). Frontend rendert diesen Skin statt des
+-- Default-Sprites. NULL → Default-Sprite aus PRO_WEAPON_MAP.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS cosmetic_skin TEXT NULL;
+
 -- Welle 23-F: Camp-Cooldown nach Clearing. Wenn ein Bandit-Camp ausgelöscht
 -- wird, vermerkt der Chunk dass dort für eine Weile nichts respawnt.
 CREATE TABLE IF NOT EXISTS cleared_zones (
@@ -470,6 +478,9 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS character_created BOOLEAN NOT NULL 
 ALTER TABLE players ADD COLUMN IF NOT EXISTS display_name      TEXT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS players_display_name_unique
     ON players (LOWER(display_name)) WHERE display_name IS NOT NULL;
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS spawn_x INTEGER NULL;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS spawn_y INTEGER NULL;
 CREATE INDEX IF NOT EXISTS quests_player_status_idx ON quests (player_name, status);
 CREATE INDEX IF NOT EXISTS quests_player_template_idx ON quests (player_name, template_id);
 

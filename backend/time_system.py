@@ -17,7 +17,9 @@ import time
 
 log = logging.getLogger("liege.time_system")
 
-MINUTES_PER_REAL_SECOND = float(os.environ.get("GAME_MINUTES_PER_SECOND", "2"))
+# Welle 25: 0.5 Spielminuten pro echte Sekunde → 48 echte Minuten = 24h Game-Zeit
+# (vorher 2 → 12 echte Minuten für einen ganzen Tag, viel zu hektisch).
+MINUTES_PER_REAL_SECOND = float(os.environ.get("GAME_MINUTES_PER_SECOND", "0.5"))
 TIME_BROADCAST_INTERVAL = float(os.environ.get("TIME_BROADCAST_INTERVAL", "5.0"))
 
 # Welt-Start bei 08:00 (Morgen)

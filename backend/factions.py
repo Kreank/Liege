@@ -153,6 +153,8 @@ NPC_KIND_FACTIONS = {
     # Karawanen-Wagen → merchants_guild (gehören zu Händler-Konvois)
     "farm_cart_hay":         "merchants_guild", "handcart_empty":         "merchants_guild",
     "horse_cart_single":     "merchants_guild", "market_wagon_covered":   "merchants_guild",
+    # Welle 29e: Heuschreckenschwarm → keine Faction (Naturkatastrophe)
+    "locust_swarm":          None,
 }
 
 

@@ -145,6 +145,14 @@ STRUCTURE_TYPES = {
     "cheese_rack":         {"blocking": True},
     "wooden_fence_segment":{"blocking": True},
     "fence_gate_farm":     {"blocking": True},
+    # Welle 29e: Waldbrand-Strukturen
+    "fire_tile":           {"blocking": False},  # laufbar aber gibt Schaden
+    "burned_stump":        {"blocking": True},
+    "burned_tree_oak":     {"blocking": True},
+    "burned_tree_pine":    {"blocking": True},
+    "burned_tree_birch":   {"blocking": True},
+    "ash_pile_small":      {"blocking": False},
+    "ash_pile_large":      {"blocking": False},
 }
 
 # Welle 51 — alle Sign-Varianten als platzierbare Strukturen registrieren.
@@ -250,6 +258,47 @@ def structure_max_hp(type_: str, material: str = DEFAULT_MATERIAL) -> int:
     return max(1, int(round(base * mult)))
 
 
+# ─── Welle 25 — Multi-Tile Footprint ─────────────────────────────────────────
+# Welche Strukturen brauchen mehr als 1×1. Anker ist (x, y) oben-links;
+# Footprint deckt [x, x+w-1] × [y, y+h-1] ab. Default für nicht-gelistete = 1×1.
+STRUCTURE_FOOTPRINT = {
+    # Farm-Gebäude — solide, mehrtilig
+    "barn_large":     (4, 4),
+    "barn_small":     (3, 3),
+    "stable":         (4, 3),
+    "granary":        (3, 3),
+    "cow_shed":       (3, 2),
+    "sheepfold":      (3, 2),
+    "goat_pen":       (3, 2),
+    "pigsty":         (2, 2),
+    "henhouse":       (2, 2),
+    "dovecote":       (2, 2),
+    "dairy_house":    (3, 2),
+    "hayloft":        (3, 2),
+    "smokehouse":     (2, 2),
+    "cart_shed":      (3, 2),
+    "duck_pond":      (3, 3),
+    "goose_pasture_marker": (2, 2),
+    # Gilden / Tempel — repräsentative Gebäude
+    "mage_guild":     (4, 4),
+    "fighters_guild": (4, 4),
+    "healers_guild":  (4, 4),
+    "thieves_guild":  (4, 4),
+    "temple":         (5, 5),
+}
+
+
+def footprint_for(type_: str) -> tuple[int, int]:
+    """(width, height) — Default (1, 1) für alle nicht aufgeführten Typen."""
+    return STRUCTURE_FOOTPRINT.get(type_, (1, 1))
+
+
+def tiles_covered(x: int, y: int, type_: str) -> list[tuple[int, int]]:
+    """Liste aller (tx, ty) die ein Anker-Tile (x,y) eines Typs abdeckt."""
+    w, h = footprint_for(type_)
+    return [(x + dx, y + dy) for dx in range(w) for dy in range(h)]
+
+
 def is_combat_structure(type_: str) -> bool:
     """True wenn diese Struktur angegriffen/repariert werden kann.
     False = harvest-only (Trees, Pflanzen, Felsen)."""
@@ -338,20 +387,43 @@ def _layer_for(type_: str) -> str:
 class StructureManager:
     def __init__(self):
         # Zwei Layer-Maps: floor (Boden) + object (Wände/Möbel/Deko).
-        # Pro Tile kann genau ein Floor UND ein Object existieren.
+        # Maps speichern nur die ANKER-Position (x, y) jeder Struktur.
+        # Welle 25: Multi-Tile-Strukturen können mehrere Tiles abdecken;
+        # _covered_by_coord mappt jeden abgedeckten Tile auf das Anker-Struct.
         self._floor_by_coord: dict[tuple[int, int], dict] = {}
         self._object_by_coord: dict[tuple[int, int], dict] = {}
+        self._covered_by_coord: dict[tuple[int, int], dict] = {}
 
     def _layer_map(self, layer: str) -> dict:
         return self._floor_by_coord if layer == "floor" else self._object_by_coord
 
+    def _register_covered(self, struct: dict) -> None:
+        """Markiert alle Footprint-Tiles als von dieser Struktur abgedeckt."""
+        if struct["layer"] != "object":
+            return  # Floors blocken nicht — kein covered-Tracking nötig
+        w = int(struct.get("width", 1))
+        h = int(struct.get("height", 1))
+        for dx in range(w):
+            for dy in range(h):
+                self._covered_by_coord[(struct["x"] + dx, struct["y"] + dy)] = struct
+
+    def _unregister_covered(self, struct: dict) -> None:
+        if struct["layer"] != "object":
+            return
+        w = int(struct.get("width", 1))
+        h = int(struct.get("height", 1))
+        for dx in range(w):
+            for dy in range(h):
+                self._covered_by_coord.pop((struct["x"] + dx, struct["y"] + dy), None)
+
     async def load(self) -> None:
         rows = await db.pool().fetch(
             "SELECT id, x, y, type, owner, material, durability, max_durability, "
-            "layer, rotation FROM structures"
+            "layer, rotation, width, height FROM structures"
         )
         self._floor_by_coord.clear()
         self._object_by_coord.clear()
+        self._covered_by_coord.clear()
         for r in rows:
             # Welle 25-Migration: max_durability war evtl. 1 (DEFAULT) — backfilll
             # auf den richtigen Combat-Max wenn die Struktur HP-fähig ist.
@@ -370,6 +442,20 @@ class StructureManager:
                         "WHERE id = $3", cdur, mdur, r["id"])
                 except Exception:
                     pass
+            # Welle 25: Multi-Tile-Migration — wenn DB-Wert 1×1 ist aber der
+            # Struktur-Typ in STRUCTURE_FOOTPRINT größer steht, nutze den
+            # Konfig-Wert (Backfill für vor-Welle-25 Strukturen).
+            w_db = int(r["width"] or 1)
+            h_db = int(r["height"] or 1)
+            w_cfg, h_cfg = footprint_for(r["type"])
+            if w_db == 1 and h_db == 1 and (w_cfg > 1 or h_cfg > 1):
+                w_db, h_db = w_cfg, h_cfg
+                try:
+                    await db.pool().execute(
+                        "UPDATE structures SET width = $1, height = $2 WHERE id = $3",
+                        w_db, h_db, r["id"])
+                except Exception:
+                    pass
             struct = {
                 "id":             r["id"],
                 "x":              r["x"],
@@ -381,26 +467,33 @@ class StructureManager:
                 "max_durability": mdur,
                 "layer":          r["layer"],
                 "rotation":       r["rotation"] or 0,
+                "width":          w_db,
+                "height":         h_db,
             }
             self._layer_map(r["layer"])[(r["x"], r["y"])] = struct
+            self._register_covered(struct)
 
     def all(self) -> list[dict]:
         """Alle Strukturen aus beiden Layern (Floor zuerst, dann Object)."""
         return list(self._floor_by_coord.values()) + list(self._object_by_coord.values())
 
     def at(self, x: int, y: int) -> dict | None:
-        """Top-Layer-Lookup: Object wenn vorhanden, sonst Floor."""
-        return self._object_by_coord.get((x, y)) or self._floor_by_coord.get((x, y))
+        """Top-Layer-Lookup: Object (inkl. Multi-Tile-Cover) wenn vorhanden,
+        sonst Floor."""
+        return self._covered_by_coord.get((x, y)) or self._floor_by_coord.get((x, y))
 
     def object_at(self, x: int, y: int) -> dict | None:
-        return self._object_by_coord.get((x, y))
+        """Welle 25: Multi-Tile-aware — gibt das Anker-Struct zurück für jeden
+        Tile innerhalb des Footprints."""
+        return self._covered_by_coord.get((x, y))
 
     def floor_at(self, x: int, y: int) -> dict | None:
         return self._floor_by_coord.get((x, y))
 
     def blocks(self, x: int, y: int) -> bool:
-        """Nur Object-Layer kann blocken (Floor blockiert nie)."""
-        s = self._object_by_coord.get((x, y))
+        """Nur Object-Layer kann blocken (Floor blockiert nie).
+        Welle 25: Multi-Tile-Strukturen blocken jeden Tile in ihrem Footprint."""
+        s = self._covered_by_coord.get((x, y))
         if s is None:
             return False
         spec = STRUCTURE_TYPES.get(s["type"])
@@ -419,8 +512,17 @@ class StructureManager:
             rotation = 0
         layer = _layer_for(type_)
         layer_map = self._layer_map(layer)
-        if (x, y) in layer_map:
-            return None  # Slot in diesem Layer ist belegt
+        # Welle 25: Multi-Tile-Footprint — alle abgedeckten Tiles müssen frei
+        # sein (für object-Layer). Für floor-Layer bleibt es bei 1×1.
+        w, h = footprint_for(type_)
+        if layer == "object":
+            for dx in range(w):
+                for dy in range(h):
+                    if (x + dx, y + dy) in self._covered_by_coord:
+                        return None  # mindestens ein Tile im Footprint belegt
+        else:
+            if (x, y) in layer_map:
+                return None
         # Welle 25: max_durability aus STRUCTURE_MAX_HP-Tabelle. Wenn die
         # Struktur Combat-fähig ist, override current durability auf max (frische
         # Bauten sind voll-HP). Sonst bleibt durability = caller-Wert (Harvest).
@@ -431,9 +533,9 @@ class StructureManager:
             max_dur = durability  # harvest-only: max = initial
         row = await db.pool().fetchrow(
             "INSERT INTO structures (x, y, type, owner, material, durability, "
-            "max_durability, layer, rotation) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
-            x, y, type_, owner, material, durability, max_dur, layer, rotation,
+            "max_durability, layer, rotation, width, height) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
+            x, y, type_, owner, material, durability, max_dur, layer, rotation, w, h,
         )
         struct = {
             "id":             row["id"],
@@ -446,8 +548,11 @@ class StructureManager:
             "max_durability": max_dur,
             "layer":          layer,
             "rotation":       rotation,
+            "width":          w,
+            "height":         h,
         }
         layer_map[(x, y)] = struct
+        self._register_covered(struct)
         return struct
 
     async def upgrade_material(self, x: int, y: int,
@@ -498,18 +603,22 @@ class StructureManager:
 
     async def damage_structure(self, x: int, y: int, amount: int = 1,
                                layer: str | None = None) -> dict | None:
-        """Reduziert durability. Default-Ziel: Object-Layer (sonst Floor)."""
+        """Reduziert durability. Default-Ziel: Object-Layer (sonst Floor).
+        Welle 25: bei Multi-Tile-Strukturen wird das Anker-Struct über
+        _covered_by_coord aufgelöst."""
         if layer is None:
             # Object hat Vorrang — wenn nichts da, dann Floor
-            s = self._object_by_coord.get((x, y)) or self._floor_by_coord.get((x, y))
+            s = self._covered_by_coord.get((x, y)) or self._floor_by_coord.get((x, y))
         else:
-            s = self._layer_map(layer).get((x, y))
+            s = (self._covered_by_coord.get((x, y)) if layer == "object"
+                 else self._floor_by_coord.get((x, y)))
         if s is None:
             return None
         new_dur = s["durability"] - amount
         if new_dur <= 0:
             await db.pool().execute("DELETE FROM structures WHERE id = $1", s["id"])
-            self._layer_map(s["layer"]).pop((x, y), None)
+            self._layer_map(s["layer"]).pop((s["x"], s["y"]), None)
+            self._unregister_covered(s)
             return None
         await db.pool().execute(
             "UPDATE structures SET durability = $1 WHERE id = $2", new_dur, s["id"]
@@ -518,11 +627,22 @@ class StructureManager:
         return s
 
     async def remove(self, x: int, y: int, layer: str | None = None) -> dict | None:
-        """Entfernt eine Struktur. Default: Object-Layer; wenn None und kein Object → Floor."""
-        if layer is None:
-            struct = self._object_by_coord.pop((x, y), None)
-            if struct is None:
-                struct = self._floor_by_coord.pop((x, y), None)
+        """Entfernt eine Struktur. Default: Object-Layer; wenn None und kein Object → Floor.
+        Welle 25: Multi-Tile-aware via _covered_by_coord."""
+        if layer is None or layer == "object":
+            covered = self._covered_by_coord.get((x, y))
+            if covered is not None:
+                struct = self._object_by_coord.pop((covered["x"], covered["y"]), None)
+                if struct is not None:
+                    self._unregister_covered(struct)
+                    await db.pool().execute(
+                        "DELETE FROM structures WHERE id = $1", struct["id"]
+                    )
+                    return struct
+            if layer == "object":
+                return None
+            # layer is None, kein Object → Floor versuchen
+            struct = self._floor_by_coord.pop((x, y), None)
         else:
             struct = self._layer_map(layer).pop((x, y), None)
         if struct is None:
