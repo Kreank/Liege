@@ -22,6 +22,7 @@ import farm_worker
 import harvest
 import item_worker
 import loot
+import loot_rolls
 import needs
 import body_parts
 import bill_queue
@@ -140,6 +141,66 @@ async def _push_group_state_to_all_members(group_id: int) -> None:
 
 GROUP_XP_SHARE_RADIUS = 30   # Tiles um den NPC, in denen Group-Members XP teilen
 GROUP_XP_BONUS_FACTOR = 1.2  # +20% Gesamt-XP wenn Kill in Gruppe geht
+LOOT_ROLL_RADIUS = 15        # Tiles um den Drop, in denen Need/Greed-Roll greift
+
+
+async def _maybe_start_loot_roll(killer_id: str, dropped: dict) -> None:
+    """Wenn der Killer in einer Gruppe mit loot_rule='need_greed' ist und der
+    Drop rollwürdig (Equipment/Magic/Affix/Unique), starte einen Roll unter
+    den Member-Spielern im LOOT_ROLL_RADIUS. Sonst nichts: Free-for-All bleibt
+    das Default und der Drop liegt schlicht auf dem Boden."""
+    if dropped is None or not loot_rolls.is_rollable(dropped):
+        return
+    g = await groups.get_group_for(killer_id)
+    if not g or g.get("loot_rule") != "need_greed":
+        return
+    member_names = await groups.get_member_names(g["id"])
+    drop_x = int(dropped.get("x", 0))
+    drop_y = int(dropped.get("y", 0))
+    eligible: set[str] = set()
+    for pid in member_names:
+        pos = manager.get_players().get(pid)
+        if pos is None:
+            continue
+        if max(abs(pos["x"] - drop_x), abs(pos["y"] - drop_y)) <= LOOT_ROLL_RADIUS:
+            eligible.add(pid)
+    if not eligible:
+        return
+
+    async def _broadcast(msg, recipients):
+        for pid in recipients:
+            ws_t = manager.connections.get(pid)
+            if ws_t is None:
+                continue
+            try: await ws_t.send_json(msg)
+            except Exception: pass
+
+    async def _finalize(state):
+        # Wenn ein Gewinner feststeht: pickup direkt ins Inventar des Winners,
+        # damit man nicht erst zum Boden laufen muss. Wenn niemand gerollt hat
+        # (alle pass) → Item bleibt als FFA-Drop liegen.
+        winner = state.get("winner")
+        if not winner:
+            return
+        picked = await items.pickup(state["item"]["id"], winner)
+        if picked is None:
+            return
+        await manager.broadcast({"type": "item_picked_up",
+                                 "item_id": state["item"]["id"]})
+        ws_w = manager.connections.get(winner)
+        if ws_w is not None:
+            if picked["id"] != state["item"]["id"]:
+                try: await ws_w.send_json({
+                    "type": "inventory_update",
+                    "item_id": picked["id"],
+                    "quantity": int(picked.get("quantity", 1)),
+                })
+                except Exception: pass
+            else:
+                try: await ws_w.send_json({"type": "inventory_add", "item": picked})
+                except Exception: pass
+
+    await loot_rolls.start_roll(dropped, g["id"], eligible, _broadcast, _finalize)
 
 
 async def _gain_combat_xp_with_share(killer_id: str, amount: int,
@@ -169,6 +230,14 @@ async def _gain_combat_xp_with_share(killer_id: str, amount: int,
     for pid in nearby:
         r = await skills.gain_xp(pid, "combat", share)
         if r:
+            # gained + group_share helfen dem Frontend einen "geteilt mit Gruppe"-
+            # Toast zu zeigen statt nur "+24 XP".
+            r["gained"] = share
+            if len(nearby) > 1:
+                r["group_share"] = {
+                    "members": len(nearby),
+                    "bonus_pct": int((GROUP_XP_BONUS_FACTOR - 1) * 100),
+                }
             out.append((pid, r))
     return out
 
@@ -790,6 +859,8 @@ async def _apply_spell_effects(player_id: str, spell_id: str,
                         dropped = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
                         if dropped:
                             await manager.broadcast({"type": "item_spawned", "item": dropped})
+                            try: await _maybe_start_loot_roll(player_id, dropped)
+                            except Exception: logging.exception("loot-roll start failed")
                     await manager.broadcast({
                         "type": "npc_died", "npc_id": n["id"],
                         "killed_by": player_id, "name": n["name"],
@@ -1264,6 +1335,33 @@ async def websocket_endpoint(websocket: WebSocket):
                 await _push_group_state_to_all_members(g["id"])
                 continue
 
+            if mtype == "loot_vote":
+                roll_id = int(data.get("roll_id", 0))
+                vote_kind = (data.get("vote") or "").strip().lower()
+                res = await loot_rolls.vote(roll_id, player_id, vote_kind)
+                if not res.get("ok"):
+                    await websocket.send_json({"type": "loot_vote_error",
+                                                "reason": res["reason"]})
+                continue
+
+            if mtype == "set_loot_rule":
+                rule = (data.get("rule") or "").strip().lower()
+                g = await groups.get_group_for(player_id)
+                if not g:
+                    await websocket.send_json({"type": "group_error",
+                                                "reason": "not_in_group"})
+                    continue
+                res = await groups.set_loot_rule(g["id"], player_id, rule)
+                if not res.get("ok"):
+                    await websocket.send_json({"type": "group_error",
+                                                "reason": res["reason"]})
+                    continue
+                await _broadcast_to_group(g["id"], {
+                    "type": "loot_rule_changed",
+                    "rule": res["rule"],
+                })
+                continue
+
             if mtype == "raid_trigger_manual":
                 tier = int(data.get("tier", 1))
                 g = await groups.get_group_for(player_id)
@@ -1683,6 +1781,10 @@ async def websocket_endpoint(websocket: WebSocket):
                         await heal_player(player_id, int(effect["hp"] * heal_mult))
                     if "mana" in effect:
                         await restore_mana(player_id, effect["mana"])
+                    if "stamina" in effect:
+                        new_state = await needs.restore_stamina(player_id, int(effect["stamina"]))
+                        if new_state is not None:
+                            await websocket.send_json({"type": "player_needs", **new_state})
                     # Rejuvenation: Body-Parts mitheilen
                     part_heal = int(talent_med.get("medical_part_heal", 0))
                     if part_heal > 0:
@@ -1744,6 +1846,18 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue  # schon weg
                 if abs(int(ground["x"]) - player["x"]) + abs(int(ground["y"]) - player["y"]) > 1:
                     continue  # zu weit weg (Sanity-Check — Frontend prüft auch)
+                # Loot-Roll-Lock: Item ist gerade in einem Need/Greed-Roll →
+                # nur der ausgelobte Gewinner darf aufheben.
+                if loot_rolls.is_locked(item_id):
+                    winner = loot_rolls.allowed_picker(item_id)
+                    if winner is None:
+                        await websocket.send_json({"type": "toast",
+                                                    "text": "⏳ Loot-Roll läuft noch"})
+                        continue
+                    if winner != player_id:
+                        await websocket.send_json({"type": "toast",
+                                                    "text": f"🔒 Für {winner} reserviert"})
+                        continue
                 picked = await items.pickup(item_id, player_id)
                 if picked is None:
                     continue
@@ -1807,6 +1921,19 @@ async def websocket_endpoint(websocket: WebSocket):
                 attack_range = max(combat.ATTACK_RANGE, _is.weapon_range(weapon))
                 if combat.manhattan(player["x"], player["y"], npc["x"], npc["y"]) > attack_range:
                     continue
+                # Stamina-Cost bei 2H-Waffen — wenig Stamina = halbierter Schaden
+                # statt Block, damit der Spieler nie komplett wehrlos ist.
+                _heavy_dmg_penalty = 1.0
+                _w_stats = _is.WEAPON_STATS.get(weapon or "", {})
+                if _w_stats.get("two_handed"):
+                    if await needs.use_stamina(player_id, 8):
+                        pass
+                    else:
+                        _heavy_dmg_penalty = 0.5
+                        await websocket.send_json({
+                            "type": "toast",
+                            "text": "🥵 Erschöpft — der Hieb hat keinen Schwung",
+                        })
                 # Talent-Effekte für Combat anwenden
                 talent_effects = await talents.aggregate_effects(player_id)
                 # Crit-Chance-Boost durch Talent
@@ -1867,6 +1994,9 @@ async def websocket_endpoint(websocket: WebSocket):
                     dmg = int(dmg * body_parts.arm_damage_multiplier(bp["arms"]))
                     if dmg < 1:
                         dmg = 1
+                # Stamina-Penalty: 2H-Waffe ohne genug Ausdauer → halber Hieb
+                if _heavy_dmg_penalty < 1.0:
+                    dmg = max(1, int(dmg * _heavy_dmg_penalty))
                 # Welle 40: Waffen-spezifischer Attack-Visual
                 weapon_fx = {
                     "sword": "sword_slash", "greatsword": "sword_slash", "dagger": "sword_slash",
@@ -1899,6 +2029,8 @@ async def websocket_endpoint(websocket: WebSocket):
                             await manager.broadcast({
                                 "type": "item_spawned", "item": dropped,
                             })
+                            try: await _maybe_start_loot_roll(player_id, dropped)
+                            except Exception: logging.exception("loot-roll start failed")
                     # Welle 23: Boss-Garantie-Equipment-Drop (high quality)
                     import npc_worker as _nw
                     if npc["kind"] in _nw.BOSS_KINDS:
@@ -1912,6 +2044,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                 await manager.broadcast({
                                     "type": "item_spawned", "item": dropped,
                                 })
+                                try: await _maybe_start_loot_roll(player_id, dropped)
+                                except Exception: logging.exception("loot-roll start failed")
                     # Welle 23-F: Camp-Cooldown — wenn der letzte
                     # Bandit/Robber/Thief im chunk tot ist, mark als cleared.
                     if npc["kind"] in _nw.CAMP_ONLY_KINDS:
@@ -2150,6 +2284,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                             await manager.broadcast({
                                                 "type": "item_spawned", "item": dropped,
                                             })
+                                            try: await _maybe_start_loot_roll(player_id, dropped)
+                                            except Exception: logging.exception("loot-roll start failed")
                                     # Welle 23: Boss-Garantie-Equipment auch via Spell-Kill
                                     import npc_worker as _nw2
                                     if t["kind"] in _nw2.BOSS_KINDS:
@@ -2163,6 +2299,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                                 await manager.broadcast({
                                                     "type": "item_spawned", "item": dropped,
                                                 })
+                                                try: await _maybe_start_loot_roll(player_id, dropped)
+                                                except Exception: logging.exception("loot-roll start failed")
                                     await manager.broadcast({
                                         "type": "npc_died", "npc_id": t["id"],
                                         "killed_by": player_id, "name": t["name"],

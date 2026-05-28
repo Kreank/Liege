@@ -42,8 +42,43 @@
     <span id="party-frame-count">0/5</span>
   </div>
   <div id="party-frame-members"></div>
+  <div id="party-frame-leader-actions" style="display:none">
+    <button id="party-raid-btn" type="button">⚔️ Raid starten</button>
+  </div>
   <div id="party-frame-hint">
     /invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband
+  </div>
+</div>
+
+<!-- Welle 31: Loot-Roll-Popup (Need/Greed/Pass) -->
+<div id="loot-roll-overlay" style="display:none">
+  <div id="loot-roll-box">
+    <div id="loot-roll-title">🎲 Loot-Roll</div>
+    <div id="loot-roll-body">…</div>
+    <div id="loot-roll-actions">
+      <button id="loot-roll-need" type="button">⚔️ Need</button>
+      <button id="loot-roll-greed" type="button">💰 Greed</button>
+      <button id="loot-roll-pass" type="button">✗ Pass</button>
+    </div>
+    <div id="loot-roll-timer">20 s</div>
+  </div>
+</div>
+
+<!-- Welle 31: Raid-Tier-Selektor -->
+<div id="raid-selector-overlay" style="display:none">
+  <div id="raid-selector-box">
+    <div id="raid-selector-title">⚔️ Raid auslösen</div>
+    <div id="raid-selector-body">Wähle einen Schwierigkeitsgrad. Cooldown 15 min.</div>
+    <div id="raid-selector-tiers">
+      <button class="raid-tier-btn" data-tier="1">T1 · Plünderer-Welle · 5 Mobs</button>
+      <button class="raid-tier-btn" data-tier="2">T2 · Räuber-Bande · 10 Mobs · 5% Boss</button>
+      <button class="raid-tier-btn" data-tier="3">T3 · Stamm-Überfall · 15 Mobs · 15% Boss</button>
+      <button class="raid-tier-btn" data-tier="4">T4 · Kriegszug · 20 Mobs · 25% Boss</button>
+      <button class="raid-tier-btn" data-tier="5">T5 · Belagerung · 30 Mobs · 40% Boss</button>
+    </div>
+    <div id="raid-selector-actions">
+      <button id="raid-selector-cancel" type="button">Abbrechen</button>
+    </div>
   </div>
 </div>
 

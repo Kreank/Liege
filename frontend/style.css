@@ -1636,6 +1636,67 @@
     #group-invite-accept { border-color: #6aa050 !important; color: #b0e090 !important; }
     #group-invite-decline { border-color: #a05050 !important; color: #e09090 !important; }
 
+    #party-frame-leader-actions {
+      margin: 6px 0 4px; text-align: center;
+    }
+    #party-raid-btn {
+      background: #3a1f1f; color: #e09080;
+      border: 1px solid #a05050; padding: 4px 10px;
+      font-family: monospace; font-size: 12px; cursor: pointer;
+    }
+    #party-raid-btn:hover { background: #502a2a; color: #f0a090; }
+
+    #loot-roll-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #loot-roll-box {
+      background: #1a1814; border: 2px solid #d4a050;
+      padding: 18px 22px; min-width: 320px; max-width: 90vw;
+      color: #ddd; font-family: monospace; text-align: center;
+    }
+    #loot-roll-title { font-size: 16px; color: #f0c878; margin-bottom: 10px; }
+    #loot-roll-body  { font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
+    #loot-roll-actions { display: flex; gap: 10px; justify-content: center; }
+    #loot-roll-actions button {
+      padding: 8px 14px; font-family: monospace; font-size: 13px;
+      cursor: pointer; border: 1px solid #888;
+      background: #2a2620; color: #ddd;
+    }
+    #loot-roll-need  { border-color: #c85040 !important; color: #f0a090 !important; }
+    #loot-roll-greed { border-color: #c8a050 !important; color: #f0d090 !important; }
+    #loot-roll-pass  { border-color: #888 !important; }
+    #loot-roll-timer { font-size: 11px; color: #888; margin-top: 10px; }
+
+    #raid-selector-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #raid-selector-box {
+      background: #1a1814; border: 2px solid #a05050;
+      padding: 18px 22px; min-width: 320px; max-width: 90vw;
+      color: #ddd; font-family: monospace; text-align: center;
+    }
+    #raid-selector-title { font-size: 16px; color: #e09080; margin-bottom: 8px; }
+    #raid-selector-body  { font-size: 12px; margin-bottom: 14px; color: #aaa; }
+    #raid-selector-tiers { display: flex; flex-direction: column; gap: 6px; }
+    .raid-tier-btn {
+      padding: 8px 12px; font-family: monospace; font-size: 12px;
+      cursor: pointer; border: 1px solid #6a4040;
+      background: #261d1d; color: #d4b8a8; text-align: left;
+    }
+    .raid-tier-btn:hover { background: #382727; color: #f0c8a8; }
+    #raid-selector-actions { margin-top: 12px; }
+    #raid-selector-cancel {
+      padding: 6px 14px; font-family: monospace; font-size: 12px;
+      cursor: pointer; border: 1px solid #666;
+      background: #2a2620; color: #aaa;
+    }
+
     body.is-mobile #party-frame {
       width: 180px; font-size: 11px;
       top: auto; bottom: 110px;

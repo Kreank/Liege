@@ -5020,6 +5020,34 @@ class WorldScene extends Phaser.Scene {
           window.chatConsole.addMessage('party', msg.from, `${prefix} ${msg.text}`);
         }
         break;
+      case 'loot_roll_started':
+        this.showLootRoll(msg);
+        break;
+      case 'loot_roll_voted':
+        // Optional: kann im Chat gezeigt werden
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('party', null,
+            `🎲 ${msg.player} → ${msg.vote}`);
+        }
+        break;
+      case 'loot_roll_resolved':
+        this.hideLootRoll();
+        if (window.chatConsole) {
+          const winnerTxt = msg.winner
+            ? `🏆 ${msg.winner} (${msg.vote}, roll ${msg.roll})`
+            : '— niemand hat gerollt';
+          window.chatConsole.addMessage('party', null,
+            `🎲 Loot-Roll beendet: ${winnerTxt}`);
+        }
+        break;
+      case 'loot_rule_changed':
+        if (window.chatConsole) {
+          const txt = msg.rule === 'need_greed'
+            ? '⚔️ Loot-Regel: Need/Greed-Roll für Equipment'
+            : '🎁 Loot-Regel: Free-For-All';
+          window.chatConsole.addMessage('party', null, txt);
+        }
+        break;
       case 'raid_started':
         this.showEvent(`⚔️ ${msg.label} startet — ${msg.spawned} Kreaturen (T${msg.tier})`);
         if (window.chatConsole) {
@@ -5729,6 +5757,11 @@ class WorldScene extends Phaser.Scene {
                                  { scale: 1.3, depth: 12, once: true });
           }
         }
+        // Welle 31: Group-XP-Toast wenn der Kill in Gruppe lief
+        if (msg.group_share && window.chatConsole) {
+          window.chatConsole.addMessage('party', null,
+            `⚔️ +${msg.gained || ''} ${msg.skill} — geteilt mit ${msg.group_share.members} (+${msg.group_share.bonus_pct}%)`);
+        }
         // Welle 25: Power-Tier-Update aus skill_xp übernehmen + Mob-Color refreshen
         if (msg.power_tier != null && msg.power_tier !== this.myPowerTier) {
           this.myPowerTier = msg.power_tier;
@@ -6382,8 +6415,26 @@ class WorldScene extends Phaser.Scene {
     }
   }
 
+  _wireRaidUIOnce() {
+    if (this._raidUIWired) return;
+    this._raidUIWired = true;
+    const raidBtn = document.getElementById('party-raid-btn');
+    const cancelBtn = document.getElementById('raid-selector-cancel');
+    const tiers = document.querySelectorAll('.raid-tier-btn');
+    if (raidBtn) raidBtn.addEventListener('click', () => this.openRaidSelector());
+    if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeRaidSelector());
+    tiers.forEach(b => b.addEventListener('click', () => {
+      const tier = parseInt(b.dataset.tier, 10) || 1;
+      if (window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
+        window.GAME_WS.send(JSON.stringify({ type: 'raid_trigger_manual', tier }));
+      }
+      this.closeRaidSelector();
+    }));
+  }
+
   // Welle 31: Party / Raid Frame
   refreshPartyFrame() {
+    this._wireRaidUIOnce();
     const frame = document.getElementById('party-frame');
     const list  = document.getElementById('party-frame-members');
     const cnt   = document.getElementById('party-frame-count');
@@ -6427,7 +6478,71 @@ class WorldScene extends Phaser.Scene {
       row.appendChild(name);
       list.appendChild(row);
     }
+    // Leader-Aktionen (Raid-Button) nur sichtbar wenn ich Leader bin
+    const leaderBox = document.getElementById('party-frame-leader-actions');
+    if (leaderBox) {
+      const meIsLeader = g.members.some(m => m.name === MY_ID && m.role === 'leader');
+      leaderBox.style.display = meIsLeader ? 'block' : 'none';
+    }
     frame.style.display = 'block';
+  }
+
+  openRaidSelector() {
+    const ov = document.getElementById('raid-selector-overlay');
+    if (ov) ov.style.display = 'flex';
+  }
+  closeRaidSelector() {
+    const ov = document.getElementById('raid-selector-overlay');
+    if (ov) ov.style.display = 'none';
+  }
+
+  showLootRoll(msg) {
+    const ov   = document.getElementById('loot-roll-overlay');
+    const body = document.getElementById('loot-roll-body');
+    const need = document.getElementById('loot-roll-need');
+    const grd  = document.getElementById('loot-roll-greed');
+    const pas  = document.getElementById('loot-roll-pass');
+    const tim  = document.getElementById('loot-roll-timer');
+    if (!ov || !body) return;
+    const it = msg.item || {};
+    const itemName = (window.ITEM && window.ITEM[it.kind] || { name: it.kind || 'Item' }).name;
+    const qual = it.quality && it.quality !== 'normal' ? ` (${it.quality})` : '';
+    body.innerHTML = `<b>${itemName}${qual}</b><br>` +
+                     `<span style="color:#888;font-size:11px">Need wenn du es brauchst, Greed sonst</span>`;
+    this._currentRollId = msg.roll_id;
+    const vote = (kind) => {
+      if (window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
+        window.GAME_WS.send(JSON.stringify({
+          type: 'loot_vote', roll_id: this._currentRollId, vote: kind,
+        }));
+      }
+      this.hideLootRoll();
+    };
+    need.onclick = () => vote('need');
+    grd.onclick  = () => vote('greed');
+    pas.onclick  = () => vote('pass');
+    ov.style.display = 'flex';
+    // Countdown
+    if (this._rollTimer) clearInterval(this._rollTimer);
+    let remaining = msg.expires_in_s || 20;
+    tim.textContent = `${remaining} s`;
+    this._rollTimer = setInterval(() => {
+      remaining -= 1;
+      tim.textContent = `${remaining} s`;
+      if (remaining <= 0) {
+        clearInterval(this._rollTimer);
+        this._rollTimer = null;
+        this.hideLootRoll();
+      }
+    }, 1000);
+  }
+  hideLootRoll() {
+    const ov = document.getElementById('loot-roll-overlay');
+    if (ov) ov.style.display = 'none';
+    if (this._rollTimer) {
+      clearInterval(this._rollTimer);
+      this._rollTimer = null;
+    }
   }
 
   showGroupInvite(invite) {
@@ -9334,6 +9449,15 @@ function setupChatConsole(myRole) {
         if (!arg) { addMessage('error', null, `${cmd} TEXT — Nachricht an die Gruppe`); return true; }
         ws.send(JSON.stringify({ type: 'group_chat', text: arg }));
         return true;
+      case '/lootrule': {
+        const rule = (arg || '').trim().toLowerCase();
+        if (!['ffa', 'need_greed'].includes(rule)) {
+          addMessage('error', null, '/lootrule ffa | need_greed');
+          return true;
+        }
+        ws.send(JSON.stringify({ type: 'set_loot_rule', rule }));
+        return true;
+      }
       case '/raidstart':
       case '/triggerraid': {
         const tier = parseInt(arg, 10) || 1;
@@ -9348,7 +9472,7 @@ function setupChatConsole(myRole) {
         addMessage('system', null,
           '/invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband · '
           + '/party · /raid (→20) · /raid40 · /p TEXT (Gruppen-Chat) · '
-          + '/raidstart 1..5 (manuelle Raid-Welle)');
+          + '/raidstart 1..5 (manuelle Raid-Welle) · /lootrule ffa|need_greed');
         return true;
     }
     return false;

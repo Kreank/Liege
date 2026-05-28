@@ -281,9 +281,12 @@ def manhattan(ax: int, ay: int, bx: int, by: int) -> int:
 #   - Snacks (Beeren) → kleiner HP
 USE_EFFECTS = {
     # Tränke
-    "health_potion": {"hp": 30},
-    "mana_potion":   {"mana": 30},
-    "herb":          {"hp": 5},
+    "health_potion":         {"hp": 30},
+    "greater_health_potion": {"hp": 70},
+    "mana_potion":           {"mana": 30},
+    "greater_mana_potion":   {"mana": 70},
+    "stamina_potion":        {"stamina": 60},
+    "herb":                  {"hp": 5},
     # Beeren — alle gleich
     "strawberry":    {"hp": 2},
     "blueberry":     {"hp": 2},
