@@ -273,3 +273,39 @@ def roll_boss_equipment() -> tuple[str, str] | None:
     if not kind or not quality_k:
         return None
     return kind, quality_k
+
+
+# Welle 32: Dungeon-Key-Item-Drops aus Boss-/Pack-Leader-Kills.
+# Rudelführer/Elite-Mobs (kein Boss aber hervorgehoben).
+PACK_LEADER_KINDS = {
+    "wolf_alpha", "dire_wolf", "cave_bear", "polar_bear",
+    "wolverine", "cougar",
+}
+
+# (item_kind, chance_boss, chance_pack_leader, player_min_level)
+DUNGEON_KEY_DROPS = [
+    ("dungeon_map",  0.08, 0.03,  0),   # T3 Groß
+    ("rift_lore",    0.02, 0.00, 20),   # T4 Raid20 — nur Boss, ab Lvl 20
+    ("kings_seal",   0.005,0.00, 30),   # T5 Raid40 — sehr selten, ab Lvl 30
+]
+
+
+def roll_dungeon_key_drops(npc_kind: str, killer_combat_level: int) -> list[str]:
+    """Würfelt Key-Item-Drops für einen NPC-Kill. Nur bei Boss-Kinds
+    (BOSS_KINDS) und Pack-Leader-Kinds (PACK_LEADER_KINDS).
+    Returns Liste von Item-Slugs (kann mehrere enthalten, theoretisch leer).
+    """
+    import random as _r
+    from npc_worker import BOSS_KINDS as _BOSS
+    is_boss = npc_kind in _BOSS
+    is_leader = npc_kind in PACK_LEADER_KINDS
+    if not (is_boss or is_leader):
+        return []
+    out: list[str] = []
+    for item_kind, chance_boss, chance_leader, min_lvl in DUNGEON_KEY_DROPS:
+        if killer_combat_level < min_lvl:
+            continue
+        chance = chance_boss if is_boss else chance_leader
+        if chance > 0 and _r.random() < chance:
+            out.append(item_kind)
+    return out

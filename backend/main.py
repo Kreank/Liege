@@ -49,6 +49,7 @@ import factions
 import groups
 import quest_stages
 import dungeon_instance
+import dungeon_tiers
 import attributes
 import trade
 import world_populator
@@ -337,12 +338,19 @@ async def lifespan(app: FastAPI):
     wildfire_task = asyncio.create_task(event_worker.wildfire_tick_loop(structures, manager))
     # Welle 31: Spielergruppen-Reaper (Auto-Disband idle parties + alte Raids)
     groups_reaper_task = asyncio.create_task(groups.reaper_loop(manager))
+    # Welle 32: Dungeon-Reaper (expires_at) + Auto-Spawn
+    import dungeon_director as _dd
+    dungeon_reaper_task = asyncio.create_task(
+        _dd.reaper_loop(manager, world, structures))
+    dungeon_spawn_task = asyncio.create_task(
+        _dd.spawn_loop(manager, world, structures))
 
     yield
 
     tasks = (event_task, wander_task, item_task, spawn_task, respawn_task,
              farm_task, world_respawn_task, needs_task, bill_task, mood_task,
-             raid_task, time_task, status_task, groups_reaper_task)
+             raid_task, time_task, status_task, groups_reaper_task,
+             dungeon_reaper_task, dungeon_spawn_task)
     for t in tasks:
         t.cancel()
     for t in tasks:
@@ -861,6 +869,17 @@ async def _apply_spell_effects(player_id: str, spell_id: str,
                             await manager.broadcast({"type": "item_spawned", "item": dropped})
                             try: await _maybe_start_loot_roll(player_id, dropped)
                             except Exception: logging.exception("loot-roll start failed")
+                    # Welle 32: Key-Item-Drops (Boss / Pack-Leader)
+                    try:
+                        _kl = await skills.get_skill_level(player_id, "combat")
+                        for _key in loot.roll_dungeon_key_drops(n["kind"], _kl):
+                            _d = await items.spawn_on_ground(_key, drop_x, drop_y)
+                            if _d is not None:
+                                await manager.broadcast({
+                                    "type": "item_spawned", "item": _d,
+                                })
+                    except Exception:
+                        logging.exception("key-item drop (spell-aoe) failed")
                     await manager.broadcast({
                         "type": "npc_died", "npc_id": n["id"],
                         "killed_by": player_id, "name": n["name"],
@@ -1418,48 +1437,104 @@ async def websocket_endpoint(websocket: WebSocket):
                 if spell_caster.is_casting(player_id):
                     spell_caster.interrupt(player_id, "movement")
                 x, y = data["x"], data["y"]
-                # Welle 9b: bei Dungeon-Aufenthalt anders validieren
+                # Multi-Floor-Dungeon-Validierung
                 cur_world = await dungeon_instance.get_player_world(player_id)
                 if cur_world != "overworld":
-                    # Dungeon-Tile-Validierung
-                    dungeon_id = int(cur_world.split(":")[1])
-                    drow = await db.pool().fetchrow(
-                        "SELECT tiles, size FROM dungeons WHERE id = $1", dungeon_id,
+                    parsed = dungeon_instance.parse_world_id(cur_world)
+                    if parsed is None:
+                        continue
+                    dungeon_id, floor_idx = parsed
+                    floor = await dungeon_instance.get_floor(dungeon_id, floor_idx)
+                    if floor is None:
+                        continue
+                    size = floor["size"]
+                    tiles = floor["tiles"]
+                    if not (0 <= x < size and 0 <= y < size
+                            and dungeon_instance.is_walkable_tile(tiles[y][x])):
+                        continue
+                    manager.update_player(player_id, x, y)
+                    await db.pool().execute(
+                        "UPDATE players SET x = $1, y = $2, last_seen = NOW() "
+                        "WHERE name = $3",
+                        x, y, player_id,
                     )
-                    if drow:
-                        import json as _json
-                        tiles = drow["tiles"]
-                        if isinstance(tiles, str):
-                            tiles = _json.loads(tiles)
-                        if (0 <= x < drow["size"] and 0 <= y < drow["size"]
-                                and dungeon_instance.is_walkable_tile(tiles[y][x])):
-                            manager.update_player(player_id, x, y)
-                            await db.pool().execute(
-                                "UPDATE players SET x = $1, y = $2, last_seen = NOW() "
-                                "WHERE name = $3",
-                                x, y, player_id,
+                    # Stairs-Trigger: nur wenn der Spieler GENAU auf das
+                    # Treppen-Tile getreten ist (kein endless re-trigger).
+                    import dungeon_world as _dw
+                    tile = tiles[y][x]
+                    if tile == _dw.STAIRS_UP:
+                        if floor_idx == 0:
+                            # Floor 0 → Exit zur Overworld
+                            ow = await dungeon_instance.exit_dungeon(player_id)
+                            if ow:
+                                manager.update_player(player_id, ow[0], ow[1])
+                                cx_, cy_, _, _ = World.world_to_chunk(ow[0], ow[1])
+                                new_chunks = await world.ensure_chunks_around(
+                                    cx_, cy_, radius=CHUNK_SEND_RADIUS,
+                                )
+                                await websocket.send_json({
+                                    "type": "dungeon_exit",
+                                    "spawn": {"x": ow[0], "y": ow[1]},
+                                    "chunks": new_chunks,
+                                })
+                                await websocket.send_json({
+                                    "type": "toast",
+                                    "text": "🌅 Du verlässt das Dungeon.",
+                                })
+                        else:
+                            # Floor >0 → vorherige Floor
+                            new_floor = await dungeon_instance.change_floor(
+                                player_id, dungeon_id, floor_idx - 1,
                             )
-                            # Stairs_up?
-                            import dungeon_world as _dw
-                            if tiles[y][x] == _dw.STAIRS_UP:
-                                # Exit zurück zur Overworld
-                                ow = await dungeon_instance.exit_dungeon(player_id)
-                                if ow:
-                                    manager.update_player(player_id, ow[0], ow[1])
-                                    # Frische Overworld-Chunks senden
-                                    cx_, cy_, _, _ = World.world_to_chunk(ow[0], ow[1])
-                                    new_chunks = await world.ensure_chunks_around(
-                                        cx_, cy_, radius=CHUNK_SEND_RADIUS,
-                                    )
-                                    await websocket.send_json({
-                                        "type": "dungeon_exit",
-                                        "spawn": {"x": ow[0], "y": ow[1]},
-                                        "chunks": new_chunks,
-                                    })
-                                    await websocket.send_json({
-                                        "type": "toast",
-                                        "text": "🌅 Du verlässt das Dungeon.",
-                                    })
+                            if new_floor:
+                                manager.update_player(
+                                    player_id,
+                                    new_floor["spawn"][0], new_floor["spawn"][1],
+                                )
+                                dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+                                await websocket.send_json({
+                                    "type":       "dungeon_floor_change",
+                                    "dungeon_id": dungeon_id,
+                                    "floor_idx":  floor_idx - 1,
+                                    "floor_count":dungeon["floor_count"],
+                                    "size":       new_floor["size"],
+                                    "tiles":      new_floor["tiles"],
+                                    "spawn":      {"x": new_floor["spawn"][0],
+                                                   "y": new_floor["spawn"][1]},
+                                })
+                                await websocket.send_json({
+                                    "type": "toast",
+                                    "text": f"🪜 Floor {floor_idx}/{dungeon['floor_count']} (rauf)",
+                                })
+                    elif tile == _dw.STAIRS_DOWN:
+                        dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+                        if dungeon and floor_idx + 1 < dungeon["floor_count"]:
+                            new_floor = await dungeon_instance.change_floor(
+                                player_id, dungeon_id, floor_idx + 1,
+                            )
+                            if new_floor:
+                                manager.update_player(
+                                    player_id,
+                                    new_floor["spawn"][0], new_floor["spawn"][1],
+                                )
+                                try: await dungeon_instance.populate_floor_mobs(
+                                    dungeon_id, floor_idx + 1, npcs, manager)
+                                except Exception:
+                                    logging.exception("floor population (down) failed")
+                                await websocket.send_json({
+                                    "type":       "dungeon_floor_change",
+                                    "dungeon_id": dungeon_id,
+                                    "floor_idx":  floor_idx + 1,
+                                    "floor_count":dungeon["floor_count"],
+                                    "size":       new_floor["size"],
+                                    "tiles":      new_floor["tiles"],
+                                    "spawn":      {"x": new_floor["spawn"][0],
+                                                   "y": new_floor["spawn"][1]},
+                                })
+                                await websocket.send_json({
+                                    "type": "toast",
+                                    "text": f"🪜 Floor {floor_idx+2}/{dungeon['floor_count']} (runter)",
+                                })
                     continue
                 walkable = await world.is_walkable(x, y)
                 if walkable and not structures.blocks(x, y):
@@ -1844,6 +1919,46 @@ async def websocket_endpoint(websocket: WebSocket):
                     if (kind in ("bread", "cooked_meat")
                             and talent_eff_c.get("cooking_heal_bonus", 0) > 0):
                         await heal_player(player_id, int(talent_eff_c["cooking_heal_bonus"]))
+                # Welle 32: Dungeon-Key-Items — spawnt Tier-Dungeon an Player-Pos
+                key_tier = dungeon_tiers.tier_for_key_item(kind or "")
+                if key_tier is not None:
+                    player_pos = manager.get_players().get(player_id)
+                    if player_pos:
+                        # Walkable-Spot in der Nähe finden
+                        sx, sy = player_pos["x"], player_pos["y"]
+                        spawn_xy = None
+                        for dx, dy in [(0,0),(1,0),(-1,0),(0,1),(0,-1),(2,0),(0,2)]:
+                            tx, ty = sx + dx, sy + dy
+                            if await world.is_walkable(tx, ty) and structures.at(tx, ty) is None:
+                                spawn_xy = (tx, ty); break
+                        if spawn_xy:
+                            meta = await dungeon_instance.spawn_dungeon(
+                                spawn_xy[0], spawn_xy[1], key_tier,
+                            )
+                            s = await structures.place(
+                                spawn_xy[0], spawn_xy[1], "stairs_down", "system",
+                                material="stone", durability=999,
+                            )
+                            if s:
+                                await manager.broadcast({
+                                    "type": "structure_placed", "structure": s,
+                                })
+                            label = dungeon_tiers.TIER_LABEL.get(key_tier, "Verlies")
+                            await manager.broadcast({
+                                "type": "world_event",
+                                "kind": "dungeon_spawned",
+                                "text": f"🏚️ {player_id} öffnet ein {label}!",
+                                "x": spawn_xy[0], "y": spawn_xy[1],
+                            })
+                            await websocket.send_json({
+                                "type": "toast",
+                                "text": f"🔮 {label} öffnet sich vor dir!",
+                            })
+                        else:
+                            await websocket.send_json({
+                                "type": "toast",
+                                "text": "⛔ Kein freier Platz für das Verlies",
+                            })
 
             elif mtype == "pick_item":
                 # Expliziter Pickup: Spieler klickt auf Item am Boden in Reichweite (≤1 Tile).
@@ -2059,6 +2174,17 @@ async def websocket_endpoint(websocket: WebSocket):
                                 })
                                 try: await _maybe_start_loot_roll(player_id, dropped)
                                 except Exception: logging.exception("loot-roll start failed")
+                    # Welle 32: Dungeon-Key-Item-Drops aus Boss + Pack-Leader
+                    try:
+                        _kl = await skills.get_skill_level(player_id, "combat")
+                        for _key in loot.roll_dungeon_key_drops(npc["kind"], _kl):
+                            _d = await items.spawn_on_ground(_key, drop_x, drop_y)
+                            if _d is not None:
+                                await manager.broadcast({
+                                    "type": "item_spawned", "item": _d,
+                                })
+                    except Exception:
+                        logging.exception("key-item drop failed")
                     # Welle 23-F: Camp-Cooldown — wenn der letzte
                     # Bandit/Robber/Thief im chunk tot ist, mark als cleared.
                     if npc["kind"] in _nw.CAMP_ONLY_KINDS:
@@ -2299,6 +2425,17 @@ async def websocket_endpoint(websocket: WebSocket):
                                             })
                                             try: await _maybe_start_loot_roll(player_id, dropped)
                                             except Exception: logging.exception("loot-roll start failed")
+                                    # Welle 32: Key-Item-Drops (Boss / Pack-Leader)
+                                    try:
+                                        _kl = await skills.get_skill_level(player_id, "combat")
+                                        for _key in loot.roll_dungeon_key_drops(t["kind"], _kl):
+                                            _d = await items.spawn_on_ground(_key, drop_x, drop_y)
+                                            if _d is not None:
+                                                await manager.broadcast({
+                                                    "type": "item_spawned", "item": _d,
+                                                })
+                                    except Exception:
+                                        logging.exception("key-item drop (direct-spell) failed")
                                     # Welle 23: Boss-Garantie-Equipment auch via Spell-Kill
                                     import npc_worker as _nw2
                                     if t["kind"] in _nw2.BOSS_KINDS:
@@ -2787,7 +2924,8 @@ async def websocket_endpoint(websocket: WebSocket):
                         })
                     continue
                 if s["type"] == "stairs_down":
-                    # Welle 9b: echtes Betreten — Player wechselt Welt
+                    # Welle 32: Multi-Floor-Dungeons. Dungeon-Eingang ist per
+                    # entrance_x/y mit der stairs_down-Struktur verknüpft.
                     cur_world = await dungeon_instance.get_player_world(player_id)
                     if cur_world != "overworld":
                         await websocket.send_json({
@@ -2798,24 +2936,55 @@ async def websocket_endpoint(websocket: WebSocket):
                     cur_player = manager.get_players().get(player_id)
                     if cur_player is None:
                         continue
-                    dungeon = await dungeon_instance.enter_dungeon(
-                        player_id, s["x"], s["y"],
-                        cur_player["x"], cur_player["y"],
+                    # Existing Instance an dieser Eingangs-Position?
+                    drow = await db.pool().fetchrow(
+                        "SELECT id, tier, theme FROM dungeons "
+                        "WHERE entrance_x = $1 AND entrance_y = $2 "
+                        "  AND expires_at > NOW() ORDER BY id DESC LIMIT 1",
+                        s["x"], s["y"],
                     )
-                    # Server-Position auch in-memory updaten
-                    manager.update_player(player_id, dungeon["spawn_x"], dungeon["spawn_y"])
+                    if drow:
+                        dungeon_id = drow["id"]
+                    else:
+                        # Player-platzierte oder alte stairs_down ohne Instanz
+                        # → Ad-hoc Tier-1-Spawn (klein, 2-4h)
+                        meta = await dungeon_instance.spawn_dungeon(
+                            s["x"], s["y"], dungeon_tiers.TIER_SMALL,
+                        )
+                        dungeon_id = meta["id"]
+                    floor = await dungeon_instance.enter_dungeon(
+                        player_id, dungeon_id,
+                        cur_player["x"], cur_player["y"],
+                        floor_idx=0,
+                    )
+                    if floor is None:
+                        await websocket.send_json({
+                            "type": "toast", "text": "⛔ Dungeon nicht erreichbar"})
+                        continue
+                    dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+                    manager.update_player(player_id,
+                                          floor["spawn"][0], floor["spawn"][1])
+                    # Mobs spawnen falls erste Floor-Begegnung
+                    try: await dungeon_instance.populate_floor_mobs(
+                        dungeon_id, 0, npcs, manager)
+                    except Exception: logging.exception("floor population failed")
                     await websocket.send_json({
                         "type": "dungeon_enter",
                         "dungeon_id": dungeon["id"],
                         "name":       dungeon["name"],
-                        "theme":      dungeon.get("theme"),
-                        "size":       dungeon["size"],
-                        "tiles":      dungeon["tiles"],
-                        "spawn":      {"x": dungeon["spawn_x"], "y": dungeon["spawn_y"]},
+                        "theme":      dungeon["theme"],
+                        "tier":       dungeon["tier"],
+                        "floor_count":dungeon["floor_count"],
+                        "floor_idx":  0,
+                        "size":       floor["size"],
+                        "tiles":      floor["tiles"],
+                        "spawn":      {"x": floor["spawn"][0], "y": floor["spawn"][1]},
+                        "expires_at": dungeon["expires_at"],
                     })
+                    label = dungeon_tiers.TIER_LABEL.get(dungeon["tier"], "Dungeon")
                     await websocket.send_json({
                         "type": "toast",
-                        "text": f"🏚️ Du betrittst: {dungeon['name'].split(':')[0]}",
+                        "text": f"🏚️ {label} — Floor 1/{dungeon['floor_count']}",
                     })
                     continue
                 if s["type"] == "farm_plot":

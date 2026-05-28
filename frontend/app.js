@@ -5197,11 +5197,22 @@ class WorldScene extends Phaser.Scene {
         }
         break;
 
-      case 'npc_spawned':
+      case 'npc_spawned': {
+        // Welle 32: world_id-Filter — Overworld-Player sieht keine Dungeon-NPCs
+        // und umgekehrt. world_id='overworld' (oder fehlt) ↔ inDungeon=false.
+        const npcWorld = msg.npc.world_id || 'overworld';
+        const myWorld = this.inDungeon ? (this.currentWorldId || 'dungeon')
+                                       : 'overworld';
+        const sameWorld = (npcWorld === 'overworld' && !this.inDungeon)
+                       || (npcWorld !== 'overworld' && this.inDungeon
+                           && (this.currentWorldId == null
+                               || npcWorld === this.currentWorldId));
+        if (!sameWorld) break;
         this.spawnNPCSprite(msg.npc);
         this.showEvent(`🌿 ${msg.npc.name} ist in der Welt erschienen`);
         this.drawMinimap();
         break;
+      }
 
       case 'npc_moved':
         if (this.npcs[msg.npc_id]) {
@@ -5506,10 +5517,48 @@ class WorldScene extends Phaser.Scene {
         break;
 
       case 'dungeon_enter':
+        // Welle 32: Multi-Floor — currentWorldId nach Format dungeon:<id>:<floor>
+        this.currentWorldId = `dungeon:${msg.dungeon_id}:${msg.floor_idx || 0}`;
+        this.currentDungeonId = msg.dungeon_id;
+        this.currentDungeonTier = msg.tier;
+        this.currentDungeonFloorCount = msg.floor_count;
+        this.currentDungeonFloorIdx = msg.floor_idx || 0;
+        this.currentDungeonExpiresAt = msg.expires_at;
         this.enterDungeonMode(msg);
         break;
 
+      case 'dungeon_floor_change':
+        // Wechsel zwischen Floors — Map neu laden, currentWorldId aktualisieren
+        this.currentWorldId = `dungeon:${msg.dungeon_id}:${msg.floor_idx}`;
+        this.currentDungeonFloorIdx = msg.floor_idx;
+        // Cleanup old NPCs (alte Floor)
+        for (const nid of Object.keys(this.npcs)) {
+          const n = this.npcs[nid];
+          if (n.tween) n.tween.stop();
+          if (n.container) n.container.destroy();
+          delete this.npcs[nid];
+        }
+        // Map neu rendern wie bei Enter
+        this.enterDungeonMode({
+          dungeon_id: msg.dungeon_id,
+          name: 'Floor ' + (msg.floor_idx + 1),
+          theme: this.currentDungeonTheme,
+          size: msg.size,
+          tiles: msg.tiles,
+          spawn: msg.spawn,
+        });
+        break;
+
       case 'dungeon_exit':
+        this.currentWorldId = 'overworld';
+        this.currentDungeonId = null;
+        this.exitDungeonMode(msg);
+        break;
+
+      case 'dungeon_collapsed':
+        // Reaper hat uns rausgeworfen
+        this.currentWorldId = 'overworld';
+        this.currentDungeonId = null;
         this.exitDungeonMode(msg);
         break;
 
@@ -7257,7 +7306,8 @@ class WorldScene extends Phaser.Scene {
       0: 'dungeon_dungeon_wall',
       1: 'dungeon_dungeon_floor',
       2: 'dungeon_dungeon_floor',
-      3: 'dungeon_stairs_down',  // stairs_up zeigt das stairs-Asset
+      3: 'dungeon_stairs_down',  // STAIRS_UP (Tile 3) — gleiches Sprite (Treppe nach oben)
+      4: 'dungeon_stairs_down',  // STAIRS_DOWN (Tile 4) — gleiches Sprite (Treppe nach unten)
     };
     for (let y = 0; y < this.dungeonSize; y++) {
       for (let x = 0; x < this.dungeonSize; x++) {

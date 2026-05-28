@@ -129,6 +129,11 @@ ITEM_KINDS = {
     "runic_tablet":    {"category": "magic", "name": "Runen-Tablet",       "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/runic_tablet.png"},
     "healing_codex":   {"category": "magic", "name": "Heiler-Kodex",       "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/healing_codex.png"},
     "trade_ledger":    {"category": "magic", "name": "Handelsbuch",        "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/trade_ledger.png"},
+    # Welle 32: Dungeon-Key-Items — beim Use spawnen sie einen Tier-Dungeon-Eingang
+    # an der Spieler-Position. Quest-Reward für T3, selten via Boss-Loot.
+    "dungeon_map":     {"category": "magic", "name": "Verlies-Karte",       "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/ancient_scroll.png"},
+    "rift_lore":       {"category": "magic", "name": "Risskunde",           "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/runic_tablet.png"},
+    "kings_seal":      {"category": "magic", "name": "Königliches Siegel",  "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/gods_tablet.png"},
     # Tools — skill-spezifischer Bonus beim Equipping
     "pickaxe": {"category": "tool", "name": "Spitzhacke", "slot": "tool", "sprite": "/assets/tools/pickaxe.png"},
     "shovel":  {"category": "tool", "name": "Schaufel",   "slot": "tool", "sprite": "/assets/tools/shovel.png"},

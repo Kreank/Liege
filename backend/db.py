@@ -498,6 +498,33 @@ CREATE TABLE IF NOT EXISTS dungeons (
 ALTER TABLE players ADD COLUMN IF NOT EXISTS world_id   TEXT NOT NULL DEFAULT 'overworld';
 ALTER TABLE players ADD COLUMN IF NOT EXISTS overworld_x INTEGER NULL;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS overworld_y INTEGER NULL;
+
+-- Welle 32: NPCs welt-aware (overworld vs dungeon:<id>:<floor>)
+ALTER TABLE npcs ADD COLUMN IF NOT EXISTS world_id TEXT NOT NULL DEFAULT 'overworld';
+CREATE INDEX IF NOT EXISTS npcs_world_id_idx ON npcs (world_id);
+
+-- Welle 32: Multi-Floor + Tier + Lifetime
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS tier         INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS floor_count  INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS expires_at   TIMESTAMPTZ NULL;
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS entrance_x   INTEGER NULL;
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS entrance_y   INTEGER NULL;
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS theme        TEXT NULL;
+ALTER TABLE dungeons ADD COLUMN IF NOT EXISTS warned       BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS dungeon_floors (
+    dungeon_id    BIGINT  NOT NULL REFERENCES dungeons(id) ON DELETE CASCADE,
+    floor_idx     INTEGER NOT NULL,
+    size          INTEGER NOT NULL,
+    tiles         JSONB   NOT NULL,
+    spawn_x       INTEGER NOT NULL,
+    spawn_y       INTEGER NOT NULL,
+    next_stair_x  INTEGER NULL,
+    next_stair_y  INTEGER NULL,
+    populated     BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (dungeon_id, floor_idx)
+);
+CREATE INDEX IF NOT EXISTS dungeons_expires_idx ON dungeons (expires_at) WHERE expires_at IS NOT NULL;
 """
 
 _pool: asyncpg.Pool | None = None

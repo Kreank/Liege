@@ -1,20 +1,22 @@
 """Prozeduraler Dungeon-Generator (BSP-basiert).
 
-Erzeugt eine kleine Map (DEFAULT 24×24) mit Räumen, Korridoren, Start-Tile
-und 'stairs_up' am Eingang. Mobs/Truhen werden per `populate` befüllt.
+Erzeugt Floor-Maps für mehrstufige Dungeons. Pro Floor ein BSP-Layout
+mit Räumen, Korridoren, Start-Tile, `stairs_up` (Exit/vorherige Floor)
+und optional `stairs_down` (nächste Floor).
 
 Tile-IDs (Dungeon-spezifisch, separat von Overworld):
     0 = wall (solid)
     1 = floor
     2 = corridor (auch begehbar)
-    3 = stairs_up (Exit)
+    3 = stairs_up   (zur vorherigen Floor / Overworld-Exit auf Floor 0)
+    4 = stairs_down (zur nächsten Floor, nur auf nicht-letzter Floor)
 """
 import logging
 import random
 
 log = logging.getLogger("liege.dungeon_world")
 
-WALL, FLOOR, CORRIDOR, STAIRS_UP = 0, 1, 2, 3
+WALL, FLOOR, CORRIDOR, STAIRS_UP, STAIRS_DOWN = 0, 1, 2, 3, 4
 
 DEFAULT_SIZE = 24
 MIN_ROOM_SIZE = 4
@@ -78,18 +80,23 @@ def _split_bsp(rng: random.Random, x: int, y: int, w: int, h: int,
     return [_Room(x + 1, y + 1, rw, rh)]
 
 
-def generate(seed: int, size: int = DEFAULT_SIZE, theme: str | None = None) -> dict:
-    """Generiert einen Dungeon-Layout.
+def generate(seed: int, size: int = DEFAULT_SIZE, theme: str | None = None,
+             with_stairs_down: bool = False) -> dict:
+    """Generiert ein Floor-Layout.
 
     theme: optional 'crypt'/'mine'/'temple'/'ruin'/'cave' — wenn None,
     deterministisch aus seed gewählt.
+    with_stairs_down: True → ein STAIRS_DOWN-Tile im am weitesten
+    entfernten Raum platzieren. Auf der letzten Floor False (Boss statt
+    Treppe).
 
     Returns: {
         "size": size, "theme": str,
         "tiles": list[list[int]],
         "rooms": list[(cx, cy)],
-        "spawn": (x, y),
+        "spawn": (x, y),               # STAIRS_UP-Position
         "stairs_up": (x, y),
+        "stairs_down": (x, y) | None,
     }
     """
     import dungeon_themes
@@ -110,17 +117,25 @@ def generate(seed: int, size: int = DEFAULT_SIZE, theme: str | None = None) -> d
     # Spawn-Tile = erstes Room-Center, Stairs-Up dort
     spawn = centers[0] if centers else (size // 2, size // 2)
     tiles[spawn[1]][spawn[0]] = STAIRS_UP
-    log.info("Dungeon seed=%d theme=%s generiert: %d rooms, spawn=%s",
-             seed, theme, len(rooms), spawn)
+    # Stairs-Down im am weitesten entfernten Raum-Center
+    stairs_down = None
+    if with_stairs_down and len(centers) > 1:
+        farthest = max(centers[1:],
+                       key=lambda c: abs(c[0] - spawn[0]) + abs(c[1] - spawn[1]))
+        tiles[farthest[1]][farthest[0]] = STAIRS_DOWN
+        stairs_down = farthest
+    log.info("Floor seed=%d theme=%s: %d rooms, spawn=%s, stairs_down=%s",
+             seed, theme, len(rooms), spawn, stairs_down)
     return {
-        "size":      size,
-        "theme":     theme,
-        "tiles":     tiles,
-        "rooms":     centers,
-        "spawn":     spawn,
-        "stairs_up": spawn,
+        "size":         size,
+        "theme":        theme,
+        "tiles":        tiles,
+        "rooms":        centers,
+        "spawn":        spawn,
+        "stairs_up":    spawn,
+        "stairs_down":  stairs_down,
     }
 
 
 def is_walkable_tile(tile_id: int) -> bool:
-    return tile_id in (FLOOR, CORRIDOR, STAIRS_UP)
+    return tile_id in (FLOOR, CORRIDOR, STAIRS_UP, STAIRS_DOWN)

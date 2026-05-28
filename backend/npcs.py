@@ -40,6 +40,11 @@ def _row_to_dict(row) -> dict:
     except Exception:
         d["tier"] = 2
         d["display_scale"] = 1.0
+    # Welle 32: world_id (overworld vs dungeon:<id>:<floor>)
+    try:
+        d["world_id"] = row["world_id"] or "overworld"
+    except (KeyError, IndexError):
+        d["world_id"] = "overworld"
     return d
 
 
@@ -50,7 +55,8 @@ class NPCManager:
     async def load(self) -> None:
         rows = await db.pool().fetch(
             "SELECT id, name, kind, x, y, backstory, mood, mental_state, hp, max_hp, "
-            "home_x, home_y, created_at, last_moved, sprite_variant, personality FROM npcs"
+            "home_x, home_y, created_at, last_moved, sprite_variant, personality, world_id "
+            "FROM npcs"
         )
         self._by_id = {}
         for r in rows:
@@ -72,7 +78,8 @@ class NPCManager:
         return len(self._by_id)
 
     async def create(self, name: str, kind: str, x: int, y: int, backstory: str,
-                     max_hp: int = 50, sprite_variant: str | None = None) -> dict:
+                     max_hp: int = 50, sprite_variant: str | None = None,
+                     world_id: str = "overworld") -> dict:
         # Welle 26: Friendly NPCs kriegen automatisch eine Persönlichkeit für
         # variantenreiches Chatter. Creatures (hostile) brauchen keine.
         personality = None
@@ -85,15 +92,16 @@ class NPCManager:
         # Spawn-Position wird Home-Position
         row = await db.pool().fetchrow(
             "INSERT INTO npcs (name, kind, x, y, backstory, hp, max_hp, home_x, home_y, "
-            "  sprite_variant, personality) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $6, $3, $4, $7, $8) "
+            "  sprite_variant, personality, world_id) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $6, $3, $4, $7, $8, $9) "
             "RETURNING id, name, kind, x, y, backstory, mood, mental_state, hp, max_hp, "
             "created_at, last_moved, sprite_variant, personality",
-            name, kind, x, y, backstory, max_hp, sprite_variant, personality,
+            name, kind, x, y, backstory, max_hp, sprite_variant, personality, world_id,
         )
         npc = _row_to_dict(row)
         npc["home_x"] = x
         npc["home_y"] = y
+        npc["world_id"] = world_id
         self._by_id[npc["id"]] = npc
         return npc
 
