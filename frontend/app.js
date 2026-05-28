@@ -1398,13 +1398,42 @@ const CREATURE_KINDS = new Set([
 // Nicht enthalten: farmer + merchant (alter Top-Down-Stil, nicht kompatibel mit
 // neuem Front-View aus /npcs/), neue Rollen (baker, bard, ...) ohne Animation.
 const ANIMATED_NPC_KINDS = [
-  // Welle 23 — alle character-Animations die Front-View sind.
+  // Welle 23 — Front-View character-Animations.
   'bandit', 'blacksmith', 'farmer', 'guard', 'healer',
   'mage', 'merchant', 'quest_giver', 'soldier', 'villager',
   // Welle 29d — 8 neue Walks aus character_walk_pack_2026_05_27
   'bard', 'hermit', 'miner', 'scholar', 'village_elder',
-  'watchman', 'villager_female', 'villager_male',
+  'watchman', 'villager_female',
+  // villager_male absichtlich raus: gelieferter Sprite ist cartoony Chibi-
+  // Stilbruch + alle 10 Frames identisch (kein Walk-Cycle). Fällt zurück auf
+  // statisches /assets/characters/npcs/villager.png via Default-Render.
+  // Welle 29e (2026-05-28) — vollständiger NPC-Walk-Drop: 30 Main + 6 Female
+  // + 10 Equip-Variants. Bestehende Einträge oben bleiben für Kompatibilität;
+  // restliche neue Kinds folgen alphabetisch in zwei Blöcken.
+  // Main (fehlende 16 aus 30):
+  'baker', 'carpenter', 'child', 'fisher', 'hunter',
+  'innkeeper', 'peasant', 'priest', 'robber', 'scribe',
+  'tailor', 'thief', 'wanderer', 'woodcutter',
+  // Female (fehlende 5 aus 6):
+  'farmer_female', 'guard_female', 'healer_female', 'mage_female', 'merchant_female',
+  // Equip-Variants (alle 10) — werden via npc.sprite_variant adressiert,
+  // _updateWalkFrame nutzt variant-prefix wenn cha_<variant>_idle_1 geladen ist.
+  'bandit_axe', 'bandit_bow', 'bandit_dagger', 'bandit_spear',
+  'miner_pickaxe',
+  'soldier_axe', 'soldier_spear', 'soldier_sword_shield',
+  'watchman_crossbow', 'watchman_lantern',
 ];
+
+// Audit-Befund Welle 29e (2026-05-28): Sub-Set der NPC-Walks mit
+// invertierten walk_left/walk_right Sprites. Frontend flippt L↔R nur für
+// diese Kinds in _updateWalkFrame, der Rest bleibt unverändert.
+const NPC_FLIP_LR_KINDS = new Set([
+  'baker', 'bandit_bow', 'bandit_spear', 'bard',
+  'healer', 'healer_female', 'mage', 'mage_female',
+  'soldier_axe', 'soldier_spear', 'soldier_sword_shield',
+  'villager_female', 'woodcutter',
+]);
+
 const ANIMATED_MONSTER_KINDS = [
   // bandit raus — nutzt characters/bandit/ via ANIMATED_NPC_KINDS für Stil-Konsistenz
   'basilisk','bat','bear','boar','bone_crawler',
@@ -4933,6 +4962,8 @@ class WorldScene extends Phaser.Scene {
         this.refreshPartyFrame();
         const pendingInvites = msg.group_invites || [];
         if (pendingInvites.length > 0) this.showGroupInvite(pendingInvites[0]);
+        // Welle 31b: Quest-Marker auf Karte initial setzen
+        this._refreshAllQuestMarkers();
         break;
 
       case 'chat':
@@ -5688,6 +5719,7 @@ class WorldScene extends Phaser.Scene {
       case 'quest_new':
         this.myQuests.push(msg.quest);
         if (this.questsOpen) this.refreshQuestsUI();
+        this._refreshAllQuestMarkers();
         break;
 
       case 'quest_progress': {
@@ -5695,12 +5727,14 @@ class WorldScene extends Phaser.Scene {
         if (i >= 0) this.myQuests[i] = msg.quest; else this.myQuests.push(msg.quest);
         if (this.questsOpen) this.refreshQuestsUI();
         if (msg.quest.status === 'completed') this.showEvent(`📜 Quest erfüllt: ${msg.quest.title}`);
+        this._refreshAllQuestMarkers();
         break;
       }
 
       case 'quest_closed':
         this.myQuests = this.myQuests.filter(q => q.id !== msg.quest_id);
         if (this.questsOpen) this.refreshQuestsUI();
+        this._refreshAllQuestMarkers();
         break;
 
       case 'research_update': {
@@ -7511,6 +7545,7 @@ class WorldScene extends Phaser.Scene {
     img._itemId = item.id;
     img._tileX = item.x;
     img._tileY = item.y;
+    img._kind  = item.kind;   // Welle 31b: für Quest-Marker-Refresh
     // Welle 50: Loot-Twinkle als loop auf hochwertigen Ground-Items
     // (Equipment + Magic). Ressourcen / Food bleiben unmarkiert.
     const SHINY_CATEGORIES = new Set(['weapon','armor','jewelry','magic']);
@@ -7519,6 +7554,8 @@ class WorldScene extends Phaser.Scene {
                                           { scale: 0.85, depth: 3, alpha: 0.85 });
     }
     this.itemSprites[item.id] = img;
+    // Welle 31b: Quest-Marker (!) wenn dieses Item ein aktives Fetch-Ziel ist
+    this._applyQuestMarkerToItemSprite(item.id);
   }
 
   // Findet das (oberste) Ground-Item auf dem gegebenen Tile, oder null.
@@ -7534,6 +7571,10 @@ class WorldScene extends Phaser.Scene {
     const s = this.itemSprites[itemId];
     if (s) {
       if (s._twinkle) s._twinkle.destroy();
+      if (s._questMarkTween) {
+        try { s._questMarkTween.stop(); } catch (e) {}
+      }
+      if (s._questMark) s._questMark.destroy();
       s.destroy();
       delete this.itemSprites[itemId];
     }
@@ -8011,10 +8052,14 @@ class WorldScene extends Phaser.Scene {
   // entfernt wurde (commit 1fb41c5).
   _npcSpriteKey(npc) {
     const cfg = NPC_SPRITE[npc.kind] || NPC_SPRITE.wanderer;
-    // sprite_variant (z.B. bandit_axe) hat Vorrang — keine Animation für Variants.
+    // sprite_variant (z.B. bandit_axe) hat Vorrang.
+    // Welle 29e: Variants sind jetzt animiert — erst Animation-Idle versuchen,
+    // dann statisches /npcs/variants/<variant>.png als Fallback.
     if (npc.sprite_variant) {
-      const key = `npc_${npc.sprite_variant}`;
-      if (this.textures.exists(key)) return key;
+      const variantAnim = `cha_${npc.sprite_variant}_idle_1`;
+      if (this.textures.exists(variantAnim)) return variantAnim;
+      const variantStatic = `npc_${npc.sprite_variant}`;
+      if (this.textures.exists(variantStatic)) return variantStatic;
     }
     // Welle 23: wenn Walk-Cycle-Animation existiert, start mit anim-idle.
     // _updateWalkFrame swappt dann durch walk_<dir>_<frame> bei Bewegung.
@@ -8111,6 +8156,9 @@ class WorldScene extends Phaser.Scene {
     if (npc.kind && !CREATURE_KINDS.has(npc.kind)) {
       this._queryNPCQuests(npc.id);
     }
+    // Welle 31b: Quest-Marker (🎯/❗) anwenden, falls dieser NPC zu einer
+    // aktiven Spieler-Quest gehört.
+    this._applyQuestMarkerToNPC(npc.id);
   }
 
   _queryNPCQuests(npcId) {
@@ -8126,6 +8174,101 @@ class WorldScene extends Phaser.Scene {
     entry.questIcon.setText(marker || '');
     if (marker) {
       entry.questIcon.setColor(marker === '❗' ? '#ffd060' : '#fff080');
+    }
+  }
+
+  // Welle 31b: Quest-Marker auf Karte aus this.myQuests ableiten.
+  // - 🎯 über NPCs deren kind ein aktives Kill-Ziel ist
+  // - ❗ über Quest-Giver-NPCs wenn Quest fertig erfüllt ist (Turn-In)
+  // - !  über Boden-Items deren kind ein aktives Fetch-Ziel ist
+  // - Minimap-Punkte werden in drawMinimap gelb statt rot eingefärbt.
+  _recomputeQuestTargetSets() {
+    const killKinds = new Set();
+    const fetchKinds = new Set();
+    const turninNpcs = new Set();
+    for (const q of (this.myQuests || [])) {
+      if (q.status !== 'active' && q.status !== 'completed') continue;
+      const obj = q.objective || {};
+      const prog = q.progress || {};
+      if (q.quest_type === 'kill' && obj.creature_kind) {
+        const need = obj.count || 1;
+        const have = prog.killed || 0;
+        if (have < need) killKinds.add(obj.creature_kind);
+      } else if (q.quest_type === 'fetch' && obj.item_kind) {
+        const need = obj.count || 1;
+        const have = prog.collected || 0;
+        if (have < need) fetchKinds.add(obj.item_kind);
+      }
+      if (q.giver_npc_id) {
+        const done = (q.status === 'completed')
+          || (q.quest_type === 'kill'
+              && (prog.killed || 0) >= (obj.count || 1))
+          || (q.quest_type === 'fetch'
+              && (prog.collected || 0) >= (obj.count || 1));
+        if (done) turninNpcs.add(q.giver_npc_id);
+      }
+    }
+    this.questKillKinds  = killKinds;
+    this.questFetchKinds = fetchKinds;
+    this.questTurninNpcIds = turninNpcs;
+  }
+
+  _chooseQuestMarkerForNPC(npc) {
+    if (!npc) return null;
+    if (this.questTurninNpcIds && this.questTurninNpcIds.has(npc.id)) return '❗';
+    if (this.questKillKinds && this.questKillKinds.has(npc.kind)) return '🎯';
+    return null;
+  }
+
+  _applyQuestMarkerToNPC(npcId) {
+    const entry = this.npcs[npcId];
+    if (!entry) return;
+    const newMark = this._chooseQuestMarkerForNPC(entry.npc);
+    const oldMark = entry._myQuestMarker || null;
+    if (newMark === oldMark) return;
+    if (newMark) {
+      this._setNPCQuestMarker(npcId, newMark);
+      entry._myQuestMarker = newMark;
+    } else if (oldMark) {
+      this._setNPCQuestMarker(npcId, '');
+      entry._myQuestMarker = null;
+    }
+  }
+
+  _applyQuestMarkerToItemSprite(itemId) {
+    const sprite = this.itemSprites && this.itemSprites[itemId];
+    if (!sprite) return;
+    const kind = sprite._kind;
+    const should = !!(kind && this.questFetchKinds
+                            && this.questFetchKinds.has(kind));
+    if (should && !sprite._questMark) {
+      sprite._questMark = this.add.text(
+        sprite.x, sprite.y - TILE_SIZE * 0.55, '!',
+        { fontSize: '14px', color: '#fff080',
+          stroke: '#000', strokeThickness: 3 }
+      ).setOrigin(0.5).setDepth(4);
+      sprite._questMarkTween = this.tweens.add({
+        targets: sprite._questMark,
+        alpha: { from: 1, to: 0.5 },
+        duration: 700, yoyo: true, repeat: -1,
+      });
+    } else if (!should && sprite._questMark) {
+      if (sprite._questMarkTween) {
+        try { sprite._questMarkTween.stop(); } catch (e) {}
+        sprite._questMarkTween = null;
+      }
+      sprite._questMark.destroy();
+      sprite._questMark = null;
+    }
+  }
+
+  _refreshAllQuestMarkers() {
+    this._recomputeQuestTargetSets();
+    for (const id of Object.keys(this.npcs || {})) {
+      this._applyQuestMarkerToNPC(Number(id));
+    }
+    for (const id of Object.keys(this.itemSprites || {})) {
+      this._applyQuestMarkerToItemSprite(Number(id));
     }
   }
 
@@ -8602,14 +8745,47 @@ class WorldScene extends Phaser.Scene {
 
     // NPCs
     const dotSize = Math.max(3, Math.floor(Math.min(scaleX, scaleY)));
+    // Welle 31b: Quest-Punkte sammeln, damit sie ÜBER den normalen NPC-Punkten
+    // gezeichnet werden (sonst übermalt der normale Punkt den Quest-Marker).
+    const questDots = [];
     for (const id of Object.keys(this.npcs)) {
       const n = this.npcs[id];
-      ctx.fillStyle = CREATURE_KINDS.has(n.npc.kind) ? '#e84040' : '#ffe070';
+      // Welle 31b: Quest-Markierungen — höhere Priorität als normale Farbe.
+      const isTurnIn = this.questTurninNpcIds
+                    && this.questTurninNpcIds.has(n.npc.id);
+      const isKillTarget = this.questKillKinds
+                        && this.questKillKinds.has(n.npc.kind);
+      const baseColor = CREATURE_KINDS.has(n.npc.kind) ? '#e84040' : '#ffe070';
+      ctx.fillStyle = baseColor;
       const px = (n.tileX - ox) * scaleX;
       const py = (n.tileY - oy) * scaleY;
       if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
         ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, dotSize, dotSize);
+        if (isTurnIn) questDots.push({ px, py, color: '#ffd060' });
+        else if (isKillTarget) questDots.push({ px, py, color: '#fff080' });
       }
+    }
+    // Welle 31b: Items mit aktiver Fetch-Quest auch auf der Minimap zeigen
+    if (this.itemSprites && this.questFetchKinds && this.questFetchKinds.size > 0) {
+      for (const id of Object.keys(this.itemSprites)) {
+        const s = this.itemSprites[id];
+        if (!this.questFetchKinds.has(s._kind)) continue;
+        const px = (s._tileX - ox) * scaleX;
+        const py = (s._tileY - oy) * scaleY;
+        if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+          questDots.push({ px, py, color: '#fff080' });
+        }
+      }
+    }
+    // Quest-Marker mit kleinem Highlight-Ring zeichnen, damit sie aus dem
+    // restlichen Minimap-Wimmelbild herausstechen.
+    for (const d of questDots) {
+      ctx.fillStyle = d.color;
+      ctx.fillRect(Math.floor(d.px) - 1, Math.floor(d.py) - 1, dotSize, dotSize);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(Math.floor(d.px) - 2, Math.floor(d.py) - 2,
+                     dotSize + 2, dotSize + 2);
     }
     for (const id of Object.keys(this.otherPlayers)) {
       const p = this.otherPlayers[id];
@@ -8732,9 +8908,10 @@ class WorldScene extends Phaser.Scene {
     // Animation-Prefix wählen:
     //   Player + Preset → 'preset_<name>' wenn Walk-Pack-Frames existieren
     //   Player default  → 'player' (assets/animations/player/walk_*)
+    //   NPC variant     → 'cha_<variant>' wenn /animations/characters/<variant>/ existiert
+    //                     (Welle 29e — Equip-Variants sind jetzt animiert)
     //   NPC kind        → 'cha_<kind>' wenn /animations/characters/<kind>/ existiert
     //   Monster         → 'mob_<kind>' wenn /animations/monsters/<kind>/ existiert
-    // Wenn NPC-Variant (z.B. bandit_axe) → keine Animation (Variant ist statisch).
     let prefix = null;
     let usesIdleFrame = true;   // 'cha_<k>_idle_<f>' / 'preset_<p>_idle_<f>'
     if (entry.isPlayer && this.myPreset
@@ -8743,9 +8920,13 @@ class WorldScene extends Phaser.Scene {
     } else if (entry.isPlayer && !this.myPreset) {
       prefix = 'player';
       usesIdleFrame = false;    // 'player_walk_<dir>_1' als Idle
-    } else if (entry.npc && !entry.npc.sprite_variant) {
+    } else if (entry.npc) {
+      const v = entry.npc.sprite_variant;
       const k = entry.npc.kind;
-      if (this.textures.exists(`cha_${k}_idle_1`)) prefix = `cha_${k}`;
+      // Variant-Animation hat Vorrang — fällt auf kind-Animation zurück,
+      // wenn ein Variant geliefert wird der noch keine Walk-Frames hat.
+      if (v && this.textures.exists(`cha_${v}_idle_1`)) prefix = `cha_${v}`;
+      else if (this.textures.exists(`cha_${k}_idle_1`)) prefix = `cha_${k}`;
       else if (this.textures.exists(`mob_${k}_idle_1`)) prefix = `mob_${k}`;
     }
     if (!prefix) return;  // kein animations-fähiger Sprite — Texture unverändert
@@ -8753,10 +8934,10 @@ class WorldScene extends Phaser.Scene {
       // Idle
       entry.moving = false;
       entry.walkTimer = 0;
-      // gleiche left/right-Inversion wie im Walk-Pfad (siehe unten)
-      const idleFacing = entry.facing || 'down';
-      const idleDir = idleFacing === 'left' ? 'right'
-                    : (idleFacing === 'right' ? 'left' : idleFacing);
+      let idleDir = entry.facing || 'down';
+      if (this._shouldFlipLR(prefix) && (idleDir === 'left' || idleDir === 'right')) {
+        idleDir = idleDir === 'left' ? 'right' : 'left';
+      }
       const key = usesIdleFrame
         ? `${prefix}_idle_1`
         : `${prefix}_walk_${idleDir}_1`;
@@ -8782,16 +8963,36 @@ class WorldScene extends Phaser.Scene {
       entry.walkFrame = entry.walkFrame === 1 ? 2 : 1;
     }
     const frame = entry.walkFrame || 1;
-    // Asset-Konvention dieses Packs hat walk_left/walk_right invertiert
-    // (walk_left_*.png zeigt Profil nach Osten und umgekehrt). Auf Sprite-Ebene
-    // tauschen statt File-Rename — wenn ein Pack mal korrekt orientiert kommt,
-    // muss nur dieser Swap raus statt 60+ Files umbenannt zu werden.
-    const fileDir = dir === 'left' ? 'right' : (dir === 'right' ? 'left' : dir);
+    // L/R-Inversion ist asset-pack-spezifisch:
+    //   - Player-Presets + Default-Player: systematisch invertiert (Pack hat
+    //     walk_left = Osten und umgekehrt) → globaler Swap.
+    //   - NPC-Pack character_phase2_3_4: Teilmenge invertiert (Audit-Befund),
+    //     siehe NPC_FLIP_LR_KINDS.
+    //   - Monster: korrekt orientiert, kein Swap.
+    let fileDir = dir;
+    if (this._shouldFlipLR(prefix) && (dir === 'left' || dir === 'right')) {
+      fileDir = dir === 'left' ? 'right' : 'left';
+    }
     const key = `${prefix}_walk_${fileDir}_${frame}`;
     if (this.textures.exists(key)) {
       entry.body.setTexture(key);
       entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
     }
+  }
+
+  // NPC-Kinds bei denen walk_left/walk_right vertauscht sind (Audit Welle 29e).
+  _shouldFlipLR(prefix) {
+    if (!prefix) return false;
+    // Player + alle Presets immer flippen — Pack ist systematisch invertiert.
+    if (prefix === 'player') return true;
+    if (prefix.startsWith('preset_')) return true;
+    // NPC-Animationen: nur wenn Kind/Variant in der Inverted-Liste.
+    if (prefix.startsWith('cha_')) {
+      const kind = prefix.slice(4);
+      return NPC_FLIP_LR_KINDS.has(kind);
+    }
+    // Monster (mob_<kind>): kein Swap.
+    return false;
   }
 
   movePlayerSmooth(p, tileX, tileY, dx = 0) {

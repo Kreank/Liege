@@ -126,6 +126,11 @@ FRIENDLY_KINDS = ["wanderer", "merchant", "hermit", "bard", "scholar", "soldier"
                   # Asset-Drop 2026-05-27: Handwerks- und Dorf-Rollen
                   "baker", "carpenter", "fisher", "hunter", "innkeeper",
                   "peasant", "priest", "scribe", "tailor", "woodcutter",
+                  # Asset-Drop 2026-05-28: Female-Varianten (eigenständige
+                  # Sprites, kein sprite_variant — beim Spawn random gemischt
+                  # mit den männlichen Pendants).
+                  "farmer_female", "guard_female", "healer_female",
+                  "mage_female", "merchant_female", "villager_female",
                   # Asset-Drop 2026-05-27b: Nutztiere — Livestock
                   "cow", "bull", "calf", "ox", "sheep", "ram", "lamb",
                   "sheared_sheep", "pig", "piglet", "boar_domestic",
@@ -252,6 +257,13 @@ NPC_MOVE_CHANCE = {
     "scribe":       0.07,  # konzentriert am Schreiben
     "tailor":       0.08,  # an der Werkbank
     "woodcutter":   0.22,  # geht zum Wald
+    # Asset-Drop 2026-05-28 — Female-Varianten (gleiche Werte wie männl. Pendants)
+    "farmer_female":   0.15,
+    "guard_female":    0.18,
+    "healer_female":   0.08,
+    "mage_female":     0.10,
+    "merchant_female": 0.10,
+    "villager_female": 0.22,
     # Asset-Drop 2026-05-27 — neue hostile Humans
     "robber":    0.20,
     "thief":     0.40,  # flink
