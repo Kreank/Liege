@@ -5014,6 +5014,33 @@ class WorldScene extends Phaser.Scene {
             `⚔️ Gruppe wurde zu ${lbl[msg.to_kind] || msg.to_kind} umgewandelt`);
         }
         break;
+      case 'group_chat':
+        if (window.chatConsole) {
+          const prefix = msg.kind === 'party' ? '[P]' : '[R]';
+          window.chatConsole.addMessage('party', msg.from, `${prefix} ${msg.text}`);
+        }
+        break;
+      case 'raid_started':
+        this.showEvent(`⚔️ ${msg.label} startet — ${msg.spawned} Kreaturen (T${msg.tier})`);
+        if (window.chatConsole) {
+          window.chatConsole.addMessage('system', null,
+            `⚔️ Raid T${msg.tier} ${msg.label} — ${msg.spawned} Mobs gespawnt (by ${msg.by})`);
+        }
+        break;
+      case 'raid_error':
+        if (window.chatConsole) {
+          const msgs = {
+            cooldown: `⏳ Raid-Cooldown noch ${Math.ceil((msg.remaining_s||0)/60)} min`,
+            invalid_tier: '⛔ Ungültiger Raid-Tier (1-5)',
+            leader_only: '⛔ Nur der Gruppen-Leader kann Raids starten',
+            not_in_group: '⛔ Du bist in keiner Gruppe',
+            leader_offline: '⛔ Leader-Position nicht ermittelbar',
+            no_walkable_spots: '⛔ Kein Spawn-Platz frei',
+          };
+          window.chatConsole.addMessage('error', null,
+            msgs[msg.reason] || `Raid-Fehler: ${msg.reason}`);
+        }
+        break;
 
       case 'player_joined':
         this.spawnOther(msg.player_id, msg.x, msg.y);
@@ -9100,6 +9127,8 @@ function setupChatConsole(myRole) {
     .chat-msg.error { color: #e85040; }
     .chat-msg.claude .from { color: #c8a8e8; }
     .chat-msg.claude .body { display: block; margin-top: 2px; }
+    .chat-msg.party .from { color: #80c0e0; }
+    .chat-msg.party { color: #b0d8ee; }
     #chat-input-row {
       border-top: 1px solid #2a2a35;
       display: flex; padding: 6px; gap: 4px;
@@ -9299,9 +9328,27 @@ function setupChatConsole(myRole) {
       case '/largeraid':
         ws.send(JSON.stringify({ type: 'group_convert_to_raid', kind: 'raid_large' }));
         return true;
+      case '/p':
+      case '/r':
+      case '/g':
+        if (!arg) { addMessage('error', null, `${cmd} TEXT — Nachricht an die Gruppe`); return true; }
+        ws.send(JSON.stringify({ type: 'group_chat', text: arg }));
+        return true;
+      case '/raidstart':
+      case '/triggerraid': {
+        const tier = parseInt(arg, 10) || 1;
+        if (tier < 1 || tier > 5) {
+          addMessage('error', null, '/raidstart TIER — TIER 1..5');
+          return true;
+        }
+        ws.send(JSON.stringify({ type: 'raid_trigger_manual', tier }));
+        return true;
+      }
       case '/help':
         addMessage('system', null,
-          '/invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband · /party · /raid (→20) · /raid40');
+          '/invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband · '
+          + '/party · /raid (→20) · /raid40 · /p TEXT (Gruppen-Chat) · '
+          + '/raidstart 1..5 (manuelle Raid-Welle)');
         return true;
     }
     return false;

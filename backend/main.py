@@ -138,6 +138,41 @@ async def _push_group_state_to_all_members(group_id: int) -> None:
         await _push_group_state(pid)
 
 
+GROUP_XP_SHARE_RADIUS = 30   # Tiles um den NPC, in denen Group-Members XP teilen
+GROUP_XP_BONUS_FACTOR = 1.2  # +20% Gesamt-XP wenn Kill in Gruppe geht
+
+
+async def _gain_combat_xp_with_share(killer_id: str, amount: int,
+                                     npc_x: int, npc_y: int) -> list[tuple[str, dict]]:
+    """Combat-XP-Vergabe mit Gruppen-Split.
+    - Killer nicht in Gruppe: bekommt volle XP allein.
+    - Sonst: alle Group-Mitglieder im 30-Tile-Radius teilen (amount × 1.2) / N.
+      Der +20%-Bonus belohnt Gruppieren, /N verhindert, dass Gruppen-Grinding
+      Solo-Kills nominal überlegen ist.
+    Return: liste (player_name, xp_result_dict) für alle die XP bekommen haben."""
+    g = await groups.get_group_for(killer_id)
+    if not g:
+        r = await skills.gain_xp(killer_id, "combat", amount)
+        return [(killer_id, r)] if r else []
+    member_names = await groups.get_member_names(g["id"])
+    nearby: list[str] = []
+    for pid in member_names:
+        pos = manager.get_players().get(pid)
+        if pos is None:
+            continue
+        if max(abs(pos["x"] - npc_x), abs(pos["y"] - npc_y)) <= GROUP_XP_SHARE_RADIUS:
+            nearby.append(pid)
+    if not nearby:
+        nearby = [killer_id]  # Safety: Killer war wohl gerade off-Position
+    share = max(1, int(round(amount * GROUP_XP_BONUS_FACTOR / len(nearby))))
+    out: list[tuple[str, dict]] = []
+    for pid in nearby:
+        r = await skills.gain_xp(pid, "combat", share)
+        if r:
+            out.append((pid, r))
+    return out
+
+
 async def _find_drop_xy(x: int, y: int) -> tuple[int, int]:
     """Return a coordinate suitable for ground-loot near (x, y).
 
@@ -774,6 +809,18 @@ async def _apply_spell_effects(player_id: str, spell_id: str,
                                                   {"type": "quest_progress", "quest": q})
                     except Exception:
                         logging.exception("quest hook (spell-kill) failed")
+                    # Combat-XP-Share auch bei Spell-Kills (analog Melee-Kill)
+                    try:
+                        _shares = await _gain_combat_xp_with_share(
+                            player_id, max(2, final // 2), n["x"], n["y"]
+                        )
+                        for _pid, _xr in _shares:
+                            ws_t = manager.connections.get(_pid)
+                            if ws_t is not None:
+                                try: await ws_t.send_json({"type": "skill_xp", **_xr})
+                                except Exception: pass
+                    except Exception:
+                        logging.exception("xp share (spell-kill) failed")
                 else:
                     await manager.broadcast({
                         "type": "npc_damaged", "npc_id": n["id"],
@@ -1215,6 +1262,35 @@ async def websocket_endpoint(websocket: WebSocket):
                     "to_kind": res["to_kind"],
                 })
                 await _push_group_state_to_all_members(g["id"])
+                continue
+
+            if mtype == "raid_trigger_manual":
+                tier = int(data.get("tier", 1))
+                g = await groups.get_group_for(player_id)
+                if not g:
+                    await websocket.send_json({"type": "group_error",
+                                                "reason": "not_in_group"})
+                    continue
+                # Nur Leader darf manuelle Raids triggern
+                if g["leader"] != player_id:
+                    await websocket.send_json({"type": "group_error",
+                                                "reason": "leader_only"})
+                    continue
+                res = await raid_director.trigger_manual_raid(
+                    player_id, tier, world, npcs, manager, events,
+                )
+                if not res.get("ok"):
+                    await websocket.send_json({"type": "raid_error",
+                                                "reason": res["reason"],
+                                                "remaining_s": res.get("remaining_s", 0)})
+                    continue
+                await _broadcast_to_group(g["id"], {
+                    "type": "raid_started",
+                    "tier": res["tier"],
+                    "label": res["label"],
+                    "spawned": res["spawned"],
+                    "by": player_id,
+                })
                 continue
 
             # Welle 25: force_respawn — Sofort-Respawn aus dem Down-State
@@ -1907,9 +1983,21 @@ async def websocket_endpoint(websocket: WebSocket):
                         "crit":   is_crit,
                         "by":     player_id,
                     })
-                xp_result = await skills.gain_xp(player_id, "combat", max(2, dmg // 2))
-                if xp_result:
-                    await websocket.send_json({"type": "skill_xp", **xp_result})
+                # Welle 31: XP-Split bei Gruppe — alle Members im 15-Tile-Radius
+                _xp_amount = max(2, dmg // 2)
+                _xp_shares = await _gain_combat_xp_with_share(
+                    player_id, _xp_amount, npc["x"], npc["y"]
+                )
+                for _pid, _xr in _xp_shares:
+                    if _pid == player_id:
+                        await websocket.send_json({"type": "skill_xp", **_xr})
+                    else:
+                        _ws_m = manager.connections.get(_pid)
+                        if _ws_m is not None:
+                            try:
+                                await _ws_m.send_json({"type": "skill_xp", **_xr})
+                            except Exception:
+                                pass
 
             elif mtype == "cast_spell":
                 # Welle 25: Neuer Pfad — spell_id statt item_id (Hotbar/Spellbook-Cast).
@@ -2095,6 +2183,18 @@ async def websocket_endpoint(websocket: WebSocket):
                                                 {"type": "quest_progress", "quest": q})
                                     except Exception:
                                         logging.exception("quest hook (direct-spell-kill) failed")
+                                    # Combat-XP-Share auch bei Direct-Spell-Kills
+                                    try:
+                                        _shares = await _gain_combat_xp_with_share(
+                                            player_id, max(2, _final // 2), t["x"], t["y"]
+                                        )
+                                        for _pid, _xr in _shares:
+                                            ws_t = manager.connections.get(_pid)
+                                            if ws_t is not None:
+                                                try: await ws_t.send_json({"type": "skill_xp", **_xr})
+                                                except Exception: pass
+                                    except Exception:
+                                        logging.exception("xp share (direct-spell-kill) failed")
                                 else:
                                     await manager.broadcast({
                                         "type": "npc_damaged", "npc_id": t["id"],

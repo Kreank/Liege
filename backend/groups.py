@@ -437,6 +437,25 @@ async def promote(group_id: int, by_player: str, target: str) -> dict:
     return {"ok": True, "promoted": target}
 
 
+LOOT_RULES = ("ffa", "need_greed")
+
+
+async def set_loot_rule(group_id: int, by_player: str, rule: str) -> dict:
+    """Setzt die Loot-Regel der Gruppe. Nur Leader.
+    'ffa'        — alles fällt auf den Boden, jeder darf aufheben (default)
+    'need_greed' — rollwürdige Drops (equipment/magic/affix) lösen Roll aus
+                   (siehe loot_rolls.py). Resources/Food/Consumables bleiben FFA."""
+    if rule not in LOOT_RULES:
+        return {"ok": False, "reason": "invalid_rule"}
+    if not await can_promote(group_id, by_player):
+        return {"ok": False, "reason": "no_permission"}
+    await db.pool().execute(
+        "UPDATE player_groups SET loot_rule = $2, last_active_at = NOW() "
+        "WHERE id = $1", group_id, rule,
+    )
+    return {"ok": True, "rule": rule}
+
+
 async def convert_to_raid(group_id: int, by_player: str, new_kind: str) -> dict:
     """Wandelt eine Gruppe in einen größeren Container um. Nur Leader.
     Erlaubte Up-Konvertierungen: party → raid_small → raid_large.
