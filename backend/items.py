@@ -3,22 +3,28 @@ import db
 # Original-Pack 2026-05-27 — hand-painted 128×128 Inventar-Icons.
 # Default-Sprites für die meisten Items kommen aus diesem Pool.
 _OP = "/assets/professional/original_pack_2026_05_27/icons_128"
+# Inspired-Pack 2026-05-27 — Default-Sprite-Upgrade pro Weapon-Kind.
+_INSP = "/assets/equipment/weapons/professional/inspired_2026_05_27/icons_128"
+# Reference-Based — Defaults für die spezialisierten Welle-29d-Waffen.
+_REF = "/assets/equipment/weapons/professional/reference_based/icons_128"
+# Armor reference_based — Slot+Rarity-getaggter Pool für alle 5 Slots.
+_ARM = "/assets/equipment/armor/professional/reference_based/icons_128"
 
 # Asset-Pfade pro Item-Kind und Metadaten
 ITEM_KINDS = {
-    # Waffen
-    "sword":         {"category": "weapon", "name": "Schwert",       "slot": "weapon", "sprite": f"{_OP}/black_guard_longsword.png"},
-    "axe":           {"category": "weapon", "name": "Axt",           "slot": "weapon", "sprite": f"{_OP}/old_execution_axe.png"},
-    "bow":           {"category": "weapon", "name": "Bogen",         "slot": "weapon", "sprite": f"{_OP}/ashwood_recurve_bow.png"},
-    "staff":         {"category": "weapon", "name": "Stab",          "slot": "weapon", "sprite": f"{_OP}/red_oak_staff.png"},
-    "wand":          {"category": "weapon", "name": "Zauberstab",    "slot": "weapon", "sprite": f"{_OP}/red_oak_staff.png"},
-    "greatsword":    {"category": "weapon", "name": "Großschwert",   "slot": "weapon", "sprite": f"{_OP}/cleaver_greatsword.png"},
-    "spear":         {"category": "weapon", "name": "Speer",         "slot": "weapon", "sprite": f"{_OP}/plain_war_spear.png"},
-    "crossbow":      {"category": "weapon", "name": "Armbrust",      "slot": "weapon", "sprite": f"{_OP}/stormbow_crossbow.png"},
-    "throwing_knife":{"category": "weapon", "name": "Wurfmesser",    "slot": "weapon", "sprite": f"{_OP}/hooked_ritual_dagger.png"},
-    "mace":          {"category": "weapon", "name": "Streitkolben",  "slot": "weapon", "sprite": f"{_OP}/iron_mace.png"},
-    "scythe":        {"category": "weapon", "name": "Sense",         "slot": "weapon", "sprite": f"{_OP}/graveyard_scythe.png"},
-    "dagger":        {"category": "weapon", "name": "Dolch",         "slot": "weapon", "sprite": f"{_OP}/hooked_ritual_dagger.png"},
+    # Waffen — Default-Sprites aus inspired_2026_05_27 (hochwertig painterly)
+    "sword":         {"category": "weapon", "name": "Schwert",       "slot": "weapon", "sprite": f"{_INSP}/iron_vigil_longsword.png"},
+    "axe":           {"category": "weapon", "name": "Axt",           "slot": "weapon", "sprite": f"{_INSP}/oxhide_execution_axe.png"},
+    "bow":           {"category": "weapon", "name": "Bogen",         "slot": "weapon", "sprite": f"{_INSP}/thornwood_recurve_bow.png"},
+    "staff":         {"category": "weapon", "name": "Stab",          "slot": "weapon", "sprite": f"{_INSP}/emberroot_staff.png"},
+    "wand":          {"category": "weapon", "name": "Zauberstab",    "slot": "weapon", "sprite": f"{_INSP}/bramble_witch_wand.png"},
+    "greatsword":    {"category": "weapon", "name": "Großschwert",   "slot": "weapon", "sprite": f"{_INSP}/quarry_cleaver_greatsword.png"},
+    "spear":         {"category": "weapon", "name": "Speer",         "slot": "weapon", "sprite": f"{_INSP}/duskpoint_war_spear.png"},
+    "crossbow":      {"category": "weapon", "name": "Armbrust",      "slot": "weapon", "sprite": f"{_INSP}/siegewood_crossbow.png"},
+    "throwing_knife":{"category": "weapon", "name": "Wurfmesser",    "slot": "weapon", "sprite": f"{_INSP}/paired_ravencut_knives.png"},
+    "mace":          {"category": "weapon", "name": "Streitkolben",  "slot": "weapon", "sprite": f"{_INSP}/oathbound_iron_mace.png"},
+    "scythe":        {"category": "weapon", "name": "Sense",         "slot": "weapon", "sprite": f"{_INSP}/gravebriar_scythe.png"},
+    "dagger":        {"category": "weapon", "name": "Dolch",         "slot": "weapon", "sprite": f"{_INSP}/crescent_hook_dagger.png"},
     # Welle 27 (2026-05-27) — neue Waffen-Kinds aus reference_based-Pack
     "katana":        {"category": "weapon", "name": "Katana",        "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/steel_katana.png"},
     "halberd":       {"category": "weapon", "name": "Hellebarde",    "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/raven_halberd.png"},
@@ -27,12 +33,12 @@ ITEM_KINDS = {
     "runeblade":     {"category": "weapon", "name": "Runenklinge",   "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/obsidian_runeblade.png"},
     "twinblade":     {"category": "weapon", "name": "Doppelklinge",  "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/ice_and_night_blades.png"},
     "sickle_weapon": {"category": "weapon", "name": "Kampfsichel",   "slot": "weapon", "sprite": "/assets/equipment/weapons/professional/reference_based/icons_128/iron_hook_sickle.png"},
-    # Rüstung
-    "helmet":     {"category": "armor", "name": "Helm",         "slot": "helmet",     "sprite": f"{_OP}/crested_hoplite_helm.png"},
-    "chestplate": {"category": "armor", "name": "Brustpanzer",  "slot": "chestplate", "sprite": f"{_OP}/wandering_knight_armor.png"},
-    "gloves":     {"category": "armor", "name": "Handschuhe",   "slot": "gloves",     "sprite": f"{_OP}/thief_buckled_gloves.png"},
-    "shield":     {"category": "armor", "name": "Schild",       "slot": "shield",     "sprite": f"{_OP}/ornate_guard_shield.png"},
-    "boots":      {"category": "armor", "name": "Stiefel",      "slot": "boots",      "sprite": f"{_OP}/dwarven_field_boots.png"},
+    # Rüstung — Default-Sprites aus reference_based-Pack (slot+rarity tagged)
+    "helmet":     {"category": "armor", "name": "Helm",         "slot": "helmet",     "sprite": f"{_ARM}/crested_hoplite_helm.png"},
+    "chestplate": {"category": "armor", "name": "Brustpanzer",  "slot": "chestplate", "sprite": f"{_ARM}/wandering_knight_armor.png"},
+    "gloves":     {"category": "armor", "name": "Handschuhe",   "slot": "gloves",     "sprite": f"{_ARM}/thief_buckled_gloves.png"},
+    "shield":     {"category": "armor", "name": "Schild",       "slot": "shield",     "sprite": f"{_ARM}/ornate_guard_shield.png"},
+    "boots":      {"category": "armor", "name": "Stiefel",      "slot": "boots",      "sprite": f"{_ARM}/dwarven_field_boots.png"},
     # Schmuck
     "ring":   {"category": "jewelry", "name": "Ring",           "slot": "ring",   "sprite": "/assets/equipment/jewelry/ring.png"},
     "amulet": {"category": "jewelry", "name": "Amulett",        "slot": "amulet", "sprite": "/assets/equipment/jewelry/amulet.png"},

@@ -1741,9 +1741,10 @@ function itemAssetPath(item, materialOpt) {
   const cfg = ITEM[kind];
   if (!cfg) return '';
   // Welle 25: cosmetic_skin (Backend-gerollt, persistiert) hat Vorrang vor allem.
-  // Selbe Sprite-Datei wie ANCIENT_BLADE_POOL (from_neu_pro/icons_128).
+  // Source-Ordner ist kind-abhängig (Schwert-Pool vs. Arcane-Staves vs. Armor).
   if (typeof item !== 'string' && item && item.cosmetic_skin) {
-    return `/assets/equipment/weapons/professional/from_neu_pro/icons_128/${item.cosmetic_skin}.png`;
+    const dir = SKIN_DIR_BY_KIND[kind];
+    if (dir) return `/assets/${dir}/icons_128/${item.cosmetic_skin}.png`;
   }
   // Pro-Sprite-Set hat Vorrang (Asset-Drop 2026-05-26b)
   if (RARITY_WEAPONS.has(kind)) {
@@ -1803,11 +1804,16 @@ function itemSpriteKey(scene, item) {
   const quality = (typeof item === 'string') ? null : item?.quality;
   const cfg = ITEM[kind];
   if (!cfg) return null;
-  // Welle 25: cosmetic_skin (Backend-gerollt) hat höchste Priorität. Re-uses
-  // den ANCIENT_BLADE_POOL-Preload (selbe Sprite-Files unter ancient_blade_<slug>).
+  // cosmetic_skin (Backend-gerollt) hat höchste Priorität. Sword/Greatsword
+  // nutzen den älteren ANCIENT_BLADE_POOL-Preload, alle anderen Kinds (Staff,
+  // Wand, Armor) nutzen den generischen skin_<slug>-Preload.
   if (typeof item !== 'string' && item && item.cosmetic_skin) {
-    const aKey = `ancient_blade_${item.cosmetic_skin}`;
-    if (scene && scene.textures && scene.textures.exists(aKey)) return aKey;
+    if (scene && scene.textures) {
+      const aKey = `ancient_blade_${item.cosmetic_skin}`;
+      if (scene.textures.exists(aKey)) return aKey;
+      const sKey = `skin_${item.cosmetic_skin}`;
+      if (scene.textures.exists(sKey)) return sKey;
+    }
   }
   // Pro-Weapon-Sprite (rarity-spezifisch)
   if (RARITY_WEAPONS.has(kind)) {
@@ -2069,27 +2075,10 @@ const PRO_ARMOR_MAP = {
   },
 };
 
-// Welle 23: Set aller (rarity, slug) Kombinationen die unter rarity_v2/
-// existieren. Generiert via tools/check_weapons.py. Wenn eine angeforderte
-// Kombination NICHT drin ist, fällt proWeaponPath auf icons_128/ zurück
-// (dort liegen die Basis-Sprites für alle Slugs).
-const PRO_WEAPON_RARITY_FILES = new Set([
-  'common|ashwood_recurve_bow','common|black_guard_longsword','common|cleaver_greatsword',
-  'common|hunter_bow_set','common|iron_hook_sickle','common|old_execution_axe',
-  'common|red_oak_staff','common|steel_katana',
-  'legendary|amethyst_trident','legendary|crimson_twinblade','legendary|flame_cleaver_axe',
-  'legendary|gandiva_bow','legendary|obsidian_runeblade','legendary|void_reaper_scythe',
-  'legendary|wolf_end_redblade',
-  'poor|iron_hatchet','poor|plain_aruming_sword','poor|plain_war_spear',
-  'poor|silver_straightsword','poor|woodcutter_hatchet',
-  'rare|blackthorn_shard','rare|bloodtalon_throwers','rare|blue_crescent_axe',
-  'rare|crescent_saber','rare|ebony_longbow','rare|graveyard_scythe',
-  'rare|hooked_ritual_dagger','rare|ice_and_night_blades','rare|raven_halberd',
-  'rare|rose_glass_sword','rare|stormbow','rare|white_magus_staff',
-  'very_rare|azure_glaive','very_rare|bloodpoint_lance','very_rare|chain_reaper',
-  'very_rare|demon_slayer_lance','very_rare|goldleaf_bow','very_rare|ruby_spear',
-  'very_rare|sunspike_lance','very_rare|thorn_blackblade',
-]);
+// Tier-/rarity_v2-Unterordner sind als Anti-Pattern entfernt (Commit fcc4ee9).
+// Alle Sprites liegen jetzt flach in icons_128/; pro Slug existiert genau eine
+// Sprite-Datei. proWeaponPath/proArmorPath bedienen sich direkt daraus.
+const PRO_WEAPON_RARITY_FILES = new Set();
 
 // Welle 27 — from_neu_pro Ancient-Blade-Pool: 26 stylized Schwerter von
 // Arthur Malagon (swordtember/stylized_blades) + ev_ganin + black_knight.
@@ -2132,6 +2121,56 @@ function _ancientBladeForItem(itemId) {
   return ANCIENT_BLADE_POOL[idx];
 }
 
+// Quellordner pro Kind für Backend-gerollte cosmetic_skin-Slugs.
+// Spiegelt backend/skin_pools.py:SKIN_DIR_BY_KIND.
+const SKIN_DIR_BY_KIND = {
+  sword:      'equipment/weapons/professional/from_neu_pro',
+  greatsword: 'equipment/weapons/professional/from_neu_pro',
+  staff:      'equipment/weapons/professional/inspired_arcane_2026_05_27',
+  wand:       'equipment/weapons/professional/inspired_arcane_2026_05_27',
+  helmet:     'equipment/armor/professional/reference_based',
+  chestplate: 'equipment/armor/professional/reference_based',
+  gloves:     'equipment/armor/professional/reference_based',
+  boots:      'equipment/armor/professional/reference_based',
+  shield:     'equipment/armor/professional/reference_based',
+};
+
+// Slugs zum Preloaden pro Kind. Sword/Greatsword laufen über den separaten
+// ANCIENT_BLADE_POOL-Preload — hier nur die neuen Pools.
+const SKIN_POOL_PRELOAD = {
+  staff: [
+    'frost_crystal_staff', 'sun_reliquary_staff', 'living_thorn_staff',
+    'void_smoke_war_staff', 'turquoise_rune_staff', 'bone_eye_necromancer_staff',
+    'violet_orb_focus_staff', 'antler_blossom_witch_staff', 'blue_arcane_axe_staff',
+  ],
+  wand: [
+    'pale_moon_wand', 'brass_oracle_scepter', 'amethyst_root_wand',
+    'twisted_black_iron_wand', 'green_seedling_wand', 'ember_priest_rod',
+  ],
+  helmet: [
+    'crested_hoplite_helm', 'black_knight_helm',
+    'winged_crusader_helm', 'winged_knight_helm', 'crowned_steel_helm',
+    'templar_visor_helm', 'plague_doctor_helm', 'antlered_dark_helm',
+  ],
+  chestplate: [
+    'grey_landsknecht_armor', 'black_tactical_armor',
+    'green_hooded_mantle', 'wandering_knight_armor',
+    'mercenary_plate_cuirass', 'linothorax_cuirass',
+    'spiked_war_cuirass', 'samurai_war_armor',
+  ],
+  gloves: [
+    'black_leather_glove', 'thief_buckled_gloves', 'heavy_iron_gauntlet',
+    'stone_guard_gauntlets', 'fur_cuffed_brawler_gloves', 'black_thievery_gloves',
+    'noble_gilded_gloves', 'void_claw_gauntlets',
+  ],
+  boots: [
+    'wrapped_ranger_boots', 'dwarven_field_boots',
+    'black_iron_greaves', 'runeplate_greaves', 'middle_earth_plate_boots',
+    'ember_wolf_greaves',
+  ],
+  shield: ['ornate_guard_shield'],
+};
+
 // Welle 29c: Inspired-Pack-Slugs (assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/)
 const INSPIRED_WEAPON_SLUGS = new Set([
   'iron_vigil_longsword', 'quarry_cleaver_greatsword', 'oxhide_execution_axe',
@@ -2152,16 +2191,9 @@ function proWeaponPath(kind, rarity, itemId) {
   if (!m) return null;
   const id = m[rarity] || m.default;
   if (!id) return null;
-  // Welle 29c: Inspired-Pack hat eigene icons_128/ — wenn Slug daraus stammt,
-  // nutze diesen Pfad direkt (rarity_v2 hat keine Inspired-Variants).
+  // Inspired-Pack hat eigene icons_128/ — wenn Slug daraus stammt, dort holen.
   if (INSPIRED_WEAPON_SLUGS.has(id)) {
     return `/assets/equipment/weapons/professional/inspired_2026_05_27/icons_128/${id}.png`;
-  }
-  // Wenn rarity_v2-File existiert: nutze es. Sonst Fallback auf icons_128
-  // (Basis-Sprite ohne Rarity-Tinting).
-  if (rarity && rarity !== 'default'
-      && PRO_WEAPON_RARITY_FILES.has(`${rarity}|${id}`)) {
-    return `/assets/equipment/weapons/professional/reference_based/rarity_v2/${rarity}/${id}.png`;
   }
   return `/assets/equipment/weapons/professional/reference_based/icons_128/${id}.png`;
 }
@@ -2171,9 +2203,7 @@ function proArmorPath(slot, rarity) {
   const r = rarity || 'common';
   const id = m[r] || m.default;
   if (!id) return null;
-  // Files liegen unter der Rarity, in der das Sprite zugewiesen wurde — nicht
-  // unter `r`. Lookup über die Slot-Map.
-  return `/assets/equipment/armor/professional/reference_based/by_rarity/${_proArmorAssetRarity(slot, id)}/${id}.png`;
+  return `/assets/equipment/armor/professional/reference_based/icons_128/${id}.png`;
 }
 
 // Pro Armor-Asset hat eine canonical Rarity (im Manifest). Wir mappen
@@ -2783,6 +2813,15 @@ class WorldScene extends Phaser.Scene {
     for (const slug of ANCIENT_BLADE_POOL) {
       this.load.image(`ancient_blade_${slug}`,
         `/assets/equipment/weapons/professional/from_neu_pro/icons_128/${slug}.png`);
+    }
+    // Cosmetic-Skin-Pools für Staves/Wands/Armor — Texture-Key = `skin_<slug>`.
+    // Wird in itemSpriteKey() per cosmetic_skin angesprochen.
+    for (const [kind, dir] of Object.entries(SKIN_DIR_BY_KIND)) {
+      const slugs = SKIN_POOL_PRELOAD[kind];
+      if (!slugs) continue;
+      for (const slug of slugs) {
+        this.load.image(`skin_${slug}`, `/assets/${dir}/icons_128/${slug}.png`);
+      }
     }
     // Pro-Armor-Variants: 5 Slots × 5 Rarities
     for (const r of PRO_RARITIES) {
