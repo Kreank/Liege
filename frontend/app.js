@@ -2576,10 +2576,21 @@ class WorldScene extends Phaser.Scene {
     this.load.image('fx_heal_glow',    '/assets/effects/heal_glow.png');
     this.load.image('fx_poison_cloud', '/assets/effects/poison_cloud.png');
     this.load.image('char_player',     '/assets/characters/player.png');
-    // Welle 23 — Player-Presets (Character-Creation)
-    for (const p of ['ember_mage', 'iron_delver', 'knife_runner',
-                      'shieldbearer', 'wanderer_cloak', 'wild_ranger']) {
+    // Welle 23 — Player-Presets (Character-Creation): 128×128 Portraits für UI
+    // + 64×64 Walk-Frames aus dem player_preset_walk_pack_2026_05_28.
+    const PLAYER_PRESETS = ['ember_mage', 'iron_delver', 'knife_runner',
+                            'shieldbearer', 'wanderer_cloak', 'wild_ranger'];
+    for (const p of PLAYER_PRESETS) {
       this.load.image(`preset_${p}`, `/assets/characters/player_presets/${p}.png`);
+      // Walk-Pack: 2 idle + 8 walk-Frames pro Preset
+      for (const f of [1, 2]) {
+        this.load.image(`preset_${p}_idle_${f}`,
+          `/assets/animations/player_presets/${p}/idle_${f}.png`);
+        for (const dir of ['down', 'up', 'left', 'right']) {
+          this.load.image(`preset_${p}_walk_${dir}_${f}`,
+            `/assets/animations/player_presets/${p}/walk_${dir}_${f}.png`);
+        }
+      }
     }
     this.load.image('fx_shadow',       '/assets/effects/shadow.png');
 
@@ -8329,10 +8340,14 @@ class WorldScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setAlpha(0.55);
 
-    // Welle 23: Wenn Player ein Preset gewählt hat → preset-sprite,
-    // sonst Walk-Animation, sonst char_player Fallback.
+    // Wenn Player ein Preset gewählt hat: Walk-Pack-Idle-Frame bevorzugen,
+    // fallback auf das 128er-Portrait. Sonst Default-Walk-Animation, dann char_player.
     let startKey = 'char_player';
-    if (isMe && this.myPreset && this.textures.exists(`preset_${this.myPreset}`)) {
+    if (isMe && this.myPreset
+        && this.textures.exists(`preset_${this.myPreset}_idle_1`)) {
+      startKey = `preset_${this.myPreset}_idle_1`;
+    } else if (isMe && this.myPreset
+               && this.textures.exists(`preset_${this.myPreset}`)) {
       startKey = `preset_${this.myPreset}`;
     } else if (this.textures.exists('player_walk_down_1')) {
       startKey = 'player_walk_down_1';
@@ -8359,14 +8374,19 @@ class WorldScene extends Phaser.Scene {
     entry.body.flipX = false;
     entry.body.setRotation(0);
     // Animation-Prefix wählen:
-    //   Player    → 'player' (assets/animations/player/walk_*)
-    //   NPC kind  → 'cha_<kind>' wenn /animations/characters/<kind>/ existiert
-    //   Monster   → 'mob_<kind>' wenn /animations/monsters/<kind>/ existiert
-    // Wenn Variant (z.B. bandit_axe) → keine Animation (Variant ist statisch).
-    // Welle 23: Player mit Preset → keine Animation, Preset-Sprite bleibt.
+    //   Player + Preset → 'preset_<name>' wenn Walk-Pack-Frames existieren
+    //   Player default  → 'player' (assets/animations/player/walk_*)
+    //   NPC kind        → 'cha_<kind>' wenn /animations/characters/<kind>/ existiert
+    //   Monster         → 'mob_<kind>' wenn /animations/monsters/<kind>/ existiert
+    // Wenn NPC-Variant (z.B. bandit_axe) → keine Animation (Variant ist statisch).
     let prefix = null;
-    if (entry.isPlayer && !this.myPreset) {
+    let usesIdleFrame = true;   // 'cha_<k>_idle_<f>' / 'preset_<p>_idle_<f>'
+    if (entry.isPlayer && this.myPreset
+        && this.textures.exists(`preset_${this.myPreset}_idle_1`)) {
+      prefix = `preset_${this.myPreset}`;
+    } else if (entry.isPlayer && !this.myPreset) {
       prefix = 'player';
+      usesIdleFrame = false;    // 'player_walk_<dir>_1' als Idle
     } else if (entry.npc && !entry.npc.sprite_variant) {
       const k = entry.npc.kind;
       if (this.textures.exists(`cha_${k}_idle_1`)) prefix = `cha_${k}`;
@@ -8377,10 +8397,9 @@ class WorldScene extends Phaser.Scene {
       // Idle
       entry.moving = false;
       entry.walkTimer = 0;
-      // Player: idle = walk_<dir>_1 (Stand-Frame); NPC/Monster: idle_1.
-      const key = entry.isPlayer
-        ? `player_walk_${entry.facing || 'down'}_1`
-        : `${prefix}_idle_1`;
+      const key = usesIdleFrame
+        ? `${prefix}_idle_1`
+        : `${prefix}_walk_${entry.facing || 'down'}_1`;
       if (this.textures.exists(key)) {
         entry.body.setTexture(key);
         entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);

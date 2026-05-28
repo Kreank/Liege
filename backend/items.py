@@ -120,15 +120,15 @@ ITEM_KINDS = {
     "research_tome":   {"category": "consumable", "name": "Forschungs-Folianten",    "sprite": "/assets/magic/spell_book.png"},
     # Welle 30c — Tech-Prints für Late-Game-Research-Nodes
     # Werden beim Node-Unlock consumed. Drop-Quellen: Boss-Loot, Quest-Rewards,
-    # Ruinen-Truhen. Sprite-Paths sind Placeholder bis User echte Icons liefert.
-    "mithril_plans":   {"category": "magic", "name": "Mithril-Pläne",      "sprite": "/assets/magic/scroll.png"},
-    "ancient_scroll":  {"category": "magic", "name": "Antike Schriftrolle","sprite": "/assets/magic/scroll.png"},
-    "dragon_skull":    {"category": "magic", "name": "Drachenschädel",     "sprite": "/assets/magic/rune_stone.png"},
-    "gods_tablet":     {"category": "magic", "name": "Götter-Tablet",      "sprite": "/assets/magic/spell_book.png"},
-    "alchemy_codex":   {"category": "magic", "name": "Alchemisten-Kodex",  "sprite": "/assets/magic/spell_book.png"},
-    "runic_tablet":    {"category": "magic", "name": "Runen-Tablet",       "sprite": "/assets/magic/rune_stone.png"},
-    "healing_codex":   {"category": "magic", "name": "Heiler-Kodex",       "sprite": "/assets/magic/spell_book.png"},
-    "trade_ledger":    {"category": "magic", "name": "Handelsbuch",        "sprite": "/assets/magic/scroll.png"},
+    # Ruinen-Truhen. Sprites aus tech_prints_2026_05_28-Pack.
+    "mithril_plans":   {"category": "magic", "name": "Mithril-Pläne",      "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/mithril_plans.png"},
+    "ancient_scroll":  {"category": "magic", "name": "Antike Schriftrolle","sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/ancient_scroll.png"},
+    "dragon_skull":    {"category": "magic", "name": "Drachenschädel",     "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/dragon_skull.png"},
+    "gods_tablet":     {"category": "magic", "name": "Götter-Tablet",      "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/gods_tablet.png"},
+    "alchemy_codex":   {"category": "magic", "name": "Alchemisten-Kodex",  "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/alchemy_codex.png"},
+    "runic_tablet":    {"category": "magic", "name": "Runen-Tablet",       "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/runic_tablet.png"},
+    "healing_codex":   {"category": "magic", "name": "Heiler-Kodex",       "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/healing_codex.png"},
+    "trade_ledger":    {"category": "magic", "name": "Handelsbuch",        "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/trade_ledger.png"},
     # Tools — skill-spezifischer Bonus beim Equipping
     "pickaxe": {"category": "tool", "name": "Spitzhacke", "slot": "tool", "sprite": "/assets/tools/pickaxe.png"},
     "shovel":  {"category": "tool", "name": "Schaufel",   "slot": "tool", "sprite": "/assets/tools/shovel.png"},

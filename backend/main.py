@@ -45,6 +45,7 @@ import quest_generator
 import region_history
 import npc_memory
 import factions
+import groups
 import quest_stages
 import dungeon_instance
 import attributes
@@ -72,6 +73,69 @@ items = ItemManager()
 import items as _items_module
 _items_module.set_global_item_manager(items)
 world: World | None = None
+
+
+async def _group_snapshot(player_id: str) -> dict | None:
+    """Komplettes Group-Bild für einen Spieler (oder None wenn nicht in Gruppe)."""
+    g = await groups.get_group_for(player_id)
+    if not g:
+        return None
+    members = await groups.get_members(g["id"])
+    member_states = []
+    for m in members:
+        pid = m["player_name"]
+        pos = manager.get_players().get(pid)
+        member_states.append({
+            "name": pid,
+            "role": m["role"],
+            "sub_party": m["sub_party"],
+            "online": pid in manager.connections,
+            "x": pos["x"] if pos else None,
+            "y": pos["y"] if pos else None,
+        })
+    return {
+        "id": g["id"],
+        "kind": g["kind"],
+        "leader": g["leader"],
+        "name": g["name"],
+        "loot_rule": g["loot_rule"],
+        "your_role": g["role"],
+        "members": member_states,
+    }
+
+
+async def _broadcast_to_group(group_id: int, message: dict,
+                              exclude: str | None = None) -> None:
+    """Sendet `message` an alle online Mitglieder einer Gruppe."""
+    names = await groups.get_member_names(group_id)
+    for pid in names:
+        if pid == exclude:
+            continue
+        ws = manager.connections.get(pid)
+        if ws is None:
+            continue
+        try:
+            await ws.send_json(message)
+        except Exception:
+            pass
+
+
+async def _push_group_state(player_id: str) -> None:
+    """Schickt dem Spieler sein aktuelles group_state-Snapshot."""
+    ws = manager.connections.get(player_id)
+    if ws is None:
+        return
+    snap = await _group_snapshot(player_id)
+    try:
+        await ws.send_json({"type": "group_state", "group": snap})
+    except Exception:
+        pass
+
+
+async def _push_group_state_to_all_members(group_id: int) -> None:
+    names = await groups.get_member_names(group_id)
+    for pid in names:
+        await _push_group_state(pid)
 
 
 async def _find_drop_xy(x: int, y: int) -> tuple[int, int]:
@@ -107,6 +171,8 @@ async def lifespan(app: FastAPI):
     updated_npc_factions = await factions.assign_faction_to_existing_npcs()
     if updated_npc_factions:
         logging.info("Faction-IDs gesetzt für %d NPCs", updated_npc_factions)
+    # Welle 31: Spielergruppen (Party / Raid)
+    await groups.init_schema()
     # Welle 23: Region-Difficulty-Tabelle (Stage-2-Hook für World-Brain)
     try:
         import region_difficulty
@@ -165,12 +231,14 @@ async def lifespan(app: FastAPI):
     disaster_task = asyncio.create_task(disaster_state.run(manager))
     # Welle 29e: Wildfire-Spread-Loop (alle 30s prüft fire_tiles → spread/burn out)
     wildfire_task = asyncio.create_task(event_worker.wildfire_tick_loop(structures, manager))
+    # Welle 31: Spielergruppen-Reaper (Auto-Disband idle parties + alte Raids)
+    groups_reaper_task = asyncio.create_task(groups.reaper_loop(manager))
 
     yield
 
     tasks = (event_task, wander_task, item_task, spawn_task, respawn_task,
              farm_task, world_respawn_task, needs_task, bill_task, mood_task,
-             raid_task, time_task, status_task)
+             raid_task, time_task, status_task, groups_reaper_task)
     for t in tasks:
         t.cancel()
     for t in tasks:
@@ -906,7 +974,19 @@ async def websocket_endpoint(websocket: WebSocket):
                                 await talents.get_talent_points(player_id),
                             ),
         },
+        "group":         await _group_snapshot(player_id),
+        "group_invites": await groups.list_invites_for(player_id),
     })
+
+    # Welle 31: falls Spieler Party-Leader ist und gerade reconnected, Reaper-Timer löschen
+    _g = await groups.get_group_for(player_id)
+    if _g and _g["kind"] == "party" and _g["leader"] == player_id:
+        groups.mark_leader_online(_g["id"])
+    # Alle Mitarbeiter-Anzeigen aktualisieren (Online-Status)
+    if _g:
+        await _broadcast_to_group(_g["id"], {
+            "type": "group_member_online", "player_name": player_id,
+        }, exclude=player_id)
 
     await manager.broadcast({
         "type": "player_joined",
@@ -3421,6 +3501,17 @@ async def websocket_endpoint(websocket: WebSocket):
         if ds and ds.get("task"):
             try: ds["task"].cancel()
             except Exception: pass
+        # Welle 31: Gruppen — Leader-Offline-Reaper-Timer setzen + Member benachrichtigen
+        try:
+            _g = await groups.get_group_for(player_id)
+            if _g:
+                if _g["kind"] == "party" and _g["leader"] == player_id:
+                    groups.mark_leader_offline(_g["id"])
+                await _broadcast_to_group(_g["id"], {
+                    "type": "group_member_offline", "player_name": player_id,
+                }, exclude=player_id)
+        except Exception:
+            logging.exception("group-disconnect-hook fehlgeschlagen")
         manager.disconnect(player_id)
         await db.pool().execute(
             "UPDATE players SET last_seen = NOW() WHERE name = $1", player_id
