@@ -12,6 +12,7 @@ import os
 import random
 
 import combat
+import currency
 import llm
 import npc_worker
 import player_profile
@@ -263,10 +264,26 @@ async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
                 marker = _marker(pos, label="🌿 Heilkraut", color="#60d060", ttl_s=900)
 
         elif effect == "drop_coin":
-            kind = random.choice(["copper_coin", "silver_coin"])
-            pos = await _spawn_ground_item_near_player(world, connection_manager, kind)
-            if pos:
-                marker = _marker(pos, label="🪙 Münzbeutel", color="#e8c860", ttl_s=600)
+            # Welle 33: Münzfund fließt direkt in den Geldbeutel eines zufälligen
+            # Online-Spielers (Währung ist kein Boden-Item mehr).
+            _pids = list(connection_manager.get_players().keys())
+            if _pids:
+                _pid = random.choice(_pids)
+                _amount = random.randint(40, 200)  # Kupfer
+                await currency.add(_pid, _amount)
+                _p = connection_manager.get_players().get(_pid)
+                _ws = connection_manager.connections.get(_pid)
+                if _ws is not None:
+                    try:
+                        await _ws.send_json({"type": "wallet_update",
+                                             "copper": await currency.balance(_pid)})
+                        await _ws.send_json({"type": "toast",
+                                             "text": f"🪙 Münzfund: +{currency.format(_amount)}"})
+                    except Exception:
+                        pass
+                if _p:
+                    marker = _marker((_p["x"], _p["y"]), label="🪙 Münzfund",
+                                     color="#e8c860", ttl_s=600)
 
         elif effect == "drop_items":
             first_pos = None

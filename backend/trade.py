@@ -1,8 +1,13 @@
-"""Handels-Logik. Währung sind gold_ore-Items (Workaround bis coin.png da ist)."""
+"""Handels-Logik. Welle 33: Bezahlt wird aus dem Geldbeutel (currency.py),
+Preise sind in KUPFER. gold_ore ist wieder ein normales (verkaufbares) Erz.
+
+Warenwert-Hinweis: Diese Zahlen sind 1:1 aus dem alten gold_ore-System
+übernommen (jetzt als Kupfer interpretiert). Das eigentliche Preis-Balancing
+über die drei Münz-Stufen kommt in einem separaten Warenwert-Pass."""
 
 import random
 
-# Marktpreise pro Item-Kind in coins. Höhere Werte = wertvoller.
+# Marktpreise pro Item-Kind in KUPFER. Höhere Werte = wertvoller.
 ITEM_VALUES = {
     # Resources
     "wood":         2,
@@ -13,7 +18,7 @@ ITEM_VALUES = {
     "herb":         4,
     "iron_ore":     8,
     "silver_ore":   15,
-    "gold_ore":     0,    # ist die Währung selbst
+    "gold_ore":     30,   # Welle 33: normales Erz, kein Geld mehr
     "mythril_ore":  40,
     "steel_ingot":  12,
     "crystal":      25,

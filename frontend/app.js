@@ -835,6 +835,8 @@ const STRUCTURE_BY_KEY = Object.fromEntries(
 const USABLE_STRUCTURE_TYPES = new Set([
   'bed', 'well', 'chest', 'workbench', 'furnace', 'anvil', 'farm_plot',
   'campfire', 'cooking_pot', 'quest_board',
+  // Dungeon-Eingang: Klick muss use_structure (Eintritt) routen, NICHT attack.
+  'stairs_down',
   // Farm-Stationen
   'cheese_press', 'butter_churn', 'milking_stool', 'nesting_box_egg',
   'feed_trough', 'water_trough',
@@ -1003,7 +1005,7 @@ const ITEM_DESC = {
   wood:          'Allzweck-Holz aus Bäumen. Stapelbar bis 500.',
   stone:         'Bruchstein vom Bergbau. Stapelbar bis 500.',
   iron_ore:      'Eisenerz — am Amboss zu Stahl schmiedbar.',
-  gold_ore:      'Goldnugget. Funktioniert als Währung beim Händler.',
+  gold_ore:      'Goldnugget. Wertvolles Erz — beim Händler gegen Münzen verkaufbar.',
   silver_ore:    'Silbererz — wertvoll, magisch leitend.',
   mythril_ore:   'Sagenhaftes Mythril. Sehr selten.',
   steel_ingot:   'Stahlbarren — Hauptmaterial für hochwertige Waffen.',
@@ -1140,6 +1142,35 @@ const WATER_CONTAINER_CAPACITY = {
 const WATER_CONTAINER_KINDS = new Set(Object.keys(WATER_CONTAINER_CAPACITY));
 function isWaterContainer(kind) { return WATER_CONTAINER_KINDS.has(kind); }
 function containerCapacity(kind) { return WATER_CONTAINER_CAPACITY[kind] || 0; }
+
+// Welle 33: Geldbeutel. Intern Kupfer; 100K = 1S, 100S = 1G.
+// Liefert HTML mit Münz-Icons, z. B. "1<img>23<img>45<img>".
+const COIN_ICON = {
+  gold:   '/assets/currency/coin_gold.png',
+  silver: '/assets/currency/coin_silver.png',
+  copper: '/assets/currency/coin_copper.png',
+};
+function splitCoins(copper) {
+  copper = Math.max(0, Math.floor(copper || 0));
+  return { g: Math.floor(copper / 10000), s: Math.floor((copper % 10000) / 100), c: copper % 100 };
+}
+function formatCoinsHtml(copper) {
+  const { g, s, c } = splitCoins(copper);
+  const ic = (src) => `<img class="coin-ic" src="${src}">`;
+  let out = '';
+  if (g) out += `${g}${ic(COIN_ICON.gold)}`;
+  if (s || g) out += `${s}${ic(COIN_ICON.silver)}`;
+  out += `${c}${ic(COIN_ICON.copper)}`;
+  return out;
+}
+function formatCoinsText(copper) {
+  const { g, s, c } = splitCoins(copper);
+  let parts = [];
+  if (g) parts.push(`${g}g`);
+  if (s || g) parts.push(`${s}s`);
+  parts.push(`${c}k`);
+  return parts.join(' ');
+}
 
 function _qualityMult(q) { return QUALITY_MULT_FE[q] || 1.0; }
 
@@ -1434,6 +1465,30 @@ const NPC_FLIP_LR_KINDS = new Set([
   'villager_female', 'woodcutter',
 ]);
 
+// Fix Walk-Flicker (2026-05-29): Die Player-Preset-Walk-Packs sind uneinheitlich
+// orientiert (KI-generiert) — bei mehreren Presets ist innerhalb eines Richtungs-
+// Paares ein Frame horizontal gespiegelt, was beim Laufen nach links/rechts ein
+// Hin-und-Her-Flackern erzeugt (Charakter schaut bei jedem Schritt mal links, mal
+// rechts). Der frühere globale L↔R-Swap konnte das nicht beheben, weil die Dateien
+// selbst inkonsistent sind. Stattdessen bauen wir die Seitenansicht aus EINEM
+// sauberen Frame-Paar pro Preset und spiegeln per flipX für die Gegenrichtung.
+//   srcDir     = welches Datei-Set (walk_left_* / walk_right_*) die zwei Schritt-
+//                Frames liefert (das mit der saubersten Seiten-Pose).
+//   baseFacing = tatsächliche Blickrichtung von Frame 1 dieses Sets (per Pixel-
+//                Analyse + Sichtprüfung bestimmt, NICHT der Dateiname).
+//   flip2      = true wenn Frame 2 die gespiegelte Pose von Frame 1 ist und erst
+//                gespiegelt werden muss, damit beide Frames gleich blicken.
+// Render-Logik: Texture = preset_<p>_walk_<srcDir>_<f>; flipX so gesetzt, dass die
+// effektive Blickrichtung == Laufrichtung ist (siehe _updateWalkFrame).
+const PRESET_WALK_CFG = {
+  ember_mage:     { srcDir: 'left',  baseFacing: 'left',  flip2: false },
+  iron_delver:    { srcDir: 'left',  baseFacing: 'left',  flip2: false },
+  knife_runner:   { srcDir: 'left',  baseFacing: 'right', flip2: true  },
+  shieldbearer:   { srcDir: 'left',  baseFacing: 'left',  flip2: false },
+  wanderer_cloak: { srcDir: 'left',  baseFacing: 'left',  flip2: false },
+  wild_ranger:    { srcDir: 'right', baseFacing: 'right', flip2: false },
+};
+
 const ANIMATED_MONSTER_KINDS = [
   // bandit raus — nutzt characters/bandit/ via ANIMATED_NPC_KINDS für Stil-Konsistenz
   'basilisk','bat','bear','boar','bone_crawler',
@@ -1681,6 +1736,36 @@ const WORLD_POLISH_ANIMS = [
   { key:'leaf_rustle',           frames:16, fps:12, looping:true,  category:'ambient'  },
   { key:'campfire_embers',       frames:16, fps:12, looping:true,  category:'ambient'  },
 ];
+
+// Biome-Ambient-Overlays (Asset-Drop professional/biomes, 2026-05-29 verdrahtet).
+// 12-Frame loopable fullscreen-Overlays (camera-space, wie die Wetter-Overlays),
+// gespiegelt aus _addWeatherLayer. Spec aus
+// assets/animations/professional/manifest.json → "biomes". Key-Format: pb_<id>_NN.
+// Werden subtil (niedriges Alpha, unter den Wetter-Layern) gerendert und beim
+// Biome-Wechsel des Spielers ein-/ausgeblendet. Im Dungeon kein Ambient.
+const BIOME_AMBIENT_DEFS = [
+  { id: 'desert_heat_haze',      frames: 12, ms:  75 },
+  { id: 'desert_dust',           frames: 12, ms:  80 },
+  { id: 'jungle_humidity_motes', frames: 12, ms:  90 },
+  { id: 'jungle_leaf_drift',     frames: 12, ms: 110 },
+  { id: 'swamp_mist',            frames: 12, ms: 105 },
+  { id: 'volcanic_ash',          frames: 12, ms:  80 },
+];
+const BIOME_AMBIENT_MS = Object.fromEntries(
+  BIOME_AMBIENT_DEFS.map(d => [d.id, d.ms]));
+const BIOME_AMBIENT_FRAMES = Object.fromEntries(
+  BIOME_AMBIENT_DEFS.map(d => [d.id, d.frames]));
+// Tile-Biome (siehe TILES const: SAND=1, DESERT=5, JUNGLE=6, LAVA=7, SWAMP=9)
+// → Ambient-Effekt + Alpha. Bewusst dezent: das Overlay soll Atmosphäre geben,
+// nicht die Sicht verdecken. Wüste flimmert (heat_haze), Sand staubt leicht,
+// Dschungel hat Feuchte-Partikel, Sumpf Nebel, Lava treibende Asche.
+const BIOME_AMBIENT_BY_TILE = {
+  1: { id: 'desert_dust',           alpha: 0.16 },
+  5: { id: 'desert_heat_haze',      alpha: 0.20 },
+  6: { id: 'jungle_humidity_motes', alpha: 0.18 },
+  7: { id: 'volcanic_ash',          alpha: 0.24 },
+  9: { id: 'swamp_mist',            alpha: 0.22 },
+};
 
 // Welle world-detail-p2 (Asset-Drop 2026-05-27): Animals + Transport.
 // Pro item zwei Spritesheets (walk/roll + idle). Frame-Größen variieren pro
@@ -2329,6 +2414,8 @@ class WorldScene extends Phaser.Scene {
     this.weatherLayers  = {};          // key: layer-name → {img, frame, count, alpha}
     this.weatherPhase   = 'clear';     // 'clear' | 'rain' | 'snow' | 'fog' | 'swamp_mist'
     this.weatherIntensity = 0;         // 0=clear, 1=light, 2=medium, 3=heavy, 4=peak
+    this.biomeAmbientLayer = null;     // {img, timer, onResize, id} oder null
+    this.biomeAmbientId = null;        // aktuell gezeigter Biome-Ambient-Effekt
     this.inventory      = [];          // Spieler-Inventar [item dict, ...]
     this.inventoryOpen  = false;
     this.myHp           = 100;
@@ -2921,6 +3008,16 @@ class WorldScene extends Phaser.Scene {
         const ff = String(f).padStart(2, '0');
         this.load.image(`pw_${name}_${ff}`,
           `/assets/animations/professional/weather_overlays/${name}_overlay/${name}_overlay_${ff}.png`);
+      }
+    }
+    // Biome-Ambient-Overlays (Asset-Drop professional/biomes): 12-Frame loopable
+    // fullscreen-Overlays. Key-Format: pb_<id>_NN. Siehe BIOME_AMBIENT_DEFS +
+    // _applyBiomeAmbient (gespiegelt aus dem Wetter-Overlay-System).
+    for (const def of BIOME_AMBIENT_DEFS) {
+      for (let f = 1; f <= def.frames; f++) {
+        const ff = String(f).padStart(2, '0');
+        this.load.image(`pb_${def.id}_${ff}`,
+          `/assets/animations/professional/biomes/${def.id}/${def.id}_${ff}.png`);
       }
     }
     // Welle 50 — World-Polish-Effekte: 22 transparente Spritesheets 192×192
@@ -4874,6 +4971,9 @@ class WorldScene extends Phaser.Scene {
         this.loadGroundItems(msg.items_ground || []);
         // Inventar
         this.inventory = msg.inventory || [];
+        // Welle 33: Geldbeutel
+        this.myWalletCopper = msg.wallet_copper || 0;
+        this.refreshWalletHud();
         this.refreshInventoryUI();
         this.refreshHotbar();
         // HP / Mana / Hunger / Stamina / Skills
@@ -4975,6 +5075,9 @@ class WorldScene extends Phaser.Scene {
         if (pendingInvites.length > 0) this.showGroupInvite(pendingInvites[0]);
         // Welle 31b: Quest-Marker auf Karte initial setzen
         this._refreshAllQuestMarkers();
+        // Biome-Ambient für die Start-Position einblenden (Chunks sind oben
+        // bereits geladen, Spawn-Tile steht fest).
+        this._applyBiomeAmbient();
         break;
 
       case 'chat':
@@ -5882,6 +5985,15 @@ class WorldScene extends Phaser.Scene {
           this.activeTrade.coins = msg.coins;
           this.refreshTradeUI();
         }
+        // Welle 33: trade_coins ist der aktuelle Kupfer-Stand → HUD mitziehen
+        this.myWalletCopper = msg.coins;
+        this.refreshWalletHud();
+        break;
+
+      case 'wallet_update':
+        // Welle 33: Geldbeutel-Stand (Kupfer) geändert
+        this.myWalletCopper = msg.copper;
+        this.refreshWalletHud();
         break;
     }
   }
@@ -5910,12 +6022,12 @@ class WorldScene extends Phaser.Scene {
 
   refreshTradeUI() {
     if (!this.activeTrade) return;
-    document.getElementById('trade-coins').textContent = this.activeTrade.coins;
-    // Welle 38: Stacking-aware sellable list
+    document.getElementById('trade-coins').innerHTML = formatCoinsHtml(this.activeTrade.coins);
+    // Welle 38: Stacking-aware sellable list (Welle 33: Münzen sind keine Items mehr)
     const left = document.getElementById('trade-player-items');
     left.innerHTML = '';
     left.className = 'trade-col';
-    const sellable = this.inventory.filter(it => !it.equipped_slot && it.kind !== 'gold_ore');
+    const sellable = this.inventory.filter(it => !it.equipped_slot);
     for (const it of sellable) {
       const cfg = ITEM[it.kind] || {};
       const row = document.createElement('div');
@@ -5967,7 +6079,7 @@ class WorldScene extends Phaser.Scene {
       const name = document.createElement('span'); name.className = 'name';
       name.textContent = off.name; row.appendChild(name);
       const price = document.createElement('span'); price.className = 'price';
-      price.textContent = `${off.price} 🪙`; row.appendChild(price);
+      price.innerHTML = formatCoinsHtml(off.price); row.appendChild(price);
       const btn = document.createElement('button');
       btn.textContent = '← Kaufen';
       btn.disabled = !canAfford;
@@ -6676,6 +6788,12 @@ class WorldScene extends Phaser.Scene {
     this._pendingInviteId = null;
   }
 
+  refreshWalletHud() {
+    const el = document.getElementById('wallet-hud');
+    if (!el) return;
+    el.innerHTML = formatCoinsHtml(this.myWalletCopper || 0);
+  }
+
   refreshNeedsBars() {
     const hf = document.getElementById('hunger-fill');
     const ht = document.getElementById('hunger-text');
@@ -7320,6 +7438,8 @@ class WorldScene extends Phaser.Scene {
     this.inDungeon    = true;
     this.dungeonTiles = msg.tiles;
     this.dungeonSize  = msg.size;
+    // Kein Biome-Ambient unter Tage.
+    this._clearBiomeAmbient();
     // Alle Overworld-Tiles + Structures + NPCs verstecken
     for (const k in this.tileSprites) { this.tileSprites[k].setVisible(false); }
     for (const k in this.structSprites) { this.structSprites[k]?.setVisible(false); }
@@ -7393,6 +7513,8 @@ class WorldScene extends Phaser.Scene {
     }
     // Spieler-Position
     if (msg.spawn) this.setLocalPositionFromTile(msg.spawn.x, msg.spawn.y);
+    // Biome-Ambient für die Oberwelt-Position wieder evaluieren.
+    this._applyBiomeAmbient();
   }
 
   // Overrides für Dungeon-Mode: tileAt liest aus Dungeon-Tiles statt Chunks
@@ -7748,6 +7870,63 @@ class WorldScene extends Phaser.Scene {
       s.img && s.img.destroy();
     }
     this.weatherLayers = {};
+  }
+
+  // Biome-Ambient-Overlay (professional/biomes): subtiler, animierter Vollbild-
+  // Layer der zum Biome unter dem Spieler passt (Hitzeflimmern in der Wüste,
+  // Sumpfnebel, treibende Vulkanasche, …). Spiegelt die Wetter-Overlay-Mechanik,
+  // liegt aber unter den Wetter-Layern. Wird bei jedem Biome-Wechsel re-evaluiert.
+  _applyBiomeAmbient() {
+    if (this.inDungeon) { this._clearBiomeAmbient(); return; }
+    const tile = this.tileAt(this.myTileX, this.myTileY);
+    const cfg = BIOME_AMBIENT_BY_TILE[tile];
+    if (!cfg) { this._clearBiomeAmbient(); return; }
+    // Dschungel: zwischen Feuchte-Partikeln und Blätter-Drift abwechseln, damit
+    // beide Pack-Effekte vorkommen (Wechsel nur beim Betreten, nicht pro Schritt).
+    let id = cfg.id;
+    if (tile === 6) {
+      this._jungleAmbientToggle = !this._jungleAmbientToggle;
+      id = this._jungleAmbientToggle ? 'jungle_humidity_motes' : 'jungle_leaf_drift';
+    }
+    if (this.biomeAmbientId === id && this.biomeAmbientLayer) return;  // schon aktiv
+    this._clearBiomeAmbient();
+    const key0 = `pb_${id}_01`;
+    if (!this.textures.exists(key0)) return;   // Frames fehlen → still überspringen
+    const w = this.scale.width, h = this.scale.height;
+    const img = this.add.image(0, 0, key0).setOrigin(0, 0);
+    // Depth 150: über der Welt, aber UNTER Wetter (200) und Blitz (201).
+    img.setScrollFactor(0).setDepth(150).setAlpha(cfg.alpha);
+    img.setDisplaySize(w, h);
+    const count = BIOME_AMBIENT_FRAMES[id] || 12;
+    const state = { img, frame: 1, count, id };
+    state.onResize = () => {
+      if (state.img && state.img.active) {
+        state.img.setDisplaySize(this.scale.width, this.scale.height);
+      }
+    };
+    this.scale.on('resize', state.onResize);
+    state.timer = this.time.addEvent({
+      delay: BIOME_AMBIENT_MS[id] || 90, loop: true,
+      callback: () => {
+        if (!state.img.active) return;
+        state.frame = state.frame % state.count + 1;
+        const ff = String(state.frame).padStart(2, '0');
+        state.img.setTexture(`pb_${id}_${ff}`);
+      },
+    });
+    this.biomeAmbientLayer = state;
+    this.biomeAmbientId = id;
+  }
+
+  _clearBiomeAmbient() {
+    const s = this.biomeAmbientLayer;
+    if (s) {
+      s.timer && s.timer.remove();
+      s.onResize && this.scale.off('resize', s.onResize);
+      s.img && s.img.destroy();
+    }
+    this.biomeAmbientLayer = null;
+    this.biomeAmbientId = null;
   }
 
   toggleInventory() {
@@ -8974,19 +9153,30 @@ class WorldScene extends Phaser.Scene {
       entry.walkFrame = entry.walkFrame === 1 ? 2 : 1;
     }
     const frame = entry.walkFrame || 1;
-    // L/R-Inversion ist asset-pack-spezifisch:
-    //   - Player-Presets + Default-Player: systematisch invertiert (Pack hat
-    //     walk_left = Osten und umgekehrt) → globaler Swap.
+    // L/R-Handling ist asset-pack-spezifisch:
+    //   - Player-Presets: Packs sind uneinheitlich gespiegelt → wir bauen die
+    //     Seitenansicht aus EINEM sauberen Frame-Paar (PRESET_WALK_CFG) und
+    //     spiegeln per flipX für die Gegenrichtung (Fix Walk-Flicker 2026-05-29).
     //   - NPC-Pack character_phase2_3_4: Teilmenge invertiert (Audit-Befund),
-    //     siehe NPC_FLIP_LR_KINDS.
-    //   - Monster: korrekt orientiert, kein Swap.
+    //     siehe NPC_FLIP_LR_KINDS → datei-basierter Swap.
+    //   - Default-Player / Monster: korrekt orientiert, kein Swap.
     let fileDir = dir;
-    if (this._shouldFlipLR(prefix) && (dir === 'left' || dir === 'right')) {
+    let flipX = false;
+    const presetName = prefix.startsWith('preset_') ? prefix.slice(7) : null;
+    const cfg = presetName ? PRESET_WALK_CFG[presetName] : null;
+    if (cfg && (dir === 'left' || dir === 'right')) {
+      // Kanonisches Seiten-Paar + flipX → kein Flackern, korrekte Richtung.
+      fileDir = cfg.srcDir;
+      const flip = cfg.baseFacing === 'left' ? 'right' : 'left';
+      const authoredFacing = (frame === 2 && cfg.flip2) ? flip : cfg.baseFacing;
+      flipX = authoredFacing !== dir;
+    } else if (this._shouldFlipLR(prefix) && (dir === 'left' || dir === 'right')) {
       fileDir = dir === 'left' ? 'right' : 'left';
     }
     const key = `${prefix}_walk_${fileDir}_${frame}`;
     if (this.textures.exists(key)) {
       entry.body.setTexture(key);
+      entry.body.flipX = flipX;
       entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
     }
   }
@@ -8994,9 +9184,11 @@ class WorldScene extends Phaser.Scene {
   // NPC-Kinds bei denen walk_left/walk_right vertauscht sind (Audit Welle 29e).
   _shouldFlipLR(prefix) {
     if (!prefix) return false;
-    // Player + alle Presets immer flippen — Pack ist systematisch invertiert.
-    if (prefix === 'player') return true;
-    if (prefix.startsWith('preset_')) return true;
+    // Player-Presets werden über PRESET_WALK_CFG (kanonisches Frame-Paar + flipX)
+    // behandelt — kein globaler Swap mehr. Default-Player-Frames sind front-facing
+    // identisch, daher ebenfalls kein Swap nötig (Fix Walk-Flicker 2026-05-29).
+    if (prefix === 'player') return false;
+    if (prefix.startsWith('preset_')) return false;
     // NPC-Animationen: nur wenn Kind/Variant in der Inverted-Liste.
     if (prefix.startsWith('cha_')) {
       const kind = prefix.slice(4);
@@ -9337,9 +9529,13 @@ class WorldScene extends Phaser.Scene {
       this.ws.send(JSON.stringify({ type: 'move', x: newTileX, y: newTileY }));
       this.updateUI(newTileX, newTileY);
       this.drawMinimap();
-      // Biome geändert → Wetter neu evaluieren (Wüste/Lava blocken Niederschlag)
+      // Biome geändert → Wetter + Biome-Ambient neu evaluieren (Wüste/Lava
+      // blocken Niederschlag, bekommen aber Hitzeflimmern/Asche als Ambient).
       const curTile = this.tileAt(newTileX, newTileY);
-      if (curTile !== prevTile) this._applyWeather();
+      if (curTile !== prevTile) {
+        this._applyWeather();
+        this._applyBiomeAmbient();
+      }
       // Welle 50: Footstep-Dust am verlassenen Tile, jeden zweiten Schritt,
       // nur auf trockenen Böden (sand/desert/snow/mountain/lava — kein Wasser
       // oder dichtes Gras). Hält die Anim subtil statt dauerhaft.

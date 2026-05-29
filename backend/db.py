@@ -525,6 +525,35 @@ CREATE TABLE IF NOT EXISTS dungeon_floors (
     PRIMARY KEY (dungeon_id, floor_idx)
 );
 CREATE INDEX IF NOT EXISTS dungeons_expires_idx ON dungeons (expires_at) WHERE expires_at IS NOT NULL;
+
+-- Welle 33: Geldbeutel. Währung lebt als Kupfer-Gesamtbetrag am Spieler,
+-- nicht mehr als Münz-Items. 100 Kupfer = 1 Silber, 100 Silber = 1 Gold.
+ALTER TABLE players ADD COLUMN IF NOT EXISTS wallet_copper BIGINT NOT NULL DEFAULT 0;
+
+-- Einmal-Migration (selbst-idempotent: konsumiert die eigenen Inputs):
+-- bestehende Münz-Items jedes Spielers ins Guthaben falten, danach löschen.
+-- gold_ore bleibt bewusst unangetastet (ist wieder ein normales Erz).
+UPDATE players p SET wallet_copper = wallet_copper + COALESCE(f.copper, 0)
+FROM (
+    SELECT owner,
+           SUM(quantity * CASE kind
+               WHEN 'copper_coin' THEN 1
+               WHEN 'silver_coin' THEN 100
+               WHEN 'gold_coin'   THEN 10000
+               ELSE 0 END)::bigint AS copper
+    FROM items
+    WHERE owner IS NOT NULL
+      AND owner NOT LIKE 'chest:%'
+      AND kind IN ('copper_coin', 'silver_coin', 'gold_coin')
+    GROUP BY owner
+) f
+WHERE p.name = f.owner;
+
+-- Spieler- und Boden-Münzen entfernen. Truhen-Münzen (owner 'chest:%') bleiben
+-- erhalten und werden beim Entnehmen ins Guthaben verrechnet.
+DELETE FROM items
+WHERE kind IN ('copper_coin', 'silver_coin', 'gold_coin')
+  AND (owner IS NULL OR owner NOT LIKE 'chest:%');
 """
 
 _pool: asyncpg.Pool | None = None

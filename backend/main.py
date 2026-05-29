@@ -74,7 +74,24 @@ items = ItemManager()
 # können, ohne den item_manager als Parameter durchreichen zu müssen.
 import items as _items_module
 _items_module.set_global_item_manager(items)
+import currency
 world: World | None = None
+
+
+async def _push_wallet(player_id: str, gained: int | None = None) -> None:
+    """Schickt den aktuellen Geldbeutel-Stand an einen Spieler. `gained` (Kupfer)
+    triggert zusätzlich einen Gewinn-Toast."""
+    ws = manager.connections.get(player_id)
+    if ws is None:
+        return
+    try:
+        bal = await currency.balance(player_id)
+        await ws.send_json({"type": "wallet_update", "copper": bal})
+        if gained:
+            await ws.send_json({"type": "toast",
+                                "text": f"💰 +{currency.format(gained)}"})
+    except Exception:
+        logging.debug("wallet push failed for %s", player_id)
 
 
 async def _group_snapshot(player_id: str) -> dict | None:
@@ -157,6 +174,7 @@ async def _drop_loot_for_npc(killer_id: str, npc: dict,
     npc_kind = npc["kind"]
     npc_world = (npc.get("world_id") or "overworld")
     is_dungeon = npc_world.startswith("dungeon:")
+    coins_copper = 0   # Welle 33: Münz-Drops fließen in den Geldbeutel statt auf den Boden
 
     if is_dungeon:
         # Dungeon-Tier + Theme aus DB lesen
@@ -179,6 +197,9 @@ async def _drop_loot_for_npc(killer_id: str, npc: dict,
             role = "trash"
         drops = loot.roll_dungeon_loot(npc_kind, tier, role, theme_data)
         for kind, quality in drops:
+            if currency.is_currency(kind):
+                coins_copper += currency.coin_to_copper(kind)
+                continue
             d = await items.spawn_on_ground(kind, drop_x, drop_y,
                                              quality_kind=quality)
             if d is not None:
@@ -188,6 +209,9 @@ async def _drop_loot_for_npc(killer_id: str, npc: dict,
     else:
         # Overworld: bisherige Logik
         for drop_kind in loot.roll_loot(npc_kind):
+            if currency.is_currency(drop_kind):
+                coins_copper += currency.coin_to_copper(drop_kind)
+                continue
             d = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
             if d is not None:
                 await manager.broadcast({"type": "item_spawned", "item": d})
@@ -213,6 +237,14 @@ async def _drop_loot_for_npc(killer_id: str, npc: dict,
                 await manager.broadcast({"type": "item_spawned", "item": d})
     except Exception:
         logging.exception("key-item drop failed")
+
+    # Welle 33: gesammelte Münzen dem Killer gutschreiben + Geldbeutel pushen
+    if coins_copper > 0:
+        try:
+            await currency.add(killer_id, coins_copper)
+            await _push_wallet(killer_id, gained=coins_copper)
+        except Exception:
+            logging.exception("coin credit failed")
 
 
 async def _maybe_start_loot_roll(killer_id: str, dropped: dict) -> None:
@@ -1130,6 +1162,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "npcs": nearby_npcs,
         "items_ground": nearby_items,
         "inventory": await items.get_inventory(player_id),
+        "wallet_copper": await currency.balance(player_id),
         "spawn": spawn,
         "hp": state["hp"],
         "max_hp": state["max_hp"],
@@ -3255,6 +3288,20 @@ async def websocket_endpoint(websocket: WebSocket):
             elif mtype == "chest_transfer_from":
                 chest_id = int(data.get("chest_id", 0))
                 item_id = int(data.get("item_id", 0))
+                # Welle 33: Münzen aus der Truhe → Geldbeutel statt Inventar.
+                _krow = await db.pool().fetchrow(
+                    "SELECT kind, quantity FROM items WHERE id = $1 AND owner = $2",
+                    item_id, f"chest:{chest_id}",
+                )
+                if _krow and currency.is_currency(_krow["kind"]):
+                    _gain = currency.coin_to_copper(_krow["kind"], _krow["quantity"] or 1)
+                    await db.pool().execute("DELETE FROM items WHERE id = $1", item_id)
+                    await currency.add(player_id, _gain)
+                    await websocket.send_json({
+                        "type": "chest_remove", "chest_id": chest_id, "item_id": item_id,
+                    })
+                    await _push_wallet(player_id, gained=_gain)
+                    continue
                 transferred = await items.transfer_from_chest(item_id, chest_id, player_id)
                 if transferred:
                     await websocket.send_json({
@@ -3383,13 +3430,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     }
                     for k in offerings_kinds if k in ITEM_KINDS
                 ]
-                counts = await items.count_owned_by_kind(player_id)
                 await websocket.send_json({
                     "type":      "trade_open",
                     "npc_id":    npc_id,
                     "npc_name":  npc["name"],
                     "offerings": offerings,
-                    "coins":     counts.get("gold_ore", 0),
+                    "coins":     await currency.balance(player_id),  # Kupfer
                 })
 
             elif mtype == "buy_item":
@@ -3405,24 +3451,23 @@ async def websocket_endpoint(websocket: WebSocket):
                 if talent_eff_t.get("social_buy_discount", 0) > 0:
                     discount *= (1 - talent_eff_t["social_buy_discount"])
                 price = max(1, int(round(price * discount)))
-                counts = await items.count_owned_by_kind(player_id)
-                if counts.get("gold_ore", 0) < price:
-                    await websocket.send_json({"type": "toast", "text": "Nicht genug Münzen"})
+                # Welle 33: aus dem Geldbeutel bezahlen (atomar)
+                if not await currency.spend(player_id, price):
+                    await websocket.send_json({"type": "toast", "text": "Nicht genug Geld"})
                     continue
                 # Social-XP für Trade
                 sxp = await skills.gain_xp(player_id, "social", 3)
                 if sxp:
                     await websocket.send_json({"type": "skill_xp", **sxp})
-                for _ in range(price):
-                    await items.consume_one(player_id, "gold_ore")
                 created = await items.create_for_player(kind, player_id)
                 if created is None:
+                    await currency.add(player_id, price)  # Refund bei Fehlschlag
                     continue
                 inv = await items.get_inventory(player_id)
                 await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
-                new_counts = await items.count_owned_by_kind(player_id)
+                await _push_wallet(player_id)
                 await websocket.send_json({
-                    "type": "trade_coins", "coins": new_counts.get("gold_ore", 0),
+                    "type": "trade_coins", "coins": await currency.balance(player_id),
                 })
 
             elif mtype == "sell_item":
@@ -3434,8 +3479,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 if row is None:
                     continue
                 kind = row["kind"]
-                if kind == "gold_ore":
-                    continue  # Currency selber nicht verkaufbar
                 price = trade.sell_price(kind)
                 # Social-Skill + Merchant-Friend-Talent: Verkaufs-Bonus
                 talent_eff_s = await talents.aggregate_effects(player_id)
@@ -3446,13 +3489,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 if sxp:
                     await websocket.send_json({"type": "skill_xp", **sxp})
                 await db.pool().execute("DELETE FROM items WHERE id = $1", item_id)
-                for _ in range(price):
-                    await items.create_for_player("gold_ore", player_id)
+                # Welle 33: Erlös in den Geldbeutel
+                await currency.add(player_id, price)
                 inv = await items.get_inventory(player_id)
                 await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
-                new_counts = await items.count_owned_by_kind(player_id)
+                await _push_wallet(player_id)
                 await websocket.send_json({
-                    "type": "trade_coins", "coins": new_counts.get("gold_ore", 0),
+                    "type": "trade_coins", "coins": await currency.balance(player_id),
                 })
 
             elif mtype == "learn_talent":
@@ -3834,16 +3877,15 @@ async def websocket_endpoint(websocket: WebSocket):
                     xp_res = await skills.gain_xp(player_id, "combat", int(reward["xp"]))
                     if xp_res:
                         await websocket.send_json({"type": "skill_xp", **xp_res})
-                # Gold (als copper_coin-Stack)
+                # Welle 33: Gold-Reward in den Geldbeutel. Das "gold"-Feld wird als
+                # SILBER interpretiert (×100 Kupfer) — Warenwert-Annahme, im
+                # späteren Balancing-Pass ggf. anpassen.
                 gold = int(reward.get("gold", 0))
                 if gold > 0:
-                    created = await items.create_for_player("copper_coin", player_id)
-                    if created and gold > 1:
-                        # quantity hochsetzen
-                        await db.pool().execute(
-                            "UPDATE items SET quantity = quantity + $2 WHERE id = $1",
-                            created["id"], gold - 1,
-                        )
+                    await currency.add(player_id, gold * currency.COPPER_PER_SILVER)
+                # Münz-items im Reward sind via create_for_player schon ins Guthaben
+                # geflossen → Geldbeutel jetzt an den Client pushen.
+                await _push_wallet(player_id)
                 # Faction-Reputation-Toast
                 for fac, delta in (reward.get("faction") or {}).items():
                     new_rep = await quests.get_reputation(player_id, fac)
@@ -3924,12 +3966,12 @@ async def websocket_endpoint(websocket: WebSocket):
                         created = await items.create_for_player(item_kind, player_id)
                         if created is not None:
                             await websocket.send_json({"type": "inventory_add", "item": created})
-                # Gold
+                # Welle 33: Gold-Reward in den Geldbeutel ("gold"-Feld = Silber).
+                # Münz-items oben sind via create_for_player schon ins Guthaben geflossen.
                 gold = int(reward.get("gold", 0) or 0)
-                for _ in range(gold):
-                    created = await items.create_for_player("gold_coin", player_id)
-                    if created is not None:
-                        await websocket.send_json({"type": "inventory_add", "item": created})
+                if gold > 0:
+                    await currency.add(player_id, gold * currency.COPPER_PER_SILVER)
+                await _push_wallet(player_id)
                 # XP → Combat-Skill (pragmatisch)
                 xp = int(reward.get("xp", 0) or 0)
                 if xp > 0:

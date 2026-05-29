@@ -1,4 +1,5 @@
 import db
+import currency
 
 # Original-Pack 2026-05-27 — hand-painted 128×128 Inventar-Icons.
 # Default-Sprites für die meisten Items kommen aus diesem Pool.
@@ -311,6 +312,10 @@ class ItemManager:
     async def spawn_on_ground(self, kind: str, x: int, y: int,
                               material: str | None = None,
                               quality_kind: str = "normal") -> dict | None:
+        # Welle 33: Währung wird nie als Boden-Item gespawnt — der Caller
+        # (z. B. _drop_loot_for_npc) schreibt sie direkt in den Geldbeutel.
+        if currency.is_currency(kind):
+            return None
         cfg = ITEM_KINDS.get(kind)
         if cfg is None:
             return None
@@ -718,6 +723,11 @@ class ItemManager:
     async def create_for_player(self, kind: str, player_name: str,
                                 quality_kind: str = "normal",
                                 material: str | None = None) -> dict | None:
+        # Welle 33: Währung ist kein Inventar-Item mehr → Geldbeutel gutschreiben.
+        # Returnt None (Caller behandeln None bereits); Wallet-Push macht der Caller.
+        if currency.is_currency(kind):
+            await currency.add_coin(player_name, kind)
+            return None
         cfg = ITEM_KINDS.get(kind)
         if cfg is None:
             return None

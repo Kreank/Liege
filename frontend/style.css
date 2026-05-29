@@ -38,6 +38,19 @@
       height: 100%; width: 100%;
       transition: width 0.3s;
     }
+    /* Welle 33: Geldbeutel-HUD */
+    #wallet-hud {
+      position: fixed; left: 12px; top: 188px; z-index: 10;
+      display: flex; align-items: center; gap: 2px;
+      height: 22px; padding: 0 8px;
+      background: rgba(0,0,0,0.6); border: 1px solid #c8a84a; border-radius: 3px;
+      color: #f0e0b0; font-size: 14px; font-weight: bold;
+      text-shadow: 1px 1px 0 #000;
+    }
+    #wallet-hud .coin-ic {
+      width: 16px; height: 16px; margin: 0 5px 0 1px;
+      image-rendering: pixelated; vertical-align: middle;
+    }
     #hp-fill      { background: linear-gradient(to right, #a02820, #e85040); }
     #mana-fill    { background: linear-gradient(to right, #2030a0, #4080e8); }
     #hunger-fill  { background: linear-gradient(to right, #6a4020, #d08040); }

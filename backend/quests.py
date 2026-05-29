@@ -359,7 +359,9 @@ async def turn_in(quest_id: int, player_name: str) -> dict | None:
     if not row or row["status"] != "completed":
         return None
     await mark_closed(quest_id)
-    reward = row["reward"]
+    # reward kann (legacy) doppelt JSON-encoded sein → defensiv parsen,
+    # sonst ist es ein str und reward.get(...) crasht (Reward ginge verloren).
+    reward = _maybe_parse(row["reward"])
     # Faction-Reputation anwenden
     for fac, delta in (reward.get("faction") or {}).items():
         await add_reputation(player_name, fac, int(delta))
