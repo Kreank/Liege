@@ -21,7 +21,7 @@ import dungeon_tiers
 log = logging.getLogger("liege.dungeon_director")
 
 REAPER_INTERVAL = int(os.environ.get("DUNGEON_REAPER_INTERVAL", "30"))   # 30s
-SPAWN_INTERVAL  = int(os.environ.get("DUNGEON_SPAWN_INTERVAL",  "300"))  # 5 min
+SPAWN_INTERVAL  = int(os.environ.get("DUNGEON_SPAWN_INTERVAL",  "120"))  # 2 min
 WARN_BEFORE_S   = int(os.environ.get("DUNGEON_WARN_BEFORE_S",   "600"))  # 10 min
 
 # Pro Welt: maximale Anzahl aktiver Tier-1/2-Dungeons. Verhindert dass die
@@ -43,7 +43,8 @@ SPAWN_CHANCE = {
 
 # ─── Reaper ────────────────────────────────────────────────────────────────
 
-async def reaper_loop(connection_manager, world, structures_module) -> None:
+async def reaper_loop(connection_manager, world, structures_module,
+                      npc_manager=None) -> None:
     log.info("Dungeon-Reaper startet (tick=%ds, warn=%ds)",
              REAPER_INTERVAL, WARN_BEFORE_S)
     while True:
@@ -78,10 +79,18 @@ async def reaper_loop(connection_manager, world, structures_module) -> None:
                         continue
                     if ow:
                         connection_manager.update_player(pid, ow[0], ow[1])
+                        _ow_npcs = []
+                        if npc_manager is not None:
+                            _r = 256
+                            _ow_npcs = [n for n in npc_manager.all()
+                                        if (n.get("world_id") or "overworld") == "overworld"
+                                        and abs(n["x"] - ow[0]) <= _r
+                                        and abs(n["y"] - ow[1]) <= _r]
                         try:
                             await ws.send_json({
                                 "type": "dungeon_collapsed",
                                 "spawn": {"x": ow[0], "y": ow[1]},
+                                "npcs": _ow_npcs,
                             })
                             await ws.send_json({
                                 "type": "toast",
@@ -174,52 +183,64 @@ async def _find_random_spawn_location(world, connection_manager) -> tuple[int, i
 
 async def spawn_loop(connection_manager, world, structures_module) -> None:
     log.info("Dungeon-Spawn-Worker startet (tick=%ds)", SPAWN_INTERVAL)
-    await asyncio.sleep(60)  # Warm-up
+    await asyncio.sleep(10)  # kurzer Warm-up → erste Dungeons schnell verfügbar
     while True:
         try:
-            await asyncio.sleep(SPAWN_INTERVAL)
             if not connection_manager.get_players():
+                await asyncio.sleep(SPAWN_INTERVAL)
                 continue
             counts = await _count_active_by_tier()
             for tier in (dungeon_tiers.TIER_SMALL, dungeon_tiers.TIER_MEDIUM):
                 cap = MAX_AUTO_DUNGEONS.get(tier, 0)
                 cur = counts.get(tier, 0)
-                if cur >= cap:
-                    continue
-                if random.random() > SPAWN_CHANCE.get(tier, 0):
-                    continue
-                pos = await _find_random_spawn_location(world, connection_manager)
-                if pos is None:
-                    continue
-                wx, wy = pos
-                meta = await dungeon_instance.spawn_dungeon(wx, wy, tier)
-                # Stairs-Down-Struktur auf der Welt-Position platzieren
-                try:
-                    s = await structures_module.place(
-                        wx, wy, "stairs_down", "system",
-                        material="stone", durability=999,
-                    )
-                    if s:
+                # Pro Runde mehrere Versuche für kleine Verliese → zügiger Aufbau.
+                attempts = 2 if tier == dungeon_tiers.TIER_SMALL else 1
+                for _attempt in range(attempts):
+                    if cur >= cap:
+                        break
+                    if random.random() > SPAWN_CHANCE.get(tier, 0):
+                        continue
+                    pos = await _find_random_spawn_location(world, connection_manager)
+                    if pos is None:
+                        continue
+                    wx, wy = pos
+                    # Theme nach Eingangs-Biome (Lava→Magmaschlund, Schnee→Frosthöhle …)
+                    import dungeon_themes as _dt
+                    try:
+                        _biome = await world.tile_at(wx, wy)
+                    except Exception:
+                        _biome = 2
+                    _theme = _dt.theme_for_biome(_biome, wx * 31 + wy)
+                    meta = await dungeon_instance.spawn_dungeon(wx, wy, tier, theme=_theme)
+                    cur += 1
+                    # Stairs-Down-Struktur auf der Welt-Position platzieren
+                    try:
+                        s = await structures_module.place(
+                            wx, wy, "stairs_down", "system",
+                            material="stone", durability=999,
+                        )
+                        if s:
+                            await connection_manager.broadcast({
+                                "type": "structure_placed", "structure": s,
+                            })
+                    except Exception:
+                        log.exception("Stairs-Spawn fehlgeschlagen @(%d,%d)", wx, wy)
+                    # Welt-Event-Broadcast für Tier ≥ 2 (Mittel sichtbar machen)
+                    if tier >= dungeon_tiers.TIER_MEDIUM:
+                        label = dungeon_tiers.TIER_LABEL.get(tier, "Verlies")
                         await connection_manager.broadcast({
-                            "type": "structure_placed", "structure": s,
+                            "type": "world_event",
+                            "kind": "dungeon_spawned",
+                            "text": f"🏚️ Ein {label} öffnet sich bei ({wx}, {wy})!",
+                            "x": wx, "y": wy,
                         })
-                except Exception:
-                    log.exception("Stairs-Spawn fehlgeschlagen @(%d,%d)", wx, wy)
-                # Welt-Event-Broadcast für Tier ≥ 2 (Mittel sichtbar machen)
-                if tier >= dungeon_tiers.TIER_MEDIUM:
-                    label = dungeon_tiers.TIER_LABEL.get(tier, "Verlies")
-                    await connection_manager.broadcast({
-                        "type": "world_event",
-                        "kind": "dungeon_spawned",
-                        "text": f"🏚️ Ein {label} öffnet sich bei ({wx}, {wy})!",
-                        "x": wx, "y": wy,
-                    })
-                log.info("Auto-Dungeon T%d gespawnt: id=%d @(%d,%d)",
-                         tier, meta["id"], wx, wy)
-                # Minimap-Ortung aktualisieren (neuer Eingang spürbar).
-                await broadcast_dungeon_sense(connection_manager)
+                    log.info("Auto-Dungeon T%d gespawnt: id=%d @(%d,%d) theme=%s",
+                             tier, meta["id"], wx, wy, _theme)
+                    await broadcast_dungeon_sense(connection_manager)
+            await asyncio.sleep(SPAWN_INTERVAL)
         except asyncio.CancelledError:
             log.info("Dungeon-Spawn-Worker gestoppt")
             raise
         except Exception:
             log.exception("Spawn-Iteration fehlgeschlagen")
+            await asyncio.sleep(SPAWN_INTERVAL)

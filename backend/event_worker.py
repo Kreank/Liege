@@ -345,6 +345,68 @@ async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
             # Welle 29e: Waldbrand — 2-3 fire_tile Strukturen + Spread-Logik
             await _trigger_wildfire(world, structure_manager, connection_manager)
 
+        # ── Welle 2026-05-29: 5 neue Disaster-Packs ─────────────────────────
+        elif effect == "thunderstorm":
+            import disaster_state
+            await disaster_state.activate("thunderstorm")
+            await connection_manager.broadcast({
+                "type": "disaster_started", "kind": "thunderstorm",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["thunderstorm"],
+                "label": "⛈️ Gewitter",
+            })
+            await connection_manager.broadcast({
+                "type": "toast", "text": "⛈️ Ein Unwetter zieht auf — Vorsicht vor Blitzen!"})
+
+        elif effect == "toxic_fog":
+            import disaster_state
+            await disaster_state.activate("toxic_fog")
+            await connection_manager.broadcast({
+                "type": "disaster_started", "kind": "toxic_fog",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["toxic_fog"],
+                "label": "☣️ Giftnebel",
+            })
+            await connection_manager.broadcast({
+                "type": "toast", "text": "☣️ Giftiger Nebel breitet sich aus — er zersetzt die Lunge."})
+
+        elif effect == "ash_rain":
+            import disaster_state
+            await disaster_state.activate("ash_rain")
+            await connection_manager.broadcast({
+                "type": "disaster_started", "kind": "ash_rain",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["ash_rain"],
+                "label": "🌋 Aschenregen",
+            })
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🌋 Asche regnet vom Himmel — Atmen und Laufen fallen schwer."})
+
+        elif effect == "scorching_heat":
+            import disaster_state
+            await disaster_state.activate("scorching_heat")
+            await connection_manager.broadcast({
+                "type": "disaster_started", "kind": "scorching_heat",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["scorching_heat"],
+                "label": "☀️ Sengende Hitze",
+            })
+            await connection_manager.broadcast({
+                "type": "toast", "text": "☀️ Sengende Hitze — der Durst frisst dich, jede Bewegung zehrt."})
+
+        elif effect == "frog_plague":
+            import disaster_state
+            await disaster_state.activate("frog_plague")
+            await connection_manager.broadcast({
+                "type": "disaster_started", "kind": "frog_plague",
+                "duration_s": disaster_state.DISASTER_DEFAULT_DURATION["frog_plague"],
+                "label": "🐸 Froschplage",
+            })
+            try:
+                await npc_worker.spawn_cluster(
+                    world, npc_manager, connection_manager,
+                    kind="frog_swarm", count=random.randint(6, 10))
+            except Exception:
+                log.exception("Frog-Plague-Spawn fehlgeschlagen")
+            await connection_manager.broadcast({
+                "type": "toast", "text": "🐸 Eine Froschplage bricht herein — sie kriechen überall!"})
+
     except Exception:
         log.exception("Event-Effekt fehlgeschlagen: %s", effect)
     return marker

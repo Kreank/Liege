@@ -26,6 +26,12 @@ DISASTER_DEFAULT_DURATION = {
     "wildfire":     180,     # 3 min initial — Brand-Effekt läuft danach via fire_tiles weiter
     "tainted_well": 1800,    # 30 min
     "locust":       300,     # 5 min Schwarm wandert
+    # Welle 2026-05-29: 5 neue Disaster-Packs (Art war fertig, Logik fehlte).
+    "thunderstorm":   600,   # 10 min — Blitzeinschläge
+    "toxic_fog":      540,   # 9 min — Gift-DoT
+    "ash_rain":       600,   # 10 min — Sicht/Ausdauer
+    "scorching_heat": 720,   # 12 min — Durst/Ausdauer brutal
+    "frog_plague":    420,   # 7 min — Frosch-Schwarm
 }
 
 

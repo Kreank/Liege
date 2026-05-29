@@ -121,6 +121,14 @@ class NPCManager:
         npc["hp"] = new_hp
         return npc
 
+    async def despawn(self, npc_id: int) -> bool:
+        """Entfernt einen NPC ohne Loot/Tod (Recycling weit entfernter Mobs)."""
+        if npc_id not in self._by_id:
+            return False
+        await db.pool().execute("DELETE FROM npcs WHERE id = $1", npc_id)
+        self._by_id.pop(npc_id, None)
+        return True
+
     async def move(self, npc_id: int, x: int, y: int) -> bool:
         npc = self._by_id.get(npc_id)
         if npc is None:

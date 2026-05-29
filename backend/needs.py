@@ -328,16 +328,19 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
             if not player_names:
                 continue
 
-            # Welle 24: Sterbende-Sonne-Disaster verdoppelt Hunger+Thirst-Drain
-            drain_mult = 1
+            # Disaster-Modifikatoren: dying_sun → Hunger+Durst ×2; scorching_heat
+            # → Durst ×2 (Hitze); toxic_fog → Gift-DoT; thunderstorm → Blitze.
+            _dying = _scorch = _toxic = _storm = False
             try:
                 import disaster_state
-                if disaster_state.is_active("dying_sun"):
-                    drain_mult = 2
+                _dying  = disaster_state.is_active("dying_sun")
+                _scorch = disaster_state.is_active("scorching_heat")
+                _toxic  = disaster_state.is_active("toxic_fog")
+                _storm  = disaster_state.is_active("thunderstorm")
             except Exception:
                 pass
-            hunger_drain = 1 * drain_mult
-            thirst_drain = THIRST_PER_TICK * drain_mult
+            hunger_drain = 1 * (2 if _dying else 1)
+            thirst_drain = THIRST_PER_TICK * (2 if (_dying or _scorch) else 1)
 
             for name in player_names:
                 # 1) Hunger -hunger_drain, Durst -thirst_drain
@@ -368,8 +371,32 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
                     except Exception:
                         log.exception("Dehydration-Damage fehlgeschlagen für %s", name)
 
-                # 4) WS-Update an diesen Spieler
+                # 4) Giftnebel-DoT: zersetzt die Lunge solange aktiv.
+                if _toxic:
+                    try:
+                        await damage_player_cb(name, 6)
+                    except Exception:
+                        pass
+
+                # 5) WS-Update an diesen Spieler
                 await _send_needs(connection_manager, name, needs)
+
+            # Gewitter: pro Tick ein Blitzeinschlag bei einem zufälligen Spieler.
+            if _storm and player_names:
+                import random as _rnd
+                _t = _rnd.choice(player_names)
+                _p = connection_manager.get_players().get(_t)
+                try:
+                    await damage_player_cb(_t, _rnd.randint(14, 22))
+                    if _p is not None:
+                        await connection_manager.broadcast({
+                            "type": "lightning_strike", "x": _p["x"], "y": _p["y"]})
+                    _ws = connection_manager.connections.get(_t)
+                    if _ws is not None:
+                        await _ws.send_json({
+                            "type": "toast", "text": "⚡ Ein Blitz schlägt direkt neben dir ein!"})
+                except Exception:
+                    log.debug("Blitz-Schaden fehlgeschlagen", exc_info=True)
 
         except asyncio.CancelledError:
             log.info("Needs-Worker gestoppt")
@@ -418,6 +445,15 @@ async def run_stamina(connection_manager, heal_player_cb=None) -> None:
                         rate = STAMINA_REGEN_MID
                     else:
                         rate = STAMINA_REGEN_FULL
+                    # Aschenregen / sengende Hitze drosseln die Erholung (halbe Regen).
+                    if rate > 0:
+                        try:
+                            import disaster_state
+                            if disaster_state.is_active("ash_rain") or \
+                               disaster_state.is_active("scorching_heat"):
+                                rate *= 0.5
+                        except Exception:
+                            pass
 
                 # Akkumulieren → ganzzahliges Delta
                 acc = _stamina_accum.get(name, 0.0) + rate

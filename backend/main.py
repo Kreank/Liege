@@ -444,7 +444,7 @@ async def lifespan(app: FastAPI):
     # Welle 32: Dungeon-Reaper (expires_at) + Auto-Spawn
     import dungeon_director as _dd
     dungeon_reaper_task = asyncio.create_task(
-        _dd.reaper_loop(manager, world, structures))
+        _dd.reaper_loop(manager, world, structures, npcs))
     dungeon_spawn_task = asyncio.create_task(
         _dd.spawn_loop(manager, world, structures))
 
@@ -520,6 +520,51 @@ async def _active_dungeon_markers() -> list[dict]:
     )
     return [{"x": r["entrance_x"], "y": r["entrance_y"], "tier": r["tier"]}
             for r in rows]
+
+
+async def _dungeon_floor_payload(dungeon_id: int, floor_idx: int) -> dict:
+    """Zusatz-Daten für dungeon_enter/floor_change: Theme-Tint, sichtbare
+    Features (Kisten/Decor/ausgelöste Fallen) und die NPCs dieser Floor."""
+    import dungeon_themes
+    dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+    theme = dungeon["theme"] if dungeon else "cave"
+    td = dungeon_themes.THEMES.get(theme, {})
+    world_id = f"dungeon:{dungeon_id}:{floor_idx}"
+    return {
+        "theme": theme,
+        "theme_data": {
+            "label":         td.get("label"),
+            "wall_tint":     td.get("wall_tint"),
+            "floor_tint":    td.get("floor_tint"),
+            "ambient_color": td.get("ambient_color"),
+            "ambient":       td.get("ambient"),
+        },
+        "features": await dungeon_instance.visible_features(dungeon_id, floor_idx),
+        "npcs":     dungeon_instance.npcs_in_world(npcs, world_id),
+    }
+
+
+_DUNGEON_TRAP_DMG = {
+    "spike_trap": 14, "dart_trap": 12, "fire_trap": 22,
+    "frost_trap": 16, "poison_trap": 10, "rockfall_trap": 24,
+}
+_TRAP_LABEL = {
+    "spike_trap":    "🗡️ Stachelfalle! Spitzen schießen aus dem Boden.",
+    "dart_trap":     "🎯 Pfeilfalle! Bolzen aus der Wand.",
+    "fire_trap":     "🔥 Feuerfalle! Eine Stichflamme schlägt hoch.",
+    "frost_trap":    "❄️ Frostfalle! Eisige Dornen.",
+    "poison_trap":   "☠️ Giftfalle! Eine grüne Wolke zischt hervor.",
+    "rockfall_trap": "🪨 Steinschlag! Die Decke bricht herab.",
+}
+
+
+def _overworld_npcs_near(x: int, y: int, radius: int = 0) -> list:
+    """Overworld-NPCs im Umkreis (für Rückkehr aus dem Dungeon → Client lädt
+    seine NPC-Sprites neu)."""
+    r = radius or (CHUNK_SEND_RADIUS * 32 + 32)
+    return [n for n in npcs.all()
+            if (n.get("world_id") or "overworld") == "overworld"
+            and abs(n["x"] - x) <= r and abs(n["y"] - y) <= r]
 
 
 async def _populate_chunks_bg(chunks) -> None:
@@ -1466,6 +1511,27 @@ async def websocket_endpoint(websocket: WebSocket):
                                             "text": f"♻️ {count} Chunks zurückgesetzt"})
                 continue
 
+            if mtype == "dev_trigger_event":
+                # Admin-only: feuert sofort einen Event-Effekt (zum Testen von
+                # Disastern etc.). data.effect = z.B. "thunderstorm", "toxic_fog".
+                if user.get("role") != "admin":
+                    await websocket.send_json({"type": "toast", "text": "⛔ Admin only"})
+                    continue
+                eff = (data.get("effect") or "").strip()
+                if not eff:
+                    await websocket.send_json({"type": "toast", "text": "effect fehlt"})
+                    continue
+                try:
+                    await event_worker._apply_event_effect(
+                        {"effect": eff}, {}, world, npcs, structures, manager)
+                    await websocket.send_json({"type": "toast",
+                                                "text": f"🧪 Event ausgelöst: {eff}"})
+                except Exception as _e:
+                    logging.exception("dev_trigger_event fehlgeschlagen")
+                    await websocket.send_json({"type": "toast",
+                                                "text": f"Fehler: {_e}"})
+                continue
+
             if mtype == "loot_vote":
                 roll_id = int(data.get("roll_id", 0))
                 vote_kind = (data.get("vote") or "").strip().lower()
@@ -1561,6 +1627,21 @@ async def websocket_endpoint(websocket: WebSocket):
                         "WHERE name = $3",
                         x, y, player_id,
                     )
+                    # Versteckte Falle? → auslösen (Schaden + aufdecken).
+                    _trap = await dungeon_instance.trap_at(dungeon_id, floor_idx, x, y)
+                    if _trap:
+                        dungeon_instance.mark_trap_triggered(dungeon_id, floor_idx, x, y)
+                        _tdmg = _DUNGEON_TRAP_DMG.get(_trap, 12)
+                        await damage_player(player_id, _tdmg)
+                        if _trap == "poison_trap":
+                            try: await status_effects.apply("player", player_id,
+                                    "poisoned", magnitude=4, duration_seconds=20)
+                            except Exception: pass
+                        await websocket.send_json({
+                            "type": "trap_triggered", "x": x, "y": y,
+                            "kind": _trap, "dmg": _tdmg,
+                            "text": _TRAP_LABEL.get(_trap, "💥 Falle ausgelöst!"),
+                        })
                     # Stairs-Trigger: nur wenn der Spieler GENAU auf das
                     # Treppen-Tile getreten ist (kein endless re-trigger).
                     import dungeon_world as _dw
@@ -1579,6 +1660,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                     "type": "dungeon_exit",
                                     "spawn": {"x": ow[0], "y": ow[1]},
                                     "chunks": new_chunks,
+                                    "npcs": _overworld_npcs_near(ow[0], ow[1]),
                                 })
                                 await websocket.send_json({
                                     "type": "toast",
@@ -1595,6 +1677,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                     new_floor["spawn"][0], new_floor["spawn"][1],
                                 )
                                 dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+                                _extra = await _dungeon_floor_payload(dungeon_id, floor_idx - 1)
                                 await websocket.send_json({
                                     "type":       "dungeon_floor_change",
                                     "dungeon_id": dungeon_id,
@@ -1604,6 +1687,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                     "tiles":      new_floor["tiles"],
                                     "spawn":      {"x": new_floor["spawn"][0],
                                                    "y": new_floor["spawn"][1]},
+                                    **_extra,
                                 })
                                 await websocket.send_json({
                                     "type": "toast",
@@ -1624,6 +1708,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                     dungeon_id, floor_idx + 1, npcs, manager)
                                 except Exception:
                                     logging.exception("floor population (down) failed")
+                                _extra = await _dungeon_floor_payload(dungeon_id, floor_idx + 1)
                                 await websocket.send_json({
                                     "type":       "dungeon_floor_change",
                                     "dungeon_id": dungeon_id,
@@ -1633,6 +1718,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                     "tiles":      new_floor["tiles"],
                                     "spawn":      {"x": new_floor["spawn"][0],
                                                    "y": new_floor["spawn"][1]},
+                                    **_extra,
                                 })
                                 await websocket.send_json({
                                     "type": "toast",
@@ -1726,6 +1812,47 @@ async def websocket_endpoint(websocket: WebSocket):
             elif mtype == "wake":
                 # Spieler wacht aktiv aus dem Bett-Schlaf auf.
                 needs.set_resting(player_id, False)
+
+            elif mtype == "dungeon_chest":
+                # Dungeon-Schatzkiste öffnen (Auto-Loot direkt ins Inventar).
+                cw = await dungeon_instance.get_player_world(player_id)
+                parsed = dungeon_instance.parse_world_id(cw)
+                if parsed is None:
+                    continue
+                _did, _fidx = parsed
+                ccx, ccy = int(data.get("x", 0)), int(data.get("y", 0))
+                _pp = manager.get_players().get(player_id)
+                if _pp is None:
+                    continue
+                if max(abs(ccx - _pp["x"]), abs(ccy - _pp["y"])) > 1:
+                    await websocket.send_json({"type": "toast", "text": "🧰 Zu weit weg."})
+                    continue
+                if not await dungeon_instance.chest_at(_did, _fidx, ccx, ccy):
+                    continue
+                dungeon_instance.mark_chest_opened(_did, _fidx, ccx, ccy)
+                import chest_loot as _cl
+                _dg = await dungeon_instance.get_dungeon(_did)
+                _is_last = bool(_dg and _fidx >= _dg["floor_count"] - 1)
+                _rolls = _cl.roll_chest_loot("boss" if _is_last else "dungeon")
+                _found = []
+                for _r in _rolls:
+                    _kind = _r["kind"]
+                    _qty = max(1, int(_r.get("quantity", 1)))
+                    _ql = _r.get("quality", "normal")
+                    if currency.is_currency(_kind):
+                        await currency.add_coin(player_id, _kind, _qty)
+                        _found.append(f"{_qty}× {_kind}")
+                        continue
+                    for _ in range(min(_qty, 20)):
+                        _it = await items.create_for_player(_kind, player_id, _ql)
+                        if _it:
+                            await websocket.send_json({"type": "inventory_add", "item": _it})
+                    _found.append(f"{_qty}× {_kind}" if _qty > 1 else _kind)
+                await websocket.send_json({"type": "wallet_update",
+                                            "copper": await currency.balance(player_id)})
+                await websocket.send_json({"type": "dungeon_chest_opened", "x": ccx, "y": ccy})
+                await websocket.send_json({"type": "toast",
+                                            "text": "🧰 Schatz gefunden: " + ", ".join(_found[:6])})
 
             elif mtype == "place_structure":
                 x, y, type_ = data["x"], data["y"], data["structure_type"]
@@ -3031,9 +3158,13 @@ async def websocket_endpoint(websocket: WebSocket):
                         dungeon_id = drow["id"]
                     else:
                         # Player-platzierte oder alte stairs_down ohne Instanz
-                        # → Ad-hoc Tier-1-Spawn (klein, 2-4h)
+                        # → Ad-hoc Tier-1-Spawn (klein, 2-4h), Theme nach Biome.
+                        import dungeon_themes as _dt
+                        try: _biome = await world.tile_at(s["x"], s["y"])
+                        except Exception: _biome = 2
                         meta = await dungeon_instance.spawn_dungeon(
                             s["x"], s["y"], dungeon_tiers.TIER_SMALL,
+                            theme=_dt.theme_for_biome(_biome, s["x"] * 31 + s["y"]),
                         )
                         dungeon_id = meta["id"]
                     floor = await dungeon_instance.enter_dungeon(
@@ -3052,11 +3183,11 @@ async def websocket_endpoint(websocket: WebSocket):
                     try: await dungeon_instance.populate_floor_mobs(
                         dungeon_id, 0, npcs, manager)
                     except Exception: logging.exception("floor population failed")
+                    _extra = await _dungeon_floor_payload(dungeon["id"], 0)
                     await websocket.send_json({
                         "type": "dungeon_enter",
                         "dungeon_id": dungeon["id"],
                         "name":       dungeon["name"],
-                        "theme":      dungeon["theme"],
                         "tier":       dungeon["tier"],
                         "floor_count":dungeon["floor_count"],
                         "floor_idx":  0,
@@ -3064,6 +3195,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         "tiles":      floor["tiles"],
                         "spawn":      {"x": floor["spawn"][0], "y": floor["spawn"][1]},
                         "expires_at": dungeon["expires_at"],
+                        **_extra,
                     })
                     label = dungeon_tiers.TIER_LABEL.get(dungeon["tier"], "Dungeon")
                     await websocket.send_json({

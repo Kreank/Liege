@@ -408,7 +408,14 @@ async def floor_features(dungeon_id: int, floor_idx: int) -> dict:
     if dungeon is None:
         return {"theme": "cave", "chests": [], "traps": [], "decor": []}
     floor_seed = (dungeon["seed"] * 1009 + floor_idx * 31337) & 0x7FFFFFFF
-    size = dungeon_tiers.FLOOR_SIZE.get(dungeon["tier"], 24)
+    # WICHTIG: tatsächliche gespeicherte Floor-Größe verwenden (alte Dungeons
+    # wurden mit kleinerer Größe generiert) — sonst liegen Features außerhalb.
+    srow = await db.pool().fetchrow(
+        "SELECT size FROM dungeon_floors WHERE dungeon_id = $1 AND floor_idx = $2",
+        dungeon_id, floor_idx,
+    )
+    size = (srow["size"] if srow and srow["size"]
+            else dungeon_tiers.FLOOR_SIZE.get(dungeon["tier"], 24))
     is_last = (floor_idx >= dungeon["floor_count"] - 1)
     layout = dungeon_world.generate(
         floor_seed, size=size, theme=dungeon["theme"],

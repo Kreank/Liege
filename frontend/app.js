@@ -1361,6 +1361,7 @@ const NPC_SPRITE = {
   rabbit:    { sprite: 'animal_rabbit', tint: 0xffffff, label: 'Hase' },
   // Welle 29e: Disaster-Mob (wandernder Schwarm)
   locust_swarm: { sprite: 'mob_locust_swarm_idle_1', tint: 0xffffff, label: 'Heuschreckenschwarm' },
+  frog_swarm:   { sprite: 'animal_frog_swarm',       tint: 0xffffff, label: 'Froschschwarm' },
   // Creatures — eigenes Sprite, kein Tint
   goblin:   { sprite: 'monster_goblin',   tint: 0xffffff, label: 'Goblin' },
   wolf:     { sprite: 'monster_wolf',     tint: 0xffffff, label: 'Wolf' },
@@ -1427,6 +1428,7 @@ const CREATURE_KINDS = new Set([
   'frost_sprite','fire_imp','mushroom_imp','thornling','treant',
   'stone_golem','crystal_golem','gargoyle','bone_crawler','giant_spider',
   'minotaur','harpy','basilisk','chimera','griffin','hydra','manticore',
+  'frog_swarm',   // Disaster-Mob (Froschplage)
   // Welle 14 — professional asset-drop (muss mit backend/npc_worker.CREATURE_KINDS sync sein)
   'razorback_vermin','spined_abyss_larva','reed_walker','redland_scavenger',
   'mossback_warden','grave_wraith','serpent_oracle','urtikus_eye_fiend',
@@ -1622,6 +1624,12 @@ const ITEM = {
   spell_book:    { name: 'Feuerball-Buch', sprite: 'item_spell_book', category: 'magic',                          path: '/assets/magic/spell_book.png' },
   scroll:        { name: 'Schriftrolle',sprite: 'item_scroll',        category: 'magic',                          path: '/assets/magic/scroll.png' },
   rune_stone:    { name: 'Heilrune',    sprite: 'item_rune_stone',    category: 'magic',                          path: '/assets/magic/rune_stone.png' },
+  // Welle 34b — dedizierte Lore-/Key-Item-Icons (2026-05-29-Pack)
+  research_scroll: { name: 'Forschungs-Schriftrolle', sprite: 'item_research_scroll', category: 'consumable', path: '/assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_scroll.png' },
+  research_tome:   { name: 'Forschungs-Folianten',    sprite: 'item_research_tome',   category: 'consumable', path: '/assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_tome.png' },
+  dungeon_map:     { name: 'Verlies-Karte',           sprite: 'item_dungeon_map',     category: 'magic',      path: '/assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/dungeon_map.png' },
+  rift_lore:       { name: 'Risskunde',               sprite: 'item_rift_lore',       category: 'magic',      path: '/assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/rift_lore.png' },
+  kings_seal:      { name: 'Königliches Siegel',      sprite: 'item_kings_seal',      category: 'magic',      path: '/assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/kings_seal.png' },
   pickaxe:       { name: 'Spitzhacke',  sprite: 'item_pickaxe',       category: 'tool',       slot: 'tool',       path: '/assets/tools/pickaxe.png' },
   shovel:        { name: 'Schaufel',    sprite: 'item_shovel',        category: 'tool',       slot: 'tool',       path: '/assets/tools/shovel.png' },
   hammer:        { name: 'Hammer',      sprite: 'item_hammer',        category: 'tool',       slot: 'tool',       path: '/assets/tools/hammer.png' },
@@ -2594,15 +2602,14 @@ class WorldScene extends Phaser.Scene {
     this.load.image('struct_spike_trap',  '/assets/traps/spike_trap.png');
     this.load.image('struct_poison_trap', '/assets/traps/poison_trap.png');
     this.load.image('struct_stairs_down', '/assets/dungeons/stairs_down.png');
-    // Welle 23 — Gilden + Tempel + Quest-Board (Sprites fehlen noch in
-    // assets/, daher als Platzhalter andere Structure-Sprites recycled).
-    // Sobald echte Sprites da sind: hier Pfade auf eigene Files umstellen.
-    this.load.image('struct_mage_guild',     '/assets/structures/workbench.png');
-    this.load.image('struct_fighters_guild', '/assets/structures/anvil.png');
-    this.load.image('struct_healers_guild',  '/assets/structures/bed.png');
-    this.load.image('struct_thieves_guild',  '/assets/structures/chest.png');
-    this.load.image('struct_temple',         '/assets/structures/well.png');
-    this.load.image('struct_quest_board',    '/assets/structures/marker.png');
+    // Welle 34b — echte Gilden-/Tempel-/Quest-Board-Sprites (2026-05-29-Pack).
+    this.load.image('struct_mage_guild',     '/assets/structures/guilds/mage_guild.png');
+    this.load.image('struct_fighters_guild', '/assets/structures/guilds/fighters_guild.png');
+    this.load.image('struct_healers_guild',  '/assets/structures/guilds/healers_guild.png');
+    this.load.image('struct_thieves_guild',  '/assets/structures/guilds/thieves_guild.png');
+    this.load.image('struct_temple',         '/assets/structures/guilds/temple.png');
+    this.load.image('struct_quest_board',
+      '/assets/professional/additional_assets_2026_05_29_v2/icons_128/quest_board.png');
 
     // Deko-Props — Default-Pfade aus /assets/props/<cat>/.
     for (const p of ['tree_oak','tree_pine','tree_dead','tree_stump','fallen_log',
@@ -2700,6 +2707,7 @@ class WorldScene extends Phaser.Scene {
       '/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_01.png');
     this.load.image('mob_locust_swarm_idle_2',
       '/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_03.png');
+    this.load.image('animal_frog_swarm', '/assets/animals/swarms/frog/frog_green.png');
     // butter_churn + cheese_rack liegen unter food/dairy/ statt structures/farm/
     this.load.image('farm_butter_churn', '/assets/food/dairy/butter_churn.png');
     this.load.image('farm_cheese_rack',  '/assets/food/dairy/cheese_rack.png');
@@ -3602,6 +3610,29 @@ class WorldScene extends Phaser.Scene {
         material: this.selectedMaterial,
         rotation: this.placeRotation || 0,
       }));
+      return;
+    }
+
+    // Dungeon-Modus: eigene Klick-Logik (Mob angreifen / Kiste öffnen).
+    // Overworld-Struktur/Wasser-Branches werden übersprungen (gleiche Koords!).
+    if (this.inDungeon) {
+      const dnpc = this.findNPCAt(tx, ty);
+      if (dnpc && CREATURE_KINDS.has(dnpc.npc.kind)) {
+        const reach = this.currentWeaponRange();
+        const dist = Math.max(Math.abs(dnpc.tileX - this.myTileX),
+                              Math.abs(dnpc.tileY - this.myTileY));
+        if (dist <= reach) this.attackNPC(dnpc.npc.id);
+        else this.showEvent(`⚔️ Zu weit weg (Reichweite ${reach})`);
+        return;
+      }
+      const chest = (this.dungeonFeatures && this.dungeonFeatures.chests || [])
+        .find(c => c.x === tx && c.y === ty && !c.opened);
+      if (chest) {
+        const dist = Math.max(Math.abs(tx - this.myTileX), Math.abs(ty - this.myTileY));
+        if (dist <= 1) this.ws.send(JSON.stringify({ type: 'dungeon_chest', x: tx, y: ty }));
+        else this.showEvent('🧰 Komm näher an die Kiste');
+        return;
+      }
       return;
     }
 
@@ -5007,6 +5038,7 @@ class WorldScene extends Phaser.Scene {
           target[`${s.x},${s.y}`] = s;
         }
         this.drawStructures();
+        this._syncDungeonEntrances();   // gespürte Dungeon-Eingänge einblenden
         // Chronik mit vergangenen Events füllen
         this.loadInitialEvents(msg.events || []);
         // NPCs in die Welt setzen
@@ -5441,6 +5473,7 @@ class WorldScene extends Phaser.Scene {
       // — Dungeon-Ortung: aktive Eingänge (Client gated im Spür-Radius) ——————
       case 'dungeon_sense':
         this.dungeonSenseList = msg.dungeons || [];
+        this._syncDungeonEntrances();
         this.drawMinimap();
         break;
 
@@ -5561,7 +5594,8 @@ class WorldScene extends Phaser.Scene {
           delete this.npcs[msg.npc_id];
           this.drawMinimap();
         }
-        this.showEvent(`☠️ ${msg.name} wurde besiegt`);
+        // Recycelte (weit entfernte) Mobs nicht als "besiegt" melden.
+        if (!msg.recycled && msg.name) this.showEvent(`☠️ ${msg.name} wurde besiegt`);
         break;
 
       case 'npc_attacked':
@@ -5652,6 +5686,16 @@ class WorldScene extends Phaser.Scene {
         this._onDisasterEnded(msg.kind);
         if (msg.kind === 'blood_moon') window.SoundManager.stopMusic();
         break;
+      case 'lightning_strike': {
+        // Gewitter-Blitz: Bildschirm-Flash + Einschlag-Effekt am Tile.
+        this._lightningFlash();
+        if (msg.x != null && msg.y != null && !this.inDungeon) {
+          const lx = msg.x * TILE_SIZE + TILE_SIZE / 2;
+          const ly = msg.y * TILE_SIZE + TILE_SIZE / 2;
+          this.playOverlayAnim('hit_spark', lx, ly, { scale: 1.2, depth: 9, once: true });
+        }
+        break;
+      }
       case 'earthquake_shake':
         this._onEarthquakeShake(msg.duration_ms || 6000, msg.magnitude || 6);
         window.playSfx('earthquake_rumble');
@@ -5735,21 +5779,17 @@ class WorldScene extends Phaser.Scene {
         break;
 
       case 'dungeon_floor_change':
-        // Wechsel zwischen Floors — Map neu laden, currentWorldId aktualisieren
+        // Wechsel zwischen Floors — Map neu laden, currentWorldId aktualisieren.
+        // enterDungeonMode lädt NPCs/Features/Theme aus der Message.
         this.currentWorldId = `dungeon:${msg.dungeon_id}:${msg.floor_idx}`;
         this.currentDungeonFloorIdx = msg.floor_idx;
-        // Cleanup old NPCs (alte Floor)
-        for (const nid of Object.keys(this.npcs)) {
-          const n = this.npcs[nid];
-          if (n.tween) n.tween.stop();
-          if (n.container) n.container.destroy();
-          delete this.npcs[nid];
-        }
-        // Map neu rendern wie bei Enter
         this.enterDungeonMode({
           dungeon_id: msg.dungeon_id,
           name: 'Floor ' + (msg.floor_idx + 1),
-          theme: this.currentDungeonTheme,
+          theme: msg.theme || this.currentDungeonTheme,
+          theme_data: msg.theme_data,
+          features: msg.features,
+          npcs: msg.npcs,
           size: msg.size,
           tiles: msg.tiles,
           spawn: msg.spawn,
@@ -5768,6 +5808,36 @@ class WorldScene extends Phaser.Scene {
         this.currentDungeonId = null;
         this.exitDungeonMode(msg);
         break;
+
+      // Versteckte Falle ausgelöst → Sprite aufdecken + Schaden-Feedback.
+      case 'trap_triggered': {
+        if (!this.dungeonFeatures) this.dungeonFeatures = { chests: [], decor: [], traps: [] };
+        if (!this.dungeonFeatures.traps) this.dungeonFeatures.traps = [];
+        this.dungeonFeatures.traps.push({ x: msg.x, y: msg.y, kind: msg.kind });
+        const tpx = msg.x * TILE_SIZE + TILE_SIZE / 2;
+        const tpy = msg.y * TILE_SIZE + TILE_SIZE / 2;
+        this.playOverlayAnim('hit_spark', tpx, tpy, { scale: 0.7, depth: 9, once: true });
+        if (msg.dmg) this._floatingDamage(tpx, tpy, msg.dmg, { color: '#ff5030' });
+        if (this._lastDungeonRenderTile) this.renderDungeonViewport(true);
+        if (msg.text) this.showEvent(msg.text);
+        break;
+      }
+
+      // Dungeon-Kiste geöffnet → Sprite entfernen.
+      case 'dungeon_chest_opened': {
+        if (this.dungeonFeatures && this.dungeonFeatures.chests) {
+          for (const c of this.dungeonFeatures.chests) {
+            if (c.x === msg.x && c.y === msg.y) c.opened = true;
+          }
+        }
+        const fk = `c:${msg.x},${msg.y}`;
+        if (this.dungeonFeatureSprites && this.dungeonFeatureSprites[fk]) {
+          this.dungeonFeatureSprites[fk].destroy();
+          delete this.dungeonFeatureSprites[fk];
+        }
+        window.playSfx && window.playSfx('chest_open', { x: msg.x, y: msg.y });
+        break;
+      }
 
       case 'factions_update':
         this.myFactions = msg.factions || [];
@@ -7589,71 +7659,146 @@ class WorldScene extends Phaser.Scene {
     this.inDungeon    = true;
     this.dungeonTiles = msg.tiles;
     this.dungeonSize  = msg.size;
-    // Kein Biome-Ambient unter Tage.
+    // Theme (Tint/Ambient) + Features (Kisten/Decor/sichtbare Fallen).
+    this.dungeonTheme = msg.theme_data || null;
+    if (msg.theme) this.currentDungeonTheme = msg.theme;
+    this.dungeonFeatures = msg.features || { chests: [], decor: [], traps: [] };
     this._clearBiomeAmbient();
-    // Alle Overworld-Tiles + Structures + NPCs verstecken
+    // Overworld-Layer verstecken.
     for (const k in this.tileSprites) { this.tileSprites[k].setVisible(false); }
     for (const k in this.structSprites) { this.structSprites[k]?.setVisible(false); }
-    for (const id in this.npcs) {
-      if (this.npcs[id].container) this.npcs[id].container.setVisible(false);
-    }
     for (const id in this.otherPlayers) {
       if (this.otherPlayers[id].container) this.otherPlayers[id].container.setVisible(false);
     }
-    // Items am Boden verstecken
     for (const k in this.groundItemSprites || {}) { this.groundItemSprites[k]?.setVisible(false); }
-    // Dungeon-Tiles rendern
-    this.renderDungeonTiles();
-    // Spieler-Position setzen
+    // NPCs dieser Floor laden (löscht alte Welt-NPCs, spawnt die Dungeon-Mobs).
+    this.loadNPCs(msg.npcs || []);
+    // Dungeon-Sprites zurücksetzen + Spieler positionieren, dann Viewport rendern.
+    this._clearDungeonSprites();
+    this._lastDungeonRenderTile = null;
     this.setLocalPositionFromTile(msg.spawn.x, msg.spawn.y);
-    this.showStoryEvent({
-      kind: 'natural',
-      title: '🏚️ ' + msg.name.split(':')[0],
-      body: 'Du betrittst die Tiefen. Suche den Aufstieg.',
-    });
+    this.renderDungeonViewport(true);
+    if (msg.name) {
+      this.showStoryEvent({
+        kind: 'natural',
+        title: '🏚️ ' + String(msg.name).split(':')[0],
+        body: 'Du betrittst die Tiefen. Erkunde, überlebe, finde den Abstieg.',
+      });
+    }
   }
 
-  renderDungeonTiles() {
-    // Cleanup vorheriger dungeon-sprites
-    for (const k in this.dungeonSprites) { this.dungeonSprites[k].destroy(); }
+  _clearDungeonSprites() {
+    for (const k in (this.dungeonSprites || {})) { this.dungeonSprites[k].destroy(); }
     this.dungeonSprites = {};
-    if (!this.dungeonTiles) return;
-    const DUNG_TILE = {
-      0: 'dungeon_dungeon_wall',
-      1: 'dungeon_dungeon_floor',
-      2: 'dungeon_dungeon_floor',
-      3: 'dungeon_stairs_down',  // STAIRS_UP (Tile 3) — gleiches Sprite (Treppe nach oben)
-      4: 'dungeon_stairs_down',  // STAIRS_DOWN (Tile 4) — gleiches Sprite (Treppe nach unten)
-    };
-    for (let y = 0; y < this.dungeonSize; y++) {
-      for (let x = 0; x < this.dungeonSize; x++) {
-        const tile = this.dungeonTiles[y][x];
-        const key = DUNG_TILE[tile];
-        if (!key || !this.textures.exists(key)) continue;
+    for (const k in (this.dungeonFeatureSprites || {})) { this.dungeonFeatureSprites[k].destroy(); }
+    this.dungeonFeatureSprites = {};
+  }
+
+  // Viewport-Culling: rendert nur Dungeon-Tiles im Umkreis des Spielers, damit
+  // sehr große Etagen performant bleiben. Re-Render bei genug Bewegung.
+  renderDungeonViewport(force = false) {
+    if (!this.inDungeon || !this.dungeonTiles) return;
+    const R = 24;   // Render-Radius in Tiles um den Spieler
+    const ptx = this.myTileX, pty = this.myTileY;
+    const last = this._lastDungeonRenderTile;
+    if (!force && last && Math.abs(ptx - last.x) < 6 && Math.abs(pty - last.y) < 6) return;
+    this._lastDungeonRenderTile = { x: ptx, y: pty };
+    const minX = Math.max(0, ptx - R), maxX = Math.min(this.dungeonSize - 1, ptx + R);
+    const minY = Math.max(0, pty - R), maxY = Math.min(this.dungeonSize - 1, pty + R);
+    if (!this.dungeonSprites) this.dungeonSprites = {};
+    // Out-of-range-Sprites abräumen.
+    for (const k in this.dungeonSprites) {
+      const c = k.split(',');
+      const sx = +c[0], sy = +c[1];
+      if (sx < minX || sx > maxX || sy < minY || sy > maxY) {
+        this.dungeonSprites[k].destroy();
+        delete this.dungeonSprites[k];
+      }
+    }
+    const theme = this.dungeonTheme || {};
+    const wallTint  = (theme.wall_tint  != null) ? theme.wall_tint  : 0xffffff;
+    const floorTint = (theme.floor_tint != null) ? theme.floor_tint : 0xffffff;
+    for (let y = minY; y <= maxY; y++) {
+      const row = this.dungeonTiles[y];
+      for (let x = minX; x <= maxX; x++) {
+        const k = `${x},${y}`;
+        if (this.dungeonSprites[k]) continue;
+        const tile = row[x];
+        let key, tint;
+        if (tile === 0)      { key = 'dungeon_dungeon_wall';  tint = wallTint; }
+        else if (tile === 3) { key = 'dungeon_stairs_up';     tint = 0xffffff; }
+        else if (tile === 4) { key = 'dungeon_stairs_down';   tint = 0xffffff; }
+        else                 { key = 'dungeon_dungeon_floor'; tint = floorTint; }
+        if (!this.textures.exists(key)) continue;
         const img = this.add.image(x * TILE_SIZE, y * TILE_SIZE, key).setOrigin(0, 0);
         img.setDisplaySize(TILE_SIZE, TILE_SIZE);
         img.setDepth(0);
-        this.dungeonSprites[`${x},${y}`] = img;
+        if (tint !== 0xffffff) img.setTint(tint);
+        this.dungeonSprites[k] = img;
       }
+    }
+    this._renderDungeonFeatures(minX, maxX, minY, maxY);
+  }
+
+  _renderDungeonFeatures(minX, maxX, minY, maxY) {
+    for (const k in (this.dungeonFeatureSprites || {})) { this.dungeonFeatureSprites[k].destroy(); }
+    this.dungeonFeatureSprites = {};
+    const f = this.dungeonFeatures || {};
+    const inR = (x, y) => x >= minX && x <= maxX && y >= minY && y <= maxY;
+    for (const d of (f.decor || [])) {
+      if (!inR(d.x, d.y)) continue;
+      const key = `prop_${d.kind}`;
+      if (!this.textures.exists(key)) continue;
+      const img = this.add.image(d.x * TILE_SIZE + TILE_SIZE / 2,
+                                 d.y * TILE_SIZE + TILE_SIZE / 2, key).setOrigin(0.5, 0.6);
+      img.setDisplaySize(TILE_SIZE * 0.9, TILE_SIZE * 0.9);
+      img.setDepth(1.4);
+      this.dungeonFeatureSprites[`d:${d.x},${d.y}`] = img;
+    }
+    for (const c of (f.chests || [])) {
+      if (c.opened || !inR(c.x, c.y)) continue;
+      if (!this.textures.exists('dungeon_treasure_chest')) continue;
+      const img = this.add.image(c.x * TILE_SIZE + TILE_SIZE / 2,
+                                 c.y * TILE_SIZE + TILE_SIZE / 2,
+                                 'dungeon_treasure_chest').setOrigin(0.5, 0.6);
+      img.setDisplaySize(TILE_SIZE * 0.85, TILE_SIZE * 0.85);
+      img.setDepth(2);
+      this.dungeonFeatureSprites[`c:${c.x},${c.y}`] = img;
+    }
+    for (const t of (f.traps || [])) {   // nur AUSGELÖSTE Fallen sind in der Liste
+      if (!inR(t.x, t.y)) continue;
+      const key = (t.kind === 'poison_trap') ? 'struct_poison_trap' : 'struct_spike_trap';
+      if (!this.textures.exists(key)) continue;
+      const img = this.add.image(t.x * TILE_SIZE + TILE_SIZE / 2,
+                                 t.y * TILE_SIZE + TILE_SIZE / 2, key).setOrigin(0.5);
+      img.setDisplaySize(TILE_SIZE * 0.8, TILE_SIZE * 0.8);
+      img.setDepth(0.6).setAlpha(0.92).setTint(0xff6040);
+      this.dungeonFeatureSprites[`t:${t.x},${t.y}`] = img;
     }
   }
 
   exitDungeonMode(msg) {
     this.inDungeon = false;
     this.dungeonTiles = null;
-    // Dungeon-Sprites abräumen
-    for (const k in this.dungeonSprites) { this.dungeonSprites[k].destroy(); }
-    this.dungeonSprites = {};
+    this.dungeonFeatures = null;
+    this.dungeonTheme = null;
+    // Dungeon-Sprites + Feature-Sprites abräumen
+    this._clearDungeonSprites();
     // Overworld-Tiles wieder einblenden
     for (const k in this.tileSprites) { this.tileSprites[k].setVisible(true); }
     for (const k in this.structSprites) { this.structSprites[k]?.setVisible(true); }
-    for (const id in this.npcs) {
-      if (this.npcs[id].container) this.npcs[id].container.setVisible(true);
-    }
     for (const id in this.otherPlayers) {
       if (this.otherPlayers[id].container) this.otherPlayers[id].container.setVisible(true);
     }
     for (const k in this.groundItemSprites || {}) { this.groundItemSprites[k]?.setVisible(true); }
+    // Overworld-NPCs neu laden (beim Dungeon-Betreten wurden sie zerstört).
+    this.loadNPCs(msg.npcs || []);
+    // Gespürte Eingänge wieder synchronisieren (Sense-Updates im Dungeon
+    // wurden übersprungen). Tracking aus bestehenden _sensed-Strukturen neu
+    // aufbauen, dann abgleichen (abgelaufene entfernen / neue ergänzen).
+    this._injectedEntrances = new Set(
+      Object.keys(this.structures).filter(k => this.structures[k] && this.structures[k]._sensed));
+    this._syncDungeonEntrances();
     // Frische Chunks anwenden
     if (msg.chunks) {
       for (const c of msg.chunks) {
@@ -8117,6 +8262,35 @@ class WorldScene extends Phaser.Scene {
     this._endRest();
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ type: 'wake' }));
+    }
+  }
+
+  // Phantom-Marker-Fix: gespürte Dungeon-Eingänge als echte (anklickbare)
+  // Welt-Sprites einblenden — auch fern vom Spawn, wo Strukturen nicht
+  // gestreamt werden. So entspricht jeder Minimap-Marker einem sichtbaren
+  // Eingang. Klick darauf läuft über den normalen Struktur-Klick (use_structure).
+  _syncDungeonEntrances() {
+    if (this.inDungeon) return;
+    if (!this._injectedEntrances) this._injectedEntrances = new Set();
+    const want = new Set((this.dungeonSenseList || []).map(d => `${d.x},${d.y}`));
+    for (const key of [...this._injectedEntrances]) {
+      if (!want.has(key)) {
+        this._injectedEntrances.delete(key);
+        const s = this.structures[key];
+        if (s && s._sensed) {
+          const [sx, sy] = key.split(',').map(Number);
+          this.removeStructureSprite(sx, sy, 'object');
+          delete this.structures[key];
+        }
+      }
+    }
+    for (const d of (this.dungeonSenseList || [])) {
+      const key = `${d.x},${d.y}`;
+      if (this.structures[key]) continue;   // echte oder schon injizierte Struktur
+      const st = { x: d.x, y: d.y, type: 'stairs_down', layer: 'object', _sensed: true };
+      this.structures[key] = st;
+      this.addStructureSprite(st);
+      this._injectedEntrances.add(key);
     }
   }
 
@@ -9565,12 +9739,55 @@ class WorldScene extends Phaser.Scene {
         this.showEvent(`☠️ ${msg.label || 'Vergifteter Brunnen'} bei (${msg.x},${msg.y})`);
       }
       return;
+    } else if (kind === 'thunderstorm') {
+      const A = '/assets/tiles/overlays/disasters/thunderstorm/storm_clouds_dark_tile_01.png';
+      overlay.style.background = `linear-gradient(rgba(18,20,45,0.45),rgba(18,20,45,0.45)), url('${A}')`;
+      overlay.style.backgroundSize = '256px, 256px';
+      overlay.style.mixBlendMode = 'normal';
+      // Periodische Blitz-Flashes (rein visuell, der Schaden kommt vom Server).
+      const d = this._activeDisasters.get(kind);
+      if (d && !d.flashTimer) {
+        d.flashTimer = setInterval(() => { this._lightningFlash(); },
+                                   4000 + Math.random() * 5000);
+      }
+    } else if (kind === 'toxic_fog') {
+      const A = '/assets/tiles/overlays/disasters/toxic_fog/toxic_fog_layer_dense_tile_01.png';
+      overlay.style.background = `linear-gradient(rgba(70,150,40,0.30),rgba(40,90,30,0.30)), url('${A}')`;
+      overlay.style.backgroundSize = '256px, 256px';
+    } else if (kind === 'ash_rain') {
+      const A = '/assets/tiles/overlays/disasters/ash_rain/ash_rain_sky_overlay_heavy.png';
+      overlay.style.background = `linear-gradient(rgba(55,55,60,0.40),rgba(40,40,45,0.40)), url('${A}') center/cover`;
+    } else if (kind === 'scorching_heat') {
+      const A = '/assets/tiles/overlays/disasters/scorching_heat/heat_haze_sky_overlay.png';
+      overlay.style.background = `linear-gradient(rgba(255,150,40,0.24),rgba(210,90,20,0.18)), url('${A}') center/cover`;
+      overlay.style.mixBlendMode = 'multiply';
+    } else if (kind === 'frog_plague') {
+      overlay.style.background = 'radial-gradient(circle at center, rgba(80,140,40,0) 40%, rgba(70,130,35,0.30) 100%)';
+      overlay.style.mixBlendMode = 'multiply';
     }
     requestAnimationFrame(() => { overlay.style.opacity = '1'; });
   }
 
+  _lightningFlash() {
+    let f = document.getElementById('lightning-flash');
+    if (!f) {
+      f = document.createElement('div');
+      f.id = 'lightning-flash';
+      f.style.cssText = 'position:fixed;inset:0;z-index:7;pointer-events:none;'
+        + 'background:rgba(220,230,255,0.7);opacity:0;transition:opacity 90ms;';
+      document.body.appendChild(f);
+    }
+    f.style.opacity = '0.7';
+    setTimeout(() => { f.style.opacity = '0'; }, 90);
+    window.playSfx && window.playSfx('thunder', { volume: 0.5 });
+  }
+
   _onDisasterEnded(kind) {
-    if (this._activeDisasters) this._activeDisasters.delete(kind);
+    if (this._activeDisasters) {
+      const d = this._activeDisasters.get(kind);
+      if (d && d.flashTimer) clearInterval(d.flashTimer);
+      this._activeDisasters.delete(kind);
+    }
     this._refreshDisasterHud();
     const overlay = document.getElementById(`disaster-${kind}`);
     if (overlay) {
@@ -9797,6 +10014,8 @@ class WorldScene extends Phaser.Scene {
       this.ws.send(JSON.stringify({ type: 'move', x: newTileX, y: newTileY }));
       this.updateUI(newTileX, newTileY);
       this.drawMinimap();
+      // Im Dungeon: Viewport-Culling neu auswerten (große Etagen performant).
+      if (this.inDungeon) { this.renderDungeonViewport(); return; }
       // Biome geändert → Wetter + Biome-Ambient neu evaluieren (Wüste/Lava
       // blocken Niederschlag, bekommen aber Hitzeflimmern/Asche als Ambient).
       const curTile = this.tileAt(newTileX, newTileY);
@@ -9831,7 +10050,7 @@ class WorldScene extends Phaser.Scene {
     if (this.inDungeon) {
       if (x < 0 || y < 0 || x >= this.dungeonSize || y >= this.dungeonSize) return false;
       const dt = this.dungeonTiles[y][x];
-      return dt === 1 || dt === 2 || dt === 3;   // floor, corridor, stairs_up
+      return dt === 1 || dt === 2 || dt === 3 || dt === 4;  // floor/corridor/stairs up+down
     }
     const t = this.tileAt(x, y);
     if (t === null) return false;  // Chunk noch nicht geladen → blockt vorerst
@@ -10212,6 +10431,15 @@ function setupChatConsole(myRole) {
     const text = inputEl.value.trim();
     if (!text) return;
     if (activeMode === 'player') {
+      // Admin-Test: /disaster <kind> löst sofort ein Disaster/Event aus.
+      if (text.startsWith('/disaster ') || text.startsWith('/event ')) {
+        const eff = text.split(/\s+/)[1];
+        if (eff && window.GAME_WS && window.GAME_WS.readyState === WebSocket.OPEN) {
+          window.GAME_WS.send(JSON.stringify({ type: 'dev_trigger_event', effect: eff }));
+        }
+        inputEl.value = '';
+        return;
+      }
       // Welle 31: Slash-Commands für Gruppen
       if (text.startsWith('/') && handleGroupSlashCommand(text)) {
         inputEl.value = '';

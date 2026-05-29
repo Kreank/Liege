@@ -22,6 +22,7 @@ NPC_HP_BY_KIND = {
     # Welle 28: Wald-Tiere
     "fox":      28,
     "rabbit":   10,
+    "frog_swarm": 30,   # Disaster-Mob (Froschplage) — schwach, in Massen
     "robber":   55,    # robuster als bandit
     "thief":    30,    # schwächer, fokussiert auf flinke Angriffe
     "boar":     70,
@@ -159,6 +160,7 @@ CREATURE_DAMAGE = {
     "bandit":   14,    # bewaffnet
     "fox":       6,
     "rabbit":    2,
+    "frog_swarm": 5,   # einzeln schwach, aber kommen im Schwarm
     "robber":   16,    # stärkerer Hieb
     "thief":    9,     # weniger Damage, schnell
     "boar":     11,
@@ -409,6 +411,7 @@ _DEFAULT_NPC_STATS = {
 _NPC_STAT_OVERRIDES = {
     # ─── Tier 1 — Vermin/Imps (trash) ───────────────────────────────────────
     "rat":             {"defense": 0, "speed": 1.4, "tier": 1, "aggro_range": 4},
+    "frog_swarm":      {"defense": 0, "speed": 1.2, "tier": 1, "aggro_range": 6},
     "bat":             {"defense": 0, "speed": 1.6, "tier": 1, "aggro_range": 5},
     "spider":          {"defense": 1, "speed": 1.1, "tier": 1, "necrotic_resist": 20},
     "slime":           {"defense": 2, "speed": 0.6, "tier": 1, "magic_resist": 30, "ice_resist": 20},
@@ -486,6 +489,14 @@ _NPC_STAT_OVERRIDES = {
 }
 
 
+# Neutrale Kreaturen: greifen den Spieler NICHT von sich aus an (aggro_range 0).
+# Der Spieler kann sie trotzdem jagen (Fleisch/Leder/Quests). Aggressive Mobs
+# (Wölfe, Goblins, Banditen, Bären …) behalten ihre aggro_range > 0.
+NEUTRAL_CREATURE_KINDS = {
+    "rabbit", "fox", "stag", "deer",
+}
+
+
 def creature_stats(kind: str) -> dict:
     """Vollständiger Stat-Block für ein Monster-Kind, gemerged mit Defaults.
 
@@ -496,6 +507,8 @@ def creature_stats(kind: str) -> dict:
     out["hp"]  = NPC_HP_BY_KIND.get(kind, 30)
     out["dmg"] = CREATURE_DAMAGE.get(kind, 5)
     out.update(_NPC_STAT_OVERRIDES.get(kind, {}))
+    if kind in NEUTRAL_CREATURE_KINDS:
+        out["aggro_range"] = 0   # neutral — initiiert keinen Angriff
     return out
 
 
@@ -682,7 +695,7 @@ _ENTITY_BASE_SCALE = {
     "handcart_empty": 1.4, "farm_cart_hay": 1.8, "horse_cart_single": 2.0,
     "market_wagon_covered": 2.2,
     # — Wild-Monster: klein —
-    "rat": 0.45, "ember_rat": 0.5, "bat": 0.5, "shadow_bat": 0.6,
+    "rat": 0.45, "ember_rat": 0.5, "bat": 0.5, "shadow_bat": 0.6, "frog_swarm": 0.6,
     "slimelet": 0.45, "fae_mite": 0.4, "crystal_tick": 0.45, "gloom_moth": 0.5,
     "thorn_scarab": 0.55, "mushroom_imp": 0.7, "thornling": 0.7,
     "fire_imp": 0.7, "frost_sprite": 0.7, "ember_newt": 0.6, "crystal_beetle": 0.7,

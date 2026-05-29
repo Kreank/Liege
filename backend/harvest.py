@@ -90,7 +90,12 @@ YIELD_PER_HIT = {
     # MOUNTAIN_ADJACENT_BONUS, sodass Mithril & Co. nur in passenden Gebieten
     # auftauchen und nicht irgendwo auf der Wiese.
     "rock_small":    [("stone", 1, 2, 100)],
-    "rock_large":    [("stone", 1, 2, 100)],
+    # rock_large = ERZ-Felsen: mehr Stein + alle vorhandenen Roh-Erze (Eisen
+    # häufig, Silber/Gold seltener, Kristall/Mithril selten). Biome-/Berg-Boni
+    # kommen zusätzlich obendrauf. 5 Schläge (DURABILITY).
+    "rock_large":    [("stone", 2, 3, 100), ("iron_ore", 0, 1, 40),
+                      ("silver_ore", 0, 1, 16), ("gold_ore", 0, 1, 9),
+                      ("crystal", 0, 1, 10), ("mythril_ore", 0, 1, 3)],
     "rock_mossy":    [("stone", 1, 1, 100), ("herb", 0, 1, 20)],
     # Pflanzen droppen jetzt Pflanzenfaser statt direkt Stoff —
     # Stoff muss aus 3 Fasern an der Hand gewebt werden (recipe weave_cloth)

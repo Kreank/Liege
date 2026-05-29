@@ -166,26 +166,32 @@ AMBIENT_PROPS_BY_BIOME = {
     # (Gras ~5,5% Abdeckung, Sand 0%). Werte ~3× angehoben für eine üppigere Welt;
     # Sites (Pass A) bleiben die dichten Cluster, Ambient ist der dichtere
     # Hintergrund. Chance pro Tile = base * (0.6 + fertility*0.6).
+    # Rock-Rebalance 2026-05-29: Stein war kaum zu finden. rock_small (→Stein)
+    # jetzt deutlich häufiger; rock_large = ERZ-Felsen (Stein + Erze, siehe
+    # harvest.py) in jedem Land-Biome gestreut → Erze auch ohne Berge findbar.
     GRASS:  [("tall_grass", 0.085), ("flowers", 0.035), ("bush", 0.028),
-             ("tree_oak", 0.035), ("rock_small", 0.018)],
+             ("tree_oak", 0.035), ("rock_small", 0.045), ("rock_large", 0.014)],
     FOREST: [("tree_oak", 0.085), ("tree_pine", 0.065),
              ("tall_grass", 0.045), ("bush", 0.018), ("flowers", 0.012),
-             ("rock_mossy", 0.009), ("fallen_log", 0.007)],
+             ("rock_mossy", 0.020), ("rock_small", 0.030), ("rock_large", 0.014),
+             ("fallen_log", 0.007)],
     DESERT: [("dry_bush", 0.030), ("desert_skull", 0.005),
-             ("rock_small", 0.030), ("cactus", 0.030),
+             ("rock_small", 0.045), ("rock_large", 0.016), ("cactus", 0.030),
              ("tree_dead", 0.012), ("bones_scatter", 0.006)],
     JUNGLE: [("tree_oak", 0.060), ("tree_pine", 0.050),
-             ("palm_tree", 0.028),
+             ("palm_tree", 0.028), ("rock_small", 0.025), ("rock_large", 0.012),
              ("tall_grass", 0.045), ("jungle_flower", 0.022),
              ("jungle_vines", 0.018), ("bush", 0.033)],
     SWAMP:  [("reeds", 0.050), ("lily_pads", 0.020), ("tall_grass", 0.025),
+             ("rock_small", 0.020), ("rock_large", 0.010),
              ("tree_dead", 0.030), ("mushrooms", 0.020)],
     SNOW:   [("frozen_bush", 0.020), ("tree_pine", 0.045),
-             ("rock_small", 0.018), ("snow_rock", 0.022), ("ice_crystal", 0.008)],
+             ("rock_small", 0.040), ("snow_rock", 0.025), ("rock_large", 0.016),
+             ("ice_crystal", 0.008)],
     # Sand bekommt jetzt eigene spärliche Props (vorher komplett kahl). Küsten-Sand
     # bekommt zusätzlich WATERSIDE-Scatter über _pick_ambient.
-    SAND:   [("rock_small", 0.018), ("dry_bush", 0.012), ("tree_dead", 0.006),
-             ("rubble", 0.004)],
+    SAND:   [("rock_small", 0.030), ("rock_large", 0.010), ("dry_bush", 0.012),
+             ("tree_dead", 0.006), ("rubble", 0.004)],
 }
 
 

@@ -96,6 +96,12 @@ EVENT_TEMPLATES = [
     {"tier": "catastrophe", "tag": "plague_rumor",  "weight": 8,  "audience": ["any","mage"], "danger": 0.6, "effect": "plague_npcs"},
     {"tier": "catastrophe", "tag": "blood_moon_prelude","weight": 6, "audience": ["any","warrior"], "danger": 0.9},
     {"tier": "catastrophe", "tag": "elite_pack",    "weight": 10, "audience": ["warrior"], "danger": 0.8, "effect": "spawn_elites"},
+    # Welle 2026-05-29: 5 neue Disaster (Art-Packs verdrahtet).
+    {"tier": "catastrophe", "tag": "thunderstorm",   "weight": 14, "audience": ["any"], "danger": 0.7, "effect": "thunderstorm"},
+    {"tier": "catastrophe", "tag": "toxic_fog",      "weight": 11, "audience": ["any","mage"], "danger": 0.7, "effect": "toxic_fog"},
+    {"tier": "catastrophe", "tag": "ash_rain",       "weight": 11, "audience": ["any"], "danger": 0.6, "effect": "ash_rain"},
+    {"tier": "catastrophe", "tag": "scorching_heat", "weight": 11, "audience": ["any","farmer"], "danger": 0.7, "effect": "scorching_heat"},
+    {"tier": "catastrophe", "tag": "frog_plague",    "weight": 10, "audience": ["any","farmer"], "danger": 0.6, "effect": "frog_plague"},
 
     # ── Tier 4: Welt-Boss (~5h) ─────────────────────────────────────────────
     {"tier": "boss", "tag": "dragon_awakens",     "weight": 18, "audience": ["warrior"], "danger": 1.0, "effect": "boss_spawn:dragon_whelp"},

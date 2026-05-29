@@ -15,8 +15,13 @@ log = logging.getLogger("liege.npc_worker")
 
 INITIAL_NPC_COUNT = int(os.environ.get("INITIAL_NPC_COUNT", "20"))
 # Periodisches Creature-Respawn: hält die Welt belebt nach Tötungen
-MIN_CREATURE_COUNT = int(os.environ.get("MIN_CREATURE_COUNT", "30"))
-CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "45"))
+MIN_CREATURE_COUNT = int(os.environ.get("MIN_CREATURE_COUNT", "150"))
+CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "8"))
+# Kreaturen weiter als dies von JEDEM Spieler entfernt werden recycelt (despawnt),
+# damit die Population beim Erkunden mitwandert statt hinter dem Spieler zu
+# verbleiben (sonst füllt sich der Cap im Startgebiet und neue Gegenden sind leer).
+CREATURE_RECYCLE_DIST = int(os.environ.get("CREATURE_RECYCLE_DIST", "110"))
+CREATURE_RECYCLE_PER_TICK = 25
 
 # Sprite-Varianten pro Kind (Waffen/Rollen-Bilder). Beim Spawn wird zufällig
 # eine Variante gepickt und in npcs.sprite_variant gespeichert, damit der
@@ -169,7 +174,7 @@ CART_KINDS = {
 
 # Welle 29e: Disaster-Mobs — sind technisch NPCs aber mit Sonderlogik.
 # Wandern durch die Welt + ziehen Damage-Halo hinter sich her.
-DISASTER_MOB_KINDS = {"locust_swarm"}
+DISASTER_MOB_KINDS = {"locust_swarm", "frog_swarm"}
 CREATURE_KINDS = [
     # Welle 1-3
     "goblin", "wolf", "skeleton", "spider", "slime",
@@ -178,6 +183,8 @@ CREATURE_KINDS = [
     "robber", "thief",
     # Welle 28: Wald-Tiere mit Pro-Walk-Cycles
     "fox", "rabbit",
+    # Disaster-Mob (nur via Froschplage-Event, kein Wild-Spawn → CAMP_ONLY_KINDS)
+    "frog_swarm",
     # Welle 13 — neue Tiere
     "stag", "lynx", "cougar", "wolverine", "dire_wolf", "wolf_alpha",
     "cave_bear", "polar_bear", "crocodile", "cobra",
@@ -606,7 +613,7 @@ async def spawn_one(world, npc_manager, connection_manager, kind: str | None = N
 
 # Welle 23: Kinds die NIE über den Respawn-Loop spawnen — kommen nur via
 # scripted Sources (village_spawner bandit_camp, event_worker ambush etc.).
-CAMP_ONLY_KINDS = {"bandit", "robber", "thief"}
+CAMP_ONLY_KINDS = {"bandit", "robber", "thief", "frog_swarm"}
 
 # Welle 25: Heiler-Threat. Wenn ein Spieler einen Heal-Spell castet, werden
 # Mobs in seiner Nähe vorrangig auf den Caster aggro'd (auch über kürzere
@@ -633,6 +640,22 @@ async def respawn_loop(world, npc_manager, connection_manager,
     while True:
         try:
             await asyncio.sleep(CREATURE_RESPAWN_INTERVAL)
+            players_now = list(connection_manager.get_players().values())
+            # Recycling: weit von allen Spielern entfernte (Nicht-Camp-)Kreaturen
+            # despawnen, damit der Cap nicht im verlassenen Startgebiet klemmt.
+            if players_now:
+                recycled = 0
+                for n in list(npc_manager.all()):
+                    if recycled >= CREATURE_RECYCLE_PER_TICK:
+                        break
+                    if n["kind"] not in CREATURE_KINDS or n["kind"] in CAMP_ONLY_KINDS:
+                        continue
+                    if all(max(abs(n["x"] - p["x"]), abs(n["y"] - p["y"])) > CREATURE_RECYCLE_DIST
+                           for p in players_now):
+                        if await npc_manager.despawn(n["id"]):
+                            await connection_manager.broadcast(
+                                {"type": "npc_died", "npc_id": n["id"], "recycled": True})
+                            recycled += 1
             creatures = [n for n in npc_manager.all() if n["kind"] in CREATURE_KINDS]
             deficit = MIN_CREATURE_COUNT - len(creatures)
             if deficit <= 0:

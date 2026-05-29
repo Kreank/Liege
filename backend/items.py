@@ -10,6 +10,8 @@ _INSP = "/assets/equipment/weapons/professional/inspired_2026_05_27/icons_128"
 _REF = "/assets/equipment/weapons/professional/reference_based/icons_128"
 # Armor reference_based — Slot+Rarity-getaggter Pool für alle 5 Slots.
 _ARM = "/assets/equipment/armor/professional/reference_based/icons_128"
+# Welle 34b — dedizierte Lore-/Key-Item-Icons (2026-05-29-Pack).
+_LORE = "/assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128"
 
 # Asset-Pfade pro Item-Kind und Metadaten
 ITEM_KINDS = {
@@ -117,8 +119,8 @@ ITEM_KINDS = {
     "wind_slash_scroll":  {"category": "magic", "name": "Wind-Schriftrolle",  "sprite": "/assets/animations/spells/wind_slash_icon.png"},
     "holy_shield_scroll": {"category": "magic", "name": "Heiliger Schild",    "sprite": "/assets/animations/spells/holy_shield_icon.png"},
     # Welle 22 — Forschungs-Items (geben Pool-Punkte beim Use)
-    "research_scroll": {"category": "consumable", "name": "Forschungs-Schriftrolle", "sprite": "/assets/magic/scroll.png"},
-    "research_tome":   {"category": "consumable", "name": "Forschungs-Folianten",    "sprite": "/assets/magic/spell_book.png"},
+    "research_scroll": {"category": "consumable", "name": "Forschungs-Schriftrolle", "sprite": f"{_LORE}/research_scroll.png"},
+    "research_tome":   {"category": "consumable", "name": "Forschungs-Folianten",    "sprite": f"{_LORE}/research_tome.png"},
     # Welle 30c — Tech-Prints für Late-Game-Research-Nodes
     # Werden beim Node-Unlock consumed. Drop-Quellen: Boss-Loot, Quest-Rewards,
     # Ruinen-Truhen. Sprites aus tech_prints_2026_05_28-Pack.
@@ -132,9 +134,9 @@ ITEM_KINDS = {
     "trade_ledger":    {"category": "magic", "name": "Handelsbuch",        "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/trade_ledger.png"},
     # Welle 32: Dungeon-Key-Items — beim Use spawnen sie einen Tier-Dungeon-Eingang
     # an der Spieler-Position. Quest-Reward für T3, selten via Boss-Loot.
-    "dungeon_map":     {"category": "magic", "name": "Verlies-Karte",       "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/ancient_scroll.png"},
-    "rift_lore":       {"category": "magic", "name": "Risskunde",           "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/runic_tablet.png"},
-    "kings_seal":      {"category": "magic", "name": "Königliches Siegel",  "sprite": "/assets/magic/professional/tech_prints_2026_05_28/icons_128/gods_tablet.png"},
+    "dungeon_map":     {"category": "magic", "name": "Verlies-Karte",       "sprite": f"{_LORE}/dungeon_map.png"},
+    "rift_lore":       {"category": "magic", "name": "Risskunde",           "sprite": f"{_LORE}/rift_lore.png"},
+    "kings_seal":      {"category": "magic", "name": "Königliches Siegel",  "sprite": f"{_LORE}/kings_seal.png"},
     # Tools — skill-spezifischer Bonus beim Equipping
     "pickaxe": {"category": "tool", "name": "Spitzhacke", "slot": "tool", "sprite": "/assets/tools/pickaxe.png"},
     "shovel":  {"category": "tool", "name": "Schaufel",   "slot": "tool", "sprite": "/assets/tools/shovel.png"},
