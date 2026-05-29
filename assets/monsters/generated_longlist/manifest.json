@@ -1,0 +1,3281 @@
+{
+  "asset_type": "monster_longlist_sprite_sheets",
+  "source": "monster_generieren.md",
+  "generation_mode": "built-in image_gen sprite sheets, one image per source section",
+  "sheet_resolution": "1254x1254 RGB PNG",
+  "total_unique_assets": 133,
+  "notes": [
+    "Generated as integration-ready sprite sheets, not individual cropped transparent sprites.",
+    "Duplicate slugs in the source list are represented once.",
+    "Use section sheet path plus row/column/grid dimensions for slicing or direct atlas lookup."
+  ],
+  "sections": [
+    {
+      "section_index": 1,
+      "section_roman": "I",
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+      "grid_columns": 4,
+      "grid_rows": 3,
+      "asset_count": 11,
+      "assets": [
+        {
+          "slug": "creature_marsh_rat_swarm",
+          "name": "Sumpfratten-Schwarm",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "XS×8",
+            "Sumpf",
+            "Schwarm aus pelzigen Wasserratten, schimmernde Augen",
+            "Bissschwarm, schwach einzeln, AoE-Bonus bei Bündelung. Krankheit-Tick."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_marsh_rat_swarm.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 314,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_carrion_crow",
+          "name": "Aaskrähe",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Überall (Tag)",
+            "Sitzt auf Leichen, fliegt auf wenn man zu nahe kommt",
+            "Schwacher Hack-Angriff, Truppe markiert Position (visueller „Hier wurde"
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_carrion_crow.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 0,
+            "right": 627,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_giant_centipede",
+          "name": "Riesenhundertfüßer",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Höhle, Sumpf",
+            "Glänzend-schwarz, mehrgliedrig, schnell",
+            "Vergiftet (poison-DOT), kann unter Strukturen durchkriechen."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_giant_centipede.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 940,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_blood_leech_cluster",
+          "name": "Blutegel-Klumpen",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S×6",
+            "Sumpf, Fluss",
+            "Klebt unter Stegen, fällt von oben",
+            "Saugt HP (lifesteal an Egel), kurze Reichweite."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_blood_leech_cluster.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 0,
+            "right": 1254,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_thornback_hare",
+          "name": "Dornrücken-Hase",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Grasland",
+            "Hase mit verhornten Stacheln auf dem Rücken — Beute, die",
+            "Flieht meist; bei Treffer dornen-Reflect (5% dmg back)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_thornback_hare.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 418,
+            "right": 314,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_burrow_grub",
+          "name": "Wühlmade",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Erde, Feld",
+            "Fette Larve, frisst Crops",
+            "Pflanzen-Schaden auf Farmen; selbst kaum Angriff, viele auf einem Acker."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_burrow_grub.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 418,
+            "right": 627,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_glass_wing_moth",
+          "name": "Glasflügelmotte",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Wald, Nacht",
+            "Zerbrechlich-schön, von Lichtern angezogen",
+            "Schwach, aber schwarmt um Fackeln → blendet kurz (debuff aim)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_glass_wing_moth.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 418,
+            "right": 940,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_ember_wasp",
+          "name": "Glutwespe",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S×4",
+            "Wüste,",
+            "Heiß glühender Hinterleib",
+            "Fire-Stich (kleiner Burn-Tick), Schwarm-Bewegung."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_ember_wasp.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 418,
+            "right": 1254,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_chittering_spider_nest",
+          "name": "Klickerspinnen-Nest",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 8,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "XS×10",
+            "Höhle, Ruine",
+            "Kleine Spinnen, die aus einem Eisack quellen",
+            "Spawnt aus Brutsack-Struktur; Sack zerstören stoppt Spawn."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_chittering_spider_nest.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 836,
+            "right": 314,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_bog_toad",
+          "name": "Moor-Kröte",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 9,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Sumpf",
+            "Aufgeblasen, klebrige Zunge",
+            "Zungen-Reichweite (3 Tiles), zieht Spieler ein Tile zu sich."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bog_toad.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 836,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_briar_imp",
+          "name": "Dornenkobold",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_01_bestien_klein_schwarm.png",
+          "grid_index": 10,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Wald, Hecke",
+            "Kleines Wesen aus Dornen und Pflanzenfaser",
+            "Verstecken in Hecken-Tile, Sprung-Angriff aus Tarnung."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_briar_imp.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 836,
+            "right": 940,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 2,
+      "section_roman": "II",
+      "section_title": "Bestien — Mittel (T2)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+      "grid_columns": 4,
+      "grid_rows": 3,
+      "asset_count": 12,
+      "assets": [
+        {
+          "slug": "creature_dire_wolf",
+          "name": "Schreckenswolf",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Wald, Berg",
+            "Größer als normaler Wolf, dunkles Fell, vernarbt",
+            "Rudel-Bonus: +20% dmg pro adjacent Wolf."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dire_wolf.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 314,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_silverback_boar",
+          "name": "Silberrücken-Eber",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Wald",
+            "Massiver Eber mit silbergrauem Borstenkamm",
+            "Charge-Attack (3 Tile Anlauf), gestürzte Opfer 1s prone."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_silverback_boar.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 0,
+            "right": 627,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_grasping_kelp",
+          "name": "Greifender Tang",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Küste, Untiefe",
+            "Pflanzlich, scheinbar passiv",
+            "Wartet im Wasser-Tile, packt Spieler bei Berührung (root für 3s)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grasping_kelp.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 940,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_riverbank_crocodilian",
+          "name": "Flussufer-Krokodil",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Fluss",
+            "Lauert halb getaucht",
+            "Death-Roll Sonderschlag bei <30% HP des Opfers."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_riverbank_crocodilian.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 0,
+            "right": 1254,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_panther_shade",
+          "name": "Schattenpanther",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Wald, Dämmerung",
+            "Fast unsichtbar bis Angriff",
+            "Stealth bis 4 Tile Distanz; erster Hit ist auto-Crit."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_panther_shade.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 418,
+            "right": 314,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_glacier_lynx",
+          "name": "Gletscher-Luchs",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Tundra, Berg",
+            "Weiß-blau, eisige Atem-Wolke",
+            "Frostbiss (ice-debuff, slow)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_glacier_lynx.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 418,
+            "right": 627,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_dune_strider",
+          "name": "Dünenschreiter",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Wüste",
+            "Vogelartig, lange Beine, federloser Hals",
+            "Sehr schnell, hit-and-run; entzieht sich nach Hit 2 Tiles weg."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dune_strider.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 418,
+            "right": 940,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_hyena_pack_leader",
+          "name": "Hyänen-Anführerin",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M",
+            "Trockenland",
+            "Größer als die Pack-Members",
+            "Spawnt 2 normale Hyänen mit; lacht (audio cue)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_hyena_pack_leader.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 418,
+            "right": 1254,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_normal_hyena",
+          "name": "Hyäne",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 8,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Trockenland",
+            "—",
+            "—"
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_normal_hyena.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 836,
+            "right": 314,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_shrike_falcon",
+          "name": "Würger-Falke",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 9,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "S",
+            "Berg, Klippe",
+            "Spießt Beute auf Dornen",
+            "Dive-Bomb-Angriff aus großer Höhe (langer Wind-up, aber crit)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_shrike_falcon.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 836,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_grove_stag_corrupted",
+          "name": "Verdorbener Hirsch",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 10,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Wald-Tief",
+            "Edelhirsch mit schwärzlichem Geweih, Augen leuchten",
+            "Charge + Geweih-Stoß; rein defensiv bis provoziert, dann unerbittlich."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grove_stag_corrupted.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 836,
+            "right": 940,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_swamp_otter_clan",
+          "name": "Sumpfotter-Clan",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_02_bestien_mittel.png",
+          "grid_index": 11,
+          "row": 2,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "M×3",
+            "Sumpf",
+            "Werkzeuge benutzende Otter — listig, nicht nur Bestie",
+            "Stehlen Items aus Inventar (kleine Resource), fliehen wenn HP <40%."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_swamp_otter_clan.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 836,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 3,
+      "section_roman": "III",
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+      "grid_columns": 4,
+      "grid_rows": 2,
+      "asset_count": 8,
+      "assets": [
+        {
+          "slug": "creature_thornmaw",
+          "name": "Dornenschlund",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Sumpf-Lichtung",
+            "Pflanzlicher Mahlrachen im Boden",
+            "Tile-Anchored. Greift auf 5 Tile Reichweite zu, kann nicht fliehen."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_thornmaw.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 314,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_iron_horn_aurochs",
+          "name": "Eisenhorn-Auerochse",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Grasland-Nord",
+            "Aurochse mit verhornter Stirn wie Eisenplatte",
+            "Frontaler Charge ignoriert 50% Armor; Flanke verwundbar."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_iron_horn_aurochs.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 0,
+            "right": 627,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_ridgeback_drake",
+          "name": "Kammrücken-Drachling",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Berg",
+            "Flügellos, Reptilien-Brust, Säurespeicher",
+            "Spuckt Säure (acid-DOT), zerfrisst Ausrüstung-Quality (1 step temp)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_ridgeback_drake.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 940,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_glacier_juggernaut_bear",
+          "name": "Gletscher-Berserker-Bär",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Eisberg",
+            "Riesenbär mit Eiskristallen im Fell",
+            "Frost-Aura (slow um 2 Tiles); Rage bei <30% HP (Crits ×2)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_glacier_juggernaut_bear.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 0,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_dune_terror_worm",
+          "name": "Dünen-Schreckenswurm",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "XL",
+            "Wüste",
+            "Riesiger Sandwurm, taucht aus Boden auf",
+            "Burrow: verschwindet → spawnt 3 Tiles versetzt auf, surprise-attack."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dune_terror_worm.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 314,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_canyon_wyrm",
+          "name": "Schluchtwyvern",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Canyon",
+            "Geflügelt, Klippen-Bewohner",
+            "Dive + Carry: hebt Spieler 3 Tiles in die Höhe, droppt ihn (fall-dmg)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_canyon_wyrm.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 627,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_marsh_naga",
+          "name": "Sumpf-Naga",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "L",
+            "Sumpf-Tief",
+            "Halb Schlange, halb Mensch, schamanisch",
+            "Caster: poison-bolt, Self-Heal aus Sumpf-Tile."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_marsh_naga.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 627,
+            "right": 940,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_bog_titan_elk",
+          "name": "Moor-Titanelch",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_03_bestien_apex.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "XL",
+            "Moor-Tief",
+            "Riesenelch mit Schädel-Helm-Knochenwucherung",
+            "Geweih-Sweep AoE (Halbkreis vor sich), Cripple-Effekt auf Beine."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bog_titan_elk.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 627,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 4,
+      "section_roman": "IV",
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+      "grid_columns": 6,
+      "grid_rows": 4,
+      "asset_count": 23,
+      "assets": [
+        {
+          "slug": "creature_road_brigand",
+          "name": "Wegelagerer",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Straße",
+            "Einfacher Räuber, leichte Klinge",
+            "—"
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_road_brigand.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 209,
+            "bottom": 314
+          }
+        },
+        {
+          "slug": "creature_brigand_archer",
+          "name": "Wegelagerer-Schütze",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Straße, Hügel",
+            "Hinter Hecke versteckt",
+            "Range 8 Tile; flieht bei Nahkampf-Druck."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_brigand_archer.png",
+          "crop_bounds": {
+            "left": 209,
+            "top": 0,
+            "right": 418,
+            "bottom": 314
+          }
+        },
+        {
+          "slug": "creature_brigand_brute",
+          "name": "Brutaler Bandit",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Lager",
+            "Zweihänder, Lederpanzer",
+            "Power-Attack alle 3s, langer Wind-up."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_brigand_brute.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 0,
+            "right": 627,
+            "bottom": 314
+          }
+        },
+        {
+          "slug": "creature_brigand_captain",
+          "name": "Räuber-Hauptmann",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Camp",
+            "Trägt Standarte, organisiert",
+            "Aura: +15% dmg für alle Banditen in 5 Tiles."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_brigand_captain.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 836,
+            "bottom": 314
+          }
+        },
+        {
+          "slug": "creature_smoke_bandit",
+          "name": "Rauch-Schurke",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 4,
+          "row": 0,
+          "column": 4,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Stadt-Rand",
+            "Wirft Rauchbomben",
+            "Smoke-Pellet (3 Tile Wolke, blockt LoS), nutzt für Flucht/Flanke."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_smoke_bandit.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 0,
+            "right": 1045,
+            "bottom": 314
+          }
+        },
+        {
+          "slug": "creature_deserter_soldier",
+          "name": "Deserteur",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 5,
+          "row": 0,
+          "column": 5,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Ruine",
+            "Ex-Soldat in zerschlissener Uniform",
+            "Volle Kettenrüstung, langsam aber gepanzert."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_deserter_soldier.png",
+          "crop_bounds": {
+            "left": 1045,
+            "top": 0,
+            "right": 1254,
+            "bottom": 314
+          }
+        },
+        {
+          "slug": "creature_witch_hunter_renegade",
+          "name": "Abtrünniger Hexenjäger",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Wald",
+            "Eifernder Fanatiker",
+            "Anti-Magic: silence-Bolzen verhindert Spells 4s."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_witch_hunter_renegade.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 314,
+            "right": 209,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_slaver_with_chain",
+          "name": "Sklaventreiber",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Karawane",
+            "Schweres Mann mit Sklavenkette",
+            "Kettenwurf (zieht Spieler 2 Tile zu sich), peitschen-Knock."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_slaver_with_chain.png",
+          "crop_bounds": {
+            "left": 209,
+            "top": 314,
+            "right": 418,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_pit_dog_handler",
+          "name": "Hundeführer",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 8,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Camp",
+            "Mit 2 Kampfhunden an Leinen",
+            "Lässt Hunde los (spawnt 2 creature_pit_dog)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_pit_dog_handler.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 314,
+            "right": 627,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_pit_dog",
+          "name": "Kampfhund",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 9,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "(Begleiter)",
+            "—",
+            "Bite + leashed-Bonus dmg in Sichtweite des Handlers."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_pit_dog.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 314,
+            "right": 836,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_grin_goblin_scrapper",
+          "name": "Grinsekobold",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 10,
+          "row": 1,
+          "column": 4,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Murmelnd, flink, kichert."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grin_goblin_scrapper.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 314,
+            "right": 1045,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_grin_goblin_shaman",
+          "name": "Kobold-Schamane",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 11,
+          "row": 1,
+          "column": 5,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Tribal-Caster, Knochenstab. Heilt Truppe."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grin_goblin_shaman.png",
+          "crop_bounds": {
+            "left": 1045,
+            "top": 314,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_grin_goblin_warbeast_rider",
+          "name": "Kobold-Reiter",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 12,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Reitet auf creature_warboar (separate Entity)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grin_goblin_warbeast_rider.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 209,
+            "bottom": 940
+          }
+        },
+        {
+          "slug": "creature_warboar_mount",
+          "name": "Kampfeber",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 13,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Charge-Beförderer für den Reiter."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_warboar_mount.png",
+          "crop_bounds": {
+            "left": 209,
+            "top": 627,
+            "right": 418,
+            "bottom": 940
+          }
+        },
+        {
+          "slug": "creature_grin_goblin_warchief",
+          "name": "Kobold-Kriegshäuptling",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 14,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Boss-Type; spawnt Reinforcements bei 50% HP."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grin_goblin_warchief.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 627,
+            "right": 627,
+            "bottom": 940
+          }
+        },
+        {
+          "slug": "creature_hobgoblin_legionnaire",
+          "name": "Hobgoblin-Legionär",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 15,
+          "row": 2,
+          "column": 3,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Größer, diszipliniert, Schildwall mit Mit-Hobgoblins."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_hobgoblin_legionnaire.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 627,
+            "right": 836,
+            "bottom": 940
+          }
+        },
+        {
+          "slug": "creature_orgrim_basher",
+          "name": "Orgrim-Schläger",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 16,
+          "row": 2,
+          "column": 4,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Halbblut zwischen Goblin & Ogre, brutal."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_orgrim_basher.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 627,
+            "right": 1045,
+            "bottom": 940
+          }
+        },
+        {
+          "slug": "creature_blood_kin_warrior",
+          "name": "Blutsippe-Krieger",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 17,
+          "row": 2,
+          "column": 5,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Bemalt, Gesichtstribal, Knochenrüstung."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_blood_kin_warrior.png",
+          "crop_bounds": {
+            "left": 1045,
+            "top": 627,
+            "right": 1254,
+            "bottom": 940
+          }
+        },
+        {
+          "slug": "creature_blood_kin_screamer",
+          "name": "Blutsippe-Schreier",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 18,
+          "row": 3,
+          "column": 0,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Schrei-Debuff (fear 2s), silbe-laute Stimme."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_blood_kin_screamer.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 940,
+            "right": 209,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_ash_druid",
+          "name": "Aschdruide",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 19,
+          "row": 3,
+          "column": 1,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Verbrannter Naturheiler, dunkel-grüne Magie."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_ash_druid.png",
+          "crop_bounds": {
+            "left": 209,
+            "top": 940,
+            "right": 418,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_silent_cultist",
+          "name": "Stiller Kultist",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 20,
+          "row": 3,
+          "column": 2,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Maske, kein Wort, Dolche."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_silent_cultist.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 940,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_void_speaker",
+          "name": "Leerensprecher",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 21,
+          "row": 3,
+          "column": 3,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Kult-Hohepriester, eldritch-Caster."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_void_speaker.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 940,
+            "right": 836,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_swamp_witch",
+          "name": "Sumpf-Hexe",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_04_humanoide_raeuber_banden.png",
+          "grid_index": 22,
+          "row": 3,
+          "column": 4,
+          "grid_columns": 6,
+          "grid_rows": 4,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Solo, Hütte, Tränke, Verwandlung als Bluff."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_swamp_witch.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 940,
+            "right": 1045,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 5,
+      "section_roman": "V",
+      "section_title": "Untote — abgestuft",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+      "grid_columns": 5,
+      "grid_rows": 3,
+      "asset_count": 14,
+      "assets": [
+        {
+          "slug": "creature_shambling_corpse",
+          "name": "Schlurfender Leichnam",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Frisch, langsam",
+            "Greif-Hit, infiziert (rot-DOT)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_shambling_corpse.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 251,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_plague_walker",
+          "name": "Pest-Wanderer",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Aufgequollen, gelblich",
+            "Stirbt → AoE-Pestwolke (poison cloud 3s)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_plague_walker.png",
+          "crop_bounds": {
+            "left": 251,
+            "top": 0,
+            "right": 502,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_rotmaw",
+          "name": "Faulschlund",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Bauch geplatzt, schleppt Eingeweide",
+            "Beim Tod: spawnt 3 creature_marsh_rat_swarm."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_rotmaw.png",
+          "crop_bounds": {
+            "left": 502,
+            "top": 0,
+            "right": 752,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_husk_runner",
+          "name": "Hülle-Sprinter",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Dürr, schnell, schreiend",
+            "Schnellster Untoter; charge-fokussiert."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_husk_runner.png",
+          "crop_bounds": {
+            "left": 752,
+            "top": 0,
+            "right": 1003,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_bone_skirmisher",
+          "name": "Knochen-Plänkler",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 4,
+          "row": 0,
+          "column": 4,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Skelett mit Kurzschwert",
+            "—"
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bone_skirmisher.png",
+          "crop_bounds": {
+            "left": 1003,
+            "top": 0,
+            "right": 1254,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_bone_archer",
+          "name": "Knochen-Schütze",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Skelett mit altem Bogen",
+            "Range, schwach Nahkampf."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bone_archer.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 418,
+            "right": 251,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_armored_revenant",
+          "name": "Gepanzerter Wiedergänger",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Vollrüstung des einstigen Ritters",
+            "Hoch Armor, schwer; reflektiert melee-crit."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_armored_revenant.png",
+          "crop_bounds": {
+            "left": 251,
+            "top": 418,
+            "right": 502,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_grave_drinker_ghoul",
+          "name": "Grabtrinker",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Lange Klauen, Geifer",
+            "Lifesteal-Klauenhieb."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grave_drinker_ghoul.png",
+          "crop_bounds": {
+            "left": 502,
+            "top": 418,
+            "right": 752,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_wailing_specter",
+          "name": "Wehklagender Geist",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 8,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Halb-transparent, Frauen-Silhouette",
+            "Phase: 50% Chance physical-immune (1s); Wail-Fear-AoE."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_wailing_specter.png",
+          "crop_bounds": {
+            "left": 752,
+            "top": 418,
+            "right": 1003,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_lantern_wight",
+          "name": "Laternen-Wicht",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 9,
+          "row": 1,
+          "column": 4,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Trägt verfaulte Laterne im Schädel",
+            "Lichtkegel verlangsamt im Strahl."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_lantern_wight.png",
+          "crop_bounds": {
+            "left": 1003,
+            "top": 418,
+            "right": 1254,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_crypt_lord",
+          "name": "Gruft-Fürst",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 10,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Untoter Adliger in Robe",
+            "Spawnt Skelette stetig; Kill schließt 1 Spawn-Sarg."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_crypt_lord.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 836,
+            "right": 251,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_lich_archivist",
+          "name": "Lich-Archivar",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 11,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Boss; ehemaliger Gelehrter",
+            "Multi-Phase: physisch → körperlos → Phylakterie."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_lich_archivist.png",
+          "crop_bounds": {
+            "left": 251,
+            "top": 836,
+            "right": 502,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_vampire_lordling",
+          "name": "Vampir-Lord",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 12,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Aristokratisch, eleganter Mantel",
+            "Drain-Bite, Bat-Form-Escape bei <20% HP."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_vampire_lordling.png",
+          "crop_bounds": {
+            "left": 502,
+            "top": 836,
+            "right": 752,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_ossuary_titan",
+          "name": "Beinhaus-Titan",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_05_untote.png",
+          "grid_index": 13,
+          "row": 2,
+          "column": 3,
+          "grid_columns": 5,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Riesengestalt aus tausenden Knochen",
+            "Boss; verliert Knochen-Schicht je 20% HP = neues Move-Set."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_ossuary_titan.png",
+          "crop_bounds": {
+            "left": 752,
+            "top": 836,
+            "right": 1003,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 6,
+      "section_roman": "VI",
+      "section_title": "Magisch / Faye / Elementare",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+      "grid_columns": 4,
+      "grid_rows": 3,
+      "asset_count": 12,
+      "assets": [
+        {
+          "slug": "creature_will_o_wisp",
+          "name": "Irrlicht",
+          "tier": "1",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Schwebendes blaues Licht",
+            "Schwach; Licht lockt andere Mobs."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_will_o_wisp.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 314,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_mire_drowner",
+          "name": "Tümpelfrau",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Halb-Mensch im Wasser, lange Haare",
+            "Zieht Spieler 1 Tile pro Sek ins Wasser."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_mire_drowner.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 0,
+            "right": 627,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_treant_warden",
+          "name": "Baumriese",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Lebender Baum, ruht",
+            "Erst aggro nach 3 Hits auf Wald-Tile in Nähe; Wurzelschlag-AoE."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_treant_warden.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 940,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_dryad_hunter",
+          "name": "Dryadenjägerin",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Pflanzen-Frau, Bogen aus Lebendholz",
+            "Range; Wurzeln immobilisieren."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dryad_hunter.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 0,
+            "right": 1254,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_fae_changeling",
+          "name": "Wechselbalg",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Imitiert NPCs",
+            "Tarnt sich als Villager bis Angriff; doppelter erster Hit."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_fae_changeling.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 418,
+            "right": 314,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_fire_elemental_small",
+          "name": "Kleines Feuer-Elementar",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Wandernde Flammensäule",
+            "Fire-DOT-Aura."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_fire_elemental_small.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 418,
+            "right": 627,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_fire_elemental_lord",
+          "name": "Feuer-Lord",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Boss-Variante",
+            "Spawnt kleine Elementare bei 75/50/25% HP."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_fire_elemental_lord.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 418,
+            "right": 940,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_water_elemental_brine",
+          "name": "Salzwasser-Elementar",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Klar bläulich-grün, Klippen",
+            "Heilt durch Regen-Wetter, Fire-Vuln."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_water_elemental_brine.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 418,
+            "right": 1254,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_stone_elemental_lumbering",
+          "name": "Stein-Koloss",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 8,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Geht langsam, schwer",
+            "Hohe Armor, Ground-Slam AoE knockback."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_stone_elemental_lumbering.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 836,
+            "right": 314,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_lightning_djinn",
+          "name": "Blitzdschinn",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 9,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Wirbelnde elektrische Gestalt",
+            "Chain-Lightning, Teleport bei Schaden."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_lightning_djinn.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 836,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_frost_revenant_yeti",
+          "name": "Frost-Yeti",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 10,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Mythos der Hochberge",
+            "Slam → Ice-Patch (slippery 4s)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_frost_revenant_yeti.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 836,
+            "right": 940,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_starlight_unicorn_corrupt",
+          "name": "Verdorbenes Einhorn",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_06_magisch_faye_elementare.png",
+          "grid_index": 11,
+          "row": 2,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Einst rein, jetzt dunkel",
+            "Heal-Reverse (eigene Heals werden zu dmg in 8 Tile Aura)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_starlight_unicorn_corrupt.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 836,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 7,
+      "section_roman": "VII",
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+      "grid_columns": 4,
+      "grid_rows": 2,
+      "asset_count": 8,
+      "assets": [
+        {
+          "slug": "creature_thing_in_the_well",
+          "name": "Brunnenwesen",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Tentakel aus altem Brunnen",
+            "Reichweite 4 Tile; nicht moveable. Multiple-Mund-Hits."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_thing_in_the_well.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 314,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_eyeless_pilgrim",
+          "name": "Augenloser Pilger",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Mensch ohne Augen, Stirn-Pupille",
+            "Sieht durch Wände; immun zu Stealth."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_eyeless_pilgrim.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 0,
+            "right": 627,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_choir_of_mouths",
+          "name": "Mund-Chor",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Knäuel aus 30 Münder",
+            "AoE-Schrei (sanity-debuff, alle Skills -1 Tier 10s)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_choir_of_mouths.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 940,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_hollow_marrow_serpent",
+          "name": "Mark-Schlange",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Bleich, kriecht aus Knochen",
+            "Saugt durch Skeleton-Kills HP; bevorzugt Untoten-Tiles."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_hollow_marrow_serpent.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 0,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_geometry_horror",
+          "name": "Geometriegrauen",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Stetig wandelnde Form",
+            "Phasen-Shift: jeder 3. Hit ist 0 dmg; eigene Caster-Spells reflektieren."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_geometry_horror.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 314,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_drowned_cathedral_thing",
+          "name": "Versunkene Kathedrale",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Tentakel aus Untiefe",
+            "Boss; only triggert wenn 5 Spieler im Radius — Anti-Solo."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_drowned_cathedral_thing.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 627,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_inverted_pilgrim_swarm",
+          "name": "Umgestülpte Pilger",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Innen-nach-außen Menschen, schwarm",
+            "T4 Schwarm-Boss-tauglich."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_inverted_pilgrim_swarm.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 627,
+            "right": 940,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_star_mote_imp",
+          "name": "Sternpartikel",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_07_eldritch_aberration.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Klein, glühend, Asteroid-Splitter",
+            "Schweben, Range-Magic, sterben in Explosion."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_star_mote_imp.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 627,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 8,
+      "section_roman": "VIII",
+      "section_title": "Konstrukte",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+      "grid_columns": 4,
+      "grid_rows": 2,
+      "asset_count": 7,
+      "assets": [
+        {
+          "slug": "creature_clay_homunculus",
+          "name": "Lehm-Homunkulus",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Geformt, simpel, beschriftet",
+            "Schmilzt in Regen (Regen-Disaster killt sie 5%/s)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_clay_homunculus.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 314,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_iron_sentinel",
+          "name": "Eiserner Wächter",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Ritter-Statue, magisch belebt",
+            "Hohes Armor; nur Crits durchschlagen voll."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_iron_sentinel.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 0,
+            "right": 627,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_bone_ossuary_construct",
+          "name": "Beinhaus-Konstrukt",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Verschmolzene Skelette als ein Wesen",
+            "Bei Tod: zerfällt in 4 normale Skelette."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bone_ossuary_construct.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 0,
+            "right": 940,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_arcane_orrery_guardian",
+          "name": "Sternenuhr-Wächter",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Bronzeapparat mit Augenkreisen",
+            "Cycle: alle 10s wechselt resist-type (fire→ice→arcane)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_arcane_orrery_guardian.png",
+          "crop_bounds": {
+            "left": 940,
+            "top": 0,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_grindstone_golem",
+          "name": "Schleifsteingolem",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Großer Mühlstein, läuft auf zwei Beinen",
+            "Roll-Charge: 6-Tile-Geradeaus, hoch dmg, schwer zu stoppen."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_grindstone_golem.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 314,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_voidforge_juggernaut",
+          "name": "Leerenschmiede-Juggernaut",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Riesiger Eisenmech aus Schmiede einer toten Stadt",
+            "Boss; hat 4 zerstörbare Komponenten (Beine, Arme, Brust, Kopf)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_voidforge_juggernaut.png",
+          "crop_bounds": {
+            "left": 314,
+            "top": 627,
+            "right": 627,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_runic_jar",
+          "name": "Runenkrug",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_08_konstrukte.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 4,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Topf mit gravierten Runen, schwebt",
+            "Spuckt Geister; Krug-Hit = große AoE."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_runic_jar.png",
+          "crop_bounds": {
+            "left": 627,
+            "top": 627,
+            "right": 940,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 9,
+      "section_roman": "IX",
+      "section_title": "Drachen-Verwandtschaft",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+      "grid_columns": 3,
+      "grid_rows": 3,
+      "asset_count": 9,
+      "assets": [
+        {
+          "slug": "creature_dragon_whelp",
+          "name": "Drachenwelpe",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "(existiert) Klein, Reptilien-Welpe",
+            "—"
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dragon_whelp.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 418,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_dragon_pup_litter",
+          "name": "Drachen-Wurfgeschwister",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "3× kleine Welpen",
+            "Schwarmverhalten, einer flieht zu Eltern."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dragon_pup_litter.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 0,
+            "right": 836,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_wyrmling_basilisk",
+          "name": "Basilisken-Welpe",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Schlangenartig, Steinblick",
+            "Stone-Gaze auf 4 Tile: 1s Petrify (bei Augenkontakt)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_wyrmling_basilisk.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 0,
+            "right": 1254,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_chromatic_drake_red",
+          "name": "Rot-Drache",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 3,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Mid-Boss-Tier, Fire-Theme",
+            "Cone-Breath (5 Tile-Kegel, fire)."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_red.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 418,
+            "right": 418,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_chromatic_drake_white",
+          "name": "Frost-Drache",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Eis-Schuppen",
+            "Frost-Breath, frieren Wasser-Tile zu Eis."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_white.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 418,
+            "right": 836,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_chromatic_drake_black",
+          "name": "Säure-Drache",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Sumpf-Habitat",
+            "Säure-Breath, Item-Quality-Korrosion."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_black.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 418,
+            "right": 1254,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_chromatic_drake_green",
+          "name": "Gift-Drache",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 6,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Wald-Hochstand",
+            "Poison-Cloud-Breath, langer Tick."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_green.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 836,
+            "right": 418,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_chromatic_drake_blue",
+          "name": "Blitz-Drache",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 7,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Berg-Höhe, Sturm-Wetter",
+            "Lightning-Bolt-Range, Stun."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_blue.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 836,
+            "right": 836,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_ancient_dragon_lord",
+          "name": "Uralter Drachenfürst",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_09_drachen_verwandtschaft.png",
+          "grid_index": 8,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Endgame-Boss",
+            "Multi-Phase Boden→Luft→Brutkammer; 3 Atem-Typen rotierend."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_ancient_dragon_lord.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 836,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 10,
+      "section_roman": "X",
+      "section_title": "Bosse — Setting-spezifisch",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+      "grid_columns": 5,
+      "grid_rows": 2,
+      "asset_count": 10,
+      "assets": [
+        {
+          "slug": "creature_boss_forest_old_mother",
+          "name": "Alte Mutter des Waldes",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Wald-Tief",
+            "Riesenspinne in unterirdischem Bau",
+            "Phasen: Krabbeln → Webe-Trap → Brut-Spawn."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_forest_old_mother.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 251,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_boss_swamp_witchking",
+          "name": "Sumpf-Hexenkönig",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Sumpf-Schloss",
+            "Untoter Adliger",
+            "Pestwolke-AoE, summons Plague-Walker."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_swamp_witchking.png",
+          "crop_bounds": {
+            "left": 251,
+            "top": 0,
+            "right": 502,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_boss_mountain_avalanche_giant",
+          "name": "Lawinen-Riese",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Hochalp",
+            "Riesengestalt aus Eis und Stein",
+            "Stomp triggert eigentliche Avalanche-Disaster auf Boss-Tile."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_mountain_avalanche_giant.png",
+          "crop_bounds": {
+            "left": 502,
+            "top": 0,
+            "right": 752,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_boss_desert_pharaoh_revenant",
+          "name": "Pharao-Wiedergänger",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 3,
+          "row": 0,
+          "column": 3,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Pyramide",
+            "Verfluchter Herrscher",
+            "4 Phasen entsprechend „Stunden-Säulen\"; jede phase = eigener Move-Set."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_desert_pharaoh_revenant.png",
+          "crop_bounds": {
+            "left": 752,
+            "top": 0,
+            "right": 1003,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_boss_volcano_smith_demon",
+          "name": "Vulkan-Schmiededämon",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 4,
+          "row": 0,
+          "column": 4,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Vulkankrater",
+            "Esse-Riese, schmiedet seine eigene Waffe nach",
+            "Verändert Waffe alle 30s: Hammer-Slam → Klingen-Sweep → Speer-Stoß."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_volcano_smith_demon.png",
+          "crop_bounds": {
+            "left": 1003,
+            "top": 0,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_boss_dungeon_undying_king",
+          "name": "Unsterblicher König",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Krypta-Tief",
+            "Sitzt auf Thron, steht erst nach 30% HP auf",
+            "Phase 1 thrönt + ruft Skelette; Phase 2 schwertgeführt, kein Spawn mehr."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_dungeon_undying_king.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 251,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_boss_river_kelpie_queen",
+          "name": "Kelpie-Königin",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 6,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Fluss-Tiefe",
+            "Wasserpferd-Hybrid",
+            "Zieht Spieler ins Wasser, dort 50% mehr dmg."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_river_kelpie_queen.png",
+          "crop_bounds": {
+            "left": 251,
+            "top": 627,
+            "right": 502,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_boss_coast_kraken_arm",
+          "name": "Kraken-Arm",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 7,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Klippe an See",
+            "Nur ein Arm sichtbar — Rest unter Wasser",
+            "Tile-anchored Boss; mehrere Spawn-Sites gleichzeitig, alle müssen runter."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_coast_kraken_arm.png",
+          "crop_bounds": {
+            "left": 502,
+            "top": 627,
+            "right": 752,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_boss_capital_traitor_general",
+          "name": "Verräter-General",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 8,
+          "row": 1,
+          "column": 3,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Hauptstadt (Capital coming)",
+            "Ehemaliger Königswachen-Anführer",
+            "Spawnt königliche Wache-Trupps; Spieler-skill „adlig\" wird relevant."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_capital_traitor_general.png",
+          "crop_bounds": {
+            "left": 752,
+            "top": 627,
+            "right": 1003,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_boss_sky_bound_roc",
+          "name": "Wolken-Roc",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_10_bosse_setting.png",
+          "grid_index": 9,
+          "row": 1,
+          "column": 4,
+          "grid_columns": 5,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Hoch-Klippe",
+            "Riesenadler",
+            "Aufnehmen + Fallen-Lassen ist die Kernmechanik."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_boss_sky_bound_roc.png",
+          "crop_bounds": {
+            "left": 1003,
+            "top": 627,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 11,
+      "section_roman": "XI",
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+      "grid_columns": 3,
+      "grid_rows": 3,
+      "asset_count": 9,
+      "assets": [
+        {
+          "slug": "creature_bloodmoon_revenant",
+          "name": "Blutmond-Wiedergänger",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Blutmond",
+            "Verstärkter Untoter, nur während Blutmond. Drop nur dann."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bloodmoon_revenant.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 418,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_plague_carrier_villager",
+          "name": "Pesttragender Dorfbewohner",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Pest",
+            "War mal NPC, wandelte sich. Existing villager-NPCs können sich transformieren."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_plague_carrier_villager.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 0,
+            "right": 836,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_storm_caller_djinn",
+          "name": "Sturmrufer",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Sturm",
+            "Multipliziert die Lightning-Strikes."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_storm_caller_djinn.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 0,
+            "right": 1254,
+            "bottom": 418
+          }
+        },
+        {
+          "slug": "creature_wildfire_pyre_imp",
+          "name": "Brandkobold",
+          "tier": "2",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 3,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Waldbrand",
+            "Spawnt ON fire_tiles, schwach aber knapp ums Spielen."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_wildfire_pyre_imp.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 418,
+            "right": 418,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_dying_sun_shade",
+          "name": "Schatten der sterbenden Sonne",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Sterbende Sonne",
+            "Stark im Dunkeln, schwach im Licht."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dying_sun_shade.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 418,
+            "right": 836,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_quake_burrower",
+          "name": "Bebenwurm",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 5,
+          "row": 1,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Erdbeben",
+            "Taucht aus Rissen auf, knappes 60s-Window."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_quake_burrower.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 418,
+            "right": 1254,
+            "bottom": 836
+          }
+        },
+        {
+          "slug": "creature_locust_queen",
+          "name": "Heuschrecken-Königin",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 6,
+          "row": 2,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: Schwarm",
+            "Anführer des Schwarms; töten = Schwarm löst sich auf."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_locust_queen.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 836,
+            "right": 418,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_poisoned_spring_horror",
+          "name": "Brunnenhorror",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 7,
+          "row": 2,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster: vergiftete Quelle",
+            "Materialisiert sich aus betroffenem Wasser-Tile."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_poisoned_spring_horror.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 836,
+            "right": 836,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_bloodmoon_alpha_wolf",
+          "name": "Blutmond-Leitwolf",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_11_disaster_event_spawns.png",
+          "grid_index": 8,
+          "row": 2,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 3,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Disaster + Wolf-Pack",
+            "Konvertiert reguläre Wölfe zu Blutmond-Variante."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_bloodmoon_alpha_wolf.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 836,
+            "right": 1254,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 12,
+      "section_roman": "XII",
+      "section_title": "Selten / Welt-Geheimnisse (Lore-Carrier)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_12_lore_carrier.png",
+      "grid_columns": 3,
+      "grid_rows": 2,
+      "asset_count": 5,
+      "assets": [
+        {
+          "slug": "creature_silent_pilgrim_white",
+          "name": "Weißer Pilger",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_12_lore_carrier.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Spawns einmal pro 50h, wandert über Karte",
+            "Aggro nur bei Angriff; Drops einzigartiger Tech-Print."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_silent_pilgrim_white.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 418,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_clockwork_messenger",
+          "name": "Uhrwerks-Bote",
+          "tier": "3",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_12_lore_carrier.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Wandernde Boten-Konstrukt, läuft Routen",
+            "Drops Lore-Karte mit Tech-Print-Hinweisen."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_clockwork_messenger.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 0,
+            "right": 836,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_starfall_traveller",
+          "name": "Sternfallreisender",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_12_lore_carrier.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Erscheint nur nach Meteoriten-Event",
+            "Drop: einzigartiges Magic-Item-Kit."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_starfall_traveller.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 0,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_old_god_avatar_fragment",
+          "name": "Götter-Fragment",
+          "tier": "5",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_12_lore_carrier.png",
+          "grid_index": 3,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Einmal pro Welt-Lifecycle",
+            "Boss; nicht wieder spawnbar. Persistente Welt-Buff-Drops."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_old_god_avatar_fragment.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 418,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_dream_walker",
+          "name": "Traumwandler",
+          "tier": "4",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_12_lore_carrier.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Erscheint nur in Spieler-Schlafphasen",
+            "Nicht-physisch; Mental-Encounter."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_dream_walker.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 627,
+            "right": 836,
+            "bottom": 1254
+          }
+        }
+      ]
+    },
+    {
+      "section_index": 13,
+      "section_roman": "XIII",
+      "section_title": "Bestien — Reittiere & Begleiter (falls geplant)",
+      "sheet": "assets/monsters/generated_longlist/sheets/section_13_reittiere_begleiter.png",
+      "grid_columns": 3,
+      "grid_rows": 2,
+      "asset_count": 5,
+      "assets": [
+        {
+          "slug": "creature_riding_horse_brown",
+          "name": "Reitpferd, braun",
+          "tier": "n/a",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_13_reittiere_begleiter.png",
+          "grid_index": 0,
+          "row": 0,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Zähmbar/kaufbar."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_riding_horse_brown.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 0,
+            "right": 418,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_riding_horse_war",
+          "name": "Schlachtross",
+          "tier": "n/a",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_13_reittiere_begleiter.png",
+          "grid_index": 1,
+          "row": 0,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Stärker, gepanzert."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_riding_horse_war.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 0,
+            "right": 836,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_war_wolf",
+          "name": "Kampfwolf",
+          "tier": "n/a",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_13_reittiere_begleiter.png",
+          "grid_index": 2,
+          "row": 0,
+          "column": 2,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Anti-bandit-companion, zähmbar."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_war_wolf.png",
+          "crop_bounds": {
+            "left": 836,
+            "top": 0,
+            "right": 1254,
+            "bottom": 627
+          }
+        },
+        {
+          "slug": "creature_falcon_companion",
+          "name": "Falke-Begleiter",
+          "tier": "n/a",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_13_reittiere_begleiter.png",
+          "grid_index": 3,
+          "row": 1,
+          "column": 0,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Scout-Funktion, kein dmg."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_falcon_companion.png",
+          "crop_bounds": {
+            "left": 0,
+            "top": 627,
+            "right": 418,
+            "bottom": 1254
+          }
+        },
+        {
+          "slug": "creature_pack_ox",
+          "name": "Lastochse",
+          "tier": "n/a",
+          "sheet": "assets/monsters/generated_longlist/sheets/section_13_reittiere_begleiter.png",
+          "grid_index": 4,
+          "row": 1,
+          "column": 1,
+          "grid_columns": 3,
+          "grid_rows": 2,
+          "cell_hint": "Cells are ordered left-to-right, top-to-bottom. Sheet size is 1254x1254; derive crop bounds from grid dimensions and inspect padding before final slicing.",
+          "source_columns": [
+            "Erhöht Trag-Limit."
+          ],
+          "cell_file": "assets/monsters/generated_longlist/cells/creature_pack_ox.png",
+          "crop_bounds": {
+            "left": 418,
+            "top": 627,
+            "right": 836,
+            "bottom": 1254
+          }
+        }
+      ]
+    }
+  ],
+  "individual_cell_files": "assets/monsters/generated_longlist/cells/{slug}.png"
+}
