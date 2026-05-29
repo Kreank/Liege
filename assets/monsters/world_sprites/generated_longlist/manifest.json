@@ -1,0 +1,4673 @@
+{
+  "generated": "2026-05-29",
+  "asset_type": "generated_longlist_monster_world_sprites",
+  "source_manifest": "assets/monsters/generated_longlist/manifest.json",
+  "source_note": "Generated longlist cells are RGB atlas/portrait cells; this pack contains cleaned transparent derivatives for in-game use.",
+  "count": 133,
+  "sizes": [
+    "512x512 fixed cutout",
+    "128x128",
+    "96x96",
+    "64x64 icon"
+  ],
+  "contacts": [
+    "assets/monsters/world_sprites/generated_longlist/contacts/generated_longlist_world_sprites_contact.jpg"
+  ],
+  "items": [
+    {
+      "id": "creature_marsh_rat_swarm",
+      "name": "Sumpfratten-Schwarm",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_marsh_rat_swarm.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_marsh_rat_swarm_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_marsh_rat_swarm_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_marsh_rat_swarm_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_marsh_rat_swarm_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_marsh_rat_swarm_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          37,
+          37,
+          38
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 65,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          5,
+          82,
+          314,
+          392
+        ],
+        "alpha_coverage": 0.5252
+      }
+    },
+    {
+      "id": "creature_carrion_crow",
+      "name": "Aaskrähe",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_carrion_crow.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_carrion_crow_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_carrion_crow_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_carrion_crow_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_carrion_crow_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_carrion_crow_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          36,
+          37,
+          38
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 41,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          27,
+          124,
+          301,
+          364
+        ],
+        "alpha_coverage": 0.3454
+      }
+    },
+    {
+      "id": "creature_giant_centipede",
+      "name": "Riesenhundertfüßer",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_giant_centipede.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_giant_centipede_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_giant_centipede_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_giant_centipede_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_giant_centipede_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_giant_centipede_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          36,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 47,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          30,
+          74,
+          284,
+          409
+        ],
+        "alpha_coverage": 0.3942
+      }
+    },
+    {
+      "id": "creature_blood_leech_cluster",
+      "name": "Blutegel-Klumpen",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_blood_leech_cluster.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_blood_leech_cluster_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_blood_leech_cluster_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_blood_leech_cluster_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_blood_leech_cluster_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_blood_leech_cluster_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          36,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 43,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          147,
+          296,
+          396
+        ],
+        "alpha_coverage": 0.4292
+      }
+    },
+    {
+      "id": "creature_thornback_hare",
+      "name": "Dornrücken-Hase",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_thornback_hare.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_thornback_hare_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_thornback_hare_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_thornback_hare_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_thornback_hare_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_thornback_hare_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          39,
+          40,
+          40
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 44,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          31,
+          48,
+          306,
+          355
+        ],
+        "alpha_coverage": 0.4231
+      }
+    },
+    {
+      "id": "creature_burrow_grub",
+      "name": "Wühlmade",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_burrow_grub.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_burrow_grub_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_burrow_grub_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_burrow_grub_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_burrow_grub_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_burrow_grub_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          39,
+          39,
+          40
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 24,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          3,
+          114,
+          286,
+          357
+        ],
+        "alpha_coverage": 0.3947
+      }
+    },
+    {
+      "id": "creature_glass_wing_moth",
+      "name": "Glasflügelmotte",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_glass_wing_moth.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_glass_wing_moth_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_glass_wing_moth_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_glass_wing_moth_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_glass_wing_moth_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_glass_wing_moth_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          39,
+          39,
+          40
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 61,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          78,
+          298,
+          385
+        ],
+        "alpha_coverage": 0.3614
+      }
+    },
+    {
+      "id": "creature_ember_wasp",
+      "name": "Glutwespe",
+      "tier": "2",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_ember_wasp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_ember_wasp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_ember_wasp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_ember_wasp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_ember_wasp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_ember_wasp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          39,
+          39,
+          40
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 80,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          30,
+          55,
+          295,
+          382
+        ],
+        "alpha_coverage": 0.2338
+      }
+    },
+    {
+      "id": "creature_chittering_spider_nest",
+      "name": "Klickerspinnen-Nest",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_chittering_spider_nest.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_chittering_spider_nest_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chittering_spider_nest_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_chittering_spider_nest_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_chittering_spider_nest_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_chittering_spider_nest_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          39,
+          40,
+          41
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 124,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          14,
+          13,
+          314,
+          319
+        ],
+        "alpha_coverage": 0.4683
+      }
+    },
+    {
+      "id": "creature_bog_toad",
+      "name": "Moor-Kröte",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bog_toad.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bog_toad_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bog_toad_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bog_toad_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bog_toad_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bog_toad_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          39,
+          39,
+          40
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 105,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          61,
+          313,
+          320
+        ],
+        "alpha_coverage": 0.4335
+      }
+    },
+    {
+      "id": "creature_briar_imp",
+      "name": "Dornenkobold",
+      "tier": "1",
+      "section_index": 1,
+      "section_title": "Bestien — Klein & Schwarm (T1)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_briar_imp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_briar_imp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_briar_imp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_briar_imp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_briar_imp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_briar_imp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          40,
+          40,
+          41
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 59,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          27,
+          8,
+          286,
+          338
+        ],
+        "alpha_coverage": 0.4064
+      }
+    },
+    {
+      "id": "creature_dire_wolf",
+      "name": "Schreckenswolf",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dire_wolf.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dire_wolf_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dire_wolf_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dire_wolf_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dire_wolf_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dire_wolf_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 116,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          33,
+          77,
+          314,
+          380
+        ],
+        "alpha_coverage": 0.4696
+      }
+    },
+    {
+      "id": "creature_silverback_boar",
+      "name": "Silberrücken-Eber",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_silverback_boar.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_silverback_boar_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_silverback_boar_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_silverback_boar_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_silverback_boar_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_silverback_boar_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 55,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          17,
+          67,
+          310,
+          380
+        ],
+        "alpha_coverage": 0.5067
+      }
+    },
+    {
+      "id": "creature_grasping_kelp",
+      "name": "Greifender Tang",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grasping_kelp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grasping_kelp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grasping_kelp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grasping_kelp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grasping_kelp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grasping_kelp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          36,
+          36,
+          38
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 53,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          10,
+          56,
+          280,
+          394
+        ],
+        "alpha_coverage": 0.4462
+      }
+    },
+    {
+      "id": "creature_riverbank_crocodilian",
+      "name": "Flussufer-Krokodil",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_riverbank_crocodilian.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_riverbank_crocodilian_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_riverbank_crocodilian_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_riverbank_crocodilian_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_riverbank_crocodilian_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_riverbank_crocodilian_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 116,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          120,
+          299,
+          388
+        ],
+        "alpha_coverage": 0.3935
+      }
+    },
+    {
+      "id": "creature_panther_shade",
+      "name": "Schattenpanther",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_panther_shade.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_panther_shade_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_panther_shade_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_panther_shade_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_panther_shade_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_panther_shade_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 427,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          12,
+          72,
+          306,
+          350
+        ],
+        "alpha_coverage": 0.3627
+      }
+    },
+    {
+      "id": "creature_glacier_lynx",
+      "name": "Gletscher-Luchs",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_glacier_lynx.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_glacier_lynx_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_glacier_lynx_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_glacier_lynx_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_glacier_lynx_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_glacier_lynx_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 92,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          1,
+          35,
+          303,
+          354
+        ],
+        "alpha_coverage": 0.5204
+      }
+    },
+    {
+      "id": "creature_dune_strider",
+      "name": "Dünenschreiter",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dune_strider.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dune_strider_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dune_strider_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dune_strider_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dune_strider_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dune_strider_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          36,
+          36,
+          38
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 59,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          25,
+          17,
+          273,
+          351
+        ],
+        "alpha_coverage": 0.3535
+      }
+    },
+    {
+      "id": "creature_hyena_pack_leader",
+      "name": "Hyänen-Anführerin",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_hyena_pack_leader.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_hyena_pack_leader_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_hyena_pack_leader_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_hyena_pack_leader_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_hyena_pack_leader_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_hyena_pack_leader_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          35,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 85,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          43,
+          301,
+          346
+        ],
+        "alpha_coverage": 0.4791
+      }
+    },
+    {
+      "id": "creature_normal_hyena",
+      "name": "Hyäne",
+      "tier": "1",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_normal_hyena.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_normal_hyena_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_normal_hyena_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_normal_hyena_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_normal_hyena_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_normal_hyena_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 104,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          40,
+          38,
+          308,
+          298
+        ],
+        "alpha_coverage": 0.3883
+      }
+    },
+    {
+      "id": "creature_shrike_falcon",
+      "name": "Würger-Falke",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_shrike_falcon.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_shrike_falcon_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_shrike_falcon_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_shrike_falcon_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_shrike_falcon_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_shrike_falcon_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          36,
+          37
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 67,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          13,
+          2,
+          297,
+          312
+        ],
+        "alpha_coverage": 0.4285
+      }
+    },
+    {
+      "id": "creature_grove_stag_corrupted",
+      "name": "Verdorbener Hirsch",
+      "tier": "3",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grove_stag_corrupted.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grove_stag_corrupted_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grove_stag_corrupted_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grove_stag_corrupted_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grove_stag_corrupted_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grove_stag_corrupted_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          36,
+          36,
+          38
+        ],
+        "threshold": 38.51,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 514,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          262,
+          335
+        ],
+        "alpha_coverage": 0.4083
+      }
+    },
+    {
+      "id": "creature_swamp_otter_clan",
+      "name": "Sumpfotter-Clan",
+      "tier": "2",
+      "section_index": 2,
+      "section_title": "Bestien — Mittel (T2)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_swamp_otter_clan.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_swamp_otter_clan_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_swamp_otter_clan_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_swamp_otter_clan_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_swamp_otter_clan_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_swamp_otter_clan_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          35,
+          35,
+          37
+        ],
+        "threshold": 26.58,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 71,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          51,
+          306,
+          322
+        ],
+        "alpha_coverage": 0.4711
+      }
+    },
+    {
+      "id": "creature_thornmaw",
+      "name": "Dornenschlund",
+      "tier": "3",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_thornmaw.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_thornmaw_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_thornmaw_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_thornmaw_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_thornmaw_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_thornmaw_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 185,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          148,
+          314,
+          569
+        ],
+        "alpha_coverage": 0.459
+      }
+    },
+    {
+      "id": "creature_iron_horn_aurochs",
+      "name": "Eisenhorn-Auerochse",
+      "tier": "3",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_iron_horn_aurochs.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_iron_horn_aurochs_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_iron_horn_aurochs_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_iron_horn_aurochs_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_iron_horn_aurochs_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_iron_horn_aurochs_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 385,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          145,
+          313,
+          553
+        ],
+        "alpha_coverage": 0.4316
+      }
+    },
+    {
+      "id": "creature_ridgeback_drake",
+      "name": "Kammrücken-Drachling",
+      "tier": "3",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_ridgeback_drake.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_ridgeback_drake_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_ridgeback_drake_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_ridgeback_drake_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_ridgeback_drake_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_ridgeback_drake_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 258,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          3,
+          153,
+          305,
+          557
+        ],
+        "alpha_coverage": 0.4191
+      }
+    },
+    {
+      "id": "creature_glacier_juggernaut_bear",
+      "name": "Gletscher-Berserker-Bär",
+      "tier": "3",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_glacier_juggernaut_bear.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_glacier_juggernaut_bear_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_glacier_juggernaut_bear_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_glacier_juggernaut_bear_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_glacier_juggernaut_bear_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_glacier_juggernaut_bear_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 102,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          160,
+          314,
+          564
+        ],
+        "alpha_coverage": 0.4609
+      }
+    },
+    {
+      "id": "creature_dune_terror_worm",
+      "name": "Dünen-Schreckenswurm",
+      "tier": "4",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dune_terror_worm.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dune_terror_worm_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dune_terror_worm_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dune_terror_worm_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dune_terror_worm_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dune_terror_worm_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 228,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          15,
+          27,
+          307,
+          498
+        ],
+        "alpha_coverage": 0.4926
+      }
+    },
+    {
+      "id": "creature_canyon_wyrm",
+      "name": "Schluchtwyvern",
+      "tier": "4",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_canyon_wyrm.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_canyon_wyrm_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_canyon_wyrm_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_canyon_wyrm_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_canyon_wyrm_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_canyon_wyrm_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          33,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 410,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          14,
+          311,
+          484
+        ],
+        "alpha_coverage": 0.5479
+      }
+    },
+    {
+      "id": "creature_marsh_naga",
+      "name": "Sumpf-Naga",
+      "tier": "3",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_marsh_naga.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_marsh_naga_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_marsh_naga_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_marsh_naga_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_marsh_naga_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_marsh_naga_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          33,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 406,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          27,
+          285,
+          501
+        ],
+        "alpha_coverage": 0.4251
+      }
+    },
+    {
+      "id": "creature_bog_titan_elk",
+      "name": "Moor-Titanelch",
+      "tier": "4",
+      "section_index": 3,
+      "section_title": "Bestien — Apex / Boss-tauglich (T3–T4)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bog_titan_elk.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bog_titan_elk_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bog_titan_elk_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bog_titan_elk_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bog_titan_elk_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bog_titan_elk_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 359,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          1,
+          298,
+          499
+        ],
+        "alpha_coverage": 0.5064
+      }
+    },
+    {
+      "id": "creature_road_brigand",
+      "name": "Wegelagerer",
+      "tier": "1",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_road_brigand.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_road_brigand_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_road_brigand_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_road_brigand_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_road_brigand_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_road_brigand_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 47.76,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 118,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          12,
+          95,
+          198,
+          314
+        ],
+        "alpha_coverage": 0.3424
+      }
+    },
+    {
+      "id": "creature_brigand_archer",
+      "name": "Wegelagerer-Schütze",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_brigand_archer.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_brigand_archer_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_brigand_archer_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_brigand_archer_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_brigand_archer_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_brigand_archer_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 49.32,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 63,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          1,
+          107,
+          176,
+          314
+        ],
+        "alpha_coverage": 0.2957
+      }
+    },
+    {
+      "id": "creature_brigand_brute",
+      "name": "Brutaler Bandit",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_brigand_brute.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_brigand_brute_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_brigand_brute_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_brigand_brute_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_brigand_brute_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_brigand_brute_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 53.93,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 106,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          0,
+          93,
+          185,
+          314
+        ],
+        "alpha_coverage": 0.3867
+      }
+    },
+    {
+      "id": "creature_brigand_captain",
+      "name": "Räuber-Hauptmann",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_brigand_captain.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_brigand_captain_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_brigand_captain_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_brigand_captain_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_brigand_captain_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_brigand_captain_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 31.43,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 28,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          13,
+          20,
+          196,
+          314
+        ],
+        "alpha_coverage": 0.5281
+      }
+    },
+    {
+      "id": "creature_smoke_bandit",
+      "name": "Rauch-Schurke",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_smoke_bandit.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_smoke_bandit_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_smoke_bandit_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_smoke_bandit_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_smoke_bandit_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_smoke_bandit_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 39.09,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 135,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          3,
+          110,
+          176,
+          314
+        ],
+        "alpha_coverage": 0.3418
+      }
+    },
+    {
+      "id": "creature_deserter_soldier",
+      "name": "Deserteur",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_deserter_soldier.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_deserter_soldier_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_deserter_soldier_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_deserter_soldier_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_deserter_soldier_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_deserter_soldier_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 28.48,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 24,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          0,
+          103,
+          172,
+          314
+        ],
+        "alpha_coverage": 0.3203
+      }
+    },
+    {
+      "id": "creature_witch_hunter_renegade",
+      "name": "Abtrünniger Hexenjäger",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_witch_hunter_renegade.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_witch_hunter_renegade_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_witch_hunter_renegade_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_witch_hunter_renegade_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_witch_hunter_renegade_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_witch_hunter_renegade_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 50.42,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 204,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          16,
+          2,
+          192,
+          313
+        ],
+        "alpha_coverage": 0.3937
+      }
+    },
+    {
+      "id": "creature_slaver_with_chain",
+      "name": "Sklaventreiber",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_slaver_with_chain.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_slaver_with_chain_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_slaver_with_chain_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_slaver_with_chain_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_slaver_with_chain_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_slaver_with_chain_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 56.24,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 126,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          13,
+          74,
+          177,
+          313
+        ],
+        "alpha_coverage": 0.4282
+      }
+    },
+    {
+      "id": "creature_pit_dog_handler",
+      "name": "Hundeführer",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_pit_dog_handler.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_pit_dog_handler_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_pit_dog_handler_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_pit_dog_handler_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_pit_dog_handler_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_pit_dog_handler_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 58.13,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 156,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          10,
+          1,
+          183,
+          313
+        ],
+        "alpha_coverage": 0.41
+      }
+    },
+    {
+      "id": "creature_pit_dog",
+      "name": "Kampfhund",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_pit_dog.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_pit_dog_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_pit_dog_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_pit_dog_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_pit_dog_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_pit_dog_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 57.35,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 207,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          0,
+          3,
+          189,
+          313
+        ],
+        "alpha_coverage": 0.2242
+      }
+    },
+    {
+      "id": "creature_grin_goblin_scrapper",
+      "name": "Grinsekobold",
+      "tier": "1",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grin_goblin_scrapper.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grin_goblin_scrapper_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grin_goblin_scrapper_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grin_goblin_scrapper_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grin_goblin_scrapper_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grin_goblin_scrapper_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 56.52,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 120,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          0,
+          142,
+          161,
+          313
+        ],
+        "alpha_coverage": 0.27
+      }
+    },
+    {
+      "id": "creature_grin_goblin_shaman",
+      "name": "Kobold-Schamane",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grin_goblin_shaman.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grin_goblin_shaman_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grin_goblin_shaman_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grin_goblin_shaman_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grin_goblin_shaman_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grin_goblin_shaman_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          33,
+          34
+        ],
+        "threshold": 59.68,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 151,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          0,
+          12,
+          180,
+          313
+        ],
+        "alpha_coverage": 0.4402
+      }
+    },
+    {
+      "id": "creature_grin_goblin_warbeast_rider",
+      "name": "Kobold-Reiter",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grin_goblin_warbeast_rider.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grin_goblin_warbeast_rider_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grin_goblin_warbeast_rider_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grin_goblin_warbeast_rider_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grin_goblin_warbeast_rider_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grin_goblin_warbeast_rider_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 47.12,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 234,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          15,
+          4,
+          209,
+          304
+        ],
+        "alpha_coverage": 0.4032
+      }
+    },
+    {
+      "id": "creature_warboar_mount",
+      "name": "Kampfeber",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_warboar_mount.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_warboar_mount_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_warboar_mount_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_warboar_mount_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_warboar_mount_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_warboar_mount_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 44.37,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 232,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          8,
+          2,
+          209,
+          307
+        ],
+        "alpha_coverage": 0.3546
+      }
+    },
+    {
+      "id": "creature_grin_goblin_warchief",
+      "name": "Kobold-Kriegshäuptling",
+      "tier": "4",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grin_goblin_warchief.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grin_goblin_warchief_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grin_goblin_warchief_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grin_goblin_warchief_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grin_goblin_warchief_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grin_goblin_warchief_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 45.28,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 186,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          12,
+          0,
+          205,
+          312
+        ],
+        "alpha_coverage": 0.5654
+      }
+    },
+    {
+      "id": "creature_hobgoblin_legionnaire",
+      "name": "Hobgoblin-Legionär",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_hobgoblin_legionnaire.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_hobgoblin_legionnaire_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_hobgoblin_legionnaire_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_hobgoblin_legionnaire_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_hobgoblin_legionnaire_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_hobgoblin_legionnaire_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 54.02,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 195,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          16,
+          0,
+          170,
+          313
+        ],
+        "alpha_coverage": 0.3596
+      }
+    },
+    {
+      "id": "creature_orgrim_basher",
+      "name": "Orgrim-Schläger",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_orgrim_basher.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_orgrim_basher_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_orgrim_basher_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_orgrim_basher_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_orgrim_basher_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_orgrim_basher_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          35
+        ],
+        "threshold": 46.26,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 229,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          0,
+          2,
+          176,
+          305
+        ],
+        "alpha_coverage": 0.4853
+      }
+    },
+    {
+      "id": "creature_blood_kin_warrior",
+      "name": "Blutsippe-Krieger",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_blood_kin_warrior.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_blood_kin_warrior_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_blood_kin_warrior_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_blood_kin_warrior_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_blood_kin_warrior_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_blood_kin_warrior_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          33,
+          35
+        ],
+        "threshold": 50.72,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 205,
+        "source_size": [
+          209,
+          313
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          188,
+          307
+        ],
+        "alpha_coverage": 0.4572
+      }
+    },
+    {
+      "id": "creature_blood_kin_screamer",
+      "name": "Blutsippe-Schreier",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_blood_kin_screamer.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_blood_kin_screamer_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_blood_kin_screamer_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_blood_kin_screamer_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_blood_kin_screamer_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_blood_kin_screamer_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 60,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          14,
+          0,
+          194,
+          270
+        ],
+        "alpha_coverage": 0.4938
+      }
+    },
+    {
+      "id": "creature_ash_druid",
+      "name": "Aschdruide",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_ash_druid.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_ash_druid_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_ash_druid_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_ash_druid_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_ash_druid_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_ash_druid_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 78,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          17,
+          8,
+          203,
+          273
+        ],
+        "alpha_coverage": 0.4835
+      }
+    },
+    {
+      "id": "creature_silent_cultist",
+      "name": "Stiller Kultist",
+      "tier": "2",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_silent_cultist.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_silent_cultist_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_silent_cultist_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_silent_cultist_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_silent_cultist_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_silent_cultist_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 56,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          20,
+          44,
+          198,
+          276
+        ],
+        "alpha_coverage": 0.3685
+      }
+    },
+    {
+      "id": "creature_void_speaker",
+      "name": "Leerensprecher",
+      "tier": "4",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_void_speaker.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_void_speaker_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_void_speaker_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_void_speaker_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_void_speaker_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_void_speaker_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 77,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          17,
+          0,
+          209,
+          275
+        ],
+        "alpha_coverage": 0.5492
+      }
+    },
+    {
+      "id": "creature_swamp_witch",
+      "name": "Sumpf-Hexe",
+      "tier": "3",
+      "section_index": 4,
+      "section_title": "Humanoide — Räuber & Banden (T1–T3)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_swamp_witch.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_swamp_witch_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_swamp_witch_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_swamp_witch_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_swamp_witch_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_swamp_witch_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          34,
+          34,
+          36
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 55,
+        "source_size": [
+          209,
+          314
+        ],
+        "cutout_bbox": [
+          16,
+          30,
+          209,
+          280
+        ],
+        "alpha_coverage": 0.4584
+      }
+    },
+    {
+      "id": "creature_shambling_corpse",
+      "name": "Schlurfender Leichnam",
+      "tier": "1",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_shambling_corpse.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_shambling_corpse_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_shambling_corpse_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_shambling_corpse_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_shambling_corpse_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_shambling_corpse_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 91,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          25,
+          91,
+          248,
+          399
+        ],
+        "alpha_coverage": 0.3846
+      }
+    },
+    {
+      "id": "creature_plague_walker",
+      "name": "Pest-Wanderer",
+      "tier": "2",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_plague_walker.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_plague_walker_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_plague_walker_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_plague_walker_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_plague_walker_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_plague_walker_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 156,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          26,
+          81,
+          246,
+          413
+        ],
+        "alpha_coverage": 0.426
+      }
+    },
+    {
+      "id": "creature_rotmaw",
+      "name": "Faulschlund",
+      "tier": "2",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_rotmaw.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_rotmaw_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_rotmaw_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_rotmaw_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_rotmaw_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_rotmaw_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 56,
+        "source_size": [
+          250,
+          418
+        ],
+        "cutout_bbox": [
+          29,
+          91,
+          226,
+          411
+        ],
+        "alpha_coverage": 0.3892
+      }
+    },
+    {
+      "id": "creature_husk_runner",
+      "name": "Hülle-Sprinter",
+      "tier": "2",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_husk_runner.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_husk_runner_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_husk_runner_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_husk_runner_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_husk_runner_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_husk_runner_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 168,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          9,
+          102,
+          200,
+          412
+        ],
+        "alpha_coverage": 0.241
+      }
+    },
+    {
+      "id": "creature_bone_skirmisher",
+      "name": "Knochen-Plänkler",
+      "tier": "2",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bone_skirmisher.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bone_skirmisher_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bone_skirmisher_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bone_skirmisher_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bone_skirmisher_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bone_skirmisher_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          32,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 88,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          99,
+          220,
+          403
+        ],
+        "alpha_coverage": 0.3835
+      }
+    },
+    {
+      "id": "creature_bone_archer",
+      "name": "Knochen-Schütze",
+      "tier": "2",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bone_archer.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bone_archer_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bone_archer_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bone_archer_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bone_archer_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bone_archer_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 121,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          23,
+          41,
+          244,
+          365
+        ],
+        "alpha_coverage": 0.3819
+      }
+    },
+    {
+      "id": "creature_armored_revenant",
+      "name": "Gepanzerter Wiedergänger",
+      "tier": "3",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_armored_revenant.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_armored_revenant_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_armored_revenant_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_armored_revenant_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_armored_revenant_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_armored_revenant_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 118,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          2,
+          26,
+          251,
+          367
+        ],
+        "alpha_coverage": 0.4804
+      }
+    },
+    {
+      "id": "creature_grave_drinker_ghoul",
+      "name": "Grabtrinker",
+      "tier": "3",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grave_drinker_ghoul.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grave_drinker_ghoul_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grave_drinker_ghoul_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grave_drinker_ghoul_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grave_drinker_ghoul_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grave_drinker_ghoul_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 88,
+        "source_size": [
+          250,
+          418
+        ],
+        "cutout_bbox": [
+          25,
+          118,
+          229,
+          370
+        ],
+        "alpha_coverage": 0.3335
+      }
+    },
+    {
+      "id": "creature_wailing_specter",
+      "name": "Wehklagender Geist",
+      "tier": "3",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_wailing_specter.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_wailing_specter_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_wailing_specter_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_wailing_specter_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_wailing_specter_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_wailing_specter_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          33
+        ],
+        "threshold": 38.44,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 490,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          25,
+          215,
+          354
+        ],
+        "alpha_coverage": 0.3834
+      }
+    },
+    {
+      "id": "creature_lantern_wight",
+      "name": "Laternen-Wicht",
+      "tier": "3",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_lantern_wight.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_lantern_wight_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_lantern_wight_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_lantern_wight_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_lantern_wight_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_lantern_wight_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 30.62,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 203,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          36,
+          222,
+          371
+        ],
+        "alpha_coverage": 0.5004
+      }
+    },
+    {
+      "id": "creature_crypt_lord",
+      "name": "Gruft-Fürst",
+      "tier": "4",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_crypt_lord.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_crypt_lord_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_crypt_lord_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_crypt_lord_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_crypt_lord_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_crypt_lord_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 206,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          31,
+          0,
+          236,
+          340
+        ],
+        "alpha_coverage": 0.4513
+      }
+    },
+    {
+      "id": "creature_lich_archivist",
+      "name": "Lich-Archivar",
+      "tier": "5",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_lich_archivist.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_lich_archivist_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_lich_archivist_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_lich_archivist_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_lich_archivist_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_lich_archivist_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          33
+        ],
+        "threshold": 30.3,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 179,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          21,
+          0,
+          251,
+          340
+        ],
+        "alpha_coverage": 0.5738
+      }
+    },
+    {
+      "id": "creature_vampire_lordling",
+      "name": "Vampir-Lord",
+      "tier": "4",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_vampire_lordling.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_vampire_lordling_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_vampire_lordling_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_vampire_lordling_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_vampire_lordling_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_vampire_lordling_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 144,
+        "source_size": [
+          250,
+          418
+        ],
+        "cutout_bbox": [
+          26,
+          4,
+          248,
+          338
+        ],
+        "alpha_coverage": 0.4531
+      }
+    },
+    {
+      "id": "creature_ossuary_titan",
+      "name": "Beinhaus-Titan",
+      "tier": "5",
+      "section_index": 5,
+      "section_title": "Untote — abgestuft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_ossuary_titan.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_ossuary_titan_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_ossuary_titan_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_ossuary_titan_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_ossuary_titan_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_ossuary_titan_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          33
+        ],
+        "threshold": 29.26,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 166,
+        "source_size": [
+          251,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          245,
+          337
+        ],
+        "alpha_coverage": 0.6163
+      }
+    },
+    {
+      "id": "creature_will_o_wisp",
+      "name": "Irrlicht",
+      "tier": "1",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_will_o_wisp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_will_o_wisp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_will_o_wisp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_will_o_wisp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_will_o_wisp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_will_o_wisp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          32
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 163,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          63,
+          91,
+          224,
+          405
+        ],
+        "alpha_coverage": 0.1822
+      }
+    },
+    {
+      "id": "creature_mire_drowner",
+      "name": "Tümpelfrau",
+      "tier": "3",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_mire_drowner.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_mire_drowner_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_mire_drowner_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_mire_drowner_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_mire_drowner_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_mire_drowner_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          31,
+          32
+        ],
+        "threshold": 27.72,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 353,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          2,
+          87,
+          278,
+          418
+        ],
+        "alpha_coverage": 0.3978
+      }
+    },
+    {
+      "id": "creature_treant_warden",
+      "name": "Baumriese",
+      "tier": "4",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_treant_warden.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_treant_warden_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_treant_warden_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_treant_warden_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_treant_warden_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_treant_warden_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          32
+        ],
+        "threshold": 38.62,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 710,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          15,
+          285,
+          415
+        ],
+        "alpha_coverage": 0.5395
+      }
+    },
+    {
+      "id": "creature_dryad_hunter",
+      "name": "Dryadenjägerin",
+      "tier": "3",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dryad_hunter.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dryad_hunter_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dryad_hunter_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dryad_hunter_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dryad_hunter_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dryad_hunter_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          32
+        ],
+        "threshold": 32.47,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 249,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          15,
+          67,
+          260,
+          418
+        ],
+        "alpha_coverage": 0.3826
+      }
+    },
+    {
+      "id": "creature_fae_changeling",
+      "name": "Wechselbalg",
+      "tier": "3",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_fae_changeling.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_fae_changeling_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_fae_changeling_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_fae_changeling_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_fae_changeling_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_fae_changeling_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 187,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          62,
+          45,
+          253,
+          368
+        ],
+        "alpha_coverage": 0.31
+      }
+    },
+    {
+      "id": "creature_fire_elemental_small",
+      "name": "Kleines Feuer-Elementar",
+      "tier": "2",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_fire_elemental_small.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_fire_elemental_small_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_fire_elemental_small_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_fire_elemental_small_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_fire_elemental_small_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_fire_elemental_small_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          30
+        ],
+        "threshold": 38.45,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 255,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          7,
+          42,
+          245,
+          381
+        ],
+        "alpha_coverage": 0.3901
+      }
+    },
+    {
+      "id": "creature_fire_elemental_lord",
+      "name": "Feuer-Lord",
+      "tier": "4",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_fire_elemental_lord.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_fire_elemental_lord_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_fire_elemental_lord_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_fire_elemental_lord_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_fire_elemental_lord_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_fire_elemental_lord_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          30
+        ],
+        "threshold": 40.5,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 191,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          287,
+          409
+        ],
+        "alpha_coverage": 0.629
+      }
+    },
+    {
+      "id": "creature_water_elemental_brine",
+      "name": "Salzwasser-Elementar",
+      "tier": "3",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_water_elemental_brine.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_water_elemental_brine_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_water_elemental_brine_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_water_elemental_brine_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_water_elemental_brine_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_water_elemental_brine_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 303,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          276,
+          397
+        ],
+        "alpha_coverage": 0.526
+      }
+    },
+    {
+      "id": "creature_stone_elemental_lumbering",
+      "name": "Stein-Koloss",
+      "tier": "3",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_stone_elemental_lumbering.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_stone_elemental_lumbering_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_stone_elemental_lumbering_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_stone_elemental_lumbering_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_stone_elemental_lumbering_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_stone_elemental_lumbering_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 210,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          24,
+          0,
+          305,
+          365
+        ],
+        "alpha_coverage": 0.581
+      }
+    },
+    {
+      "id": "creature_lightning_djinn",
+      "name": "Blitzdschinn",
+      "tier": "4",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_lightning_djinn.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_lightning_djinn_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_lightning_djinn_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_lightning_djinn_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_lightning_djinn_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_lightning_djinn_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 28.71,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 274,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          8,
+          0,
+          280,
+          364
+        ],
+        "alpha_coverage": 0.4598
+      }
+    },
+    {
+      "id": "creature_frost_revenant_yeti",
+      "name": "Frost-Yeti",
+      "tier": "4",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_frost_revenant_yeti.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_frost_revenant_yeti_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_frost_revenant_yeti_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_frost_revenant_yeti_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_frost_revenant_yeti_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_frost_revenant_yeti_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 32.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 484,
+        "source_size": [
+          313,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          276,
+          362
+        ],
+        "alpha_coverage": 0.5333
+      }
+    },
+    {
+      "id": "creature_starlight_unicorn_corrupt",
+      "name": "Verdorbenes Einhorn",
+      "tier": "4",
+      "section_index": 6,
+      "section_title": "Magisch / Faye / Elementare",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_starlight_unicorn_corrupt.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_starlight_unicorn_corrupt_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_starlight_unicorn_corrupt_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_starlight_unicorn_corrupt_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_starlight_unicorn_corrupt_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_starlight_unicorn_corrupt_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 630,
+        "source_size": [
+          314,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          285,
+          361
+        ],
+        "alpha_coverage": 0.4572
+      }
+    },
+    {
+      "id": "creature_thing_in_the_well",
+      "name": "Brunnenwesen",
+      "tier": "4",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_thing_in_the_well.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_thing_in_the_well_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_thing_in_the_well_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_thing_in_the_well_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_thing_in_the_well_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_thing_in_the_well_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 239,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          13,
+          141,
+          314,
+          578
+        ],
+        "alpha_coverage": 0.4709
+      }
+    },
+    {
+      "id": "creature_eyeless_pilgrim",
+      "name": "Augenloser Pilger",
+      "tier": "3",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_eyeless_pilgrim.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_eyeless_pilgrim_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_eyeless_pilgrim_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_eyeless_pilgrim_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_eyeless_pilgrim_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_eyeless_pilgrim_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          33,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 182,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          18,
+          113,
+          280,
+          583
+        ],
+        "alpha_coverage": 0.4197
+      }
+    },
+    {
+      "id": "creature_choir_of_mouths",
+      "name": "Mund-Chor",
+      "tier": "4",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_choir_of_mouths.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_choir_of_mouths_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_choir_of_mouths_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_choir_of_mouths_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_choir_of_mouths_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_choir_of_mouths_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          33,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 330,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          123,
+          277,
+          578
+        ],
+        "alpha_coverage": 0.4571
+      }
+    },
+    {
+      "id": "creature_hollow_marrow_serpent",
+      "name": "Mark-Schlange",
+      "tier": "4",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_hollow_marrow_serpent.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_hollow_marrow_serpent_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_hollow_marrow_serpent_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_hollow_marrow_serpent_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_hollow_marrow_serpent_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_hollow_marrow_serpent_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 192,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          133,
+          294,
+          590
+        ],
+        "alpha_coverage": 0.4858
+      }
+    },
+    {
+      "id": "creature_geometry_horror",
+      "name": "Geometriegrauen",
+      "tier": "5",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_geometry_horror.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_geometry_horror_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_geometry_horror_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_geometry_horror_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_geometry_horror_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_geometry_horror_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 411,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          10,
+          15,
+          304,
+          501
+        ],
+        "alpha_coverage": 0.3841
+      }
+    },
+    {
+      "id": "creature_drowned_cathedral_thing",
+      "name": "Versunkene Kathedrale",
+      "tier": "5",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_drowned_cathedral_thing.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_drowned_cathedral_thing_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_drowned_cathedral_thing_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_drowned_cathedral_thing_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_drowned_cathedral_thing_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_drowned_cathedral_thing_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          33,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 295,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          309,
+          499
+        ],
+        "alpha_coverage": 0.535
+      }
+    },
+    {
+      "id": "creature_inverted_pilgrim_swarm",
+      "name": "Umgestülpte Pilger",
+      "tier": "4",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_inverted_pilgrim_swarm.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_inverted_pilgrim_swarm_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_inverted_pilgrim_swarm_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_inverted_pilgrim_swarm_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_inverted_pilgrim_swarm_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_inverted_pilgrim_swarm_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          33,
+          32,
+          34
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 322,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          5,
+          43,
+          303,
+          508
+        ],
+        "alpha_coverage": 0.4435
+      }
+    },
+    {
+      "id": "creature_star_mote_imp",
+      "name": "Sternpartikel",
+      "tier": "3",
+      "section_index": 7,
+      "section_title": "Eldritch / Aberration (T3–T5)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_star_mote_imp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_star_mote_imp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_star_mote_imp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_star_mote_imp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_star_mote_imp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_star_mote_imp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          32,
+          32,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 432,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          8,
+          73,
+          264,
+          492
+        ],
+        "alpha_coverage": 0.2782
+      }
+    },
+    {
+      "id": "creature_clay_homunculus",
+      "name": "Lehm-Homunkulus",
+      "tier": "2",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_clay_homunculus.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_clay_homunculus_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_clay_homunculus_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_clay_homunculus_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_clay_homunculus_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_clay_homunculus_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 150,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          42,
+          146,
+          308,
+          555
+        ],
+        "alpha_coverage": 0.3839
+      }
+    },
+    {
+      "id": "creature_iron_sentinel",
+      "name": "Eiserner Wächter",
+      "tier": "3",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_iron_sentinel.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_iron_sentinel_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_iron_sentinel_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_iron_sentinel_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_iron_sentinel_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_iron_sentinel_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 205,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          45,
+          82,
+          271,
+          552
+        ],
+        "alpha_coverage": 0.3584
+      }
+    },
+    {
+      "id": "creature_bone_ossuary_construct",
+      "name": "Beinhaus-Konstrukt",
+      "tier": "3",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bone_ossuary_construct.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bone_ossuary_construct_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bone_ossuary_construct_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bone_ossuary_construct_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bone_ossuary_construct_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bone_ossuary_construct_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 23.96,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 113,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          81,
+          274,
+          544
+        ],
+        "alpha_coverage": 0.4736
+      }
+    },
+    {
+      "id": "creature_arcane_orrery_guardian",
+      "name": "Sternenuhr-Wächter",
+      "tier": "4",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_arcane_orrery_guardian.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_arcane_orrery_guardian_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_arcane_orrery_guardian_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_arcane_orrery_guardian_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_arcane_orrery_guardian_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_arcane_orrery_guardian_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 127,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          65,
+          266,
+          563
+        ],
+        "alpha_coverage": 0.4601
+      }
+    },
+    {
+      "id": "creature_grindstone_golem",
+      "name": "Schleifsteingolem",
+      "tier": "4",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_grindstone_golem.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_grindstone_golem_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grindstone_golem_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_grindstone_golem_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_grindstone_golem_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_grindstone_golem_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 32.32,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 645,
+        "source_size": [
+          314,
+          627
+        ],
+        "cutout_bbox": [
+          34,
+          21,
+          314,
+          488
+        ],
+        "alpha_coverage": 0.4629
+      }
+    },
+    {
+      "id": "creature_voidforge_juggernaut",
+      "name": "Leerenschmiede-Juggernaut",
+      "tier": "5",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_voidforge_juggernaut.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_voidforge_juggernaut_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_voidforge_juggernaut_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_voidforge_juggernaut_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_voidforge_juggernaut_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_voidforge_juggernaut_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          32
+        ],
+        "threshold": 52.3,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 867,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          313,
+          478
+        ],
+        "alpha_coverage": 0.292
+      }
+    },
+    {
+      "id": "creature_runic_jar",
+      "name": "Runenkrug",
+      "tier": "3",
+      "section_index": 8,
+      "section_title": "Konstrukte",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_runic_jar.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_runic_jar_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_runic_jar_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_runic_jar_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_runic_jar_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_runic_jar_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 59.84,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 792,
+        "source_size": [
+          313,
+          627
+        ],
+        "cutout_bbox": [
+          6,
+          74,
+          295,
+          433
+        ],
+        "alpha_coverage": 0.1436
+      }
+    },
+    {
+      "id": "creature_dragon_whelp",
+      "name": "Drachenwelpe",
+      "tier": "3",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dragon_whelp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dragon_whelp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dragon_whelp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dragon_whelp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dragon_whelp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dragon_whelp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          30
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 215,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          71,
+          98,
+          372,
+          362
+        ],
+        "alpha_coverage": 0.3105
+      }
+    },
+    {
+      "id": "creature_dragon_pup_litter",
+      "name": "Drachen-Wurfgeschwister",
+      "tier": "3",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dragon_pup_litter.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dragon_pup_litter_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dragon_pup_litter_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dragon_pup_litter_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dragon_pup_litter_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dragon_pup_litter_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 336,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          13,
+          83,
+          399,
+          393
+        ],
+        "alpha_coverage": 0.4223
+      }
+    },
+    {
+      "id": "creature_wyrmling_basilisk",
+      "name": "Basilisken-Welpe",
+      "tier": "3",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_wyrmling_basilisk.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_wyrmling_basilisk_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_wyrmling_basilisk_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_wyrmling_basilisk_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_wyrmling_basilisk_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_wyrmling_basilisk_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 225,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          35,
+          72,
+          366,
+          382
+        ],
+        "alpha_coverage": 0.3599
+      }
+    },
+    {
+      "id": "creature_chromatic_drake_red",
+      "name": "Rot-Drache",
+      "tier": "4",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_red.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_chromatic_drake_red_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_red_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_chromatic_drake_red_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_chromatic_drake_red_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_chromatic_drake_red_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 41.21,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 680,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          11,
+          0,
+          411,
+          356
+        ],
+        "alpha_coverage": 0.5056
+      }
+    },
+    {
+      "id": "creature_chromatic_drake_white",
+      "name": "Frost-Drache",
+      "tier": "4",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_white.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_chromatic_drake_white_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_white_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_chromatic_drake_white_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_chromatic_drake_white_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_chromatic_drake_white_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 44.99,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 218,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          17,
+          0,
+          397,
+          365
+        ],
+        "alpha_coverage": 0.6092
+      }
+    },
+    {
+      "id": "creature_chromatic_drake_black",
+      "name": "Säure-Drache",
+      "tier": "4",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_black.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_chromatic_drake_black_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_black_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_chromatic_drake_black_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_chromatic_drake_black_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_chromatic_drake_black_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          30
+        ],
+        "threshold": 45.06,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 1732,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          5,
+          387,
+          418
+        ],
+        "alpha_coverage": 0.3547
+      }
+    },
+    {
+      "id": "creature_chromatic_drake_green",
+      "name": "Gift-Drache",
+      "tier": "4",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_green.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_chromatic_drake_green_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_green_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_chromatic_drake_green_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_chromatic_drake_green_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_chromatic_drake_green_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          30
+        ],
+        "threshold": 37.17,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 713,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          11,
+          0,
+          418,
+          356
+        ],
+        "alpha_coverage": 0.5507
+      }
+    },
+    {
+      "id": "creature_chromatic_drake_blue",
+      "name": "Blitz-Drache",
+      "tier": "4",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_chromatic_drake_blue.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_chromatic_drake_blue_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_blue_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_chromatic_drake_blue_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_chromatic_drake_blue_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_chromatic_drake_blue_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          31
+        ],
+        "threshold": 65.59,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 372,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          6,
+          0,
+          384,
+          363
+        ],
+        "alpha_coverage": 0.598
+      }
+    },
+    {
+      "id": "creature_ancient_dragon_lord",
+      "name": "Uralter Drachenfürst",
+      "tier": "5",
+      "section_index": 9,
+      "section_title": "Drachen-Verwandtschaft",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_ancient_dragon_lord.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_ancient_dragon_lord_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_ancient_dragon_lord_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_ancient_dragon_lord_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_ancient_dragon_lord_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_ancient_dragon_lord_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 50.91,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 1123,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          0,
+          385,
+          369
+        ],
+        "alpha_coverage": 0.5079
+      }
+    },
+    {
+      "id": "creature_boss_forest_old_mother",
+      "name": "Alte Mutter des Waldes",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_forest_old_mother.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_forest_old_mother_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_forest_old_mother_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_forest_old_mother_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_forest_old_mother_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_forest_old_mother_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 39.98,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 431,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          120,
+          251,
+          596
+        ],
+        "alpha_coverage": 0.5437
+      }
+    },
+    {
+      "id": "creature_boss_swamp_witchking",
+      "name": "Sumpf-Hexenkönig",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_swamp_witchking.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_swamp_witchking_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_swamp_witchking_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_swamp_witchking_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_swamp_witchking_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_swamp_witchking_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 43.48,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 975,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          4,
+          140,
+          251,
+          594
+        ],
+        "alpha_coverage": 0.3588
+      }
+    },
+    {
+      "id": "creature_boss_mountain_avalanche_giant",
+      "name": "Lawinen-Riese",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_mountain_avalanche_giant.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_mountain_avalanche_giant_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_mountain_avalanche_giant_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_mountain_avalanche_giant_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_mountain_avalanche_giant_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_mountain_avalanche_giant_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          32
+        ],
+        "threshold": 48.1,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 303,
+        "source_size": [
+          250,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          114,
+          250,
+          597
+        ],
+        "alpha_coverage": 0.5659
+      }
+    },
+    {
+      "id": "creature_boss_desert_pharaoh_revenant",
+      "name": "Pharao-Wiedergänger",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_desert_pharaoh_revenant.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_desert_pharaoh_revenant_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_desert_pharaoh_revenant_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_desert_pharaoh_revenant_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_desert_pharaoh_revenant_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_desert_pharaoh_revenant_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          31,
+          32
+        ],
+        "threshold": 35.5,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 336,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          24,
+          135,
+          251,
+          604
+        ],
+        "alpha_coverage": 0.4564
+      }
+    },
+    {
+      "id": "creature_boss_volcano_smith_demon",
+      "name": "Vulkan-Schmiededämon",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_volcano_smith_demon.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_volcano_smith_demon_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_volcano_smith_demon_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_volcano_smith_demon_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_volcano_smith_demon_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_volcano_smith_demon_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 136,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          109,
+          251,
+          602
+        ],
+        "alpha_coverage": 0.5719
+      }
+    },
+    {
+      "id": "creature_boss_dungeon_undying_king",
+      "name": "Unsterblicher König",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_dungeon_undying_king.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_dungeon_undying_king_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_dungeon_undying_king_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_dungeon_undying_king_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_dungeon_undying_king_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_dungeon_undying_king_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 25.84,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 286,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          16,
+          251,
+          458
+        ],
+        "alpha_coverage": 0.5105
+      }
+    },
+    {
+      "id": "creature_boss_river_kelpie_queen",
+      "name": "Kelpie-Königin",
+      "tier": "4",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_river_kelpie_queen.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_river_kelpie_queen_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_river_kelpie_queen_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_river_kelpie_queen_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_river_kelpie_queen_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_river_kelpie_queen_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 29.34,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 325,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          12,
+          251,
+          471
+        ],
+        "alpha_coverage": 0.5381
+      }
+    },
+    {
+      "id": "creature_boss_coast_kraken_arm",
+      "name": "Kraken-Arm",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_coast_kraken_arm.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_coast_kraken_arm_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_coast_kraken_arm_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_coast_kraken_arm_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_coast_kraken_arm_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_coast_kraken_arm_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          32
+        ],
+        "threshold": 47.35,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 669,
+        "source_size": [
+          250,
+          627
+        ],
+        "cutout_bbox": [
+          8,
+          0,
+          235,
+          472
+        ],
+        "alpha_coverage": 0.3928
+      }
+    },
+    {
+      "id": "creature_boss_capital_traitor_general",
+      "name": "Verräter-General",
+      "tier": "5",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_capital_traitor_general.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_capital_traitor_general_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_capital_traitor_general_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_capital_traitor_general_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_capital_traitor_general_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_capital_traitor_general_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 40.48,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 749,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          27,
+          225,
+          472
+        ],
+        "alpha_coverage": 0.393
+      }
+    },
+    {
+      "id": "creature_boss_sky_bound_roc",
+      "name": "Wolken-Roc",
+      "tier": "4",
+      "section_index": 10,
+      "section_title": "Bosse — Setting-spezifisch",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_boss_sky_bound_roc.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_boss_sky_bound_roc_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_boss_sky_bound_roc_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_boss_sky_bound_roc_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_boss_sky_bound_roc_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_boss_sky_bound_roc_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 31.91,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 655,
+        "source_size": [
+          251,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          9,
+          237,
+          474
+        ],
+        "alpha_coverage": 0.5032
+      }
+    },
+    {
+      "id": "creature_bloodmoon_revenant",
+      "name": "Blutmond-Wiedergänger",
+      "tier": "3",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bloodmoon_revenant.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bloodmoon_revenant_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bloodmoon_revenant_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bloodmoon_revenant_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bloodmoon_revenant_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bloodmoon_revenant_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          28,
+          30
+        ],
+        "threshold": 46.12,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 548,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          51,
+          20,
+          406,
+          418
+        ],
+        "alpha_coverage": 0.5055
+      }
+    },
+    {
+      "id": "creature_plague_carrier_villager",
+      "name": "Pesttragender Dorfbewohner",
+      "tier": "2",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_plague_carrier_villager.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_plague_carrier_villager_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_plague_carrier_villager_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_plague_carrier_villager_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_plague_carrier_villager_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_plague_carrier_villager_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          28,
+          30
+        ],
+        "threshold": 37.82,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 543,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          42,
+          58,
+          357,
+          410
+        ],
+        "alpha_coverage": 0.2401
+      }
+    },
+    {
+      "id": "creature_storm_caller_djinn",
+      "name": "Sturmrufer",
+      "tier": "3",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_storm_caller_djinn.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_storm_caller_djinn_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_storm_caller_djinn_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_storm_caller_djinn_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_storm_caller_djinn_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_storm_caller_djinn_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 94.23,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 233,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          1,
+          21,
+          381,
+          418
+        ],
+        "alpha_coverage": 0.6042
+      }
+    },
+    {
+      "id": "creature_wildfire_pyre_imp",
+      "name": "Brandkobold",
+      "tier": "2",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_wildfire_pyre_imp.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_wildfire_pyre_imp_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_wildfire_pyre_imp_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_wildfire_pyre_imp_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_wildfire_pyre_imp_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_wildfire_pyre_imp_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 42.8,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 632,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          44,
+          3,
+          362,
+          418
+        ],
+        "alpha_coverage": 0.4062
+      }
+    },
+    {
+      "id": "creature_dying_sun_shade",
+      "name": "Schatten der sterbenden Sonne",
+      "tier": "4",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dying_sun_shade.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dying_sun_shade_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dying_sun_shade_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dying_sun_shade_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dying_sun_shade_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dying_sun_shade_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 34.19,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 1187,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          64,
+          44,
+          334,
+          414
+        ],
+        "alpha_coverage": 0.2943
+      }
+    },
+    {
+      "id": "creature_quake_burrower",
+      "name": "Bebenwurm",
+      "tier": "3",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_quake_burrower.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_quake_burrower_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_quake_burrower_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_quake_burrower_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_quake_burrower_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_quake_burrower_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          28,
+          28,
+          30
+        ],
+        "threshold": 45.97,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 801,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          1,
+          55,
+          388,
+          410
+        ],
+        "alpha_coverage": 0.4284
+      }
+    },
+    {
+      "id": "creature_locust_queen",
+      "name": "Heuschrecken-Königin",
+      "tier": "3",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_locust_queen.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_locust_queen_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_locust_queen_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_locust_queen_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_locust_queen_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_locust_queen_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          29,
+          30
+        ],
+        "threshold": 28.14,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 608,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          29,
+          0,
+          418,
+          378
+        ],
+        "alpha_coverage": 0.5411
+      }
+    },
+    {
+      "id": "creature_poisoned_spring_horror",
+      "name": "Brunnenhorror",
+      "tier": "4",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_poisoned_spring_horror.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_poisoned_spring_horror_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_poisoned_spring_horror_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_poisoned_spring_horror_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_poisoned_spring_horror_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_poisoned_spring_horror_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          28,
+          30
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 436,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          31,
+          12,
+          386,
+          376
+        ],
+        "alpha_coverage": 0.4775
+      }
+    },
+    {
+      "id": "creature_bloodmoon_alpha_wolf",
+      "name": "Blutmond-Leitwolf",
+      "tier": "4",
+      "section_index": 11,
+      "section_title": "Disaster-/Event-gebundene Spawns",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_bloodmoon_alpha_wolf.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_bloodmoon_alpha_wolf_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bloodmoon_alpha_wolf_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_bloodmoon_alpha_wolf_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_bloodmoon_alpha_wolf_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bloodmoon_alpha_wolf_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          29,
+          28,
+          30
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 343,
+        "source_size": [
+          418,
+          418
+        ],
+        "cutout_bbox": [
+          0,
+          12,
+          383,
+          387
+        ],
+        "alpha_coverage": 0.608
+      }
+    },
+    {
+      "id": "creature_silent_pilgrim_white",
+      "name": "Weißer Pilger",
+      "tier": "4",
+      "section_index": 12,
+      "section_title": "Selten / Welt-Geheimnisse (Lore-Carrier)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_silent_pilgrim_white.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_silent_pilgrim_white_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_silent_pilgrim_white_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_silent_pilgrim_white_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_silent_pilgrim_white_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_silent_pilgrim_white_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 222,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          52,
+          85,
+          411,
+          625
+        ],
+        "alpha_coverage": 0.4624
+      }
+    },
+    {
+      "id": "creature_clockwork_messenger",
+      "name": "Uhrwerks-Bote",
+      "tier": "3",
+      "section_index": 12,
+      "section_title": "Selten / Welt-Geheimnisse (Lore-Carrier)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_clockwork_messenger.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_clockwork_messenger_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_clockwork_messenger_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_clockwork_messenger_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_clockwork_messenger_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_clockwork_messenger_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 328,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          44,
+          177,
+          336,
+          611
+        ],
+        "alpha_coverage": 0.3078
+      }
+    },
+    {
+      "id": "creature_starfall_traveller",
+      "name": "Sternfallreisender",
+      "tier": "5",
+      "section_index": 12,
+      "section_title": "Selten / Welt-Geheimnisse (Lore-Carrier)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_starfall_traveller.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_starfall_traveller_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_starfall_traveller_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_starfall_traveller_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_starfall_traveller_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_starfall_traveller_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 29.85,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 732,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          0,
+          106,
+          369,
+          627
+        ],
+        "alpha_coverage": 0.469
+      }
+    },
+    {
+      "id": "creature_old_god_avatar_fragment",
+      "name": "Götter-Fragment",
+      "tier": "5",
+      "section_index": 12,
+      "section_title": "Selten / Welt-Geheimnisse (Lore-Carrier)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_old_god_avatar_fragment.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_old_god_avatar_fragment_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_old_god_avatar_fragment_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_old_god_avatar_fragment_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_old_god_avatar_fragment_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_old_god_avatar_fragment_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 578,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          28,
+          17,
+          399,
+          535
+        ],
+        "alpha_coverage": 0.4717
+      }
+    },
+    {
+      "id": "creature_dream_walker",
+      "name": "Traumwandler",
+      "tier": "4",
+      "section_index": 12,
+      "section_title": "Selten / Welt-Geheimnisse (Lore-Carrier)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_dream_walker.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_dream_walker_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dream_walker_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_dream_walker_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_dream_walker_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_dream_walker_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          31,
+          31,
+          33
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 623,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          41,
+          67,
+          392,
+          528
+        ],
+        "alpha_coverage": 0.3459
+      }
+    },
+    {
+      "id": "creature_riding_horse_brown",
+      "name": "Reitpferd, braun",
+      "tier": "n/a",
+      "section_index": 13,
+      "section_title": "Bestien — Reittiere & Begleiter (falls geplant)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_riding_horse_brown.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_riding_horse_brown_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_riding_horse_brown_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_riding_horse_brown_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_riding_horse_brown_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_riding_horse_brown_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 162,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          41,
+          141,
+          418,
+          605
+        ],
+        "alpha_coverage": 0.3952
+      }
+    },
+    {
+      "id": "creature_riding_horse_war",
+      "name": "Schlachtross",
+      "tier": "n/a",
+      "section_index": 13,
+      "section_title": "Bestien — Reittiere & Begleiter (falls geplant)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_riding_horse_war.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_riding_horse_war_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_riding_horse_war_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_riding_horse_war_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_riding_horse_war_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_riding_horse_war_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 130,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          37,
+          125,
+          414,
+          598
+        ],
+        "alpha_coverage": 0.4486
+      }
+    },
+    {
+      "id": "creature_war_wolf",
+      "name": "Kampfwolf",
+      "tier": "n/a",
+      "section_index": 13,
+      "section_title": "Bestien — Reittiere & Begleiter (falls geplant)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_war_wolf.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_war_wolf_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_war_wolf_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_war_wolf_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_war_wolf_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_war_wolf_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 222,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          12,
+          217,
+          389,
+          602
+        ],
+        "alpha_coverage": 0.3314
+      }
+    },
+    {
+      "id": "creature_falcon_companion",
+      "name": "Falke-Begleiter",
+      "tier": "n/a",
+      "section_index": 13,
+      "section_title": "Bestien — Reittiere & Begleiter (falls geplant)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_falcon_companion.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_falcon_companion_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_falcon_companion_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_falcon_companion_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_falcon_companion_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_falcon_companion_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 11,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          12,
+          64,
+          418,
+          476
+        ],
+        "alpha_coverage": 0.2731
+      }
+    },
+    {
+      "id": "creature_pack_ox",
+      "name": "Lastochse",
+      "tier": "n/a",
+      "section_index": 13,
+      "section_title": "Bestien — Reittiere & Begleiter (falls geplant)",
+      "source_cell": "assets/monsters/generated_longlist/cells/creature_pack_ox.png",
+      "fixed_cutout_512": "assets/monsters/world_sprites/generated_longlist/fixed_cutouts_512/creature_pack_ox_fixed_512.png",
+      "sprite_128": "assets/monsters/world_sprites/generated_longlist/sprites_128/creature_pack_ox_world_128.png",
+      "sprite_128_mirrored": "assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_pack_ox_world_128_west.png",
+      "sprite_96": "assets/monsters/world_sprites/generated_longlist/sprites_96/creature_pack_ox_world_96.png",
+      "icon_64": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_pack_ox_icon_64.png",
+      "usage": "world map sprite, transparent PNG generated from longlist cell with alpha matte and soft ground shadow",
+      "cutout_stats": {
+        "background_rgb": [
+          30,
+          30,
+          31
+        ],
+        "threshold": 22.0,
+        "edge_threshold": 16.0,
+        "removed_edge_components": 355,
+        "source_size": [
+          418,
+          627
+        ],
+        "cutout_bbox": [
+          5,
+          87,
+          404,
+          489
+        ],
+        "alpha_coverage": 0.3662
+      }
+    }
+  ]
+}
