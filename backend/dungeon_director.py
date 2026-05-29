@@ -102,6 +102,9 @@ async def reaper_loop(connection_manager, world, structures_module) -> None:
                         log.exception("Eingangs-Struktur-Remove fehlgeschlagen für %d", d["id"])
                 await dungeon_instance.delete_dungeon(d["id"])
                 log.info("Dungeon %d abgelaufen + gelöscht", d["id"])
+            if expired:
+                # Minimap-Ortung der Spieler aktualisieren (Eingang ist weg).
+                await broadcast_dungeon_sense(connection_manager)
         except asyncio.CancelledError:
             log.info("Dungeon-Reaper gestoppt")
             raise
@@ -110,6 +113,24 @@ async def reaper_loop(connection_manager, world, structures_module) -> None:
 
 
 # ─── Auto-Spawn ────────────────────────────────────────────────────────────
+
+async def broadcast_dungeon_sense(connection_manager) -> None:
+    """Schickt allen Spielern die aktuelle Liste aktiver Dungeon-Eingänge.
+    Der Client blendet sie nur im Spür-Radius (~70 Tiles) auf der Minimap ein."""
+    rows = await db.pool().fetch(
+        "SELECT tier, entrance_x, entrance_y FROM dungeons "
+        "WHERE expires_at > NOW() AND entrance_x IS NOT NULL"
+    )
+    payload = {
+        "type": "dungeon_sense",
+        "dungeons": [{"x": r["entrance_x"], "y": r["entrance_y"], "tier": r["tier"]}
+                     for r in rows],
+    }
+    try:
+        await connection_manager.broadcast(payload)
+    except Exception:
+        log.debug("dungeon_sense broadcast fehlgeschlagen", exc_info=True)
+
 
 async def _count_active_by_tier() -> dict[int, int]:
     rows = await db.pool().fetch(
@@ -195,6 +216,8 @@ async def spawn_loop(connection_manager, world, structures_module) -> None:
                     })
                 log.info("Auto-Dungeon T%d gespawnt: id=%d @(%d,%d)",
                          tier, meta["id"], wx, wy)
+                # Minimap-Ortung aktualisieren (neuer Eingang spürbar).
+                await broadcast_dungeon_sense(connection_manager)
         except asyncio.CancelledError:
             log.info("Dungeon-Spawn-Worker gestoppt")
             raise

@@ -272,6 +272,13 @@ def manhattan(ax: int, ay: int, bx: int, by: int) -> int:
     return abs(ax - bx) + abs(ay - by)
 
 
+def chebyshev(ax: int, ay: int, bx: int, by: int) -> int:
+    """Schachbrett-Distanz (max der Achsen) — Diagonale zählt als 1. Wird für
+    Reichweite/Adjazenz genutzt, damit auch diagonal/eckig versetztes Stehen
+    triggert (Spieler bewegt sich pixelweise, Welt ist aber tile-basiert)."""
+    return max(abs(ax - bx), abs(ay - by))
+
+
 # Effekte beim Use eines Consumables / Lebensmittels.
 # Hunger-Restoration läuft separat über needs.FOOD_RESTORE.
 # HP-Werte koordiniert mit needs.py:
@@ -651,22 +658,67 @@ _BOSS_KINDS = {
 }
 
 
+# ── Proportions-System (Überarbeitung 2026-05-29) ────────────────────────────
+# Relative Sprite-Größe pro Kind. Referenz: Mensch/Spieler = 1.0. Gilt für ALLE
+# Lebewesen (Tiere, Friendly-NPCs, Monster), nicht nur Creatures. Das Frontend
+# multipliziert die Basis-Tile-Größe damit. Boss-/Rudelführer-Multiplikatoren
+# kommen in npc_display_scale ON TOP. Werte bewusst „lebensecht": Huhn winzig,
+# Hund < Mensch, Kuh/Pferd/Bär > Mensch, Ogre/Hydra riesig.
+_ENTITY_BASE_SCALE = {
+    # — Geflügel / Kleintiere (winzig) —
+    "chick": 0.35, "duckling": 0.35, "gosling": 0.38,
+    "chicken_hen": 0.55, "rooster": 0.6, "duck": 0.55, "drake": 0.6,
+    "goose": 0.75, "gander": 0.8, "cat": 0.45, "rabbit": 0.45,
+    # — kleine Tiere / Jungtiere —
+    "dog": 0.65, "fox": 0.65, "lamb": 0.6, "kid_goat": 0.6, "piglet": 0.6,
+    "calf": 0.75, "foal": 0.8, "child": 0.7,
+    # — mittlere Tiere (~Mensch oder etwas drunter) —
+    "sheep": 0.85, "sheared_sheep": 0.85, "goat": 0.85, "ram": 0.95,
+    "buck_goat": 0.95, "pig": 0.95, "boar_domestic": 1.1,
+    "donkey": 1.1, "mule": 1.15,
+    # — große Tiere (> Mensch) —
+    "cow": 1.4, "bull": 1.55, "ox": 1.6, "horse": 1.5, "draft_horse": 1.8,
+    # — Karren/Wagen (NPC-Kinds) —
+    "handcart_empty": 1.4, "farm_cart_hay": 1.8, "horse_cart_single": 2.0,
+    "market_wagon_covered": 2.2,
+    # — Wild-Monster: klein —
+    "rat": 0.45, "ember_rat": 0.5, "bat": 0.5, "shadow_bat": 0.6,
+    "slimelet": 0.45, "fae_mite": 0.4, "crystal_tick": 0.45, "gloom_moth": 0.5,
+    "thorn_scarab": 0.55, "mushroom_imp": 0.7, "thornling": 0.7,
+    "fire_imp": 0.7, "frost_sprite": 0.7, "ember_newt": 0.6, "crystal_beetle": 0.7,
+    "slime": 0.65, "cobra": 0.8, "goblin": 0.85,
+    # — Wild-Monster: ~Mensch —
+    "skeleton": 0.95, "zombie": 1.0, "spider": 0.9, "wolf": 0.95,
+    "wolverine": 0.85, "lynx": 0.85, "gargoyle": 1.0, "bone_crawler": 1.2,
+    # — Wild-Monster: groß —
+    "boar": 1.1, "stag": 1.3, "cougar": 1.1, "dire_wolf": 1.25, "wolf_alpha": 1.15,
+    "bear": 1.6, "cave_bear": 1.75, "polar_bear": 1.75, "crocodile": 1.5,
+    "giant_spider": 1.5, "harpy": 1.3, "basilisk": 1.5, "griffin": 1.7,
+    "necromancer": 1.1,
+    # — Wild-Monster: sehr groß / Bosse-Basis —
+    "ogre": 1.9, "minotaur": 1.9, "treant": 2.0, "stone_golem": 1.9,
+    "crystal_golem": 2.0, "dragon_whelp": 1.7, "chimera": 1.9, "manticore": 1.8,
+    "hydra": 2.0, "kaiju_thornback": 2.2, "rockshell_colossus": 2.2,
+    "magma_shell_devourer": 2.0, "void_eye_brute": 1.9,
+    "blood_antler_drake": 1.9, "dendroid_guardian": 2.0, "frost_rune_boar_prime": 1.7,
+}
+
+# Rollen-Multiplikatoren (ON TOP der Basis-Größe).
+_BOSS_SCALE_MULT = 1.5          # deutlich imposant
+_PACK_LEADER_SCALE_MULT = 1.25  # sichtbar größer als normale Rudel-Mitglieder
+_SCALE_CAP = 3.0                # Obergrenze gegen absurde Größen
+
+
 def npc_display_scale(kind: str) -> float:
-    """Sprite-Größen-Multiplier basierend auf Rolle.
-    Boss        → 1.60x  (deutlich imposant)
-    Pack-leader → 1.25x  (sichtbar größer als normale Rudel-Mitglieder)
-    Tier 1      → 0.90x  (kleine Vermin)
-    Sonst       → 1.00x  (normale Mobs)
-    """
+    """Relative Sprite-Größe eines Kinds. Basis aus _ENTITY_BASE_SCALE
+    (Mensch=1.0), dann Boss-/Rudelführer-Multiplikator obendrauf, gedeckelt."""
+    base = _ENTITY_BASE_SCALE.get(kind)
+    if base is None:
+        # Unbekannt → leichte Tier-Heuristik (kleine Vermin kleiner, T4 groß).
+        tier = npc_tier(kind)
+        base = 0.9 if tier == 1 else (1.4 if tier >= 4 else 1.0)
     if kind in _BOSS_KINDS:
-        return 1.60
-    tier = npc_tier(kind)
-    if tier >= 4:
-        return 1.60
-    if kind in _PACK_LEADER_KINDS:
-        return 1.25
-    if tier == 3:
-        return 1.10
-    if tier == 1:
-        return 0.90
-    return 1.0
+        base *= _BOSS_SCALE_MULT
+    elif kind in _PACK_LEADER_KINDS:
+        base *= _PACK_LEADER_SCALE_MULT
+    return round(min(base, _SCALE_CAP), 3)

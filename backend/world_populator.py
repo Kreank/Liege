@@ -162,27 +162,30 @@ def _pick_for_tile(world, x: int, y: int, tile_id: int) -> str | None:
 # Trees/Rocks/Ruinen kommen NUR über Encounter-Templates — die sollen nicht
 # einzeln im Nirgendwo stehen.
 AMBIENT_PROPS_BY_BIOME = {
-    # Bäume + Felsen sind nun auch sparse über die Fläche verteilt — vorher
-    # nur über Encounter-Templates (Sites), wodurch sich >95% leerer Welt-Tiles
-    # ergeben hatten. Diese Chancen bewusst niedrig: Sites bleiben die dichten
-    # Cluster, Ambient ist der ruhige Hintergrund.
-    GRASS:  [("tall_grass", 0.025), ("flowers", 0.010), ("bush", 0.008),
-             ("tree_oak", 0.012), ("rock_small", 0.006)],
-    FOREST: [("tree_oak", 0.060), ("tree_pine", 0.045),
-             ("tall_grass", 0.030), ("bush", 0.012), ("flowers", 0.008),
-             ("rock_mossy", 0.006), ("fallen_log", 0.005)],
-    DESERT: [("dry_bush", 0.010), ("desert_skull", 0.002),
-             ("rock_small", 0.012), ("cactus", 0.010),
-             ("tree_dead", 0.005)],
-    JUNGLE: [("tree_oak", 0.040), ("tree_pine", 0.035),
-             ("palm_tree", 0.018),
-             ("tall_grass", 0.030), ("jungle_flower", 0.015),
-             ("jungle_vines", 0.012), ("bush", 0.022)],
-    SWAMP:  [("reeds", 0.025), ("lily_pads", 0.012), ("tall_grass", 0.015),
-             ("tree_dead", 0.018), ("mushrooms", 0.012)],
-    SNOW:   [("frozen_bush", 0.010), ("tree_pine", 0.025),
-             ("rock_small", 0.010), ("snow_rock", 0.012)],
-    SAND:   [],  # plus WATERSIDE für küsten-Sand
+    # Dichte-Rebalance 2026-05-29: offene Biome (Gras/Sand/Wüste) wirkten zu leer
+    # (Gras ~5,5% Abdeckung, Sand 0%). Werte ~3× angehoben für eine üppigere Welt;
+    # Sites (Pass A) bleiben die dichten Cluster, Ambient ist der dichtere
+    # Hintergrund. Chance pro Tile = base * (0.6 + fertility*0.6).
+    GRASS:  [("tall_grass", 0.085), ("flowers", 0.035), ("bush", 0.028),
+             ("tree_oak", 0.035), ("rock_small", 0.018)],
+    FOREST: [("tree_oak", 0.085), ("tree_pine", 0.065),
+             ("tall_grass", 0.045), ("bush", 0.018), ("flowers", 0.012),
+             ("rock_mossy", 0.009), ("fallen_log", 0.007)],
+    DESERT: [("dry_bush", 0.030), ("desert_skull", 0.005),
+             ("rock_small", 0.030), ("cactus", 0.030),
+             ("tree_dead", 0.012), ("bones_scatter", 0.006)],
+    JUNGLE: [("tree_oak", 0.060), ("tree_pine", 0.050),
+             ("palm_tree", 0.028),
+             ("tall_grass", 0.045), ("jungle_flower", 0.022),
+             ("jungle_vines", 0.018), ("bush", 0.033)],
+    SWAMP:  [("reeds", 0.050), ("lily_pads", 0.020), ("tall_grass", 0.025),
+             ("tree_dead", 0.030), ("mushrooms", 0.020)],
+    SNOW:   [("frozen_bush", 0.020), ("tree_pine", 0.045),
+             ("rock_small", 0.018), ("snow_rock", 0.022), ("ice_crystal", 0.008)],
+    # Sand bekommt jetzt eigene spärliche Props (vorher komplett kahl). Küsten-Sand
+    # bekommt zusätzlich WATERSIDE-Scatter über _pick_ambient.
+    SAND:   [("rock_small", 0.018), ("dry_bush", 0.012), ("tree_dead", 0.006),
+             ("rubble", 0.004)],
 }
 
 
@@ -559,7 +562,9 @@ async def populate_chunk_if_needed(world, structure_manager, connection_manager,
     # ── Pass A: 0-3 Encounter-Sites pro Chunk ──────────────────────────────
     # Pro Chunk wird gewürfelt wie viele Sites; jeder Site bekommt einen
     # Anker auf einem random walkable Tile, dann passendes Template gewählt.
-    site_count = random.choices([0, 1, 2, 3], weights=[10, 50, 30, 10], k=1)[0]
+    # Dichte-Rebalance 2026-05-29: mehr Encounter-Sites pro Chunk (Ø ~2,75 statt
+    # ~1,4) für eine belebtere Welt mit mehr Baum-/Camp-Clustern.
+    site_count = random.choices([1, 2, 3, 4], weights=[10, 30, 35, 25], k=1)[0]
     site_anchors_taken: list[tuple[int, int]] = []
     for _ in range(site_count):
         # Anker-Tile suchen (max 30 Versuche)

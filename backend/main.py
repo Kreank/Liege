@@ -417,6 +417,7 @@ async def lifespan(app: FastAPI):
     farm_task = asyncio.create_task(farm_worker.run(items, manager))
     world_respawn_task = asyncio.create_task(respawn_worker.run(world, structures, manager))
     needs_task = asyncio.create_task(needs.run(manager, damage_player))
+    stamina_task = asyncio.create_task(needs.run_stamina(manager, heal_player))
     bill_task = asyncio.create_task(bill_queue.run(manager, items, recipes))
     mood_task = asyncio.create_task(npc_mood.run(npcs, manager))
     raid_task = asyncio.create_task(raid_director.run(world, npcs, manager, events))
@@ -508,6 +509,17 @@ async def pwa_sw():
 
 DEFAULT_SPAWN_CENTER = (60, 40)  # nahe Mitte der Legacy-Welt
 CHUNK_SEND_RADIUS = 3  # 7x7 Chunks (224×224 Tiles) um Spieler
+
+
+async def _active_dungeon_markers() -> list[dict]:
+    """Aktive Dungeon-Eingänge (für Minimap-Ortung). Client blendet sie nur im
+    Spür-Radius ein, daher reicht die volle Liste (Cap ~28)."""
+    rows = await db.pool().fetch(
+        "SELECT tier, entrance_x, entrance_y FROM dungeons "
+        "WHERE expires_at > NOW() AND entrance_x IS NOT NULL"
+    )
+    return [{"x": r["entrance_x"], "y": r["entrance_y"], "tier": r["tier"]}
+            for r in rows]
 
 
 async def _populate_chunks_bg(chunks) -> None:
@@ -1158,6 +1170,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "world_seed": world.seed,
         "players": manager.get_players(),
         "structures": nearby_structs,
+        "dungeons": await _active_dungeon_markers(),   # Minimap-Ortung (Spür-Radius)
         "events": await events.recent(20),
         "npcs": nearby_npcs,
         "items_ground": nearby_items,
@@ -1519,6 +1532,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Welle 25: Down-State blockt Bewegung
                 if is_downed(player_id):
                     continue
+                # Bewegung weckt aus dem Bett-Schlaf (Safety, falls Client doch
+                # einen move sendet während noch 'resting').
+                if needs.is_resting(player_id):
+                    needs.set_resting(player_id, False)
                 # Welle 25: Bewegung bricht aktiven Cast ab.
                 if spell_caster.is_casting(player_id):
                     spell_caster.interrupt(player_id, "movement")
@@ -1701,6 +1718,15 @@ async def websocket_endpoint(websocket: WebSocket):
                             })
                             await damage_player(player_id, trap_dmg)
 
+            elif mtype == "sprint":
+                # Frontend meldet Sprint-Zustand (SHIFT gehalten + in Bewegung).
+                # run_stamina verbraucht dann Ausdauer/s und stoppt bei 0.
+                needs.set_sprint(player_id, bool(data.get("on")))
+
+            elif mtype == "wake":
+                # Spieler wacht aktiv aus dem Bett-Schlaf auf.
+                needs.set_resting(player_id, False)
+
             elif mtype == "place_structure":
                 x, y, type_ = data["x"], data["y"], data["structure_type"]
                 material = data.get("material", "stone")
@@ -1731,6 +1757,31 @@ async def websocket_endpoint(websocket: WebSocket):
                             "text": "🚪 Türen brauchen eine Wand zum Einsetzen",
                         })
                         continue
+                # Ausdauer beim Bauen: bei guter Versorgung (Hunger UND Durst
+                # >=50%) gratis → erschöpft nie. Unter 50% kostet es Ausdauer;
+                # ohne genug blockiert der Bau (Spieler merkt die Mangellage).
+                _bn = await needs.get_needs(player_id)
+                if _bn:
+                    _supply = min(_bn["hunger"] / max(1, _bn["max_hunger"]),
+                                  _bn["thirst"] / max(1, _bn["max_thirst"]))
+                    if _supply < needs.SUPPLY_LOW_PCT:
+                        if not await needs.use_stamina(player_id, needs.BUILD_STAMINA_COST):
+                            await websocket.send_json({
+                                "type": "toast",
+                                "text": "🥵 Zu erschöpft zum Bauen — iss und trink erst etwas.",
+                            })
+                            continue
+                        _bn2 = await needs.get_needs(player_id)
+                        if _bn2:
+                            await websocket.send_json({
+                                "type":        "player_needs",
+                                "hunger":      _bn2["hunger"],
+                                "max_hunger":  _bn2["max_hunger"],
+                                "stamina":     _bn2["stamina"],
+                                "max_stamina": _bn2["max_stamina"],
+                                "thirst":      _bn2["thirst"],
+                                "max_thirst":  _bn2["max_thirst"],
+                            })
                 placed = await structures.place(x, y, type_, player_id, material=material, rotation=rotation)
                 if placed is not None:
                     await manager.broadcast({
@@ -1818,7 +1869,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
-                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     continue
                 struct = structures.object_at(x, y)
                 if struct is None:
@@ -2058,7 +2109,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 )
                 if ground is None:
                     continue  # schon weg
-                if abs(int(ground["x"]) - player["x"]) + abs(int(ground["y"]) - player["y"]) > 1:
+                if combat.chebyshev(player["x"], player["y"], int(ground["x"]), int(ground["y"])) > 1:
                     continue  # zu weit weg (Sanity-Check — Frontend prüft auch)
                 # Loot-Roll-Lock: Item ist gerade in einem Need/Greed-Roll →
                 # nur der ausgelobte Gewinner darf aufheben.
@@ -2133,20 +2184,31 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Range-Check: bei Ranged-Waffen größere Reichweite
                 import item_stats as _is, random as _r
                 attack_range = max(combat.ATTACK_RANGE, _is.weapon_range(weapon))
-                if combat.manhattan(player["x"], player["y"], npc["x"], npc["y"]) > attack_range:
+                if combat.chebyshev(player["x"], player["y"], npc["x"], npc["y"]) > attack_range:
                     continue
-                # Stamina-Cost bei 2H-Waffen — wenig Stamina = halbierter Schaden
-                # statt Block, damit der Spieler nie komplett wehrlos ist.
+                # Ausdauer-Kosten pro Schlag — ALLE Waffen (2H teurer als 1H/Bogen).
+                # Zu wenig Ausdauer → halbierter Schaden statt Block, damit der
+                # Spieler nie komplett wehrlos ist.
                 _heavy_dmg_penalty = 1.0
-                _w_stats = _is.WEAPON_STATS.get(weapon or "", {})
-                if _w_stats.get("two_handed"):
-                    if await needs.use_stamina(player_id, 8):
-                        pass
-                    else:
-                        _heavy_dmg_penalty = 0.5
+                _atk_cost = needs.attack_stamina_cost(weapon)
+                if not await needs.use_stamina(player_id, _atk_cost):
+                    _heavy_dmg_penalty = 0.5
+                    await websocket.send_json({
+                        "type": "toast",
+                        "text": "🥵 Erschöpft — der Hieb hat keinen Schwung",
+                    })
+                else:
+                    # Ausdauer-Balken sofort aktualisieren (Sekunden-Loop wäre träge)
+                    _atk_needs = await needs.get_needs(player_id)
+                    if _atk_needs:
                         await websocket.send_json({
-                            "type": "toast",
-                            "text": "🥵 Erschöpft — der Hieb hat keinen Schwung",
+                            "type":        "player_needs",
+                            "hunger":      _atk_needs["hunger"],
+                            "max_hunger":  _atk_needs["max_hunger"],
+                            "stamina":     _atk_needs["stamina"],
+                            "max_stamina": _atk_needs["max_stamina"],
+                            "thirst":      _atk_needs["thirst"],
+                            "max_thirst":  _atk_needs["max_thirst"],
                         })
                 # Talent-Effekte für Combat anwenden
                 talent_effects = await talents.aggregate_effects(player_id)
@@ -2425,9 +2487,9 @@ async def websocket_endpoint(websocket: WebSocket):
                     if candidates:
                         target = min(
                             candidates,
-                            key=lambda n: combat.manhattan(player_pos["x"], player_pos["y"], n["x"], n["y"]),
+                            key=lambda n: combat.chebyshev(player_pos["x"], player_pos["y"], n["x"], n["y"]),
                         )
-                        dist = combat.manhattan(player_pos["x"], player_pos["y"], target["x"], target["y"])
+                        dist = combat.chebyshev(player_pos["x"], player_pos["y"], target["x"], target["y"])
                         if dist <= spell["range"]:
                             aoe = spell.get("aoe_radius", 0)
                             if aoe > 0:
@@ -2570,7 +2632,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 weapon = await get_equipped_weapon_kind(player_id)
                 import item_stats as _is_struct
                 attack_range = max(combat.ATTACK_RANGE, _is_struct.weapon_range(weapon))
-                if combat.manhattan(player["x"], player["y"], x, y) > attack_range:
+                if combat.chebyshev(player["x"], player["y"], x, y) > attack_range:
                     await websocket.send_json({"type": "toast", "text": "Zu weit weg."})
                     continue
                 # Damage-Calc
@@ -2641,7 +2703,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
-                if combat.manhattan(player["x"], player["y"], x, y) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     await websocket.send_json({"type": "toast", "text": "🤚 Zu weit weg."})
                     continue
                 if s["durability"] >= s.get("max_durability", s["durability"]):
@@ -2703,7 +2765,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
-                if combat.manhattan(player["x"], player["y"], x, y) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     await websocket.send_json({"type": "toast", "text": "🤚 Zu weit weg."})
                     continue
                 new_mat = structures.next_material(s["material"])
@@ -2779,7 +2841,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 if player is None:
                     continue
                 # Nur wenn nahe genug
-                if combat.manhattan(player["x"], player["y"], x, y) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     continue
                 if s["type"] == "chest":
                     contents = await items.get_chest_contents(s["id"])
@@ -3067,6 +3129,15 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type": "toast",
                         "text": f"{label} als Heim-Spawn gemerkt — du erscheinst hier wieder.",
                     })
+                    # Bett: Schlafen starten → Ausdauer (und langsam HP) regenerieren
+                    # bis 100%. Bewegung/Aktion weckt auf (siehe 'wake' + 'move').
+                    if s["type"] == "bed":
+                        needs.set_resting(player_id, True)
+                        await websocket.send_json({"type": "rest_start"})
+                        await websocket.send_json({
+                            "type": "toast",
+                            "text": "😴 Du legst dich schlafen — Bewegung weckt dich.",
+                        })
                 heal_amount = combat.STRUCTURE_HEAL.get(s["type"])
                 if heal_amount is not None:
                     key = (player_id, s["id"])
@@ -3138,7 +3209,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
-                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     await websocket.send_json({"type": "toast", "text": "Zu weit weg."})
                     continue
                 # Wasserquelle: Brunnen ODER WATER-Tile
@@ -3174,7 +3245,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
-                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     await websocket.send_json({"type": "toast", "text": "Zu weit weg."})
                     continue
                 target = structures.at(x, y)
@@ -3247,7 +3318,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 player = manager.get_players().get(player_id)
                 if player is None:
                     continue
-                if abs(x - player["x"]) + abs(y - player["y"]) > 1:
+                if combat.chebyshev(player["x"], player["y"], x, y) > 1:
                     continue
                 # WATER = tile id 0 (siehe world.py)
                 tile_id = await world.tile_at(x, y)
@@ -3417,7 +3488,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 if npc is None or npc["kind"] != "merchant":
                     continue
                 player = manager.get_players().get(player_id)
-                if player is None or combat.manhattan(player["x"], player["y"], npc["x"], npc["y"]) > 2:
+                if player is None or combat.chebyshev(player["x"], player["y"], npc["x"], npc["y"]) > 2:
                     continue
                 offerings_kinds = trade.generate_offerings(8)
                 from items import ITEM_KINDS
@@ -4154,6 +4225,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         # Welle 25: aktiven Cast + Cooldowns räumen, Down-Timer canceln
         spell_caster.cleanup_player(player_id)
+        needs.clear_player_state(player_id)   # Sprint/Ruhe/Akkumulator räumen
         ds = _downed_state.pop(player_id, None)
         if ds and ds.get("task"):
             try: ds["task"].cancel()

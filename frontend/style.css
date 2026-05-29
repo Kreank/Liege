@@ -451,6 +451,71 @@
     .faction-tier.friendly   { background: #306030; color: #c0ffc0; }
     .faction-tier.allied     { background: #2050a0; color: #c0e0ff; }
 
+    /* Bestiarium (Welle 33b) */
+    #bestiary-overlay {
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.65);
+      display: none; justify-content: center; align-items: center;
+    }
+    #bestiary-overlay.active { display: flex; }
+    #bestiary-box {
+      width: 94%; max-width: 1040px; height: 86vh;
+      background: rgba(16,14,11,0.98); border: 1px solid #b88858;
+      color: #c8b88a; font-size: 12px;
+      display: flex; flex-direction: column;
+    }
+    #bestiary-header {
+      padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      color: #e8b870; font-weight: bold;
+    }
+    #bestiary-header span { flex: 0 0 auto; }
+    #bestiary-search {
+      flex: 1 1 auto; max-width: 280px; margin-left: auto;
+      background: rgba(0,0,0,0.5); border: 1px solid #806040; color: #f0e0b0;
+      padding: 4px 8px; font-size: 12px; border-radius: 3px;
+    }
+    #bestiary-body { flex: 1 1 auto; display: flex; min-height: 0; }
+    #bestiary-grid {
+      flex: 1 1 auto; overflow-y: auto; padding: 12px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 8px; align-content: start;
+    }
+    .bestiary-card {
+      position: relative; cursor: pointer; border: 1px solid #443a28;
+      background: #15120e; border-radius: 4px; overflow: hidden;
+      transition: border-color 0.12s, transform 0.12s;
+    }
+    .bestiary-card:hover { border-color: #e8b870; transform: translateY(-2px); }
+    .bestiary-card img { width: 100%; height: 96px; object-fit: cover; display: block; }
+    .bestiary-card-name {
+      padding: 3px 4px; font-size: 10px; line-height: 1.15; color: #d8c89a;
+      text-align: center; min-height: 24px;
+    }
+    .bestiary-card-tier {
+      position: absolute; top: 3px; right: 3px;
+      background: rgba(0,0,0,0.7); border: 1px solid #b88858; color: #ffd890;
+      font-size: 9px; padding: 1px 4px; border-radius: 3px;
+    }
+    #bestiary-detail {
+      flex: 0 0 320px; border-left: 1px solid #555; padding: 16px;
+      overflow-y: auto; background: rgba(0,0,0,0.25);
+    }
+    #bestiary-detail .bd-portrait {
+      width: 100%; max-height: 360px; object-fit: contain; display: block;
+      border: 1px solid #443a28; border-radius: 4px; background: #0c0a08;
+    }
+    #bestiary-detail .bd-name { font-size: 17px; color: #ffd890; font-weight: bold; margin: 12px 0 6px; }
+    #bestiary-detail .bd-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    #bestiary-detail .bd-tier { background: #6a4a20; color: #ffd890; padding: 2px 8px; border-radius: 3px; font-size: 11px; }
+    #bestiary-detail .bd-section { color: #a09060; font-size: 11px; }
+    #bestiary-detail .bd-desc .bd-line { padding: 4px 0; border-bottom: 1px dashed #332a18; line-height: 1.4; color: #c8b88a; }
+
+    @media (max-width: 720px) {
+      #bestiary-body { flex-direction: column; }
+      #bestiary-detail { flex: 0 0 auto; border-left: none; border-top: 1px solid #555; max-height: 40vh; }
+    }
+
     /* Status-Effekte (Welle 11) */
     #status-effects-row {
       position: fixed; top: 150px; left: 12px; z-index: 11;

@@ -886,6 +886,19 @@ const STRUCTURE_DISPLAY_SCALE = {
   anvil:         1.2,
   furnace:       1.3,
   workbench:     1.2,
+  // Proportions-Pass 2026-05-29: Möbel/Objekte (1×1-Footprint) realistisch
+  // skalieren. Ein Bett ist große Möbel und muss klar größer als ein Lagerfeuer
+  // sein; Fässer/Säcke/Kisten kleiner als ein Mensch.
+  bed:           1.6,
+  campfire:      1.0,
+  cooking_pot:   0.7,
+  chest:         0.85,
+  barrel:        0.7,
+  crate:         0.8,
+  sack:          0.6,
+  hay_bale:      0.95,
+  torch:         0.7,
+  brazier:       0.8,
 };
 
 // Welle 25: Multi-Tile-Footprint pro Strukturtyp (mirror of backend
@@ -2396,6 +2409,8 @@ class WorldScene extends Phaser.Scene {
     this.myPx           = 0;
     this.myPy           = 0;
     this.moveSpeed      = 240;        // px/sec
+    this.sprintMult     = 1.5;        // +50% Tempo beim Sprinten (SHIFT)
+    this.resting        = false;      // schläft gerade im Bett (Movement gesperrt)
     this.collisionHalf  = 14;         // px Hitbox-Radius (≈44% TILE_SIZE) — forgiveness
     this.ws             = null;
     this.wasd           = null;
@@ -2447,6 +2462,8 @@ class WorldScene extends Phaser.Scene {
     this.dungeonTiles   = null;
     this.dungeonSize    = 0;
     this.dungeonSprites = {};   // key: "x,y" → Phaser.Image
+    this.dungeonSenseList = [];      // [{x,y,tier}] aktive Dungeon-Eingänge (Server)
+    this._sensedDungeonKeys = new Set();  // bereits "gespürte" (für einmaligen Toast)
     // Welle 34: Hotbar — 9 Slots mit item_id-Refs (localStorage-persistiert)
     this.hotbar         = this._loadHotbar();
     this.activeHotbar   = -1;
@@ -3200,6 +3217,12 @@ class WorldScene extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
     });
     this.cursors = this.input.keyboard.createCursorKeys();
+    // Sprint-Taste (SHIFT links): +50% Tempo, verbraucht Ausdauer/s (siehe update()).
+    this.sprintKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SHIFT);
+    this.sprintActive = false;   // aktuell gesendeter Sprint-Zustand
+    // Klick/Tap weckt aus dem Bett-Schlaf (Bewegung wird in update() abgefangen).
+    this.input.on('pointerdown', () => { if (this.resting) this._wake(); });
 
     // Build-Mode-Toggle (deaktiviert wenn Dialog offen)
     this.input.keyboard.on('keydown-B', () => { if (!this.activeDialog) this.toggleBuildMode(); });
@@ -3264,6 +3287,7 @@ class WorldScene extends Phaser.Scene {
       else if (e.key === 'Escape' && this.questsOpen) this.toggleQuests();
       else if (e.key === 'Escape' && this.talentsOpen) this.toggleTalents();
       else if (e.key === 'Escape' && this.factionsOpen) this.toggleFactions();
+      else if (e.key === 'Escape' && this.bestiaryOpen) this.toggleBestiary();
       else if (e.key === 'Escape' && this.attributesOpen) this.toggleAttributes();
       else if (e.key === 'Escape' && this.inventoryOpen) this.toggleInventory();
       else if (e.key.toLowerCase() === 'i' && this.inventoryOpen) this.toggleInventory();
@@ -3300,6 +3324,8 @@ class WorldScene extends Phaser.Scene {
     document.getElementById('quests-close').addEventListener('click', () => this.toggleQuests());
     document.getElementById('talents-close').addEventListener('click', () => this.toggleTalents());
     document.getElementById('factions-close').addEventListener('click', () => this.toggleFactions());
+    document.getElementById('bestiary-close').addEventListener('click', () => this.toggleBestiary());
+    document.getElementById('bestiary-search').addEventListener('input', (e) => this.renderBestiaryGrid(e.target.value));
     document.getElementById('attributes-close').addEventListener('click', () => this.toggleAttributes());
     // Welle 25: Spellbook-Close + Tab-Switch
     const sbClose = document.getElementById('spellbook-close');
@@ -3565,7 +3591,7 @@ class WorldScene extends Phaser.Scene {
     // Nicht im Build-Mode: zuerst Item-Pickup prüfen
     const itemSprite = this._findGroundItemAt(tx, ty);
     if (itemSprite) {
-      const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
+      const dist = Math.max(Math.abs(tx - this.myTileX), Math.abs(ty - this.myTileY));
       if (dist <= 1) {
         this.ws.send(JSON.stringify({ type: 'pick_item', item_id: itemSprite._itemId }));
       } else {
@@ -3579,7 +3605,7 @@ class WorldScene extends Phaser.Scene {
     if (npc) {
       const kind = npc.npc.kind;
       const isCreature = CREATURE_KINDS.has(kind);
-      const dist = Math.abs(npc.tileX - this.myTileX) + Math.abs(npc.tileY - this.myTileY);
+      const dist = Math.max(Math.abs(npc.tileX - this.myTileX), Math.abs(npc.tileY - this.myTileY));
       if (isCreature) {
         // Welle 33: Waffen-Range nutzen
         const reach = this.currentWeaponRange();
@@ -3602,7 +3628,7 @@ class WorldScene extends Phaser.Scene {
     // Klick auf Struktur (Bed/Well/Chest/Workbench/etc.) → Interaktion
     const s = this.structures[`${tx},${ty}`];
     if (s) {
-      const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
+      const dist = Math.max(Math.abs(tx - this.myTileX), Math.abs(ty - this.myTileY));
       // Welle 25: HP-System Click-Routing.
       // - Wenn Hammer equipped UND Struktur beschädigt → repair
       // - Wenn Combat-Struktur ohne Use-Effekt → attack (Range via Waffe)
@@ -3656,7 +3682,7 @@ class WorldScene extends Phaser.Scene {
     // Welle 17: Click auf Wasser-Tile in Reichweite → trinken
     const tileId = this.tileAt(tx, ty);
     if (tileId === 0 /* WATER */) {
-      const dist = Math.abs(tx - this.myTileX) + Math.abs(ty - this.myTileY);
+      const dist = Math.max(Math.abs(tx - this.myTileX), Math.abs(ty - this.myTileY));
       if (dist <= 1) {
         this.ws.send(JSON.stringify({ type: 'drink_water_tile', x: tx, y: ty }));
       } else {
@@ -4000,7 +4026,7 @@ class WorldScene extends Phaser.Scene {
       if (!CREATURE_KINDS.has(entry.npc.kind)) continue;
       const dx = entry.tileX - this.myTileX;
       const dy = entry.tileY - this.myTileY;
-      const dist = Math.abs(dx) + Math.abs(dy);
+      const dist = Math.max(Math.abs(dx), Math.abs(dy));
       if (dist > range) continue;
       if (dist < bestDist) { best = entry.npc; bestDist = dist; }
     }
@@ -4954,6 +4980,7 @@ class WorldScene extends Phaser.Scene {
           this.chunks[`${c.cx},${c.cy}`] = c.tiles;
         }
         this.drawWorld();
+        this.dungeonSenseList = msg.dungeons || [];   // Dungeon-Ortung (Spür-Radius)
         this.drawMinimap();
         // Strukturen aus Init laden — Floor und Object getrennt
         this.structures = {};
@@ -5392,6 +5419,24 @@ class WorldScene extends Phaser.Scene {
 
       case 'weather':
         this.setWeather(msg.phase, msg.intensity);
+        break;
+
+      // — Dungeon-Ortung: aktive Eingänge (Client gated im Spür-Radius) ——————
+      case 'dungeon_sense':
+        this.dungeonSenseList = msg.dungeons || [];
+        this.drawMinimap();
+        break;
+
+      // — Ausdauer: Schlafen & Sprint —————————————————————————————————————
+      case 'rest_start':
+        this._beginRest();
+        break;
+      case 'rest_end':
+        this._endRest();
+        break;
+      case 'sprint_state':
+        // Server erzwingt Sprint-Aus (z.B. Ausdauer leer).
+        if (msg.on === false) this.sprintActive = false;
         break;
 
       case 'inventory_add': {
@@ -7162,6 +7207,95 @@ class WorldScene extends Phaser.Scene {
     }
   }
 
+  // Welle 33b: Bestiarium — Monster-Kompendium aus dem generated_longlist-Manifest.
+  toggleBestiary() {
+    if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
+    this.bestiaryOpen = !this.bestiaryOpen;
+    const ov = document.getElementById('bestiary-overlay');
+    if (this.bestiaryOpen) {
+      ov.classList.add('active');
+      this.input.keyboard.enabled = false;
+      this.input.keyboard.clearCaptures();
+      this.loadBestiaryData().then(() => this.renderBestiaryGrid(''));
+    } else {
+      ov.classList.remove('active');
+      this.input.keyboard.enabled = true;
+    }
+  }
+
+  async loadBestiaryData() {
+    if (this.bestiaryData) return;  // einmal laden + cachen
+    try {
+      const res = await fetch('/assets/monsters/generated_longlist/manifest.json');
+      const mf = await res.json();
+      const out = [];
+      for (const sec of (mf.sections || [])) {
+        for (const a of (sec.assets || [])) {
+          const cols = (a.source_columns || [])
+            .map(c => (c || '').trim())
+            .filter(c => c && c !== '?' && c !== '—' && c !== '-');
+          out.push({
+            slug: a.slug,
+            name: a.name || a.slug,
+            tier: a.tier || '?',
+            section: sec.section_title || '',
+            cell: '/' + (a.cell_file || '').replace(/^\//, ''),
+            cols,
+          });
+        }
+      }
+      this.bestiaryData = out;
+    } catch (e) {
+      this.bestiaryData = [];
+      console.warn('Bestiarium-Manifest laden fehlgeschlagen', e);
+    }
+  }
+
+  renderBestiaryGrid(filter) {
+    const grid = document.getElementById('bestiary-grid');
+    if (!grid) return;
+    const q = (filter || '').toLowerCase().trim();
+    grid.innerHTML = '';
+    const data = (this.bestiaryData || []).filter(e =>
+      !q || e.name.toLowerCase().includes(q) || e.section.toLowerCase().includes(q)
+        || e.slug.toLowerCase().includes(q));
+    if (data.length === 0) {
+      grid.innerHTML = '<div style="padding:14px;color:#807060">Keine Treffer.</div>';
+      return;
+    }
+    for (const e of data) {
+      const card = document.createElement('div');
+      card.className = 'bestiary-card';
+      const img = document.createElement('img');
+      img.src = e.cell; img.loading = 'lazy'; img.alt = e.name;
+      card.appendChild(img);
+      const nm = document.createElement('div');
+      nm.className = 'bestiary-card-name';
+      nm.textContent = e.name;
+      card.appendChild(nm);
+      const tb = document.createElement('div');
+      tb.className = 'bestiary-card-tier';
+      tb.textContent = 'T' + e.tier;
+      card.appendChild(tb);
+      card.addEventListener('click', () => this.showBestiaryDetail(e));
+      grid.appendChild(card);
+    }
+    // Erstes Monster direkt im Detail zeigen
+    if (!this._bestiaryDetailShown) { this.showBestiaryDetail(data[0]); this._bestiaryDetailShown = true; }
+  }
+
+  showBestiaryDetail(e) {
+    const d = document.getElementById('bestiary-detail');
+    if (!d || !e) return;
+    const lines = e.cols.map(c => `<div class="bd-line">${c.replace(/</g,'&lt;')}</div>`).join('');
+    d.innerHTML =
+      `<img class="bd-portrait" src="${e.cell}" alt="${e.name}">` +
+      `<div class="bd-name">${e.name}</div>` +
+      `<div class="bd-meta"><span class="bd-tier">Tier ${e.tier}</span>` +
+      `<span class="bd-section">${e.section}</span></div>` +
+      `<div class="bd-desc">${lines}</div>`;
+  }
+
   toggleTalents() {
     if (this.activeDialog || this.activeChest || this.activeCrafting || this.activeTrade) return;
     this.talentsOpen = !this.talentsOpen;
@@ -7929,6 +8063,46 @@ class WorldScene extends Phaser.Scene {
     this.biomeAmbientId = null;
   }
 
+  // — Ausdauer: Sprint + Bett-Schlaf ————————————————————————————————————————
+  _sendSprint(on) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ type: 'sprint', on: !!on }));
+    }
+  }
+
+  _beginRest() {
+    this.resting = true;
+    if (this.sprintActive) { this.sprintActive = false; this._sendSprint(false); }
+    let ov = document.getElementById('rest-overlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'rest-overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:500;display:flex;'
+        + 'align-items:center;justify-content:center;text-align:center;'
+        + 'background:rgba(0,0,10,0.6);backdrop-filter:blur(2px);'
+        + 'pointer-events:none;color:#cfe0ff;font-size:22px;letter-spacing:1px;'
+        + 'text-shadow:0 2px 8px #000;';
+      ov.innerHTML = '<div>😴 Du ruhst dich aus…<br>'
+        + '<span style="font-size:14px;opacity:0.75">Bewegung oder Klick zum Aufwachen</span></div>';
+      document.body.appendChild(ov);
+    }
+    ov.style.display = 'flex';
+  }
+
+  _endRest() {
+    this.resting = false;
+    const ov = document.getElementById('rest-overlay');
+    if (ov) ov.style.display = 'none';
+  }
+
+  _wake() {
+    if (!this.resting) return;
+    this._endRest();
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ type: 'wake' }));
+    }
+  }
+
   toggleInventory() {
     if (this.activeDialog) return;
     this.inventoryOpen = !this.inventoryOpen;
@@ -8293,9 +8467,11 @@ class WorldScene extends Phaser.Scene {
     const cx = npc.x * TILE_SIZE + TILE_SIZE / 2;
     const cy = npc.y * TILE_SIZE + TILE_SIZE / 2;
 
-    // Welle 25: Display-Scale für Boss/Pack-Leader/Trash — nur Creatures.
+    // Display-Scale aus Backend (Proportions-System 2026-05-29): gilt für ALLE
+    // Lebewesen (Tiere/Friendly/Monster), Mensch=1.0. Boss/Rudelführer sind
+    // bereits eingerechnet. Frühere Beschränkung auf Creatures entfernt.
     const isCreature = CREATURE_KINDS.has(npc.kind);
-    const scale = (isCreature && npc.display_scale) ? npc.display_scale : 1.0;
+    const scale = npc.display_scale || 1.0;
 
     const shadow = this.add.image(0, 14, 'fx_shadow')
       .setOrigin(0.5)
@@ -8339,6 +8515,7 @@ class WorldScene extends Phaser.Scene {
       speech: null,    // ephemeral speech bubble (created on demand)
       tween: null,
       tileX: npc.x, tileY: npc.y,
+      scale,           // Proportions-Faktor (für _updateWalkFrame-Resize)
       npc,  // raw data für späteren Dialog-Kontext
     };
     this.refreshNPCMood(npc.id);
@@ -9034,6 +9211,60 @@ class WorldScene extends Phaser.Scene {
       }
     }
 
+    // Dungeon-Ortung: aktive Eingänge nur im Spür-Radius (~70 Tiles) zeigen.
+    // Innerhalb der Minimap-Sicht → violetter Marker, außerhalb → Randpfeil.
+    if (this.dungeonSenseList && this.dungeonSenseList.length > 0) {
+      const SENSE_RADIUS = 70;
+      const now = Date.now();
+      const pulse = (Math.sin(now / 250) + 1) / 2;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      const dColor = '#c060ff';   // violett — klar abgesetzt von Quest/Event
+      for (const d of this.dungeonSenseList) {
+        const cheby = Math.max(Math.abs(d.x - this.myTileX),
+                               Math.abs(d.y - this.myTileY));
+        if (cheby > SENSE_RADIUS) continue;
+        // Einmaliger "gespürt"-Hinweis pro Eingang.
+        const key = `${d.x},${d.y}`;
+        if (!this._sensedDungeonKeys.has(key)) {
+          this._sensedDungeonKeys.add(key);
+          this.showEvent('🏚️ Du spürst ein Verlies in der Nähe…');
+        }
+        const px = (d.x - ox) * scaleX;
+        const py = (d.y - oy) * scaleY;
+        const inView = px >= 0 && px < canvas.width && py >= 0 && py < canvas.height;
+        if (inView) {
+          const r = 4 + pulse * 2;
+          ctx.fillStyle = dColor;
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#1a0030';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else {
+          // Randpfeil Richtung Eingang
+          const dx = px - cx, dy = py - cy;
+          const len = Math.hypot(dx, dy) || 1;
+          const ex = cx + (dx / len) * (Math.min(cx, cy) - 5);
+          const ey = cy + (dy / len) * (Math.min(cx, cy) - 5);
+          ctx.save();
+          ctx.translate(ex, ey);
+          ctx.rotate(Math.atan2(dy, dx));
+          ctx.fillStyle = dColor;
+          ctx.beginPath();
+          ctx.moveTo(7, 0);
+          ctx.lineTo(-4, -5);
+          ctx.lineTo(-4, 5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#1a0030';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+
     // Eigener Spieler: zentral
     ctx.fillStyle = '#000';
     ctx.fillRect(canvas.width / 2 - 2, canvas.height / 2 - 2, 5, 5);
@@ -9133,7 +9364,8 @@ class WorldScene extends Phaser.Scene {
         : `${prefix}_walk_${idleDir}_1`;
       if (this.textures.exists(key)) {
         entry.body.setTexture(key);
-        entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+        const _sc = entry.scale || 1;
+        entry.body.setDisplaySize(TILE_SIZE * 0.95 * _sc, TILE_SIZE * 0.95 * _sc);
       }
       return;
     }
@@ -9177,7 +9409,8 @@ class WorldScene extends Phaser.Scene {
     if (this.textures.exists(key)) {
       entry.body.setTexture(key);
       entry.body.flipX = flipX;
-      entry.body.setDisplaySize(TILE_SIZE * 0.95, TILE_SIZE * 0.95);
+      const _sc = entry.scale || 1;
+      entry.body.setDisplaySize(TILE_SIZE * 0.95 * _sc, TILE_SIZE * 0.95 * _sc);
     }
   }
 
@@ -9490,16 +9723,34 @@ class WorldScene extends Phaser.Scene {
       vx = window.touchInput.x;
       vy = window.touchInput.y;
     }
-    if (vx === 0 && vy === 0) return;
+    // Bett-Schlaf: Bewegungs-Input weckt auf, ansonsten keine Bewegung.
+    if (this.resting) {
+      if (vx !== 0 || vy !== 0) this._wake();
+      return;
+    }
+    if (vx === 0 && vy === 0) {
+      // Stehen geblieben → Sprint beenden.
+      if (this.sprintActive) { this.sprintActive = false; this._sendSprint(false); }
+      return;
+    }
 
     // Magnitude clampen auf 1 (Keyboard diagonal & Touch-Joystick beides korrekt)
     const _mag = Math.sqrt(vx * vx + vy * vy);
     if (_mag > 1) { vx /= _mag; vy /= _mag; }
 
+    // Sprint (SHIFT gehalten + Ausdauer vorhanden): +50% Tempo, Verbrauch im
+    // Backend (run_stamina). Zustandswechsel an den Server melden.
+    const wantSprint = this.sprintKey.isDown && (this.myStamina || 0) > 0;
+    if (wantSprint !== this.sprintActive) {
+      this.sprintActive = wantSprint;
+      this._sendSprint(wantSprint);
+    }
+    const curSpeed = this.moveSpeed * (wantSprint ? this.sprintMult : 1);
+
     // Delta clampen gegen Lag-Spikes (max 100ms pro Frame)
     const dt = Math.min(0.1, (delta || 16) / 1000);
-    const dpx = vx * this.moveSpeed * dt;
-    const dpy = vy * this.moveSpeed * dt;
+    const dpx = vx * curSpeed * dt;
+    const dpy = vy * curSpeed * dt;
 
     // Achsen-separate Kollision: erlaubt Sliding an Wänden
     if (dpx !== 0) {
@@ -10260,6 +10511,7 @@ function setupTouchControls() {
     { label: '⭐', method: 'toggleTalents',   title: 'Talente',     primary: false },
     { label: '⚖️', method: 'toggleFactions',  title: 'Faktionen',   primary: false },
     { label: '📋', method: 'toggleAttributes',title: 'Attribute',   primary: false },
+    { label: '📖', method: 'toggleBestiary',  title: 'Bestiarium',  primary: false },
   ];
   BUTTONS.forEach((b) => {
     const btn = document.createElement('div');
