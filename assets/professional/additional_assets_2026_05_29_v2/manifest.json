@@ -1,0 +1,550 @@
+{
+  "generated": "2026-05-29",
+  "source_request": "zusätzlcihe_assets.md",
+  "style_reference": [
+    "assets/structures/farm/barn_large.png",
+    "assets/props/settlement/signs/trade/blacksmith_sign.png"
+  ],
+  "items": [
+    {
+      "id": "mage_guild",
+      "kind": "guild_building",
+      "game_path": "assets/structures/guilds/mage_guild.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/mage_guild.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/mage_guild.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/mage_guild.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/mage_guild.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19e6aecb508191b09d92b11b4b39ab.png"
+    },
+    {
+      "id": "fighters_guild",
+      "kind": "guild_building",
+      "game_path": "assets/structures/guilds/fighters_guild.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/fighters_guild.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/fighters_guild.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/fighters_guild.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/fighters_guild.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19e6f02d188191a0a487813a0215dd.png"
+    },
+    {
+      "id": "healers_guild",
+      "kind": "guild_building",
+      "game_path": "assets/structures/guilds/healers_guild.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/healers_guild.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/healers_guild.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/healers_guild.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/healers_guild.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19e76bca888191951b10768ccbb32e.png"
+    },
+    {
+      "id": "thieves_guild",
+      "kind": "guild_building",
+      "game_path": "assets/structures/guilds/thieves_guild.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/thieves_guild.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/thieves_guild.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/thieves_guild.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/thieves_guild.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19e7f4082081919b1a8ece24edf66e.png"
+    },
+    {
+      "id": "temple",
+      "kind": "guild_building",
+      "game_path": "assets/structures/guilds/temple.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/temple.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/temple.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/temple.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/temple.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19e84232a08191bf55ea0a4af5aeb3.png"
+    },
+    {
+      "id": "quest_board",
+      "kind": "structure_prop",
+      "game_path": "assets/structures/quest_board.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/quest_board.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/quest_board.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/quest_board.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/quest_board.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19e93031848191a83c8fac24297fe1.png"
+    },
+    {
+      "id": "fire_tile",
+      "kind": "effect_tile",
+      "game_path": "assets/tiles/effects/fire_tile.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/masters_512/fire_tile.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/icons_256/fire_tile.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/icons_128/fire_tile.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/icons_64/fire_tile.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19ec3e40e48191a0b5d533ab7bbc05.png"
+    },
+    {
+      "id": "research_tome",
+      "kind": "lore_item_icon",
+      "game_path": "assets/items/lore/research_tome.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/lore_items/masters_512/research_tome.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_256/research_tome.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_tome.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_64/research_tome.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19eccd842c8191a0e94e27a071243e.png"
+    },
+    {
+      "id": "research_scroll",
+      "kind": "lore_item_icon",
+      "game_path": "assets/items/lore/research_scroll.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/lore_items/masters_512/research_scroll.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_256/research_scroll.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_scroll.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_64/research_scroll.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19ed2127488191a255bbd5112cfe1c.png"
+    },
+    {
+      "id": "dungeon_map",
+      "kind": "lore_item_icon",
+      "game_path": "assets/items/lore/dungeon_map.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/lore_items/masters_512/dungeon_map.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_256/dungeon_map.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/dungeon_map.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_64/dungeon_map.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19ed8aca8481919497a4948aa62332.png"
+    },
+    {
+      "id": "kings_seal",
+      "kind": "lore_item_icon",
+      "game_path": "assets/items/lore/kings_seal.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/lore_items/masters_512/kings_seal.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_256/kings_seal.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/kings_seal.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_64/kings_seal.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19edd78d8481919ba274b522b33667.png"
+    },
+    {
+      "id": "rift_lore",
+      "kind": "lore_item_icon",
+      "game_path": "assets/items/lore/rift_lore.png",
+      "files": {
+        "512": "assets/professional/additional_assets_2026_05_29_v2/lore_items/masters_512/rift_lore.png",
+        "256": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_256/rift_lore.png",
+        "128": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/rift_lore.png",
+        "64": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_64/rift_lore.png"
+      },
+      "source": "/home/sascha/.codex/generated_images/019e72c3-61c8-74c3-be1d-0b7f9e9bb3bd/ig_0a124e54a60b1825016a19ee27f8848191861029e478d4afb4.png"
+    },
+    {
+      "id": "sign_schmiede",
+      "slug": "schmiede",
+      "emblem": "Hammer over anvil",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/schmiede_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/schmiede_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/schmiede_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/schmiede_sign.png"
+      }
+    },
+    {
+      "id": "sign_gasthaus",
+      "slug": "gasthaus",
+      "emblem": "foaming mug and bed",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/gasthaus_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/gasthaus_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/gasthaus_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/gasthaus_sign.png"
+      }
+    },
+    {
+      "id": "sign_wohnhaus",
+      "slug": "wohnhaus",
+      "emblem": "simple house with chimney",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/wohnhaus_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/wohnhaus_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/wohnhaus_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/wohnhaus_sign.png"
+      }
+    },
+    {
+      "id": "sign_baeckerei",
+      "slug": "baeckerei",
+      "emblem": "bread loaf or pretzel",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/baeckerei_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/baeckerei_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/baeckerei_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/baeckerei_sign.png"
+      }
+    },
+    {
+      "id": "sign_marktstand",
+      "slug": "marktstand",
+      "emblem": "market awning and scales",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/marktstand_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/marktstand_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/marktstand_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/marktstand_sign.png"
+      }
+    },
+    {
+      "id": "sign_lagerhaus",
+      "slug": "lagerhaus",
+      "emblem": "stacked crates and barrel",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/lagerhaus_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/lagerhaus_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/lagerhaus_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/lagerhaus_sign.png"
+      }
+    },
+    {
+      "id": "sign_apotheke_heiler",
+      "slug": "apotheke_heiler",
+      "emblem": "mortar and green vial",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/apotheke_heiler_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/apotheke_heiler_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/apotheke_heiler_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/apotheke_heiler_sign.png"
+      }
+    },
+    {
+      "id": "sign_stall",
+      "slug": "stall",
+      "emblem": "horseshoe and horse head",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/stall_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/stall_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/stall_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/stall_sign.png"
+      }
+    },
+    {
+      "id": "sign_wache",
+      "slug": "wache",
+      "emblem": "shield and spear",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/wache_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/wache_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/wache_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/wache_sign.png"
+      }
+    },
+    {
+      "id": "sign_kaserne",
+      "slug": "kaserne",
+      "emblem": "crossed swords and helmet",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/kaserne_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/kaserne_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/kaserne_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/kaserne_sign.png"
+      }
+    },
+    {
+      "id": "sign_rathaus",
+      "slug": "rathaus",
+      "emblem": "bell and sealed scroll",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/rathaus_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/rathaus_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/rathaus_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/rathaus_sign.png"
+      }
+    },
+    {
+      "id": "sign_bergwerk",
+      "slug": "bergwerk",
+      "emblem": "crossed pickaxes and ore",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/bergwerk_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/bergwerk_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/bergwerk_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/bergwerk_sign.png"
+      }
+    },
+    {
+      "id": "sign_saegewerk",
+      "slug": "saegewerk",
+      "emblem": "saw blade and log",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/saegewerk_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/saegewerk_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/saegewerk_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/saegewerk_sign.png"
+      }
+    },
+    {
+      "id": "sign_holzfaeller",
+      "slug": "holzfaeller",
+      "emblem": "axe in stump",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/holzfaeller_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/holzfaeller_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/holzfaeller_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/holzfaeller_sign.png"
+      }
+    },
+    {
+      "id": "sign_bauernhof",
+      "slug": "bauernhof",
+      "emblem": "wheat sheaf and pitchfork",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/bauernhof_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/bauernhof_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/bauernhof_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/bauernhof_sign.png"
+      }
+    },
+    {
+      "id": "sign_muehle",
+      "slug": "muehle",
+      "emblem": "mill wings and millstone",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/muehle_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/muehle_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/muehle_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/muehle_sign.png"
+      }
+    },
+    {
+      "id": "sign_fischerhuette",
+      "slug": "fischerhuette",
+      "emblem": "fish hook and net",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/fischerhuette_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/fischerhuette_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/fischerhuette_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/fischerhuette_sign.png"
+      }
+    },
+    {
+      "id": "sign_taverne_brauerei",
+      "slug": "taverne_brauerei",
+      "emblem": "barrel hop and mug",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/taverne_brauerei_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/taverne_brauerei_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/taverne_brauerei_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/taverne_brauerei_sign.png"
+      }
+    },
+    {
+      "id": "sign_schneiderei",
+      "slug": "schneiderei",
+      "emblem": "needle thread and scissors",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/schneiderei_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/schneiderei_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/schneiderei_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/schneiderei_sign.png"
+      }
+    },
+    {
+      "id": "sign_gerberei",
+      "slug": "gerberei",
+      "emblem": "stretched hide and scraper",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/gerberei_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/gerberei_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/gerberei_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/gerberei_sign.png"
+      }
+    },
+    {
+      "id": "sign_jaegerhuette",
+      "slug": "jaegerhuette",
+      "emblem": "bow and antlers",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/jaegerhuette_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/jaegerhuette_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/jaegerhuette_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/jaegerhuette_sign.png"
+      }
+    },
+    {
+      "id": "sign_alchemie",
+      "slug": "alchemie",
+      "emblem": "bubbling flask and sigil",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/alchemie_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/alchemie_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/alchemie_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/alchemie_sign.png"
+      }
+    },
+    {
+      "id": "sign_magierturm",
+      "slug": "magierturm",
+      "emblem": "pointed tower and arcane star",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/magierturm_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/magierturm_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/magierturm_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/magierturm_sign.png"
+      }
+    },
+    {
+      "id": "sign_kapelle",
+      "slug": "kapelle",
+      "emblem": "small chapel and candle",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/kapelle_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/kapelle_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/kapelle_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/kapelle_sign.png"
+      }
+    },
+    {
+      "id": "sign_friedhof",
+      "slug": "friedhof",
+      "emblem": "gravestone and wilted vine",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/friedhof_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/friedhof_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/friedhof_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/friedhof_sign.png"
+      }
+    },
+    {
+      "id": "sign_bibliothek",
+      "slug": "bibliothek",
+      "emblem": "stacked books and quill",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/bibliothek_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/bibliothek_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/bibliothek_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/bibliothek_sign.png"
+      }
+    },
+    {
+      "id": "sign_schule",
+      "slug": "schule",
+      "emblem": "open book and slate",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/schule_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/schule_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/schule_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/schule_sign.png"
+      }
+    },
+    {
+      "id": "sign_goldschmied",
+      "slug": "goldschmied",
+      "emblem": "gold ring gem and tiny anvil",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/goldschmied_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/goldschmied_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/goldschmied_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/goldschmied_sign.png"
+      }
+    },
+    {
+      "id": "sign_waffenladen",
+      "slug": "waffenladen",
+      "emblem": "crossed sword and axe",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/waffenladen_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/waffenladen_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/waffenladen_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/waffenladen_sign.png"
+      }
+    },
+    {
+      "id": "sign_ruestungsschmied",
+      "slug": "ruestungsschmied",
+      "emblem": "breastplate and helmet",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/ruestungsschmied_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/ruestungsschmied_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/ruestungsschmied_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/ruestungsschmied_sign.png"
+      }
+    },
+    {
+      "id": "sign_hafen",
+      "slug": "hafen",
+      "emblem": "anchor and wheel",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/hafen_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/hafen_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/hafen_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/hafen_sign.png"
+      }
+    },
+    {
+      "id": "sign_brunnen",
+      "slug": "brunnen",
+      "emblem": "stone well and bucket",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/brunnen_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/brunnen_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/brunnen_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/brunnen_sign.png"
+      }
+    },
+    {
+      "id": "sign_ritualplatz",
+      "slug": "ritualplatz",
+      "emblem": "rune circle candle dagger",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/ritualplatz_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/ritualplatz_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/ritualplatz_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/ritualplatz_sign.png"
+      }
+    },
+    {
+      "id": "sign_portalraum",
+      "slug": "portalraum",
+      "emblem": "glowing portal arch",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/portalraum_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/portalraum_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/portalraum_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/portalraum_sign.png"
+      }
+    },
+    {
+      "id": "sign_verzauberer",
+      "slug": "verzauberer",
+      "emblem": "glowing rune gem staff",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/verzauberer_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/verzauberer_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/verzauberer_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/verzauberer_sign.png"
+      }
+    },
+    {
+      "id": "sign_drachenstall",
+      "slug": "drachenstall",
+      "emblem": "dragon head egg chain",
+      "files": {
+        "64": "assets/props/settlement/signs/professional/icons_64/drachenstall_sign.png",
+        "128": "assets/props/settlement/signs/professional/icons_128/drachenstall_sign.png",
+        "256": "assets/props/settlement/signs/professional/icons_256/drachenstall_sign.png",
+        "512": "assets/props/settlement/signs/professional/masters_512/drachenstall_sign.png"
+      }
+    }
+  ]
+}
