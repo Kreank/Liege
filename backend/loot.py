@@ -357,3 +357,15 @@ def roll_dungeon_key_drops(npc_kind: str, killer_combat_level: int) -> list[str]
         if chance > 0 and _r.random() < chance:
             out.append(item_kind)
     return out
+
+
+# ── Welle 34: Monster-Longlist-Loot mergen ───────────────────────────────────
+# Tier-skalierte Drop-Tabellen für die 128 generated_longlist-Monster. Münzen
+# fließen via _drop_loot_for_npc in den Geldbeutel; Equipment via Boss/Chests.
+try:
+    import monster_longlist as _ml
+    for _k, _tbl in _ml.LOOT.items():
+        LOOT_TABLE.setdefault(_k, _tbl)
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.loot").exception("monster_longlist loot merge failed")

@@ -1435,6 +1435,17 @@ const CREATURE_KINDS = new Set([
   'magma_shell_devourer','rockshell_colossus',
 ]);
 
+// ─── Welle 34: generated_longlist-Monster registrieren ──────────────────────
+// window.LONGLIST_MONSTERS kommt aus dem defer-geladenen monsters_longlist_data.js
+// (läuft vor app.js). Registriert Sprite-Eintrag + Hostile-Flag pro Kind.
+// Die Texturen ('monster_<kind>') werden in preload() geladen.
+for (const _m of (window.LONGLIST_MONSTERS || [])) {
+  if (!NPC_SPRITE[_m.k]) {
+    NPC_SPRITE[_m.k] = { sprite: 'monster_' + _m.k, tint: 0xffffff, label: _m.n };
+  }
+  CREATURE_KINDS.add(_m.k);
+}
+
 // ─── Walk-Cycle-Animations (Asset-Drop /assets/animations/) ─────────────────
 // NPCs/Monsters in dieser Liste haben in /assets/animations/<characters|monsters>/<kind>/
 // einen vollständigen 10-Frame-Pool (idle_1/2, walk_<down|up|left|right>_1/2).
@@ -2697,7 +2708,8 @@ class WorldScene extends Phaser.Scene {
     }
     this.load.image('prop_lava_rock', '/assets/props/biomes/lava/lava_rock.png');
     // Dungeon-Tiles + Props (für Welle 9b — bereits ladbar)
-    for (const t of ['dungeon_door','dungeon_floor','dungeon_wall','stairs_down']) {
+    for (const t of ['dungeon_door','dungeon_floor','dungeon_wall','stairs_down',
+                     'stairs_up','stairs_spiral','treasure_chest']) {
       this.load.image(`dungeon_${t}`, `/assets/dungeons/${t}.png`);
     }
     for (const p of ['altar','brazier','sarcophagus','treasure_chest','wall_torch']) {
@@ -2760,6 +2772,11 @@ class WorldScene extends Phaser.Scene {
     ];
     for (const m of LEGACY_MONSTERS) {
       this.load.image(`monster_${m}`, `/assets/animations/monsters/${m}/idle_1.png`);
+    }
+    // Welle 34: 133 generated_longlist-Monster — transparente Top-Down-Sprites.
+    for (const m of (window.LONGLIST_MONSTERS || [])) {
+      this.load.image(`monster_${m.k}`,
+        `/assets/monsters/world_sprites/generated_longlist/sprites_128/${m.k}_world_128.png`);
     }
     // Generischer Fallback nur noch falls eine Kreatur weder Pro- noch Legacy-
     // Sprite hat (sollte nicht passieren, aber schützt vor Crashes).

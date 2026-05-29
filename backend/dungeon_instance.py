@@ -390,6 +390,91 @@ async def _broadcast_to_dungeon_floor(connection_manager, dungeon_id: int,
         except Exception: pass
 
 
+# ─── Features (Kisten / Fallen / Decor) + Floor-NPCs ────────────────────────
+# Features werden deterministisch aus dem Floor-Seed neu berechnet (kein Extra-
+# DB-Feld nötig). Trigger-/Öffnungs-Status liegt in-memory (Reset bei Restart ok,
+# Dungeons sind ephemer).
+_floor_feature_cache: dict = {}      # (did, fidx) -> layout-features dict
+_triggered_traps: dict = {}          # (did, fidx) -> set((x,y))
+_opened_chests: dict = {}            # (did, fidx) -> set((x,y))
+
+
+async def floor_features(dungeon_id: int, floor_idx: int) -> dict:
+    """Kisten/Fallen/Decor einer Floor (deterministisch aus Seed reproduziert)."""
+    key = (dungeon_id, floor_idx)
+    if key in _floor_feature_cache:
+        return _floor_feature_cache[key]
+    dungeon = await get_dungeon(dungeon_id)
+    if dungeon is None:
+        return {"theme": "cave", "chests": [], "traps": [], "decor": []}
+    floor_seed = (dungeon["seed"] * 1009 + floor_idx * 31337) & 0x7FFFFFFF
+    size = dungeon_tiers.FLOOR_SIZE.get(dungeon["tier"], 24)
+    is_last = (floor_idx >= dungeon["floor_count"] - 1)
+    layout = dungeon_world.generate(
+        floor_seed, size=size, theme=dungeon["theme"],
+        with_stairs_down=(not is_last),
+    )
+    feats = {
+        "theme":  dungeon["theme"],
+        "chests": layout["chests"],
+        "traps":  layout["traps"],
+        "decor":  layout["decor"],
+    }
+    _floor_feature_cache[key] = feats
+    return feats
+
+
+async def visible_features(dungeon_id: int, floor_idx: int) -> dict:
+    """Features für den Client: Kisten mit opened-Flag, Fallen NUR wenn schon
+    ausgelöst (versteckt bis getriggert), Decor immer."""
+    feats = await floor_features(dungeon_id, floor_idx)
+    key = (dungeon_id, floor_idx)
+    opened = _opened_chests.get(key, set())
+    triggered = _triggered_traps.get(key, set())
+    chests = [{"x": c["x"], "y": c["y"], "opened": (c["x"], c["y"]) in opened}
+              for c in feats["chests"]]
+    traps = [{"x": t["x"], "y": t["y"], "kind": t["kind"]}
+             for t in feats["traps"] if (t["x"], t["y"]) in triggered]
+    return {"theme": feats["theme"], "chests": chests,
+            "traps": traps, "decor": feats["decor"]}
+
+
+async def trap_at(dungeon_id: int, floor_idx: int, x: int, y: int) -> str | None:
+    """Gibt die Fallen-Art an (x,y) zurück, falls dort eine noch nicht
+    ausgelöste Falle liegt — sonst None."""
+    feats = await floor_features(dungeon_id, floor_idx)
+    key = (dungeon_id, floor_idx)
+    if (x, y) in _triggered_traps.get(key, set()):
+        return None
+    for t in feats["traps"]:
+        if t["x"] == x and t["y"] == y:
+            return t["kind"]
+    return None
+
+
+def mark_trap_triggered(dungeon_id: int, floor_idx: int, x: int, y: int) -> None:
+    _triggered_traps.setdefault((dungeon_id, floor_idx), set()).add((x, y))
+
+
+async def chest_at(dungeon_id: int, floor_idx: int, x: int, y: int) -> bool:
+    """True wenn an (x,y) eine noch nicht geöffnete Kiste liegt."""
+    feats = await floor_features(dungeon_id, floor_idx)
+    key = (dungeon_id, floor_idx)
+    if (x, y) in _opened_chests.get(key, set()):
+        return False
+    return any(c["x"] == x and c["y"] == y for c in feats["chests"])
+
+
+def mark_chest_opened(dungeon_id: int, floor_idx: int, x: int, y: int) -> None:
+    _opened_chests.setdefault((dungeon_id, floor_idx), set()).add((x, y))
+
+
+def npcs_in_world(npc_manager, world_id: str) -> list[dict]:
+    """Alle (lebenden) NPCs in einer Welt — zum Senden beim Floor-Betreten."""
+    return [n for n in npc_manager.all()
+            if (n.get("world_id") or "overworld") == world_id]
+
+
 async def list_active_dungeons() -> list[dict]:
     """Aktuell aktive Dungeons (für Welt-Marker etc.)."""
     rows = await db.pool().fetch(

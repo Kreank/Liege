@@ -1049,3 +1049,22 @@ async def wander_loop(world, npc_manager, connection_manager,
             raise
         except Exception:
             log.exception("NPC-Wander-Iteration fehlgeschlagen")
+
+
+# ── Welle 34: Monster-Longlist mergen ────────────────────────────────────────
+# Neue Kinds in Spawn-/Boss-Listen + Profile einspeisen. Sektion 11/12
+# (Disaster/Lore) landen in CAMP_ONLY_KINDS → kein Wild-Respawn (event-only).
+try:
+    import monster_longlist as _ml
+    for _k in _ml.KINDS:
+        if _k not in CREATURE_KINDS:
+            CREATURE_KINDS.append(_k)
+    for _k in _ml.BOSS_KINDS:
+        if _k not in BOSS_KINDS:
+            BOSS_KINDS.append(_k)
+    CREATURE_SPAWN_PROFILE.update(_ml.SPAWN_PROFILE)
+    CAMP_ONLY_KINDS.update(_ml.NO_WILD)
+    NPC_KINDS = FRIENDLY_KINDS + CREATURE_KINDS
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.npc_worker").exception("monster_longlist merge failed")

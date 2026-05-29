@@ -722,3 +722,18 @@ def npc_display_scale(kind: str) -> float:
     elif kind in _PACK_LEADER_KINDS:
         base *= _PACK_LEADER_SCALE_MULT
     return round(min(base, _SCALE_CAP), 3)
+
+
+# ── Welle 34: Monster-Longlist mergen ────────────────────────────────────────
+# 128 generated_longlist-Monster (Sektionen 1-12) ins Combat-System einspeisen.
+# In-place-Updates, damit alle `combat.X`-Attribut-Zugriffe die neuen Kinds sehen.
+try:
+    import monster_longlist as _ml
+    CREATURE_DAMAGE.update(_ml.DAMAGE)
+    NPC_HP_BY_KIND.update(_ml.HP)
+    _NPC_STAT_OVERRIDES.update(_ml.STAT_OVERRIDES)
+    _BOSS_KINDS.update(_ml.BOSS_KINDS)
+    CREATURE_KINDS.update(_ml.DAMAGE.keys())
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.combat").exception("monster_longlist merge failed")

@@ -31,29 +31,31 @@ LIFETIME_S = {
 }
 
 FLOOR_COUNT = {
-    TIER_SMALL:  (1, 2),
-    TIER_MEDIUM: (3, 4),
-    TIER_LARGE:  (5, 7),
-    TIER_RAID20: (8, 10),
-    TIER_RAID40: (12, 15),
+    TIER_SMALL:  (2, 3),
+    TIER_MEDIUM: (4, 6),
+    TIER_LARGE:  (7, 10),
+    TIER_RAID20: (10, 14),
+    TIER_RAID40: (14, 18),
 }
 
-# Floor-Map-Edge-Size pro Tier — höhere Tiers haben größere Maps
+# Floor-Map-Edge-Size pro Tier (Überarbeitung 2026-05-29: VIEL größer — die
+# alten 24-56 waren in <1 min durch. Frontend rendert Dungeon-Tiles jetzt mit
+# Viewport-Culling, daher sind große Maps performant.)
 FLOOR_SIZE = {
-    TIER_SMALL:  24,
-    TIER_MEDIUM: 32,
-    TIER_LARGE:  40,
-    TIER_RAID20: 48,
-    TIER_RAID40: 56,
+    TIER_SMALL:  46,
+    TIER_MEDIUM: 64,
+    TIER_LARGE:  88,
+    TIER_RAID20: 120,
+    TIER_RAID40: 160,
 }
 
-# Mob-Anzahl pro Floor — skaliert mit Tier
+# Mob-Anzahl pro Floor — skaliert mit (größerer) Map-Fläche
 MOBS_PER_FLOOR = {
-    TIER_SMALL:  (4, 7),
-    TIER_MEDIUM: (8, 12),
-    TIER_LARGE:  (12, 18),
-    TIER_RAID20: (16, 24),
-    TIER_RAID40: (22, 32),
+    TIER_SMALL:  (10, 16),
+    TIER_MEDIUM: (18, 30),
+    TIER_LARGE:  (32, 50),
+    TIER_RAID20: (50, 75),
+    TIER_RAID40: (80, 120),
 }
 
 # Boss-Anzahl auf letzter Floor (min 1, sonst nicht garantiert)
