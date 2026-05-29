@@ -497,9 +497,10 @@ const SIGN_VARIANTS = [
   ['taverne_brauerei', 'Taverne / Brauerei','🍻'],
   ['schneiderei',      'Schneiderei',       '🧵'],
   ['gerberei',         'Gerberei',          '🦌'],
-  ['jaegerhuette',     'Jägerhütte',        '🏹'],
-  ['alchemie',         'Alchemie',          '⚗️'],
-  ['magierturm',       'Magierturm',        '🪄'],
+  // Welle 34b — vorübergehend raus: Emblem off-pattern, Asset-Rework folgt.
+  // ['jaegerhuette',     'Jägerhütte',        '🏹'],
+  // ['alchemie',         'Alchemie',          '⚗️'],
+  // ['magierturm',       'Magierturm',        '🪄'],
   ['kapelle',          'Kapelle',           '⛪'],
   ['friedhof',         'Friedhof',          '🪦'],
   ['bibliothek',       'Bibliothek',        '📚'],
@@ -511,7 +512,8 @@ const SIGN_VARIANTS = [
   ['brunnen',          'Brunnen-Schild',    '⛲'],
   ['ritualplatz',      'Ritualplatz',       '🌀'],
   ['portalraum',       'Portalraum',        '🌌'],
-  ['verzauberer',      'Verzauberer',       '✨'],
+  // Welle 34b — vorübergehend raus (Emblem off-pattern):
+  // ['verzauberer',      'Verzauberer',       '✨'],
   ['drachenstall',     'Drachenstall',      '🐉'],
 ];
 
@@ -559,9 +561,9 @@ const BUILD_CATEGORIES = [
                 'sign_schneiderei','sign_gerberei','sign_baeckerei','sign_apotheke_heiler'] },
       { id: 'sign_resource',    icon: '🏭', label: 'Rohstoffe',
         types: ['sign_bergwerk','sign_holzfaeller','sign_saegewerk','sign_bauernhof',
-                'sign_muehle','sign_fischerhuette','sign_jaegerhuette','sign_stall'] },
+                'sign_muehle','sign_fischerhuette','sign_stall'] },
       { id: 'sign_magic',       icon: '🔮', label: 'Magie',
-        types: ['sign_magierturm','sign_alchemie','sign_verzauberer','sign_ritualplatz','sign_portalraum'] },
+        types: ['sign_ritualplatz','sign_portalraum'] },
       { id: 'sign_religion',    icon: '⛪', label: 'Religion',
         types: ['sign_kapelle','sign_friedhof'] },
       { id: 'sign_residential', icon: '🏠', label: 'Wohnen',
@@ -3613,9 +3615,18 @@ class WorldScene extends Phaser.Scene {
       return;
     }
 
-    // Dungeon-Modus: eigene Klick-Logik (Mob angreifen / Kiste öffnen).
+    // Dungeon-Modus: eigene Klick-Logik (Item / Mob angreifen / Kiste öffnen).
     // Overworld-Struktur/Wasser-Branches werden übersprungen (gleiche Koords!).
     if (this.inDungeon) {
+      // Boden-Item aufheben (war vorher nicht möglich — Handler kehrte ohne
+      // Pickup-Prüfung zurück).
+      const dItem = this._findGroundItemAt(tx, ty);
+      if (dItem) {
+        const dist = Math.max(Math.abs(tx - this.myTileX), Math.abs(ty - this.myTileY));
+        if (dist <= 1) this.ws.send(JSON.stringify({ type: 'pick_item', item_id: dItem._itemId }));
+        else this.showEvent('🤚 Zu weit weg zum Aufheben');
+        return;
+      }
       const dnpc = this.findNPCAt(tx, ty);
       if (dnpc && CREATURE_KINDS.has(dnpc.npc.kind)) {
         const reach = this.currentWeaponRange();
@@ -9660,6 +9671,10 @@ class WorldScene extends Phaser.Scene {
 
   // Wandkollision per Achse — erlaubt slide-along-wall
   _canMoveTo(px, py) {
+    // Escape-Ventil: steckt der Spieler GERADE in einem blockierenden Tile
+    // (z.B. wurde ein Fels nachträglich auf sein Tile gespawnt, weil die Welt
+    // langsam generierte), Kollision aussetzen damit er sich herausbewegen kann.
+    if (this._isStuck()) return true;
     // 4 Ecken der Hitbox prüfen
     const h = this.collisionHalf;
     const corners = [
@@ -9672,6 +9687,12 @@ class WorldScene extends Phaser.Scene {
       if (!this.isWalkable(tx, ty)) return false;
     }
     return true;
+  }
+
+  _isStuck() {
+    const tx = Math.floor(this.myPx / TILE_SIZE);
+    const ty = Math.floor(this.myPy / TILE_SIZE);
+    return !this.isWalkable(tx, ty);
   }
 
   spawnOther(id, tileX, tileY) {

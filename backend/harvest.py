@@ -89,7 +89,7 @@ YIELD_PER_HIT = {
     # Erze hier NICHT als Default — kommen via BONUS_YIELDS_BY_BIOME /
     # MOUNTAIN_ADJACENT_BONUS, sodass Mithril & Co. nur in passenden Gebieten
     # auftauchen und nicht irgendwo auf der Wiese.
-    "rock_small":    [("stone", 1, 2, 100)],
+    "rock_small":    [("stone", 2, 3, 100)],   # ergiebiger — Stein soll leicht zu kriegen sein
     # rock_large = ERZ-Felsen: mehr Stein + alle vorhandenen Roh-Erze (Eisen
     # häufig, Silber/Gold seltener, Kristall/Mithril selten). Biome-/Berg-Boni
     # kommen zusätzlich obendrauf. 5 Schläge (DURABILITY).

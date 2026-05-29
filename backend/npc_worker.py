@@ -656,76 +656,68 @@ async def respawn_loop(world, npc_manager, connection_manager,
                             await connection_manager.broadcast(
                                 {"type": "npc_died", "npc_id": n["id"], "recycled": True})
                             recycled += 1
+            import region_difficulty, combat as _cmb, db
             creatures = [n for n in npc_manager.all() if n["kind"] in CREATURE_KINDS]
             deficit = MIN_CREATURE_COUNT - len(creatures)
             if deficit <= 0:
                 continue
-            # Welle 23: Quest-Aware-Bias — kinds aus aktiven kill-Quests
-            # bekommen 70% Priorität. So muss Spieler nicht weit reisen für
-            # seltene Mobs.
-            kind = None
+            # Quest-Ziel-Kinds (70% Bias falls sie ins gewählte Biome passen).
+            quest_kinds: list[str] = []
             try:
-                import db
-                if random.random() < 0.70:
-                    quest_kinds = await db.pool().fetch(
-                        "SELECT DISTINCT objective->>'creature_kind' AS k FROM quests "
-                        "WHERE status = 'active' AND quest_type = 'kill' "
-                        "AND objective->>'creature_kind' IS NOT NULL"
-                    )
-                    eligible = [r["k"] for r in quest_kinds
-                                if r["k"] in wild_kinds]
-                    if eligible:
-                        kind = random.choice(eligible)
-                        log.info("Respawn-Bias: %s (Quest-Ziel)", kind)
+                rows = await db.pool().fetch(
+                    "SELECT DISTINCT objective->>'creature_kind' AS k FROM quests "
+                    "WHERE status = 'active' AND quest_type = 'kill' "
+                    "AND objective->>'creature_kind' IS NOT NULL")
+                quest_kinds = [r["k"] for r in rows if r["k"] in wild_kinds]
             except Exception:
                 pass
-            if kind is None:
-                kind = random.choice(wild_kinds)
-            profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
-            group_min, group_max = profile["group"]
-            group_size = min(random.randint(group_min, group_max), deficit)
-            biomes = profile["biomes"]
-            pos = await _find_spawn_position(
-                world, connection_manager, biomes=biomes, strict=True,
-                structure_manager=structure_manager, npc_manager=npc_manager,
-            )
-            if pos is None:
-                log.info("Gruppen-Respawn-Skip: kein passendes Biome für %s", kind)
-                continue
-            cx, cy = pos
-            # Welle 23-D/E: Region-Tier + Density-Check
-            try:
-                import region_difficulty, combat as _cmb
-                tier_max = await region_difficulty.effective_tier_max(cx, cy)
-                density  = region_difficulty.density_for_distance(cx, cy)
-                kind_tier = _cmb.creature_stats(kind).get("tier", 2)
-                # Kind zu stark für diese Region? → re-roll lighter kind, sonst skip
-                if kind_tier > tier_max:
-                    lighter = [k for k in wild_kinds
-                               if _cmb.creature_stats(k).get("tier", 2) <= tier_max
-                               and (CREATURE_SPAWN_PROFILE.get(k, {}).get("biomes")
-                                    is None or biomes is None
-                                    or CREATURE_SPAWN_PROFILE[k]["biomes"] & (biomes or set()))]
-                    if not lighter:
-                        log.info("Region-Skip: %s (tier %d) > tier_max %d @(%d,%d)",
-                                 kind, kind_tier, tier_max, cx, cy)
-                        continue
-                    kind = random.choice(lighter)
-                    profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
-                    group_min, group_max = profile["group"]
-                    group_size = min(random.randint(group_min, group_max), deficit)
-                # Density-Check: Würfel gegen Density-Multiplier
-                if density <= 0.0 or random.random() > density:
-                    log.info("Density-Skip @(%d,%d) density=%.2f", cx, cy, density)
+
+            # NEU 2026-05-29: erst POSITION (nah am Spieler, biome-agnostisch),
+            # dann ein zum Biome passendes Kind wählen → kein Skip wegen Biome-
+            # Mismatch mehr. Mehrere Gruppen pro Tick bis Defizit gedeckt ist.
+            GROUPS_PER_TICK = 4
+            for _grp in range(GROUPS_PER_TICK):
+                if deficit <= 0:
+                    break
+                pos = await _find_spawn_position(
+                    world, connection_manager, biomes=None, strict=False,
+                    structure_manager=structure_manager, npc_manager=npc_manager,
+                )
+                if pos is None:
+                    break
+                cx, cy = pos
+                try:
+                    biome = await world.tile_at(cx, cy)
+                    tier_max = await region_difficulty.effective_tier_max(cx, cy)
+                    density  = region_difficulty.density_for_distance(cx, cy)
+                except Exception:
+                    biome, tier_max, density = None, 4, 1.0
+                if density <= 0.0:
+                    continue   # Safe-Zone nahe Spawn — andere Position versuchen
+                # Kandidaten: Kind passt ins Biome dieser Position + Tier ok.
+                def _fits(k):
+                    if _cmb.creature_stats(k).get("tier", 2) > tier_max:
+                        return False
+                    kb = CREATURE_SPAWN_PROFILE.get(k, {}).get("biomes")
+                    return kb is None or (biome is not None and biome in kb)
+                eligible = [k for k in wild_kinds if _fits(k)]
+                if not eligible:
                     continue
-            except Exception:
-                log.exception("Region-Difficulty-Check fehlgeschlagen")
-            log.info("Gruppen-Respawn: %d × %s @(%d,%d) biome=%s (deficit=%d)",
-                     group_size, kind, cx, cy, biomes, deficit)
-            await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(cx, cy))
-            for _ in range(group_size - 1):
-                nx, ny = await _find_nearby_walkable(world, cx, cy, radius=3)
-                await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(nx, ny))
+                qfit = [k for k in quest_kinds if k in eligible]
+                kind = (random.choice(qfit) if (qfit and random.random() < 0.7)
+                        else random.choice(eligible))
+                if random.random() > density:
+                    continue   # Density-Gradient: weiter weg = dichter
+                profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1), "biomes": None})
+                gmin, gmax = profile["group"]
+                group_size = max(1, min(random.randint(gmin, gmax), deficit))
+                await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(cx, cy))
+                for _ in range(group_size - 1):
+                    nx, ny = await _find_nearby_walkable(world, cx, cy, radius=3)
+                    await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(nx, ny))
+                deficit -= group_size
+                log.info("Gruppen-Respawn: %d × %s @(%d,%d) biome=%s (Rest-Defizit=%d)",
+                         group_size, kind, cx, cy, biome, deficit)
         except asyncio.CancelledError:
             log.info("Creature-Respawn-Loop gestoppt")
             raise

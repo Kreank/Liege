@@ -564,6 +564,15 @@ async def populate_chunk_if_needed(world, structure_manager, connection_manager,
         return 0
     chunk = await world.get_chunk(cx, cy)
     placed_list = []
+    # Spieler-Positionen merken — KEINE (blockierenden) Props in Spielernähe
+    # platzieren, sonst landet jemand "im Stein" wenn die Welt langsam generiert.
+    _player_pos = []
+    try:
+        _player_pos = [(p["x"], p["y"]) for p in connection_manager.get_players().values()]
+    except Exception:
+        _player_pos = []
+    def _near_player(wx, wy, r=4):
+        return any(abs(wx - px) <= r and abs(wy - py) <= r for px, py in _player_pos)
 
     # ── Pass A: 0-3 Encounter-Sites pro Chunk ──────────────────────────────
     # Pro Chunk wird gewürfelt wie viele Sites; jeder Site bekommt einen
@@ -584,6 +593,8 @@ async def populate_chunk_if_needed(world, structure_manager, connection_manager,
             if tile in (WATER, MOUNTAIN, LAVA):
                 continue
             if world.is_settlement_area(wx, wy):
+                continue
+            if _near_player(wx, wy, 6):
                 continue
             # Mindestabstand zu bereits platzierten Sites
             if any(abs(wx - ax) < 6 and abs(wy - ay) < 6
@@ -615,6 +626,8 @@ async def populate_chunk_if_needed(world, structure_manager, connection_manager,
                 continue
             if structure_manager.at(wx, wy) is not None:
                 continue
+            if _near_player(wx, wy, 4):
+                continue   # keine Props direkt beim Spieler (Stuck-Vermeidung)
             # Wasser bleibt im alten Scatter (Wracks, Boote, Seerosen)
             if tile == WATER:
                 chosen = _pick_for_water(world, wx, wy)

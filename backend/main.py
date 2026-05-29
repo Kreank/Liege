@@ -1642,6 +1642,21 @@ async def websocket_endpoint(websocket: WebSocket):
                             "kind": _trap, "dmg": _tdmg,
                             "text": _TRAP_LABEL.get(_trap, "💥 Falle ausgelöst!"),
                         })
+                    # Auto-Pickup im Dungeon (analog Overworld) — Loot beim
+                    # Drüberlaufen einsammeln.
+                    for _it in await items.get_at(x, y):
+                        _pk = await items.pickup(_it["id"], player_id)
+                        if _pk is None:
+                            continue
+                        await manager.broadcast({
+                            "type": "item_picked_up", "item_id": _it["id"],
+                            "x": x, "y": y, "by": player_id})
+                        if _pk["id"] != _it["id"]:
+                            await websocket.send_json({
+                                "type": "inventory_update", "item_id": _pk["id"],
+                                "quantity": int(_pk.get("quantity", 1))})
+                        else:
+                            await websocket.send_json({"type": "inventory_add", "item": _pk})
                     # Stairs-Trigger: nur wenn der Spieler GENAU auf das
                     # Treppen-Tile getreten ist (kein endless re-trigger).
                     import dungeon_world as _dw
