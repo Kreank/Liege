@@ -1,5 +1,8 @@
 # Liege — Manuelle Test-Anleitung
 
+> **Stand: 2026-05-30** — deckt Phase 1–4 ab; neuere Systeme noch nicht
+> dokumentiert (siehe Abschnitt "Neuere Systeme (noch zu testen)" am Ende).
+
 Stand: 2026-05-25 (Phase 4b — Items, Combat, erweiterte Welt)
 
 ## Setup
@@ -467,3 +470,29 @@ worlds      (seed PK, width, height, tiles JSONB, created_at)
 players     (name PK, x, y, created_at, last_seen)
 structures  (id PK, x, y, type, owner, created_at, UNIQUE(x, y))
 ```
+
+---
+
+## Neuere Systeme (noch zu testen)
+
+Diese Systeme kamen nach Phase 4 dazu und sind hier noch nicht als volle
+Testmatrix beschrieben — nur als Test-Hinweise:
+
+- **Geldbeutel / Währung**: Münzen aufheben → landen im Wallet (nicht im
+  Beutel). Händler-Preise in G/S/K (Gold/Silber/Kupfer) anzeigen; Kauf/Verkauf
+  zieht/füllt korrekt das Wallet, Umrechnung 100er-Schritte prüfen.
+- **Stamina / Schlaf / Sprint**: Shift gedrückt halten → Sprint, Stamina sinkt.
+  Bett anklicken → schlafen, regeneriert. Bauen bei niedriger Versorgung
+  (Stamina/Hunger?) → eingeschränkt/blockiert prüfen.
+- **Bestiarium-Panel**: Öffnen, entdeckte Monster erscheinen mit Infos;
+  unentdeckte verborgen/grau.
+- **133-Monster-Spawn nach Biome**: In verschiedenen Biomen laufen → passende
+  Monster spawnen (Wüste/Schnee/Sumpf/Dschungel etc. je eigene Arten), insgesamt
+  bis zu 133 verschiedene Typen.
+- **Multi-Floor-Dungeon-Navigation**: Treppe nach unten → echte begehbare
+  Dungeon-Map. Treppen rauf/runter zwischen Etagen, Reaper-Despawn (Verfolger
+  verschwindet bei Etagenwechsel / nach Bedingung) prüfen.
+- **Gruppen / Raids**: Gruppe bilden, gemeinsam Loot → Need/Greed-Würfeln auf
+  Drops. `/raidstart` startet ein Raid-Event. Loot-Verteilung an Gruppenmitglieder.
+- **Quest-Rewards**: Quest abschließen → Item-Belohnung landet im Inventar,
+  Münz-/Währungsbelohnung im Wallet.

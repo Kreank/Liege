@@ -1,5 +1,27 @@
 # Liege Village Layout Spec
 
+> **Status (2026-05-30):** Teilweise umgesetzt — bezieht sich auf
+> `backend/village_spawner.py` (Welle 24).
+>
+> **Live im Code (Section 5, Schritte 1-5):**
+> - `SETTLEMENT_STRUCT_TYPES`-Whitelist + `_cleanup_footprint` (Deko-Räumung
+>   vor dem Bau, inkl. 1-Tile-Clearance) ✓
+> - Reihenfolge in `_place_house`: Cleanup → Türposition → Wände → Tür als
+>   echte `door_<kind>`-Struktur → Boden auf allen Innen-Tiles → Tür-Vor-Zone
+>   (innen) als `occupied` reserviert → Möbel ✓
+> - `_door_kind_for` (door_wood/iron/stone je Haustyp), `_floor_material` ✓
+> - Tür bevorzugt Süd (Gewicht 55/15/15/15), Eck-Tiles nie Tür ✓
+>
+> **Noch offen (Backlog):**
+> - `_validate_house` + Rollback (Section 3) — nicht implementiert.
+> - Pfade zwischen Tür und Brunnen (Section 2.7, `_carve_path`) — fehlt;
+>   town/capital bekommen nur Brunnen, keine Pfade.
+> - Layout-Padding: Code nutzt noch `+2 +1` (1 Tile Gasse), Spec will `+2 +2`.
+> - Boden-unter-Möbel: Code **entfernt** den Boden vor Möbel-Placement
+>   (`_try_place`), die Spec bevorzugt Boden behalten + Möbel als Overlay.
+> - Eigene äußere Tür-Vor-Tile-Clearance-Garantie (2.6) ist nicht als eigener
+>   Schritt vorhanden, hängt am allgemeinen Cleanup. Status unklar, im Code prüfen.
+
 Konkrete Design-Regeln für `backend/village_spawner.py`, abgeleitet aus
 Recherche (Minecraft, RimWorld, prozedurale Room-Gen) und den bekannten
 Bugs (offene Wände, Möbel vor Wand, keine Türen, Deko blockt Eingang,

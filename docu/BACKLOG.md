@@ -1,6 +1,51 @@
 # Liege — Feature-Backlog
 
-Stand: 2026-05-25 (nach Sub-Wellen 1-13)
+Stand: 2026-05-30 (aktuell Welle 34b). Die Wellen-Logs 1–31 darunter sind das
+historische Archiv; die jüngsten Wellen stehen direkt hier oben.
+
+## ✅ Welle 32–34b (2026-05-28 … 2026-05-30)
+
+### Welle 32 — Group/Raid, Multi-Floor-Dungeons, Stamina, Resource-Gen
+- Group/Raid komplett: XP-Share (+20%), manueller Raid-Trigger `/raidstart`,
+  Wealth-Raids gruppenweit, Group-Chat, Loot-Roll Need/Greed/Pass
+- Multi-Floor-Dungeons mit 5-Tier-System (Lifetime/Floors/Map-Size/Mobs/Bosse
+  gestaffelt), lazy Floor-Gen + Mob-Population, Reaper (Vorwarnung + Despawn),
+  Auto-Spawn-Worker, tier-aware Loot, Key-Items (dungeon_map/rift_lore/kings_seal)
+- Stamina verkabelt (Potions, 2H-Waffen-Kosten, passiver Regen)
+- Resource-Gen-Fix (Bäume/Felsen sparse pro Biome), `/repopulate`
+- 46-Kind NPC-Walk-Pack, drei Crash-Fixes (attack_structure, respawn_worker, init)
+
+### Welle 33 — Geldbeutel-Währung + Bugfixes
+- **Dungeon-Eintritt-Fix:** `stairs_down` war combat- statt use-geroutet
+- **Quest-Reward-Fix:** doppelt-JSON-encoded Reward → `_maybe_parse` in `turn_in`
+- **Geldbeutel-Währung** (`currency.py`): Kupfer/Silber/Gold (100 K = 1 S,
+  100 S = 1 G), `players.wallet_copper`. Münzen sind keine Items mehr — alle
+  Quellen schreiben ins Guthaben; `gold_ore` ist wieder ein normales Erz.
+  HUD-Anzeige + Migration bestehender Münzen.
+
+### Welle 33b — Bestiarium
+- Monster-Kompendium-Overlay (📖), liest das generated_longlist-Manifest live
+  (Portrait-Grid + Detail mit Tier/Biome/Mechanik)
+
+### Welle 34 — 133-Monster-Longlist on-map + World-Reset
+- `monster_longlist.py`: 128 Combat-Kinds aus Manifest, Stats/Spawn/Loot/Boss
+  daten-getrieben aus Tier+Größe+Biome abgeleitet, in combat/npc_worker/loot
+  gemerged (→ 199 Creature-Kinds, ~35 Bosse). Transparente Top-Down-Sprites.
+- Stamina/Schlaf/Sprint-Overhaul (`needs.py`: Sprint, Bett-Schlaf, Bau-Kosten)
+- Welt + Charaktere komplett resettet (Accounts erhalten)
+
+### Welle 34b — Bausystem-Assets verdrahtet
+- 5 Gilden + Tempel + quest_board (echte Sprites statt Platzhalter), 36
+  Gewerbe-Schilder, 5 dedizierte Lore-Item-Icons. 4 off-pattern Schilder
+  (magierturm/alchemie/jaegerhuette/verzauberer) temporär ausgeblendet bis Re-Art.
+
+### Großbaustellen (offen)
+- **Tod-Strafe** — ohne Penalty ist die Tier-Mob-Skalierung Theater (Form offen)
+- **Quest-Board** persistent: Spieler-Quest-Submit + Daily-Refresh
+- **Warenwert-Balancing** der Händlerpreise/Drops über die drei Münz-Stufen
+- 4 Gewerbe-Schilder neu generieren (Emblem off-pattern), siehe `docu/ASSETS.md`
+
+---
 
 ## ✅ Sub-Wellen 1-13 (2026-05-25 Session 3)
 

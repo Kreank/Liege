@@ -1,6 +1,6 @@
 # Liege — Welt-Design
 
-Stand: 2026-05-25
+Stand: 2026-05-30
 
 Ziel: Welt, in der unterschiedliche Spielstile koexistieren — Baumeister, Jäger, Quest-Reisende, Schmiede, Sammler — und in der eine KI auf Aktivität reagiert.
 
@@ -29,6 +29,13 @@ Wie etablierte Spiele Welten generieren (aus eigenem Erfahrungswissen, kein Web-
 ## Architektur-Plan
 
 ### Welt-Generierung (chunked, deterministic)
+
+Bestätigter Stand (`world.py`, `time_system.py`, `weather_worker.py`):
+- **10 Biome**: WATER, SAND, GRASS, FOREST, MOUNTAIN, DESERT, JUNGLE, LAVA, SNOW, SWAMP.
+- **32×32-Chunks** (`CHUNK_SIZE = 32`), prozedural + deterministisch aus Seed, in DB gecacht.
+- **Multi-Layer-Noise** (height/moisture/temperature) für Biome-Klassifikation.
+- **Tag/Nacht**: 4 Phasen (morning, day, evening, night), 1 Spieltag = **48 Echtminuten** (0,5 Spielminuten/Sekunde).
+- **Wetter**: clear / rain / snow / fog / swamp_mist mit Intensitäts-Stufen.
 
 Drei Noise-Layer pro Position (x, y):
 - **height** — bestimmt Wasser/Land/Berge
@@ -97,8 +104,48 @@ Die Welt soll mehrere Spielstile bedienen:
 | Sammler | Ressourcen verteilt, respawnable | ✓ Welt-Respawn |
 | Schmied | Schmelze, Amboss, Erz-Quellen, Rezepte | Crafting ✓, Erz-Adern als nächstes |
 | Schreiner | Werkbank, Holz-Quellen, Holz-Rezepte | ✓ |
-| Händler-Reisender | Münzen, Markt, Inventar-Diversität | ✓ Trade-System |
-| Abenteurer | Quests, Dungeons, Boss-Encounter | Quests fehlen, Dungeon-MVP da |
+| Händler-Reisender | Geldbeutel-Währung, Markt, Inventar-Diversität | ✓ Trade-System + Wallet |
+| Abenteurer | Quests, Dungeons, Boss-Encounter | ✓ KI-Quests + Multi-Floor-Dungeons (5 Tiers) |
 | Magier | Spells, Mana, Magic-Items | ✓ funktioniert |
 
-Was fehlt klar: **Quests (vom Slow Brain dynamisch generiert)**, **echte begehbare Dungeons**, **NPC-Dörfer als Hubs**.
+Was als nächstes ausgebaut wird: **NPC-Dörfer als Hubs**, **Quest-Board (Spieler reichen Quests ein/nehmen an)**, **Tod-Strafe**.
+
+## Wirtschaft & Geld
+
+Geld läuft über einen **Geldbeutel** (Wallet), nicht mehr über Inventar-Items.
+
+- Drei Münz-Stufen: **Kupfer, Silber, Gold**. `100 Kupfer = 1 Silber`, `100 Silber = 1 Gold` (= 10.000 Kupfer).
+- Intern wird alles in Kupfer gerechnet und in `players.wallet_copper` gespeichert (`currency.py`).
+- Münzen sind **keine Inventar-Items mehr** — `copper_coin`/`silver_coin`/`gold_coin` existieren nicht im Inventar. `gold_ore` ist wieder ein normales, verkaufbares Erz.
+- Geld-Quellen: Monster-Loot, Funde am Boden, Quest-Rewards, Truhen, Verkauf beim Händler.
+
+## Monster & Drops
+
+- ~133 Monster über alle Tiers **1–5**, on-map platziert.
+- Daten-getrieben aus einem Manifest (`monster_longlist.py`) — kein Code pro Monster.
+- **Spawn nach Biome** (passende Kreaturen je Umgebung).
+- **Loot tier-skaliert**: höhere Tiers droppen wertvolleres/höherwertiges Loot.
+- **Bestiarium-UI** als Kompendium: gesehene Monster werden gesammelt und einsehbar.
+
+## Dungeon-Struktur
+
+Begehbare **Multi-Floor-Instanzen** mit **5 Tiers** (`dungeon_tiers.py`):
+
+| Tier | Größe | Lifetime | Zugang |
+|------|-------|----------|--------|
+| 1 Small | klein | 2–4 h | offen |
+| 2 Medium | mittel | 16–24 h | offen |
+| 3 Large | groß | 24–48 h | Key-Item `dungeon_map` (Quest-Reward) |
+| 4 Raid20 | Raid | 3–5 Tage | Key-Item `rift_lore` (Boss-Loot/Event) |
+| 5 Raid40 | Großraid | 4–7 Tage | Key-Item `kings_seal` (selten) |
+
+- **Auto-Spawn pro Floor**: Mobs werden je Etage automatisch gesetzt, Boss garantiert auf der letzten Floor.
+- **Tier-skalierte Loot-Qualität** und Mob-Härte (Mob-Tier-Multiplikator steigt pro Tier).
+- **Reaper** räumt abgelaufene Instanzen auf, sobald die Lifetime überschritten ist.
+- **Key-Items** (`dungeon_map`/`rift_lore`/`kings_seal`) schalten die höheren Tiers (3–5) frei.
+
+## NPC-Identitäten & KI-Quests
+
+- NPCs erhalten **LLM-generierte Persönlichkeiten und Backstory** (via Ollama).
+- Zwei Brains (`llm.py`): **FAST-Brain `qwen3.5:0.8b`** für Dialoge (schnell), **SLOW-Brain `qwen3.5:9b`** für Quests/Events (CPU, sensiblere Generation).
+- **Quests**: Narrative/Texte werden per LLM erzeugt, die **Mechanik bleibt deterministisch** (klare Bedingungen, Rewards, Fortschritt).

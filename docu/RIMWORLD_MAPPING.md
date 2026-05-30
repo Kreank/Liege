@@ -1,101 +1,127 @@
 # RimWorld → Liege: Mechanik-Mapping
 
-Stand: 2026-05-25
+Stand: 2026-05-30
 
-Ziel: RimWorld-Mechaniken übernehmen, an Online-Multiplayer mit einzeln-gespielten Charakteren anpassen, dabei nicht über-engineering.
+Ziel: RimWorld-Mechaniken übernehmen, an Online-Multiplayer mit einzeln-gespielten Charakteren anpassen, dabei nicht über-engineeren.
 
-## Direkt übernehmbar (Tier 1 — fokus)
+Hinweis: Dieses Dokument war lange ungepflegt. Vieles, was hier früher als "Vorschlag/geplant" stand, ist längst implementiert. Status jetzt sauber getrennt in **✅ Erledigt**, **🔶 Teilweise/Backlog** und **⏭️ Bewusst übersprungen**.
 
-### 1. Skill-System
-RimWorld hat ~13 Skills pro Pawn (Construction, Mining, Cooking, Crafting, Melee, Shooting, ...).
-- Wir: ähnliches Set pro Spieler. Vorschlag:
-  - **Mining** (Felsen/Erze)
-  - **Woodcutting** (Bäume)
-  - **Construction** (Bauen)
-  - **Crafting** (Werkbank/Schmelze/Amboss)
-  - **Combat** (Melee + Range, evtl. split)
-  - **Magic** (Spells)
-  - **Cooking** (später wenn Food-System)
-  - **Medicine** (später wenn Heal-System komplexer)
-- Skill-Level 0–20 (RimWorld-Standard)
-- XP-Gain bei jeder Aktion (Holz hacken = Woodcutting-XP)
-- Höheres Level = schneller, mehr Output, höhere Qualität
+---
 
-### 2. Item-Quality (5 Stufen statt RimWorld-7)
+## ✅ Erledigt
+
+### 1. Skill-System (RimWorld: ~13 Skills, Level 0–20)
+Umgesetzt mit **11 Skills**: mining, woodcutting, gathering, construction, crafting, combat, magic, cooking, medical, farming, social.
+- Level 0–20 (RimWorld-Standard), **non-lineare XP-Kurve** (höhere Level kosten überproportional mehr).
+- XP bei jeder passenden Aktion (Holz hacken = woodcutting-XP usw.).
+- Höheres Level = schneller, mehr Output, höhere Qualität.
+- Combat/Magic als eigene Skills statt RimWorlds Melee/Shooting-Split.
+- Backend: `skills.py`
+
+### 2. Attribute (RimWorld-Stats, neu strukturiert)
+**12 Attribute** (deutsch): Stärke, Ausdauer, Energie, Intelligenz, Weisheit, Ausweichen, Geschick, Verteidigung, Charisma, Krit-Rate, Krit-Schaden, Schleichen.
+- Geht über RimWorlds reine Stat-Modifier hinaus, RPG-typisches Attributmodell.
+- Backend: `attributes.py`
+
+### 3. Talent-System (über RimWorld hinaus)
+**46 Talent-Nodes**, Baumstruktur mit **3 Tiers pro Skill**. Freischaltung über Skill-Progression.
+- RimWorld kennt keine Talentbäume — bewusste RPG-Erweiterung.
+- Backend: `talents.py`
+
+### 4. Item-Quality (5 Stufen statt RimWorld-7)
 RimWorld: awful/poor/normal/good/excellent/masterwork/legendary.
-Wir vereinfacht: **roh / normal / fein / meisterhaft / legendär**.
-- Hängt vom Skill des Crafters ab (Random-Roll mit Skill als Bias)
-- Stats-Boost: Schwert-fein = +20% Damage, masterwork = +50%
-- UI: Item-Name mit Qualitäts-Präfix (z.B. "✨ Meisterhaftes Eisenschwert")
+Wir: **roh / normal / fein / meisterhaft / legendär**.
+- Hängt vom Skill des Crafters ab (Random-Roll mit Skill als Bias).
+- Stats-Boost je Stufe (z.B. Schwert fein +20% Damage, meisterhaft +50%).
+- UI: Item-Name mit Qualitäts-Präfix (z.B. "✨ Meisterhaftes Eisenschwert").
 
-### 3. Hunger / Energy
-RimWorld: Food, Rest, Mood als Need-Bars.
-- Wir: **Hunger** + **Stamina** pro Spieler
-- Hunger sinkt langsam; bei 0 nimmt HP ab
-- Stamina sinkt bei Aktionen, regeneriert beim Stehen
-- Essen restored Hunger (food-items aus crafting/loot/farming)
-- Schlafen (Bett-Interaktion) restored Stamina
+### 5. Bedürfnisse (RimWorld: Food/Rest als Need-Bars)
+Umgesetzt: **Hunger + Durst + Stamina/Schlaf**.
+- Hunger & Durst sinken langsam; bei 0 nimmt HP ab.
+- **Stamina-System**: Sprint kostet 8 Stamina/s (via Shift), Bau-Aktion kostet 6 Stamina.
+- **Bett-Schlaf**: +8 Stamina/s und +4 HP/s.
+- Essen/Trinken restoren Hunger/Durst (Food-Items aus Crafting/Loot/Farming).
+- Backend: `needs.py`
 
-### 4. KI-Storyteller-Modi
-RimWorld: Cassandra (escalating), Phoebe (chill), Randy (chaos).
-- Wir: Slow Brain bekommt einen Modus-Hint im Prompt
-- 3 Modi: "balanced", "chill", "chaos"
-- Modus beeinflusst Event-Frequenz, Creature-Spawn-Härte, etc.
-- Globale Setting in env oder ein Admin-Befehl
+### 6. KI-Storyteller-Modi (Cassandra/Phoebe/Randy)
+Storyteller-Modi + KI-getriebene Events sind live.
+- Modus beeinflusst Event-Frequenz, Spawn-Härte etc.
+- Slow Brain / LLM erzeugt Narrative; Mechanik bleibt server-deterministisch.
+- Backend: `storyteller.py`, `event_worker.py`
 
-## Anpassbar mit Aufwand (Tier 2)
+### 7. Crafting-Bills (Queue statt Single-Click)
+RimWorld: Werkbank mit Bill-Liste ("mach 5 Schwerter dann stop").
+Umgesetzt: **4 Stationen** (hand / workbench / furnace / anvil) mit **Bills/Queue**.
+- Worker checkt Material und arbeitet die Queue sequenziell ab.
+- Backend: `recipes.py`, `bill_queue.py`
 
-### 5. Body-Parts-Health (komplexer Combat)
-RimWorld: jeder Pawn hat Körperteile mit eigenen HP. Bein verletzt → langsam, Arm verletzt → schlechtere Accuracy.
-- Wir: vereinfacht 3 Slots: **Beine** (Move-Speed), **Arme** (Combat-Damage), **Rumpf** (Max-HP-Reduktion)
-- Schaden zu Beinen reduziert Bewegungs-Cooldown nicht (kompliziert), aber Damage zu armen verringert eigenen Damage
-- Heilung durch Heiltrank repariert alle Wunden
+### 8. Body-Parts-Health
+RimWorld: Körperteile mit eigenen HP.
+Umgesetzt: **3 Slots — Beine / Arme / Torso** (Move-Speed, Combat-Damage, Max-HP).
+- Heilung repariert Wunden.
 
-### 6. Crafting-Bills (Queue statt Single-Click)
-RimWorld: Werkbank hat Liste von Bills ("mach 5 Schwerter dann stop").
-- Wir: aktuell pro Klick ein Recipe. Erweitert: Queue (z.B. 10× Schwert → Server craftet parallel je nach Material).
-- Implement: queue-Tabelle, Worker checkt + reduziert Materials sequenziell
+### 9. Factions / Reputation
+Fraktionen mit Reputationssystem umgesetzt (RimWorld: Faction-Goodwill).
 
-### 7. Mood + Mental Breaks
-RimWorld: low mood → mental break.
-- Wir: nicht direkt für Spieler (kein Soft-Lock-Risiko), aber für **NPCs**:
-  - NPC-Mood basierend auf "wie viele Spieler-Tötungen erlebt", "wurde getroffen?", "isst gut?"
-  - Mental break: NPCs flüchten, weinen, randomieren ziellos
+### 10. Research-Tree / Tech-Progression
+RimWorld: mehrstufige Forschung schaltet Recipes frei.
+Umgesetzt: **70 Research-Nodes**, **5 Tech-Ages × 8 Branches**.
+- Forschungspunkte kommen aus **Skill-Levelups**.
+- Backend: `research.py`
 
-## Groß (Tier 3 — eigene Wellen)
+### 11. Raids / Gruppenspiel (eskalierende Raids)
+RimWorld: periodische Raids, Schwere skaliert mit Colony-Wealth.
+Umgesetzt als Multiplayer-Gruppensystem:
+- **Party (5) / Raid20 / Raid40**.
+- **Loot-Regeln**: ffa und need_greed; **XP-Share** in der Gruppe.
+- Raids server-getrieben über Director.
+- Backend: `groups.py`, `raid_director.py`
 
-### 8. Research-Tree / Tech-Progression
-Mehrstufige Forschung schaltet bessere Recipes frei.
-- Welt-Wide oder Pro-Player? Beides denkbar.
-- UI: Tree-View, XP-Stunden in Research zu investieren.
+---
 
-### 9. World-Map / Travel
-RimWorld: Hex-Welt mit Settlements und Caravans.
-- Bei uns: aktuell ist die Welt selbst die Map. Würde "Welt-Welt-Map" bedeuten — Multi-World wie Dungeon-Layer.
-- Erstmal weglassen.
+## Neu seit Projektstart (kein direktes RimWorld-Äquivalent, ✅ erledigt)
 
-### 10. Raids (Eskalierend)
-RimWorld: periodische Raid-Attacks, Schwere steigt mit Colony-Wealth.
-- Wir: ähnlich, aber **Spieler-spezifisch**. Wenn ein Spieler viel gebaut hat, kommen Raids zu seiner Base.
-- Slow Brain triggert das.
+### 12. Währung / Geldbeutel
+**Kupfer / Silber / Gold** (100 Kupfer = 1 Silber, 100 Silber = 1 Gold), `wallet_copper` am Spieler.
+- Backend: `currency.py`
 
-## Was wir NICHT übernehmen (out-of-scope)
+### 13. Multi-Floor-Dungeons
+**5-Tier-System** mit mehreren Floors, **Reaper**, **Auto-Spawn** und **tier-skaliertem Loot**.
+- Eigene instanzierte Layer (vgl. RimWorld Ancient Danger / Quest-Sites, aber als echte Dungeons).
+- Backend: `dungeon_director.py`, `dungeon_instance.py`, `dungeon_tiers.py`, `dungeon_themes.py`, `dungeon_world.py`, `dungeons.py`
 
-- **Pawn-Recruitment** (wir haben einen Charakter pro Spieler, keine Crew)
-- **Beziehungen zwischen mehreren eigenen Pawns** (n/a)
-- **Power-Grid** (Strom-Verteilung — zu komplex für MVP)
-- **Temperature-System** als Game-Mechanik (kalt → Frostbrand etc. — zu fummelig)
-- **Animals tame / Schlachten** (späteres Update vielleicht)
-- **Drugs** (suchterzeugende Tränke — nicht im Stil)
+### 14. Monster-Longlist
+**133-Monster-Longlist** on-map, daten-getrieben aus Manifest, plus **Bestiarium-UI**.
+- Backend: `monster_longlist.py`
 
-## Reihenfolge-Vorschlag
+### 15. Quests
+**KI-generiert**: Narrative via LLM, Mechanik server-deterministisch.
 
-1. **Skill-System + XP** (mittel-groß, gibt Spielern Progression)
-2. **Item-Quality** (mittel, nutzt Skill als Bias)
-3. **Hunger + Stamina** (mittel, gibt Survival-Element)
-4. **KI-Storyteller-Modi** (klein, env-config)
-5. **Body-Parts** (mittel)
-6. **Crafting-Bills** (mittel)
-7. **NPC-Mood / Mental-Breaks** (mittel)
-8. **Research-Tree** (groß)
-9. **Raid-Mechanik** (groß)
+---
+
+## 🔶 Teilweise / Backlog
+
+### Mood + Mental Breaks (RimWorld: low mood → mental break)
+- Für Spieler bewusst **nicht** (kein Soft-Lock-Risiko).
+- Für **NPCs** angedacht: Mood aus erlebten Tötungen / Treffern / Versorgung, Mental Break = Flucht/ziellos.
+- Noch offen / Backlog.
+
+### Tod-Strafe (Death Penalty)
+- Geplant, Form noch offen. Ohne Penalty ist die hohe Mob-Skalierung Theater.
+- Backlog.
+
+### Persistentes Quest-Board
+- Über die KI-Quests hinaus: persistente Struktur, Spieler reichen Quests ein + nehmen an.
+- Kommt nach dem Capital-Feature.
+
+---
+
+## ⏭️ Bewusst übersprungen (out-of-scope)
+
+- **Pawn-Recruitment** — ein Charakter pro Spieler, keine Crew.
+- **Beziehungen zwischen mehreren eigenen Pawns** — n/a beim Single-Char-Modell.
+- **Power-Grid** (Strom-Verteilung) — zu komplex.
+- **Temperature-System** als Game-Mechanik (Frostbrand etc.) — zu fummelig.
+- **World-Map / Caravans** — die Welt selbst ist die Map; Multi-World nur als Dungeon-Layer realisiert.
+- **Animals tame / Schlachten** — evtl. späteres Update.
+- **Drugs** (suchterzeugende Tränke) — passt nicht zum Stil.
