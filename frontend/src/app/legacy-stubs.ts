@@ -13,10 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: HUD (hp/mana/needs/coords/conn-status) — Legacy `updateUI`,
-  //          `updateHpBar`, `updateNeedsBar`, `updateConnStatus` (Z. ~3500-4000).
-  'hud',
-
   // TODO F5+: Hotbar (Welle 34 — 9 Slots, item_id-Refs, localStorage).
   //          Legacy `_loadHotbar`, `refreshHotbar`, `activateHotbarSlot`.
   'hotbar',

@@ -1,0 +1,29 @@
+@if (visible()) {
+  <div class="hud-coords">
+    <span>🗡️ {{ coords() }}</span>
+  </div>
+  <div class="hud-status" [attr.data-status]="connStatus().kind">
+    <span>⚡ {{ connStatus().label }}</span>
+  </div>
+
+  <div class="hud-bar hud-bar--hp">
+    <div class="hud-bar__fill" [style.width.%]="hp().pct"></div>
+    <div class="hud-bar__text">{{ hp().label }}</div>
+  </div>
+  <div class="hud-bar hud-bar--mana">
+    <div class="hud-bar__fill" [style.width.%]="mana().pct"></div>
+    <div class="hud-bar__text">{{ mana().label }}</div>
+  </div>
+  <div class="hud-bar hud-bar--hunger">
+    <div class="hud-bar__fill" [style.width.%]="hunger().pct"></div>
+    <div class="hud-bar__text">{{ hunger().label }}</div>
+  </div>
+  <div class="hud-bar hud-bar--thirst">
+    <div class="hud-bar__fill" [style.width.%]="thirst().pct"></div>
+    <div class="hud-bar__text">{{ thirst().label }}</div>
+  </div>
+  <div class="hud-bar hud-bar--stamina">
+    <div class="hud-bar__fill" [style.width.%]="stamina().pct"></div>
+    <div class="hud-bar__text">{{ stamina().label }}</div>
+  </div>
+}

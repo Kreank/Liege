@@ -1,12 +1,6 @@
 import { Routes } from '@angular/router';
 
-// F4: Phaser-Renderer als Default-Route — die Welt rendert in einen Vollbild-
-// Host. UI-Panels (F5+) werden später als Overlay-Components über den Render
-// gelegt (Routing oder feste Component-Composition in `App`).
-export const routes: Routes = [
-  {
-    path: '',
-    loadComponent: () =>
-      import('./game/phaser-game.component').then((m) => m.PhaserGameComponent),
-  },
-];
+// Ab F5: Die UI ist single-screen (Phaser-Canvas + Overlays direkt in `App`).
+// Routing wird hier leer gelassen, bleibt aber als Hook für spätere Modi
+// (z. B. Login, Charakter-Auswahl, Admin) konfiguriert.
+export const routes: Routes = [];
