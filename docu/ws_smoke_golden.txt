@@ -1,0 +1,77 @@
+# ws_smoke golden output
+# steps=16
+
+=== CONNECT ===
+RECEIVED (1):
+  {"body_parts": {"arms": 100, "legs": 100, "torso": 100}, "chunk_size": 32, "inventory": [], "max_hp": 100, "max_hunger": 100, "max_mana": 50, "max_stamina": 100, "max_thirst": 100, "needs_character_creation": true, "player_id": "smoketest", "power_tier": 1, "preset": null, "spawn": {"x": 32, "y": 68}, "type": "init", "wallet_copper": 0, "world_seed": 20260530}
+
+=== list_attributes ===
+SENT: {"type": "list_attributes"}
+RECEIVED (1):
+  {"labels": {"ausdauer": ["\ud83e\udec1 Ausdauer", "H\u00f6here HP-Cap, weniger Ersch\u00f6pfung"], "ausweichen": ["\ud83d\udca8 Ausweichen", "Chance Angriffe komplett zu negieren"], "charisma": ["\ud83d\udcac Charisma", "Handelspreise, NPC-Mood, Diplomatie"], "energie": ["\u26a1 Energie", "Gr\u00f6\u00dferer Mana-Pool, bessere Spell-Regen"], "geschick": ["\ud83c\udfaf Geschick", "Genauigkeit, Speed, Crafting-Pr\u00e4zision"], "intelligenz": ["\ud83e\udde0 Intelligenz", "St\u00e4rkere Spells, Forschungs-Gates"], "krit_rate": ["\ud83d\udca5 Krit-Rate", "Chance auf kritischen Treffer (%)"], "krit_schaden": ["\u2728 Krit-Schaden", "Multiplier bei kritischen Treffern"], "schleichen": ["\ud83d\udc64 Schleichen", "Reduziert Aggro-Reichweite, Diebe-Skills"], "st\u00e4rke": ["\ud83d\udcaa St\u00e4rke", "Erh\u00f6ht physischen Schaden und Roh-Yield"], "verteidigung": ["\ud83d\udee1\ufe0f Verteidigung", "Schadensreduktion gegen Angriffe"], "weisheit": ["\ud83d\udcd6 Weisheit", "Heilkunst, Status-Resistenz, Lore"]}, "type": "attributes_update", "values": {"ausdauer": 0, "ausweichen": 0, "charisma": 0, "energie": 0, "geschick": 0, "intelligenz": 0, "krit_rate": 0, "krit_schaden": 0, "schleichen": 0, "st\u00e4rke": 0, "verteidigung": 0, "weisheit": 0}}
+
+=== list_talents ===
+SENT: {"type": "list_talents"}
+RECEIVED (1):
+  {"learned": [], "points": 0, "tree": {"combat": [{"desc": "+10% Melee-Damage.", "icon": "\u2694\ufe0f", "name": "Krieger", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "+10% Ranged-Damage und +1 Range.", "icon": "\ud83c\udfaf", "name": "Sch\u00fctze", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Heile 10% deines Schadens als HP.", "icon": "\ud83e\ude78", "name": "Vampirisch", "prereq": "warrior", "skill_min": 8, "status": "locked", "tier": 2}, {"desc": "+15% Crit-Chance.", "icon": "\ud83d\udc80", "name": "T\u00f6dliches Ziel", "prereq": "marksman", "skill_min": 8, "status": "locked", "tier": 2}, {"desc": "Unter 30% HP: +40% Damage.", "icon": "\ud83d\udca2", "name": "Berserker", "prereq": "vampiric", "skill_min": 14, "status": "locked", "tier": 3}, {"desc": "Crit-Damage +30%.", "icon": "\ud83d\udde1\ufe0f", "name": "Henker", "prereq": "deadly_aim", "skill_min": 14, "status": "locked", "tier": 3}], "construction": [{"desc": "+30% Construction-XP.", "icon": "\ud83d\udd28", "name": "Schnellbauer", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "20% Chance Material nicht zu verbrauchen beim Bauen.", "icon": "\ud83d\udcb0", "name": "Sparsam", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Gebaute Strukturen +50% Durability.", "icon": "\ud83d\udee1\ufe0f", "name": "Befestiger", "prereq": "fast_builder", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Strukturen k\u00f6nnen nicht von Standard-Mobs zerst\u00f6rt werden.", "icon": "\ud83c\udfdb\ufe0f", "name": "Meister-Architekt", "prereq": "fortifier", "skill_min": 14, "status": "locked", "tier": 3}], "cooking": [{"desc": "+25% Hunger-Restore von Food.", "icon": "\ud83c\udf73", "name": "K\u00f6stliche Mahlzeiten", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "30% Chance 2 St\u00fcck beim Kochen zu erhalten.", "icon": "\ud83c\udf56", "name": "Doppelte Portion", "prereq": "tasty_meals", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Gekochte Mahlzeiten heilen zus\u00e4tzlich 10 HP.", "icon": "\ud83d\udc68\u200d\ud83c\udf73", "name": "Sterne-Koch", "prereq": "double_portion", "skill_min": 12, "status": "locked", "tier": 3}], "crafting": [{"desc": "+25% Quality-Roll-Chance beim Crafting.", "icon": "\u270b", "name": "Flinke H\u00e4nde", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "15% Chance Material nicht zu verbrauchen beim Craften.", "icon": "\u267b\ufe0f", "name": "Material-\u00d6konomie", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Crafting kann nie schlechter als 'fein' werden.", "icon": "\u2b50", "name": "Perfektionist", "prereq": "quick_hands", "skill_min": 8, "status": "locked", "tier": 2}, {"desc": "+5% Chance auf 'legend\u00e4r' beim Crafting.", "icon": "\ud83d\udc51", "name": "Gro\u00dfmeister", "prereq": "perfectionist", "skill_min": 14, "status": "locked", "tier": 3}], "farming": [{"desc": "Pflanzen wachsen 30% schneller.", "icon": "\ud83c\udf31", "name": "Gr\u00fcner Daumen", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "25% Chance auf doppelte Ernte.", "icon": "\ud83c\udf3e", "name": "Doppel-Ernte", "prereq": "green_thumb", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Felder m\u00fcssen nicht mehr ausges\u00e4t werden \u2014 wachsen automatisch nach.", "icon": "\ud83c\udf3b", "name": "Boden-Meister", "prereq": "double_harvest", "skill_min": 12, "status": "locked", "tier": 3}], "gathering": [{"desc": "+25% Herb-Drop-Chance.", "icon": "\ud83c\udf3f", "name": "Kr\u00e4uterkundig", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "+20% Mushroom-Food-Drops.", "icon": "\ud83c\udf44", "name": "Pilzkenner", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Pflanzen geben +1 Yield.", "icon": "\u270b", "name": "Geschwinde Hand", "prereq": "herbalist", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Doppelte Chance auf Crystal-Drops aus Mushrooms/Flowers.", "icon": "\ud83c\udf38", "name": "Wild-Botaniker", "prereq": "swift_picker", "skill_min": 12, "status": "locked", "tier": 3}], "magic": [{"desc": "+15% Spell-Damage.", "icon": "\u2728", "name": "Arkanist", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "-20% Mana-Kosten.", "icon": "\ud83d\udca7", "name": "Mana-Effizient", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Feuer-Spells verursachen 'burning' f\u00fcr 8s.", "icon": "\ud83d\udd25", "name": "Pyromant", "prereq": "arcanist", "skill_min": 8, "status": "locked", "tier": 2}, {"desc": "+25% Mana-Pool.", "icon": "\ud83c\udf00", "name": "Kanalisierung", "prereq": "mana_efficient", "skill_min": 8, "status": "locked", "tier": 2}, {"desc": "Spells haben +1 AOE-Radius.", "icon": "\ud83d\udd2e", "name": "Erzmagier", "prereq": "pyromancer", "skill_min": 14, "status": "locked", "tier": 3}], "medical": [{"desc": "Heiltr\u00e4nke heilen +25%.", "icon": "\u2764\ufe0f\u200d\ud83e\ude79", "name": "Heiler", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Heiltr\u00e4nke heilen auch Body-Parts +15.", "icon": "\ud83d\udc96", "name": "Verj\u00fcngung", "prereq": "healer", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Beim Heilen 30% Chance auf zus\u00e4tzlichen 'blessed'-Status.", "icon": "\ud83d\ude4f", "name": "Gesegnete H\u00e4nde", "prereq": "rejuvenation", "skill_min": 12, "status": "locked", "tier": 3}], "mining": [{"desc": "Sieht Erzadern besser \u2014 +15% Drop-Chance auf Erze.", "icon": "\ud83d\udc41\ufe0f", "name": "Erzauge", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Zerschl\u00e4gt Stein mit Wucht \u2014 +25% Stone-Yield.", "icon": "\ud83d\udd28", "name": "Steinhauer", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Findet tief verborgene Edelsteine \u2014 +20% Crystal/Gold Chance.", "icon": "\u26cf\ufe0f", "name": "Tiefer Bergmann", "prereq": "ore_eye", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Pro Treffer 1 Extra-Damage am Stein.", "icon": "\ud83d\udcaa", "name": "Effizient", "prereq": "stonebreaker", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Selbst Mythril zeigt sich dir \u2014 5% Chance auf Mythril-Drop.", "icon": "\ud83d\udc8e", "name": "Mythril-Seher", "prereq": "deep_miner", "skill_min": 12, "status": "locked", "tier": 3}], "social": [{"desc": "-15% Kaufpreis bei H\u00e4ndlern.", "icon": "\ud83d\udcac", "name": "Feilscher", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "NPC-Mood +5 beim Dialog.", "icon": "\ud83d\ude0a", "name": "Charmant", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "H\u00e4ndler bieten +20% Verkaufspreis.", "icon": "\ud83d\udcb0", "name": "H\u00e4ndlerfreund", "prereq": "haggler", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Feindliche NPCs greifen 20% seltener an.", "icon": "\ud83d\udd4a\ufe0f", "name": "Diplomat", "prereq": "merchant_friend", "skill_min": 12, "status": "locked", "tier": 3}], "woodcutting": [{"desc": "+25% Wood-Yield aus B\u00e4umen.", "icon": "\ud83e\ude93", "name": "Holzf\u00e4ller", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "Findet Fr\u00fcchte/Mushrooms am Baum \u2014 +20% Chance auf Apple-Drop.", "icon": "\ud83c\udf4e", "name": "Sammler", "prereq": null, "skill_min": 2, "status": "locked", "tier": 1}, {"desc": "+1 Damage pro Treffer auf B\u00e4ume.", "icon": "\u26a1", "name": "Schneller Schlag", "prereq": "lumberjack", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "Findet seltene Drops im Wald \u2014 +10% Chance auf Crystal.", "icon": "\ud83c\udf32", "name": "Waldl\u00e4ufer", "prereq": "forager", "skill_min": 6, "status": "locked", "tier": 2}, {"desc": "B\u00e4ume droppen +1 Wood garantiert.", "icon": "\ud83c\udf33", "name": "Uralter Eiche", "prereq": "fast_chopper", "skill_min": 12, "status": "locked", "tier": 3}]}, "type": "talents_update"}
+
+=== list_bills ===
+SENT: {"type": "list_bills"}
+RECEIVED (1):
+  {"bills": [], "type": "bills_update"}
+
+=== character_check_name ===
+SENT: {"name": "SmokeHero", "type": "character_check_name"}
+RECEIVED (1):
+  {"available": false, "name": "", "reason": "zu kurz (min 3 Zeichen)", "type": "character_name_check"}
+
+=== move_east ===
+SENT: {"type": "move", "x": 61, "y": 40}
+RECEIVED (0):
+
+=== move_back ===
+SENT: {"type": "move", "x": 60, "y": 40}
+RECEIVED (0):
+
+=== open_hand_crafting ===
+SENT: {"type": "open_hand_crafting"}
+RECEIVED (1):
+  {"recipes": [{"category": "weapon", "inputs": [["wood", 3]], "material": "wood", "name": "Holzschwert", "output": "sword"}, {"category": "armor", "inputs": [["wood", 4]], "material": "wood", "name": "Holzschild", "output": "shield"}, {"category": "weapon", "inputs": [["wood", 2]], "material": "wood", "name": "Holzkn\u00fcppel", "output": "mace"}, {"category": "weapon", "inputs": [["wood", 3], ["stone", 1]], "material": "wood", "name": "Holzspeer", "output": "spear"}, {"category": "tool", "inputs": [["wood", 2], ["stone", 1]], "material": "wood", "name": "Holzaxt", "output": "axe"}, {"category": "tool", "inputs": [["wood", 2], ["stone", 2]], "material": "wood", "name": "Holzspitzhacke", "output": "pickaxe"}, {"category": "tool", "inputs": [["wood", 3], ["stone", 1]], "material": "wood", "name": "Holzhammer", "output": "hammer"}, {"category": "tool", "inputs": [["wood", 2], ["stone", 1]], "material": "wood", "name": "Holzsichel", "output": "sickle"}, {"category": "weapon", "inputs": [["wood", 2], ["stone", 3]], "material": "stone", "name": "Steinschwert", "output": "sword"}, {"category": "weapon", "inputs": [["wood", 1], ["stone", 2]], "material": "stone", "name": "Steindolch", "output": "dagger"}, {"category": "weapon", "inputs": [["wood", 2], ["stone", 3]], "material": "stone", "name": "Steinspeer", "output": "spear"}, {"category": "tool", "inputs": [["wood", 2], ["stone", 3]], "material": "stone", "name": "Steinaxt", "output": "axe"}, {"category": "tool", "inputs": [["wood", 2], ["stone", 3]], "material": "stone", "name": "Steinspitzhacke", "output": "pickaxe"}, {"category": "tool", "inputs": [["wood", 3], ["stone", 3]], "material": "stone", "name": "Steinhammer", "output": "hammer"}, {"category": "material", "inputs": [["plant_fiber", 3]], "name": "Stoff weben", "output": "cloth"}, {"category": "jewelry", "inputs": [["bone", 2], ["plant_fiber", 2]], "name": "Knochenamulett (roh)", "output": "amulet"}], "station": "hand", "type": "crafting_open"}
+
+=== group_create_party ===
+SENT: {"type": "group_create_party"}
+RECEIVED (1):
+  {"group": {"kind": "party", "leader": "smoketest", "loot_rule": "ffa", "members": [{"name": "smoketest", "online": true, "role": "leader", "sub_party": 1, "x": 32, "y": 68}], "name": null, "your_role": "leader"}, "type": "group_state"}
+
+=== group_refresh ===
+SENT: {"type": "group_refresh"}
+RECEIVED (1):
+  {"group": {"kind": "party", "leader": "smoketest", "loot_rule": "ffa", "members": [{"name": "smoketest", "online": true, "role": "leader", "sub_party": 1, "x": 32, "y": 68}], "name": null, "your_role": "leader"}, "type": "group_state"}
+
+=== group_disband ===
+SENT: {"type": "group_disband"}
+RECEIVED (2):
+  {"by": "smoketest", "type": "group_disbanded"}
+  {"group": null, "type": "group_state"}
+
+=== place_structure_invalid ===
+SENT: {"structure_type": "wall_stone", "type": "place_structure", "x": 60, "y": 40}
+RECEIVED (0):
+
+=== attack_npc_invalid ===
+SENT: {"npc_id": -1, "type": "attack_npc"}
+RECEIVED (0):
+
+=== learn_talent_invalid ===
+SENT: {"talent_id": "smoke_nonexistent", "type": "learn_talent"}
+RECEIVED (1):
+  {"text": "Unbekanntes Talent", "type": "toast"}
+
+=== chat ===
+SENT: {"text": "smoke-test-message", "type": "chat"}
+RECEIVED (1):
+  {"from": "smoketest", "text": "smoke-test-message", "type": "chat"}
+
+=== use_item_invalid ===
+SENT: {"item_id": -1, "type": "use_item"}
+RECEIVED (0):

@@ -29,3 +29,4 @@ logs/
 # Docker
 postgres-data/
 docker-volumes/
+docker-compose.override.yml
