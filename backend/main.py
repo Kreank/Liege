@@ -267,20 +267,23 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 app.add_api_websocket_route("/ws/dev-chat", dev_chat_handler)
 
-# Legacy-Vanilla-JS bleibt unter /static/* erreichbar (login.html etc.).
-# Nach Phase F-final wird das Mount entfernt.
-app.mount("/static", StaticFiles(directory="../frontend/legacy"), name="static")
 app.mount("/assets", StaticFiles(directory="../assets"), name="assets")
 
 
+# Login + Admin bleiben Legacy-HTML (eigenständige Pages ohne Angular-
+# Dependencies). Sie liegen in `frontend/public/`, werden von Angular
+# unverändert ins Build-Dir kopiert und unterhalb von `dist/frontend/
+# browser/` ausgeliefert. Die expliziten Routen unten haben Vorrang vor
+# dem Catch-All-Mount (relevant, weil `/login` und `/admin` in Angular
+# nicht als Routen existieren).
 @app.get("/login")
 async def login_page():
-    return FileResponse("../frontend/legacy/login.html")
+    return FileResponse("../frontend/dist/frontend/browser/login.html")
 
 
 @app.get("/admin")
 async def admin_page():
-    return FileResponse("../frontend/legacy/admin.html")
+    return FileResponse("../frontend/dist/frontend/browser/admin.html")
 
 
 # Manifest + Service-Worker (ngsw-worker.js, ngsw.json, safety-worker.js)
@@ -453,7 +456,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 # Angular-Build als Root mounten. MUSS am Ende stehen, damit alle
 # explizit registrierten Routen (/ws, /auth/*, /login, /admin,
-# /manifest.webmanifest, /sw.js, /assets/*, /static/*) Vorrang haben.
+# /assets/*) Vorrang haben. Manifest + Service-Worker + Icons kommen
+# aus dem Angular-Build und werden ebenfalls hierüber ausgeliefert.
 # FastAPI prüft Routes in Registrierungsreihenfolge, Mounts greifen
 # als Fallback. html=True liefert index.html für unbekannte Paths
 # (SPA-Routing).

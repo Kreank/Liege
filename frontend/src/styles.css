@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+/* Globale Liege-Styles. Komponenten-spezifisches CSS liegt in den
+   jeweiligen *.component.css. Hier nur wirklich Globales:
+   Reset, Body/HTML-Defaults, Canvas-Defaults (Phaser-Root). */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+}
+
+body {
+  background: #0a0a0f;
+  overflow: hidden;
+  font-family: monospace;
+  color: #c8b88a;
+}
+
+/* Phaser-Canvas — Touch-Defaults, kein Tap-Highlight. */
+canvas {
+  display: block;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* App-Root füllt das Viewport — die UI-Panels positionieren sich selbst
+   absolut/fixed, Phaser-Host bekommt 100%/100%. */
+app-root {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

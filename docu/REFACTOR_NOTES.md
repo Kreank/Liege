@@ -598,3 +598,111 @@ Heuristik (>=2000 verbündet, <=-500 feindlich, sonst neutral).
 - **Stub-Marker:** legacy-stubs verliert `minimap`, `settings`,
   `top-right-links`. Übrig bleibt nur noch `mobile-controls` (Touch-
   Joystick — F-final).
+
+## 24. F-extras-5 / F-PWA / F-final — Abschluss
+
+### F-extras-5 Mobile-Controls
+- **Mobile-Controls (`ui/mobile-controls/`):** Floating-Touch-Joystick
+  unten links + 9 Action-Buttons unten rechts. Component nur sichtbar,
+  wenn `pointer: coarse` ODER `window.innerWidth < 768`. Joystick
+  schreibt nicht mehr in `window.touchInput`, sondern projiziert den
+  Richtungsvektor 5 Tiles voraus und sendet `bridge.sendMove(x, y)`
+  alle 200 ms (5×/s) — gleiches Drosselungs-Verhalten wie die alte
+  Update-Loop, aber ohne Globals. Action-Buttons dispatchen
+  synthetische `KeyboardEvent`s, weil die Overlay-Components
+  (`inventory`, `quests`, `skills`, `talents`, `character`, `factions`,
+  `research`, `spellbook`) bereits `@HostListener('document:keydown')`
+  haben. Build-Button geht direkt über `bridge.toggleBuildMode()`.
+
+### F-PWA @angular/pwa
+- `ng add @angular/pwa` ersetzt das handgeschriebene `legacy/sw.js`
+  durch `ngsw-worker.js` + `ngsw.json`. `app.config.ts` registriert
+  den Worker über `provideServiceWorker('ngsw-worker.js', {enabled:
+  !isDevMode()})`.
+- `ngsw-config.json`: drei Asset-Groups —
+  `app` (prefetch: index.html, manifest, css, js),
+  `app-icons` (prefetch: `/icons/**`, `/apple-touch-icon.png`) und
+  `game-assets` (lazy/prefetch: `/assets/**/*.{png,webp,jpg,json}`).
+- Manifest auf Liege-Identität gehoben: name="Liege", short_name=
+  "Liege", description (deutsch), lang="de", theme_color=#0a0a0f,
+  background_color=#0a0a0f, display=standalone, scope=/,
+  start_url=/, categories=["games"]. Legacy-Icons (192/512/-maskable
+  + apple-touch-icon) nach `frontend/public/icons/` kopiert.
+- `backend/main.py`: Routes `/manifest.webmanifest` und `/sw.js`
+  entfernt — beide Dateien kommen jetzt aus dem Angular-Build über
+  den Catch-All-Mount.
+
+### F-final Legacy entfernt
+
+- **`frontend/legacy/` komplett gelöscht** (11 Files):
+  `app.js`, `index.html`, `style.css`, `sw.js`, `manifest.webmanifest`,
+  `monsters_longlist_data.js`, `login.html`, `admin.html`,
+  `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`,
+  `apple-touch-icon.png`.
+- **`frontend/src/app/legacy-stubs.ts` gelöscht** (Marker-Datei nicht
+  mehr nötig — alle UI-Panels migriert). Verbleibende `legacy/`-
+  Erwähnungen in Komponenten sind reine Source-Referenz-Kommentare
+  (Provenance), keine Code-Abhängigkeiten.
+- **Globale Styles:** `frontend/src/styles.css` enthält jetzt Reset
+  (margin/padding/box-sizing), html/body-Defaults, body-Background +
+  Schriftfarbe und Canvas-Touch-Defaults. Alles andere ist Komponenten-
+  CSS.
+- **Login + Admin** bleiben bewusst Legacy-HTML — beide sind eigen-
+  ständige Pages ohne Angular-Dependencies, eine Migration zu Angular-
+  Routes wäre eine eigene Phase. Sie liegen jetzt in
+  `frontend/public/login.html` / `admin.html`, werden von Angular ins
+  Build-Dir kopiert und über die expliziten FastAPI-Routen
+  `/login` / `/admin` serviert.
+- **`backend/main.py`:** `/static`-Mount (zeigte auf
+  `../frontend/legacy`) entfernt. `/login` und `/admin` zeigen jetzt
+  auf `../frontend/dist/frontend/browser/{login,admin}.html`.
+
+### Final-Snapshot (2026-05-30, Branch `refactor/structure`)
+
+| Metrik | Wert |
+|---|---|
+| `backend/main.py` Zeilen | 475 (Ziel war <500 nach Backend-Track) |
+| Frontend `src/app/` TS-Files | 76 |
+| Frontend `src/app/` TS-LOC | ~8400 |
+| Komponenten in `ui/` | 30 |
+| `any`-Vorkommen | 0 |
+| Initial-Bundle (transfer) | 112 kB (main 64 kB + chunk 47 kB + css 0.3 kB) |
+| Initial-Bundle (raw) | 468 kB |
+| Phaser-Lazy-Chunk (transfer) | 259 kB |
+| Phaser-Lazy-Chunk (raw) | 1.18 MB |
+| `ws_smoke` vs. Golden | leer (16/16 Steps) |
+
+### Latente Bugs für separaten Fix-Push (nach Refactor)
+
+Aus den Refactor-Notes-Sektionen 1-23 plus Aufgaben aus dieser Phase:
+
+1. **§1** `backend/quests.py` — alte Spaltennamen `faction`/`reputation`
+   in `get_reputation`/`add_reputation`/`all_reputation`. Crasht beim
+   `list_quests`-WS-Branch. (Smoke-Sequenz spart `list_quests` aus.)
+2. **§2** `docker-compose.yml` — `SESSION_SECRET` env var fehlt
+   (Override umgeht es lokal).
+3. **§7** `weather_worker._rain_water_plantings` — SQL referenziert
+   nicht-existierende Spalte `x`.
+4. **§9** `backend/items.py` — `ITEM_KINDS` ist ein latenter
+   `AttributeError`, fängt erst beim Trigger-Pfad.
+5. **§10** Docker-Build erwartet vorher gebautes `frontend/dist/`.
+   Sollte Multi-Stage-Build mit Node-Stage werden.
+6. **§16** `ServerMessage` ist im State-Service noch Bag-Type statt
+   echte Diskriminator-Union — engt das Typsystem in `handleMessage`
+   ein.
+7. **§19** WorldScene hat ambivalente Render-/UI-Stellen, die in der
+   Migration als "TODO F-final" zurückgelassen wurden (Build-Mode-
+   Place-Click mit Rotation + Material, Sense-Radius auf Minimap,
+   Quest-Marker-Pulse). Funktional kein Blocker — kosmetische
+   Polish-Schicht.
+8. **F-PWA** Manifest erwähnt nur `purpose: "any"` für die Standard-
+   Icons; iOS Splash-Screens und Microsoft-Tile-Color sind nicht
+   gepflegt. Reines PWA-Polish.
+9. **F-extras-5** Hotkey-Konflikt `P` (Spellbook + Bestiary
+   triggern beide). Stammt schon aus Legacy — Mobile-Button
+   "P" öffnet damit zwei Overlays gleichzeitig.
+10. **Sound-Manager** wurde nicht migriert. Settings-Component
+    spricht `window.SoundManager` an, falls vorhanden — der Code
+    war nur im Legacy-`app.js` und ist nach F-final weg. Bis zu
+    einer Migration ist das Audio-System de facto stumm.
+
