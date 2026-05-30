@@ -64,6 +64,8 @@ from events import EventManager
 from npcs import NPCManager
 import npcs as npcs_mod
 from items import ItemManager
+from ws.context import WsContext
+from ws.dispatcher import dispatch as ws_dispatch
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
@@ -511,10 +513,28 @@ async def websocket_endpoint(websocket: WebSocket):
         "name": player_id[:12],
     }, exclude=player_id)
 
+    ctx = WsContext(
+        websocket=websocket,
+        player_id=player_id,
+        manager=manager,
+        world=world,
+        structures=structures,
+        npcs=npcs,
+        items=items,
+        events=events,
+    )
+
     try:
         while True:
             data = await websocket.receive_json()
             mtype = data.get("type")
+
+            # Phase B2 (hybrid): erst neuen Dispatcher fragen, sonst Fallback
+            # in die alte if/elif-Kette. Mit jeder weiteren B-Phase wandern
+            # Branches in ws/<domain>.py und werden hier aus dem Monolithen
+            # entfernt.
+            if await ws_dispatch(ctx, data):
+                continue
 
             if mtype == "chat":
                 text = (data.get("text") or "").strip()
