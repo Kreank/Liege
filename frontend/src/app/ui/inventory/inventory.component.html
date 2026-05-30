@@ -62,9 +62,13 @@
                   [class.fine]="slot.qualityClass === 'fine'"
                   [class.masterwork]="slot.qualityClass === 'masterwork'"
                   [class.legendary]="slot.qualityClass === 'legendary'"
+                  [class.stack-warn]="slot.stackFill === 'warn'"
+                  [class.stack-full]="slot.stackFill === 'full'"
                   draggable="true"
                   (dragstart)="onDragStart($event, bagPayload(slot.item))"
-                  (click)="useOrEquip(slot.item)"
+                  (dragover)="onDragOver($event)"
+                  (drop)="onDropBagSlot($event, slot)"
+                  (click)="onSlotClick(slot.item, $event)"
                   (contextmenu)="dropItem(slot.item, $event)"
                   (dblclick)="splitStack(slot.item, $event)"
                   (mouseenter)="showTooltip(slot.item, $event)"
@@ -75,7 +79,10 @@
                     <img [src]="slot.def?.path" alt="" />
                   }
                   @if ((slot.item.quantity ?? 1) > 1) {
-                    <span class="inv-slot-count">{{ slot.item.quantity }}</span>
+                    <span
+                      class="inv-slot-count"
+                      [class.dark]="slot.stackFill !== 'normal'"
+                    >{{ slot.item.quantity }}</span>
                   }
                 </div>
               }
@@ -85,4 +92,57 @@
       </div>
     </div>
   </div>
+
+  <!-- Split-Stack-Modal (Shift+Klick) -->
+  @if (splitDialog(); as sd) {
+    <div class="inv-modal-overlay" (click)="cancelSplit()">
+      <div class="inv-modal" (click)="$event.stopPropagation()">
+        <div class="inv-modal-title">Stack teilen</div>
+        <div class="inv-modal-body">
+          <div class="inv-modal-row">
+            <span>Menge abspalten:</span>
+            <span class="inv-modal-amount">{{ sd.amount }} / {{ sd.max }}</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            [max]="sd.max"
+            [value]="sd.amount"
+            (input)="setSplitAmount(+($any($event.target).value))"
+            class="inv-modal-slider"
+          />
+          <input
+            type="number"
+            min="1"
+            [max]="sd.max"
+            [value]="sd.amount"
+            (input)="setSplitAmount(+($any($event.target).value))"
+            class="inv-modal-number"
+          />
+        </div>
+        <div class="inv-modal-actions">
+          <button type="button" class="inv-modal-btn cancel" (click)="cancelSplit()">Abbrechen</button>
+          <button type="button" class="inv-modal-btn ok" (click)="confirmSplit()">Teilen</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Drop-Bestätigungs-Modal -->
+  @if (dropConfirm(); as dc) {
+    <div class="inv-modal-overlay" (click)="cancelDrop()">
+      <div class="inv-modal" (click)="$event.stopPropagation()">
+        <div class="inv-modal-title">Item droppen?</div>
+        <div class="inv-modal-body">
+          <p class="inv-modal-text">
+            Wirklich <strong>{{ dc.quantity }} × {{ dc.name }}</strong> droppen?
+          </p>
+        </div>
+        <div class="inv-modal-actions">
+          <button type="button" class="inv-modal-btn cancel" (click)="cancelDrop()">Nein</button>
+          <button type="button" class="inv-modal-btn ok" (click)="confirmDrop()">Ja, droppen</button>
+        </div>
+      </div>
+    </div>
+  }
 }
