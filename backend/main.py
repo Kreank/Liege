@@ -67,6 +67,7 @@ from items import ItemManager
 from ws.context import WsContext
 from ws.dispatcher import dispatch as ws_dispatch
 import ws.movement  # noqa: F401 — registriert move/sprint im Dispatcher
+import ws.bills  # noqa: F401 — registriert add_bill/remove_bill/list_bills
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
@@ -3236,34 +3237,6 @@ async def websocket_endpoint(websocket: WebSocket):
                             "type": "toast",
                             "text": f"🔬 Forschung abgeschlossen: {research.RESEARCH_NODES[node_id]['name']}",
                         })
-
-            elif mtype == "add_bill":
-                station_type = data.get("station_type", "")
-                recipe_id = data.get("recipe_id", "")
-                count = max(1, min(99, int(data.get("count", 1))))
-                # Welle 22: Research-Gate auch hier
-                _recipe = recipes.find_recipe(station_type, recipe_id)
-                _req = _recipe.get("requires") if _recipe else None
-                if _req and not await research.is_node_done(player_id, _req):
-                    node_name = research.RESEARCH_NODES.get(_req, {}).get("name", _req)
-                    await websocket.send_json({
-                        "type": "toast",
-                        "text": f"🔒 Erst forschen: {node_name}",
-                    })
-                    continue
-                bill = await bill_queue.add_bill(player_id, station_type, recipe_id, count)
-                bills_now = await bill_queue.list_bills(player_id)
-                await websocket.send_json({"type": "bills_update", "bills": bills_now})
-
-            elif mtype == "remove_bill":
-                bill_id = int(data.get("bill_id", 0))
-                await bill_queue.remove_bill(bill_id, player_id)
-                bills_now = await bill_queue.list_bills(player_id)
-                await websocket.send_json({"type": "bills_update", "bills": bills_now})
-
-            elif mtype == "list_bills":
-                bills_now = await bill_queue.list_bills(player_id, data.get("station_type"))
-                await websocket.send_json({"type": "bills_update", "bills": bills_now})
 
             elif mtype == "talk_to_npc":
                 npc_id = int(data.get("npc_id", 0))
