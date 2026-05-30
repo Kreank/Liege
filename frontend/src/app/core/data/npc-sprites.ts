@@ -132,6 +132,40 @@ export const NPC_SPRITE: Readonly<Record<string, NpcSprite>> = {
   griffin:        { sprite: 'monster_griffin',        tint: 0xffffff, label: 'Greif' },
   hydra:          { sprite: 'monster_hydra',          tint: 0xffffff, label: 'Hydra' },
   manticore:      { sprite: 'monster_manticore',      tint: 0xffffff, label: 'Mantikor' },
+
+  // ─── Welle 35 — Overworld-Monster-Pool (30 overworld_*) ───────────────
+  // Sprite-Keys verweisen auf /assets/monsters/overworld_pool/sprites_128/<slug>_world_128.png
+  // bzw. icons_64/<slug>_icon_64.png — wird vom Phaser-Loader in F-final aufgelöst.
+  overworld_undead_shambler:           { sprite: 'overworld_undead_shambler',           tint: 0xffffff, label: 'Wandelnder Toter' },
+  overworld_undead_skeleton_warrior:   { sprite: 'overworld_undead_skeleton_warrior',   tint: 0xffffff, label: 'Skelett-Krieger' },
+  overworld_undead_skeleton_archer:    { sprite: 'overworld_undead_skeleton_archer',    tint: 0xffffff, label: 'Skelett-Bogenschütze' },
+  overworld_undead_wight_lantern:      { sprite: 'overworld_undead_wight_lantern',      tint: 0xffffff, label: 'Laternen-Wight' },
+  overworld_undead_ghoul_stalker:      { sprite: 'overworld_undead_ghoul_stalker',      tint: 0xffffff, label: 'Pirschender Ghul' },
+  overworld_undead_desert_mummy:       { sprite: 'overworld_undead_desert_mummy',       tint: 0xffffff, label: 'Wüsten-Mumie' },
+  overworld_goblin_scout:              { sprite: 'overworld_goblin_scout',              tint: 0xffffff, label: 'Goblin-Späher' },
+  overworld_goblin_warrior:            { sprite: 'overworld_goblin_warrior',            tint: 0xffffff, label: 'Goblin-Krieger' },
+  overworld_goblin_shaman:             { sprite: 'overworld_goblin_shaman',             tint: 0xffffff, label: 'Goblin-Schamane' },
+  overworld_hobgoblin_legionnaire:     { sprite: 'overworld_hobgoblin_legionnaire',     tint: 0xffffff, label: 'Hobgoblin-Legionär' },
+  overworld_orgrim_basher:             { sprite: 'overworld_orgrim_basher',             tint: 0xffffff, label: 'Orgrim-Schläger' },
+  overworld_brigand_footpad:           { sprite: 'overworld_brigand_footpad',           tint: 0xffffff, label: 'Wegelagerer' },
+  overworld_brigand_archer:            { sprite: 'overworld_brigand_archer',            tint: 0xffffff, label: 'Räuber-Bogenschütze' },
+  overworld_brigand_captain:           { sprite: 'overworld_brigand_captain',           tint: 0xffffff, label: 'Räuber-Hauptmann' },
+  overworld_witch_hunter_renegade:     { sprite: 'overworld_witch_hunter_renegade',     tint: 0xffffff, label: 'Abtrünniger Hexenjäger' },
+  overworld_will_o_wisp:               { sprite: 'overworld_will_o_wisp',               tint: 0xffffff, label: 'Irrlicht' },
+  overworld_briar_imp:                 { sprite: 'overworld_briar_imp',                 tint: 0xffffff, label: 'Dornen-Kobold' },
+  overworld_dryad_hunter:              { sprite: 'overworld_dryad_hunter',              tint: 0xffffff, label: 'Dryaden-Jägerin' },
+  overworld_mire_drowner:              { sprite: 'overworld_mire_drowner',              tint: 0xffffff, label: 'Sumpf-Ziehende' },
+  overworld_swamp_witch_solo:          { sprite: 'overworld_swamp_witch_solo',          tint: 0xffffff, label: 'Sumpfhexe' },
+  overworld_apex_thornback_wolf:       { sprite: 'overworld_apex_thornback_wolf',       tint: 0xffffff, label: 'Dornenrücken-Wolf' },
+  overworld_apex_silverback_boar:      { sprite: 'overworld_apex_silverback_boar',      tint: 0xffffff, label: 'Silberrücken-Eber' },
+  overworld_apex_panther_shade:        { sprite: 'overworld_apex_panther_shade',        tint: 0xffffff, label: 'Schattenpanther' },
+  overworld_apex_glacier_lynx:         { sprite: 'overworld_apex_glacier_lynx',         tint: 0xffffff, label: 'Gletscher-Luchs' },
+  overworld_apex_dune_strider:         { sprite: 'overworld_apex_dune_strider',         tint: 0xffffff, label: 'Dünenläufer' },
+  overworld_apex_swamp_otter_clan:     { sprite: 'overworld_apex_swamp_otter_clan',     tint: 0xffffff, label: 'Sumpf-Otter-Clan' },
+  overworld_apex_ridge_drake:          { sprite: 'overworld_apex_ridge_drake',          tint: 0xffffff, label: 'Felsdrache' },
+  overworld_apex_cliff_kraken_arm:     { sprite: 'overworld_apex_cliff_kraken_arm',     tint: 0xffffff, label: 'Klippen-Kraken-Arm' },
+  overworld_aberrant_eyeless_pilgrim:  { sprite: 'overworld_aberrant_eyeless_pilgrim',  tint: 0xffffff, label: 'Augenloser Pilger' },
+  overworld_aberrant_star_mote_imp:    { sprite: 'overworld_aberrant_star_mote_imp',    tint: 0xffffff, label: 'Sternsplitter-Wesen' },
 };
 
 /** Kinds die als feindliche Creatures gelten. */
@@ -154,6 +188,21 @@ export const CREATURE_KINDS: ReadonlySet<string> = new Set([
   'mantis_chimera','iron_spider','dendroid_guardian','blood_antler_drake',
   'kaiju_thornback','void_eye_brute','frost_rune_boar_prime',
   'magma_shell_devourer','rockshell_colossus',
+  // Welle 35 — Overworld-Monster-Pool (30 overworld_*)
+  'overworld_undead_shambler','overworld_undead_skeleton_warrior',
+  'overworld_undead_skeleton_archer','overworld_undead_wight_lantern',
+  'overworld_undead_ghoul_stalker','overworld_undead_desert_mummy',
+  'overworld_goblin_scout','overworld_goblin_warrior','overworld_goblin_shaman',
+  'overworld_hobgoblin_legionnaire','overworld_orgrim_basher',
+  'overworld_brigand_footpad','overworld_brigand_archer','overworld_brigand_captain',
+  'overworld_witch_hunter_renegade',
+  'overworld_will_o_wisp','overworld_briar_imp','overworld_dryad_hunter',
+  'overworld_mire_drowner','overworld_swamp_witch_solo',
+  'overworld_apex_thornback_wolf','overworld_apex_silverback_boar',
+  'overworld_apex_panther_shade','overworld_apex_glacier_lynx',
+  'overworld_apex_dune_strider','overworld_apex_swamp_otter_clan',
+  'overworld_apex_ridge_drake','overworld_apex_cliff_kraken_arm',
+  'overworld_aberrant_eyeless_pilgrim','overworld_aberrant_star_mote_imp',
 ]);
 
 /** NPCs/Monsters mit 10-Frame Walk-Animation. */

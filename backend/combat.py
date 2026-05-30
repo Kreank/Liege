@@ -751,6 +751,21 @@ except Exception:
     import logging as _lg
     _lg.getLogger("liege.combat").exception("monster_longlist merge failed")
 
+# ── Welle 35: Overworld-Monster-Pool mergen ──────────────────────────────────
+# 30 overworld_*-Mobs (Undead/Goblinoid/Räuber/Fae/Apex/Aberrant) — werden
+# nur in der Overworld gespawnt (npc_worker.respawn_loop), aber Combat-Stats
+# müssen hier sein, damit Damage-Berechnung und Boss-Flags greifen.
+try:
+    import overworld_monster_pool as _op
+    CREATURE_DAMAGE.update(_op.DAMAGE)
+    NPC_HP_BY_KIND.update(_op.HP)
+    _NPC_STAT_OVERRIDES.update(_op.STAT_OVERRIDES)
+    _BOSS_KINDS.update(_op.BOSS_KINDS)
+    CREATURE_KINDS.update(_op.DAMAGE.keys())
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.combat").exception("overworld_monster_pool merge failed")
+
 
 # ─── Welle 34c: WS-Side Combat-Helpers (extrahiert aus main.py) ──────────────
 

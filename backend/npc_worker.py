@@ -635,8 +635,12 @@ async def respawn_loop(world, npc_manager, connection_manager,
              CREATURE_RESPAWN_INTERVAL, MIN_CREATURE_COUNT,
              "on" if structure_manager else "off")
     await asyncio.sleep(60)  # Lange Anlaufzeit damit Initial-Spawn vorbei ist
-    # Wild-Spawnable Kinds = CREATURE_KINDS minus camp-only
-    wild_kinds = [k for k in CREATURE_KINDS if k not in CAMP_ONLY_KINDS]
+    # Welle 35: Wild-Spawn ist auf den overworld_*-Pool beschränkt
+    # (WILD_SPAWNABLE). Alte Slugs (skeleton, bear, ...) und creature_*
+    # bleiben in CREATURE_KINDS für Combat/Bestandsschutz, werden aber
+    # nicht mehr neu gespawnt.
+    wild_kinds = [k for k in CREATURE_KINDS
+                  if k in WILD_SPAWNABLE and k not in CAMP_ONLY_KINDS]
     while True:
         try:
             await asyncio.sleep(CREATURE_RESPAWN_INTERVAL)
@@ -694,9 +698,17 @@ async def respawn_loop(world, npc_manager, connection_manager,
                     biome, tier_max, density = None, 4, 1.0
                 if density <= 0.0:
                     continue   # Safe-Zone nahe Spawn — andere Position versuchen
+                # Welle 35: NIGHT_ONLY_KINDS nur spawnen wenn gerade Nacht ist.
+                try:
+                    import time_system
+                    _is_night = time_system.clock.is_night()
+                except Exception:
+                    _is_night = True  # Fallback: konservativ alle erlauben
                 # Kandidaten: Kind passt ins Biome dieser Position + Tier ok.
                 def _fits(k):
                     if _cmb.creature_stats(k).get("tier", 2) > tier_max:
+                        return False
+                    if not _is_night and k in NIGHT_ONLY_KINDS:
                         return False
                     kb = CREATURE_SPAWN_PROFILE.get(k, {}).get("biomes")
                     return kb is None or (biome is not None and biome in kb)
@@ -1067,8 +1079,15 @@ async def wander_loop(world, npc_manager, connection_manager,
 
 
 # ── Welle 34: Monster-Longlist mergen ────────────────────────────────────────
-# Neue Kinds in Spawn-/Boss-Listen + Profile einspeisen. Sektion 11/12
-# (Disaster/Lore) landen in CAMP_ONLY_KINDS → kein Wild-Respawn (event-only).
+# Neue Kinds in Boss-Listen einspeisen. Sektion 11/12 (Disaster/Lore) landen
+# in CAMP_ONLY_KINDS → kein Wild-Respawn (event-only).
+#
+# Welle 35 (2026-05-30): creature_* spawnen NICHT mehr in der Overworld
+# (separate Pools: Overworld = overworld_*, Dungeon = creature_*).
+# Daher mergen wir creature_* hier weiterhin in CREATURE_KINDS (damit Combat
+# und WS-Handler sie erkennen, sie kommen via dungeon_themes in Dungeons),
+# aber NICHT mehr in CREATURE_SPAWN_PROFILE. Filterung via WILD_SPAWNABLE
+# in respawn_loop.
 try:
     import monster_longlist as _ml
     for _k in _ml.KINDS:
@@ -1077,9 +1096,32 @@ try:
     for _k in _ml.BOSS_KINDS:
         if _k not in BOSS_KINDS:
             BOSS_KINDS.append(_k)
-    CREATURE_SPAWN_PROFILE.update(_ml.SPAWN_PROFILE)
     CAMP_ONLY_KINDS.update(_ml.NO_WILD)
     NPC_KINDS = FRIENDLY_KINDS + CREATURE_KINDS
 except Exception:
     import logging as _lg
     _lg.getLogger("liege.npc_worker").exception("monster_longlist merge failed")
+
+
+# ── Welle 35: Overworld-Monster-Pool mergen ──────────────────────────────────
+# 30 overworld_*-Mobs sind der EINZIGE Wild-Spawn-Pool. CREATURE_SPAWN_PROFILE
+# bekommt die Biome-Profile, WILD_SPAWNABLE markiert sie als Respawn-eligible
+# (alte Slugs wie skeleton/bear bleiben in CREATURE_KINDS für DB-Bestandsschutz,
+# spawnen aber nicht mehr neu).
+WILD_SPAWNABLE: set[str] = set()
+NIGHT_ONLY_KINDS: set[str] = set()
+try:
+    import overworld_monster_pool as _op
+    for _k in _op.KINDS:
+        if _k not in CREATURE_KINDS:
+            CREATURE_KINDS.append(_k)
+    for _k in _op.BOSS_KINDS:
+        if _k not in BOSS_KINDS:
+            BOSS_KINDS.append(_k)
+    CREATURE_SPAWN_PROFILE.update(_op.SPAWN_PROFILE)
+    WILD_SPAWNABLE.update(_op.KINDS)
+    NIGHT_ONLY_KINDS.update(_op.NIGHT_ONLY)
+    NPC_KINDS = FRIENDLY_KINDS + CREATURE_KINDS
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.npc_worker").exception("overworld_monster_pool merge failed")
