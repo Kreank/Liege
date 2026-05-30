@@ -376,36 +376,36 @@ async def turn_in(quest_id: int, player_name: str) -> dict | None:
 
 async def get_reputation(player_name: str, faction: str) -> int:
     val = await db.pool().fetchval(
-        "SELECT reputation FROM player_faction_reputation "
-        "WHERE player_name = $1 AND faction = $2",
+        "SELECT goodwill FROM player_faction_reputation "
+        "WHERE player_name = $1 AND faction_id = $2",
         player_name, faction,
     )
     return int(val or 0)
 
 
 async def add_reputation(player_name: str, faction: str, delta: int) -> int:
-    """Inkrementiert reputation, returnt neuen Wert."""
+    """Inkrementiert goodwill, returnt neuen Wert."""
     row = await db.pool().fetchrow(
-        "INSERT INTO player_faction_reputation (player_name, faction, reputation) "
+        "INSERT INTO player_faction_reputation (player_name, faction_id, goodwill) "
         "VALUES ($1, $2, $3) "
-        "ON CONFLICT (player_name, faction) DO UPDATE SET "
-        "  reputation = player_faction_reputation.reputation + $3, "
+        "ON CONFLICT (player_name, faction_id) DO UPDATE SET "
+        "  goodwill = player_faction_reputation.goodwill + $3, "
         "  updated_at = NOW() "
-        "RETURNING reputation",
+        "RETURNING goodwill",
         player_name, faction, int(delta),
     )
-    new_val = int(row["reputation"])
+    new_val = int(row["goodwill"])
     log.info("Reputation %s/%s %+d → %d", player_name, faction, delta, new_val)
     return new_val
 
 
 async def all_reputation(player_name: str) -> dict[str, int]:
     rows = await db.pool().fetch(
-        "SELECT faction, reputation FROM player_faction_reputation "
-        "WHERE player_name = $1 ORDER BY reputation DESC",
+        "SELECT faction_id, goodwill FROM player_faction_reputation "
+        "WHERE player_name = $1 ORDER BY goodwill DESC",
         player_name,
     )
-    return {r["faction"]: int(r["reputation"]) for r in rows}
+    return {r["faction_id"]: int(r["goodwill"]) for r in rows}
 
 
 # ─── Weitere Hooks (Welle 23 — defend, escort, visit, talk, deliver) ──────

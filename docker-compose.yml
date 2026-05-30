@@ -30,6 +30,9 @@ services:
     environment:
       - OLLAMA_HOST=http://host.docker.internal:11434
       - DATABASE_URL=postgresql://liege:liege@postgres:5432/liege
+      # SESSION_SECRET muss vom Host gesetzt sein (z.B. .env oder Override).
+      # auth.py wirft beim ersten Auth-Call RuntimeError wenn leer.
+      - SESSION_SECRET=${SESSION_SECRET}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

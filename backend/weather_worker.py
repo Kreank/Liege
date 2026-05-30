@@ -96,7 +96,10 @@ async def _rain_water_plantings(connection_manager, intensity: int) -> None:
         try:
             result = await db.pool().execute(
                 "UPDATE plantings SET last_watered_at = NOW() "
-                "WHERE x BETWEEN $1 AND $2 AND y BETWEEN $3 AND $4",
+                "FROM structures "
+                "WHERE plantings.structure_id = structures.id "
+                "  AND structures.x BETWEEN $1 AND $2 "
+                "  AND structures.y BETWEEN $3 AND $4",
                 p["x"] - 40, p["x"] + 40, p["y"] - 40, p["y"] + 40,
             )
             # Anzahl von "UPDATE N" parsen

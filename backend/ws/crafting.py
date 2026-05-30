@@ -18,6 +18,7 @@ import recipes
 import research
 import skills
 import talents
+from items import ITEM_KINDS
 
 from .context import WsContext
 from .dispatcher import register
@@ -87,10 +88,7 @@ async def handle_craft(ctx: WsContext, data: dict) -> None:
         # Legendary → LLM-Naming (im Hintergrund, blockt Crafting nicht)
         if q == "legendary":
             try:
-                # NOTE (REFACTOR_NOTES B10): items hier ist die ItemManager-
-                # Instance — `items.ITEM_KINDS` ist ein latenter Bug, der durch
-                # das try/except verdeckt wird. 1:1 mit Original gespiegelt.
-                base_name = items.ITEM_KINDS.get(recipe["output"], {}).get("name", recipe["output"])
+                base_name = ITEM_KINDS.get(recipe["output"], {}).get("name", recipe["output"])
                 naming = await item_namer.generate_name_and_flavor(
                     recipe["output"], base_name, q, rolled_affixes,
                     use_slow_brain=False,  # 0.8b ist schnell genug fürs Naming

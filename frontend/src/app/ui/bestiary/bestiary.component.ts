@@ -139,7 +139,8 @@ export class BestiaryComponent {
       return;
     }
     if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
-    if (ev.key === 'p' || ev.key === 'P') {
+    // Bestiary auf Y (bestiarY) — P kollidiert mit Spellbook.
+    if (ev.key === 'y' || ev.key === 'Y') {
       this.visible.update((v) => !v);
       ev.preventDefault();
     } else if (ev.key === 'Escape' && this.visible()) {
