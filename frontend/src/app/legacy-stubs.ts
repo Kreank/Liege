@@ -13,10 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Hotbar (Welle 34 — 9 Slots, item_id-Refs, localStorage).
-  //          Legacy `_loadHotbar`, `refreshHotbar`, `activateHotbarSlot`.
-  'hotbar',
-
   // TODO F5+: Inventar-Overlay (Drag/Drop, Equip, Split, Merge, Drop).
   //          Legacy `toggleInventory`, `renderInventory`, `_inventoryDrag*`.
   'inventory',

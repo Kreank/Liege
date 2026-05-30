@@ -1,0 +1,25 @@
+<div class="hotbar" role="toolbar" aria-label="Aktionsleiste">
+  @for (slot of slots(); track slot.index) {
+    <button
+      type="button"
+      class="hotbar-slot"
+      [class.active]="slot.active"
+      [class.empty]="slot.empty"
+      [class.equipped]="slot.equipped"
+      [attr.title]="slot.tooltip"
+      [attr.aria-label]="slot.def ? slot.def.name : 'Slot ' + slot.key + ' (leer)'"
+      (click)="activate(slot.index)"
+      (contextmenu)="clearSlot(slot.index, $event)"
+    >
+      <span class="hotbar-slot__key">{{ slot.key }}</span>
+      @if (slot.def?.path) {
+        <img class="hotbar-slot__icon" [src]="slot.def?.path" alt="" />
+      }
+      @if (slot.count > 1) {
+        <span class="hotbar-slot__count">{{ slot.count }}</span>
+      } @else if (slot.equipped && slot.def?.slot) {
+        <span class="hotbar-slot__count hotbar-slot__count--equipped">✓</span>
+      }
+    </button>
+  }
+</div>
