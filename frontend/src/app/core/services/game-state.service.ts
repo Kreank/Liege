@@ -114,10 +114,19 @@ export class GameStateService {
   readonly events = signal<readonly WorldEvent[]>([]);
   readonly players = signal<Readonly<Record<string, OnlinePlayer>>>({});
 
+  // ─── Chat (F14) ──────────────────────────────────────────────────────
+  readonly chatLog = signal<readonly {
+    readonly id: number;
+    readonly kind: 'player' | 'group' | 'system' | 'error' | 'self';
+    readonly from?: string;
+    readonly text: string;
+  }[]>([]);
+
   // ─── Meta ────────────────────────────────────────────────────────────
   readonly worldSeed = signal<number | string | null>(null);
   readonly chunkSize = signal<number>(32);
   readonly needsCharacterCreation = signal<boolean>(false);
+  private _nextChatId = 1;
 
   /** Tracking, welche unbekannten Types wir schon gewarnt haben (1× je Type). */
   private readonly _unknownWarned = new Set<string>();
@@ -217,7 +226,7 @@ export class GameStateService {
         this._handleGroupMemberStatus(msg);
         break;
       case 'group_converted':      this._handleGroupConverted(msg); break;
-      case 'group_chat':           /* Chat-Log in eigenem Service später */ break;
+      case 'group_chat':           this._handleGroupChat(msg); break;
       case 'group_error':
       case 'raid_error':           /* Toast — kein State */ break;
       case 'raid_started':         /* Visual-Event */ break;
@@ -277,10 +286,10 @@ export class GameStateService {
       case 'lightning_strike':
       case 'earthquake_shake':
       case 'visual_effect':
+      case 'chat':                 this._handleChat(msg); break;
       case 'character_created':
       case 'character_name_check':
       case 'toast':
-      case 'chat':
         // Reine UI-/Audio-Effekte oder Modals — keine Signals zu updaten.
         break;
 
@@ -780,6 +789,48 @@ export class GameStateService {
     const cur = this.spells();
     if (cur.learned.includes(id)) return;
     this.spells.set({ ...cur, learned: [...cur.learned, id] });
+  }
+
+  // ── Chat (F14) ──
+
+  /** Begrenzte Ring-Größe — vermeidet Memory-Blow-up bei Long-Sessions. */
+  private static readonly CHAT_MAX = 200;
+
+  private _handleChat(msg: GenericMsg): void {
+    const from = msg['from'] as string | undefined;
+    const text = msg['text'] as string | undefined;
+    if (!text) return;
+    this._pushChat({ kind: 'player', from, text });
+  }
+
+  private _handleGroupChat(msg: GenericMsg): void {
+    const from = msg['from'] as string | undefined;
+    const text = msg['text'] as string | undefined;
+    if (!text) return;
+    this._pushChat({ kind: 'group', from, text });
+  }
+
+  /** Wird vom Chat-Panel verwendet, um lokale System-/Error-/Self-Linien
+   *  einzufügen. */
+  appendChat(entry: {
+    readonly kind: 'system' | 'error' | 'self';
+    readonly from?: string;
+    readonly text: string;
+  }): void {
+    this._pushChat(entry);
+  }
+
+  private _pushChat(entry: {
+    readonly kind: 'player' | 'group' | 'system' | 'error' | 'self';
+    readonly from?: string;
+    readonly text: string;
+  }): void {
+    const id = this._nextChatId++;
+    const next = [...this.chatLog(), { id, ...entry }];
+    if (next.length > GameStateService.CHAT_MAX) {
+      next.splice(0, next.length - GameStateService.CHAT_MAX);
+    }
+    this.chatLog.set(next);
   }
 
   // ── Misc ──

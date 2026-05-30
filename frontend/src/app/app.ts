@@ -14,6 +14,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { PhaserGameComponent } from './game/phaser-game.component';
 import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
+import { ChatComponent } from './ui/chat/chat.component';
 import { GroupInviteComponent } from './ui/group-invite/group-invite.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
@@ -46,6 +47,7 @@ import { TalentsComponent } from './ui/talents/talents.component';
     GroupInviteComponent,
     SpellbookComponent,
     CastBarComponent,
+    ChatComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

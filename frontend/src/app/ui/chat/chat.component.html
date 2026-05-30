@@ -1,0 +1,28 @@
+@if (visible()) {
+  <div class="chat-console">
+    <div class="chat-header">
+      <span class="title">💬 Chat</span>
+      <button type="button" class="chat-min" (click)="toggle()">_</button>
+    </div>
+    <div class="chat-messages" #messagesEl>
+      @for (m of messages(); track m.id) {
+        <div class="chat-msg" [class]="m.kind">
+          @if (m.from) {
+            <span class="from">{{ m.from }}:</span>
+          }
+          <span class="body">{{ m.text }}</span>
+        </div>
+      }
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" type="text" maxlength="500"
+             placeholder="An alle Spieler…"
+             [ngModel]="inputText()"
+             (ngModelChange)="inputText.set($event)"
+             (keydown)="onInputKey($event)">
+      <button type="button" class="chat-send" (click)="send()">↩</button>
+    </div>
+  </div>
+} @else {
+  <div class="chat-mini" (click)="toggle()">💬 Chat öffnen</div>
+}
