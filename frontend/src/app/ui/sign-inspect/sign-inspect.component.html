@@ -6,7 +6,7 @@
         <button type="button" class="sign-inspect-close" (click)="close()">×</button>
       </div>
       <div class="sign-inspect-body">
-        <img class="sign-inspect-img" [src]="imgSrc()" [alt]="a.label">
+        <img class="sign-inspect-img" [src]="imgSrc()" [alt]="a.label" (error)="onImgError($event)">
       </div>
     </div>
   </div>

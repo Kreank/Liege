@@ -19,6 +19,7 @@ import {
   signal,
 } from '@angular/core';
 
+import { EFFECT_SPRITES } from '../../core/data/effect-sprites';
 import type { SpellEntry } from '../../core/models/talent.model';
 import { GameStateService } from '../../core/services/game-state.service';
 
@@ -56,7 +57,17 @@ export class CastBarComponent {
   });
 
   readonly iconStyle = computed<string>(() => {
-    const path = this.spell()?.icon_path;
+    const sp = this.spell();
+    const cast = this.cast();
+    // 1) Bevorzuge spell.icon_path aus dem Catalog (Welle 34+).
+    let path = sp?.icon_path;
+    // 2) Fallback: Effect-Sprite-Map (Spell-ID matched ein Anim-Kind, z. B.
+    //    `fireball_explosion`). G4-Polish: damit selbst Casts ohne Catalog-
+    //    Icon ein passendes Bild bekommen.
+    if (!path && cast) {
+      const fx = EFFECT_SPRITES[cast.spell_id] ?? EFFECT_SPRITES[`${cast.spell_id}_spell`];
+      if (fx) path = fx;
+    }
     return path ? `url(${path})` : '';
   });
 

@@ -38,8 +38,20 @@ export class SignInspectComponent {
     const a = this.active();
     if (!a) return '';
     // Master-Version (512) für scharfe Darstellung (Legacy-Pfad).
-    return `/assets/props/settlement/signs/professional/masters_512/${a.slug}_sign.png`;
+    // Slug-Normalisierung: trim trailing `_sign` falls Backend ihn bereits
+    // mitsendet, damit der Pfad `<slug>_sign.png` nicht zu `..._sign_sign`
+    // wird. Backend-Verträge variieren je Sign-Quelle (Welle 51).
+    const slug = a.slug.endsWith('_sign') ? a.slug.slice(0, -'_sign'.length) : a.slug;
+    return `/assets/props/settlement/signs/professional/masters_512/${slug}_sign.png`;
   });
+
+  /** Fallback-Handler: wenn das Master-Bild nicht existiert, zeige einen
+   *  unauffälligen Placeholder-Hinweis statt eines kaputten Image-Icons. */
+  onImgError(ev: Event): void {
+    const img = ev.target as HTMLImageElement;
+    img.style.opacity = '0.25';
+    img.alt = 'Schildbild fehlt';
+  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void { if (this.visible()) this.close(); }

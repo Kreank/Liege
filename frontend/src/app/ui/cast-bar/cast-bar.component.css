@@ -26,6 +26,10 @@
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  border: 1px solid #5070a0;
+  border-radius: 3px;
+  background-color: rgba(20, 20, 40, 0.6);
+  flex-shrink: 0;
 }
 
 .cast-bar-progress {
