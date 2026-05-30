@@ -14,11 +14,17 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PhaserGameComponent } from './game/phaser-game.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
+import { InventoryComponent } from './ui/inventory/inventory.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [PhaserGameComponent, HudComponent, HotbarComponent],
+  imports: [
+    PhaserGameComponent,
+    HudComponent,
+    HotbarComponent,
+    InventoryComponent,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

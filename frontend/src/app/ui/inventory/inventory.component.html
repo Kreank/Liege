@@ -1,0 +1,83 @@
+@if (visible()) {
+  <div class="inv-overlay" (click)="close()">
+    <div class="inv-box" (click)="$event.stopPropagation()">
+      <div class="inv-header">
+        <span>🎒 Inventar</span>
+        <button type="button" class="inv-close" (click)="close()">I / Esc</button>
+      </div>
+
+      <div class="inv-body">
+        <!-- Equipment-Spalte -->
+        <div class="inv-equip-col">
+          <div class="inv-section-title">Ausrüstung</div>
+          <div class="inv-equip-grid">
+            @for (es of equipSlots(); track es.slot) {
+              <div
+                class="equip-slot"
+                [class.empty]="!es.item"
+                [class.rough]="es.qualityClass === 'rough'"
+                [class.fine]="es.qualityClass === 'fine'"
+                [class.masterwork]="es.qualityClass === 'masterwork'"
+                [class.legendary]="es.qualityClass === 'legendary'"
+                (dragover)="onDragOver($event)"
+                (drop)="onDropEquip($event, es.slot)"
+                (click)="es.item && unequip(es.item)"
+              >
+                <span class="slot-label">{{ es.label }}</span>
+                @if (es.item && es.def) {
+                  <img
+                    [src]="es.def.path"
+                    alt=""
+                    draggable="true"
+                    (dragstart)="onDragStart($event, equipPayload(es.item))"
+                  />
+                  <span class="slot-item">{{ es.def.name }}</span>
+                } @else {
+                  <span class="placeholder">∅</span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="inv-section-title">Werte</div>
+          <div class="inv-stats">
+            <div class="stat-row"><span>Münzen</span><span class="stat-val">{{ walletCopper() }}</span></div>
+          </div>
+        </div>
+
+        <!-- Beutel-Spalte -->
+        <div class="inv-bag-col" (dragover)="onDragOver($event)" (drop)="onDropBag($event)">
+          <div class="inv-section-title">Beutel</div>
+          @if (bagItems().length === 0) {
+            <div class="inv-empty">Der Beutel ist leer.</div>
+          } @else {
+            <div class="inv-list">
+              @for (slot of bagItems(); track slot.item.id) {
+                <div
+                  class="inv-slot"
+                  [class.rough]="slot.qualityClass === 'rough'"
+                  [class.fine]="slot.qualityClass === 'fine'"
+                  [class.masterwork]="slot.qualityClass === 'masterwork'"
+                  [class.legendary]="slot.qualityClass === 'legendary'"
+                  draggable="true"
+                  [attr.title]="slot.def?.name"
+                  (dragstart)="onDragStart($event, bagPayload(slot.item))"
+                  (click)="useOrEquip(slot.item)"
+                  (contextmenu)="dropItem(slot.item, $event)"
+                  (dblclick)="splitStack(slot.item, $event)"
+                >
+                  @if (slot.def?.path) {
+                    <img [src]="slot.def?.path" alt="" />
+                  }
+                  @if ((slot.item.quantity ?? 1) > 1) {
+                    <span class="inv-slot-count">{{ slot.item.quantity }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

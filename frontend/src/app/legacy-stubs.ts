@@ -13,10 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Inventar-Overlay (Drag/Drop, Equip, Split, Merge, Drop).
-  //          Legacy `toggleInventory`, `renderInventory`, `_inventoryDrag*`.
-  'inventory',
-
   // TODO F5+: Skills-Panel (Skill-XP-Progress, Skill-Level).
   //          Legacy `toggleSkills`, `renderSkills`.
   'skills',
