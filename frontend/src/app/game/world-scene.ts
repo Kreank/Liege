@@ -28,7 +28,15 @@
 
 import Phaser from 'phaser';
 
-import { ANIMATED_NPC_KINDS, NPC_FLIP_LR_KINDS } from '../core/data/npc-sprites';
+import {
+  ANIMATED_NPC_KINDS,
+  CREATURE_KINDS,
+  NPC_FLIP_LR_KINDS,
+} from '../core/data/npc-sprites';
+import {
+  USABLE_STRUCTURE_TYPES,
+  isHarvestableStructureType,
+} from '../core/data/structures';
 import { TILE, TILE_BY_ID, TILE_SIZE } from '../core/data/tiles';
 import type { Chunk, Structure } from '../core/models/chunk.model';
 import type { GroundItem } from '../core/models/item.model';
@@ -305,19 +313,40 @@ export class WorldScene extends Phaser.Scene {
    * (F5+: `build-bar` in legacy-stubs.ts).
    */
   private handleTileClick(tileX: number, tileY: number): void {
+    // ─── Build-Mode-Pfad ─────────────────────────────────────────────────
+    // Klick auf leeres Tile → `place_structure`. Klick auf belegtes Tile
+    // fällt durch in die Default-Logik (so kann man auch im Build-Mode
+    // bestehende Strukturen abreißen/benutzen).
     if (this.bridge.buildMode()) {
-      // TODO F-final: place_structure mit Rotation + Material verdrahten.
-      // Die Build-Bar (F-extras-3) liefert bereits selectedStructure +
-      // selectedMaterial + placeRotation als Signals — die Place-Click-
-      // Logik im Renderer ist nicht Teil der UI-Migration.
-      return;
+      const structures = this.bridge.state.structures();
+      const blocked = structures.some((s) => s.x === tileX && s.y === tileY);
+      if (!blocked) {
+        const structType = this.bridge.selectedStructure();
+        if (!structType) {
+          // Kein Strukturtyp gewählt — Toast in den Chat-Stream.
+          this.bridge.state.appendChat({
+            kind: 'system',
+            text: 'Bau-Modus: Keine Struktur ausgewählt.',
+          });
+          return;
+        }
+        this.bridge.sendPlaceStructure({
+          x: tileX,
+          y: tileY,
+          structure_type: structType,
+          material: this.bridge.selectedMaterial(),
+          rotation: this.bridge.placeRotation(),
+        });
+        return;
+      }
+      // Tile blockiert → fällt durch zur Default-Logik unten.
     }
 
-    // 1) NPC?
+    // 1) NPC? Hostile → attack, friendly → talk.
     const npcs = this.bridge.state.npcsVisible();
     const npcHere = npcs.find((n) => n.x === tileX && n.y === tileY);
     if (npcHere) {
-      if (npcHere.hostile) {
+      if (this.isHostileNpc(npcHere)) {
         this.bridge.sendAttackNpc(npcHere.id);
       } else {
         this.bridge.sendTalkToNpc(npcHere.id);
@@ -333,11 +362,16 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    // 3) Struktur?
+    // 3) Struktur? Harvest-bar (Tree/Stone/Ore/Wall/Door/Crop) → attack,
+    //    sonst use (Bett/Brunnen/Schild/Truhe/…).
     const structures = this.bridge.state.structures();
     const structHere = structures.find((s) => s.x === tileX && s.y === tileY);
     if (structHere) {
-      this.bridge.sendUseStructure(tileX, tileY);
+      if (this.shouldAttackStructure(structHere.type)) {
+        this.bridge.sendAttackStructure(tileX, tileY);
+      } else {
+        this.bridge.sendUseStructure(tileX, tileY);
+      }
       return;
     }
 
@@ -352,6 +386,30 @@ export class WorldScene extends Phaser.Scene {
     }
     this.lastSentMoveTile = { x: tileX, y: tileY };
     this.bridge.sendMove(tileX, tileY);
+  }
+
+  /**
+   * Hostile-Check für NPCs. Wir bevorzugen das `hostile`-Flag aus dem
+   * Backend-Snapshot; wenn das Feld fehlt (Legacy-NPCs ohne explizites Flag),
+   * fallen wir auf das CREATURE_KINDS-Set zurück. Friendly-Default für alles
+   * andere — der Server lehnt `attack_npc` auf Friendlies ab, aber unser
+   * UX-Default ist Dialog.
+   */
+  private isHostileNpc(n: { readonly kind: string; readonly hostile?: boolean }): boolean {
+    if (n.hostile === true) return true;
+    if (n.hostile === false) return false;
+    return CREATURE_KINDS.has(n.kind);
+  }
+
+  /**
+   * Harvest vs Use. Use-Strukturen (USABLE_STRUCTURE_TYPES) gewinnen — Truhen,
+   * Betten, Brunnen, Quest-Boards. Alles andere mit Harvest-Präfix
+   * (`tree_*`, `wall*`, `door_*`, `*_plant`, …) → attack.
+   */
+  private shouldAttackStructure(type: string): boolean {
+    if (USABLE_STRUCTURE_TYPES.has(type)) return false;
+    if (type.startsWith('sign_')) return false; // Schild → use_structure (read).
+    return isHarvestableStructureType(type);
   }
 
   private handleSprintChange(on: boolean): void {

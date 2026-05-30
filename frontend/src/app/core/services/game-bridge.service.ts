@@ -89,4 +89,25 @@ export class GameBridgeService {
   sendTalkToNpc(npcId: number): void {
     this.sendIntent({ type: 'talk_to_npc', npc_id: npcId });
   }
+
+  sendAttackStructure(x: number, y: number): void {
+    this.sendIntent({ type: 'attack_structure', x, y });
+  }
+
+  sendPlaceStructure(args: {
+    readonly x: number;
+    readonly y: number;
+    readonly structure_type: string;
+    readonly material: 'stone' | 'wood' | 'straw';
+    readonly rotation: number;
+  }): void {
+    this.sendIntent({
+      type: 'place_structure',
+      x: args.x,
+      y: args.y,
+      structure_type: args.structure_type,
+      material: args.material,
+      rotation: args.rotation,
+    });
+  }
 }

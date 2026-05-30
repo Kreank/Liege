@@ -261,6 +261,29 @@ export const STRUCTURE_BY_KEY: Readonly<Record<string, string>> =
     Object.entries(STRUCTURE).map(([id, s]) => [s.key, id])
   );
 
+// Strukturen, die per Klick **abgebaut** statt benutzt werden sollen
+// (Backend-Intent `attack_structure`). Default-Logik: Trees, Stones,
+// Ore-Veins, Mauern + Türen + Zäune sowie Plant-Crops.
+export const HARVESTABLE_STRUCTURE_PREFIXES: readonly string[] = [
+  'tree_', 'stone_', 'ore_', 'rock_',
+  'wall', 'fence', 'door_',
+  // Crops liefern bei attack_structure ihre Ertrags-Items.
+  '_plant', '_bush', '_seedling', '_grown',
+];
+
+/** Convenience-Check: matched ein Strukturtyp eines der Harvest-Präfixe? */
+export function isHarvestableStructureType(type: string): boolean {
+  for (const p of HARVESTABLE_STRUCTURE_PREFIXES) {
+    // Präfix-Match (Standardfall) ODER Suffix-Match (für *_plant/_bush/…).
+    if (p.startsWith('_')) {
+      if (type.endsWith(p)) return true;
+    } else if (type.startsWith(p)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Welle 25 — Strukturen mit Interakt-Effekt (use_structure).
 export const USABLE_STRUCTURE_TYPES: ReadonlySet<string> = new Set([
   'bed', 'well', 'chest', 'workbench', 'furnace', 'anvil', 'farm_plot',
