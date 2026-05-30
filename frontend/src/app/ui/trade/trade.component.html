@@ -1,0 +1,42 @@
+@if (trade(); as t) {
+  <div class="trade-overlay">
+    <div class="trade-box">
+      <div class="trade-header">
+        <span>🪙 {{ t.npc_name }}</span>
+        <span>Münzen: {{ t.coins }}</span>
+        <button type="button" class="trade-close" (click)="close()">Esc</button>
+      </div>
+      <div class="trade-cols">
+        <div>
+          <div class="col-title">Mein Beutel (Verkaufen)</div>
+          <div class="trade-list">
+            @if (sellable().length === 0) {
+              <div class="inv-empty">(nichts zu verkaufen)</div>
+            }
+            @for (it of sellable(); track it.id) {
+              <div class="trade-row">
+                <span class="name">{{ it.name }}@if (it.quantity > 1) { <span class="qty">× {{ it.quantity }}</span> }</span>
+                <button type="button" (click)="sell(it.id)">→ Verkaufen</button>
+              </div>
+            }
+          </div>
+        </div>
+        <div>
+          <div class="col-title">Angebot des Händlers</div>
+          <div class="trade-list">
+            @if (t.offerings.length === 0) {
+              <div class="inv-empty">(keine Angebote)</div>
+            }
+            @for (off of t.offerings; track off.kind) {
+              <div class="trade-row" [class.unaffordable]="t.coins < off.price">
+                <span class="name">{{ off.name }}</span>
+                <span class="price">{{ off.price }}</span>
+                <button type="button" [disabled]="t.coins < off.price" (click)="buy(off.kind)">← Kaufen</button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

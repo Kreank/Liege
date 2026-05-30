@@ -1,0 +1,30 @@
+@if (dialog(); as d) {
+  <div class="dialog-overlay">
+    <div class="dialog-box">
+      <div class="dialog-header">
+        <span><span class="dialog-npc-name">{{ d.npc_name }}</span><span class="dialog-npc-kind"> — {{ d.npc_kind }}</span></span>
+        <button type="button" class="dialog-close" (click)="close()">Esc</button>
+      </div>
+      <div class="dialog-npc-bg">{{ d.backstory }}</div>
+      <div class="dialog-history">
+        @for (b of d.history; track $index) {
+          <div class="bubble" [class.user]="b.side === 'user'" [class.npc]="b.side === 'npc'" [class.typing]="b.typing">
+            {{ b.text }}
+          </div>
+        }
+      </div>
+      <div class="dialog-actions-row">
+        <button type="button" class="dialog-quest-btn" (click)="askQuest()">📜 Auftrag (zufällig)</button>
+      </div>
+      <div class="dialog-input-row">
+        <input class="dialog-input" type="text" maxlength="500"
+               placeholder="Sag etwas …"
+               [ngModel]="draft()"
+               (ngModelChange)="draft.set($event)"
+               (keydown)="onInputKey($event)"
+               [disabled]="d.waiting">
+        <button type="button" class="dialog-send" (click)="send()" [disabled]="d.waiting">Senden</button>
+      </div>
+    </div>
+  </div>
+}

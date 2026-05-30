@@ -114,6 +114,48 @@ export class GameStateService {
   readonly events = signal<readonly WorldEvent[]>([]);
   readonly players = signal<Readonly<Record<string, OnlinePlayer>>>({});
 
+  // ─── Interaktions-Modals (F-extras-1) ────────────────────────────────
+  /** Aktive NPC-Konversation (Dialog-Panel). */
+  readonly activeDialog = signal<{
+    readonly npc_id: number;
+    readonly npc_name: string;
+    readonly npc_kind: string;
+    readonly backstory: string;
+    /** Lokaler Verlauf — vom Dialog-Panel gepflegt. */
+    readonly history: readonly { readonly side: 'user' | 'npc'; readonly text: string; readonly typing?: boolean }[];
+    readonly waiting: boolean;
+  } | null>(null);
+
+  /** Truhe (chest_open / chest_add / chest_remove). */
+  readonly activeChest = signal<{
+    readonly chest_id: number;
+    readonly items: readonly { readonly id: number; readonly kind: string; readonly name: string; readonly quantity?: number; readonly quality?: string }[];
+  } | null>(null);
+
+  /** Crafting-Station mit Rezeptliste (crafting_open). */
+  readonly activeCrafting = signal<{
+    readonly station: string;
+    readonly recipes: readonly {
+      readonly output: string;
+      readonly category?: string;
+      readonly requires?: string | null;
+      readonly inputs: readonly { readonly kind: string; readonly quantity: number }[];
+    }[];
+  } | null>(null);
+
+  /** Händler-Tab (trade_open). */
+  readonly activeTrade = signal<{
+    readonly npc_id: number;
+    readonly npc_name: string;
+    readonly coins: number;
+    readonly offerings: readonly {
+      readonly kind: string;
+      readonly name: string;
+      readonly price: number;
+      readonly sprite_path?: string;
+    }[];
+  } | null>(null);
+
   // ─── Downed-State (F15) ──────────────────────────────────────────────
   /** Wenn der Spieler im Down-State ist, der absolute ms-Zeitstempel, ab dem
    *  er sich auto-respawnen kann. Wird auf `player_downed` gesetzt, auf
@@ -192,11 +234,11 @@ export class GameStateService {
       case 'npc_moved':            this._handleNpcMoved(msg); break;
       case 'npc_damaged':          this._handleNpcDamaged(msg); break;
       case 'npc_died':             this._handleNpcDied(msg); break;
+      case 'npc_reply':            this._handleNpcReply(msg); break;
       case 'npc_attacked':
       case 'npc_goal':
       case 'npc_speech':
       case 'npc_mood':
-      case 'npc_reply':
       case 'npc_quest_status':
         // UI-Side-Effects (Sprechblase, Mood-Icon) — kein State-Update.
         break;
@@ -261,13 +303,13 @@ export class GameStateService {
       case 'cast_finished':        this.activeCast.set(null); break;
 
       // ─── Crafting / Trade / Bills / Research ────────────────────────
-      case 'crafting_open':
+      case 'crafting_open':        this._handleCraftingOpen(msg); break;
+      case 'trade_open':           this._handleTradeOpen(msg); break;
+      case 'chest_open':           this._handleChestOpen(msg); break;
+      case 'chest_add':            this._handleChestAdd(msg); break;
+      case 'chest_remove':         this._handleChestRemove(msg); break;
       case 'sign_inspect':
-      case 'trade_open':
-      case 'chest_open':
-      case 'chest_add':
-      case 'chest_remove':
-        // UI-Modals — bekommen ihren eigenen Service in F7/F11.
+        // Sign-Inspect-Overlay kommt in F-extras-3 mit der UI-Component.
         break;
       case 'bills_update':
       case 'bill_progress':
@@ -519,7 +561,12 @@ export class GameStateService {
 
   private _handleWalletUpdate(msg: GenericMsg): void {
     const copper = msg['wallet_copper'] as number | undefined ?? msg['copper'] as number | undefined;
-    if (copper != null) this.walletCopper.set(copper);
+    if (copper != null) {
+      this.walletCopper.set(copper);
+      // Wenn der Trade-Modal offen ist, das Coin-Display dort mitziehen.
+      const trade = this.activeTrade();
+      if (trade) this.activeTrade.set({ ...trade, coins: copper });
+    }
   }
 
   // ── NPCs + Ground-Items ──
@@ -802,6 +849,122 @@ export class GameStateService {
     const cur = this.spells();
     if (cur.learned.includes(id)) return;
     this.spells.set({ ...cur, learned: [...cur.learned, id] });
+  }
+
+  // ── Interaktions-Modals (F-extras-1) ──
+
+  /** Vom Dialog-Panel aufgerufen, wenn der Spieler einen NPC anspricht. */
+  openDialog(args: {
+    readonly npc_id: number;
+    readonly npc_name: string;
+    readonly npc_kind: string;
+    readonly backstory: string;
+  }): void {
+    this.activeDialog.set({
+      npc_id: args.npc_id,
+      npc_name: args.npc_name,
+      npc_kind: args.npc_kind,
+      backstory: args.backstory,
+      history: [],
+      waiting: false,
+    });
+  }
+
+  closeDialog(): void { this.activeDialog.set(null); }
+
+  /** Erweitert den Dialog-Verlauf um eine Bubble. */
+  appendDialogBubble(side: 'user' | 'npc', text: string, opts?: { readonly typing?: boolean }): void {
+    const cur = this.activeDialog();
+    if (!cur) return;
+    this.activeDialog.set({
+      ...cur,
+      history: [...cur.history, { side, text, typing: opts?.typing }],
+    });
+  }
+
+  /** Setzt das `waiting`-Flag (während Server-Reply pending ist). */
+  setDialogWaiting(waiting: boolean): void {
+    const cur = this.activeDialog();
+    if (!cur) return;
+    this.activeDialog.set({ ...cur, waiting });
+  }
+
+  private _handleNpcReply(msg: GenericMsg): void {
+    const cur = this.activeDialog();
+    if (!cur) return;
+    const text = msg['text'] as string | undefined;
+    if (!text) return;
+    // Letzte typing-Bubble durch die echte Antwort ersetzen, sonst anhängen.
+    const idx = [...cur.history].reverse().findIndex((b) => b.typing && b.side === 'npc');
+    let history: typeof cur.history;
+    if (idx >= 0) {
+      const realIdx = cur.history.length - 1 - idx;
+      const next = cur.history.slice();
+      next[realIdx] = { side: 'npc', text };
+      history = next;
+    } else {
+      history = [...cur.history, { side: 'npc', text }];
+    }
+    this.activeDialog.set({ ...cur, history, waiting: false });
+  }
+
+  closeChest(): void { this.activeChest.set(null); }
+  closeCrafting(): void { this.activeCrafting.set(null); }
+  closeTrade(): void { this.activeTrade.set(null); }
+
+  private _handleChestOpen(msg: GenericMsg): void {
+    const id = msg['chest_id'] as number | undefined;
+    const items = msg['items'] as readonly { readonly id: number; readonly kind: string; readonly name: string; readonly quantity?: number; readonly quality?: string }[] | undefined;
+    if (id == null) return;
+    this.activeChest.set({ chest_id: id, items: items ?? [] });
+  }
+
+  private _handleChestAdd(msg: GenericMsg): void {
+    const cur = this.activeChest();
+    if (!cur) return;
+    const cid = msg['chest_id'] as number | undefined;
+    if (cid !== cur.chest_id) return;
+    const item = msg['item'] as { readonly id: number; readonly kind: string; readonly name: string; readonly quantity?: number; readonly quality?: string } | undefined;
+    if (!item) return;
+    this.activeChest.set({ ...cur, items: [...cur.items, item] });
+  }
+
+  private _handleChestRemove(msg: GenericMsg): void {
+    const cur = this.activeChest();
+    if (!cur) return;
+    const cid = msg['chest_id'] as number | undefined;
+    if (cid !== cur.chest_id) return;
+    const itemId = msg['item_id'] as number | undefined;
+    if (itemId == null) return;
+    this.activeChest.set({ ...cur, items: cur.items.filter((it) => it.id !== itemId) });
+  }
+
+  private _handleCraftingOpen(msg: GenericMsg): void {
+    const station = msg['station'] as string | undefined;
+    const recipes = msg['recipes'] as readonly {
+      readonly output: string;
+      readonly category?: string;
+      readonly requires?: string | null;
+      readonly inputs: readonly { readonly kind: string; readonly quantity: number }[];
+    }[] | undefined;
+    if (!station) return;
+    this.activeCrafting.set({ station, recipes: recipes ?? [] });
+  }
+
+  private _handleTradeOpen(msg: GenericMsg): void {
+    const npcId = msg['npc_id'] as number | undefined;
+    if (npcId == null) return;
+    this.activeTrade.set({
+      npc_id: npcId,
+      npc_name: (msg['npc_name'] as string | undefined) ?? '',
+      coins: (msg['coins'] as number | undefined) ?? 0,
+      offerings: (msg['offerings'] as readonly {
+        readonly kind: string;
+        readonly name: string;
+        readonly price: number;
+        readonly sprite_path?: string;
+      }[] | undefined) ?? [],
+    });
   }
 
   // ── Chat (F14) ──

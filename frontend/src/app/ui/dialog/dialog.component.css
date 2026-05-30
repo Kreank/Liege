@@ -1,0 +1,135 @@
+/* Übernommen aus legacy/style.css Z. 770-836 (Dialog-Modal). */
+
+:host { display: contents; }
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-box {
+  width: 90%;
+  max-width: 540px;
+  background: rgba(20, 18, 14, 0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  max-height: 75vh;
+}
+
+.dialog-header {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog-npc-name { color: #e8d870; font-weight: bold; }
+.dialog-npc-kind { color: #aaaa88; font-size: 11px; margin-left: 4px; }
+
+.dialog-npc-bg {
+  color: #888;
+  font-style: italic;
+  font-size: 11px;
+  padding: 6px 14px;
+  border-bottom: 1px solid #333;
+}
+
+.dialog-close {
+  background: none;
+  border: 1px solid #555;
+  color: #c8b88a;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+}
+.dialog-close:hover { background: rgba(255, 255, 255, 0.05); }
+
+.dialog-history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dialog-history .bubble {
+  max-width: 85%;
+  padding: 6px 10px;
+  line-height: 1.4;
+  border-radius: 4px;
+}
+.dialog-history .bubble.user {
+  align-self: flex-end;
+  background: rgba(80, 80, 40, 0.5);
+  color: #e8d870;
+}
+.dialog-history .bubble.npc {
+  align-self: flex-start;
+  background: rgba(40, 40, 60, 0.5);
+  color: #c8d8e8;
+}
+.dialog-history .bubble.typing {
+  color: #888;
+  font-style: italic;
+  animation: typingBlink 1.4s ease-in-out infinite;
+}
+@keyframes typingBlink {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.95; }
+}
+
+.dialog-actions-row {
+  padding: 4px 14px;
+}
+
+.dialog-quest-btn {
+  background: rgba(80, 60, 20, 0.5);
+  border: 1px solid #c8a868;
+  color: #e8d870;
+  cursor: pointer;
+  padding: 4px 10px;
+  margin: 4px 0;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.dialog-input-row {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  border-top: 1px solid #555;
+}
+
+.dialog-input {
+  flex: 1;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #555;
+  color: #c8b88a;
+  font-family: monospace;
+  font-size: 13px;
+  outline: none;
+}
+.dialog-input:focus { border-color: #c8b88a; }
+
+.dialog-send {
+  padding: 6px 14px;
+  background: rgba(80, 80, 40, 0.5);
+  border: 1px solid #c8b88a;
+  color: #e8d870;
+  cursor: pointer;
+  font-family: monospace;
+}
+.dialog-send:hover { background: rgba(120, 120, 60, 0.5); }
+.dialog-send:disabled { opacity: 0.5; cursor: not-allowed; }

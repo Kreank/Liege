@@ -1,0 +1,86 @@
+/* Übernommen aus legacy/style.css Z. 1049-1085 (Chest-/Crafting-Modal-Basis). */
+
+:host { display: contents; }
+
+.chest-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chest-box {
+  width: 90%;
+  max-width: 720px;
+  background: rgba(20, 18, 14, 0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.chest-header {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e8d870;
+  font-weight: bold;
+}
+
+.chest-close {
+  background: none;
+  border: 1px solid #555;
+  color: #c8b88a;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.chest-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 10px 14px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chest-cols .col-title {
+  color: #aaaa88;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.chest-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-bottom: 1px dashed #333;
+}
+.chest-item-row .name { flex: 1; }
+.chest-item-row button {
+  background: rgba(80, 80, 40, 0.5);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.inv-empty {
+  color: #807060;
+  font-size: 11px;
+  padding: 10px;
+  text-align: center;
+}

@@ -1,0 +1,26 @@
+@if (crafting(); as c) {
+  <div class="crafting-overlay">
+    <div class="crafting-box">
+      <div class="crafting-header">
+        <span>🔨 {{ stationLabel() }}</span>
+        <button type="button" class="crafting-close" (click)="close()">Esc</button>
+      </div>
+      <div class="crafting-recipes">
+        @if (c.recipes.length === 0) {
+          <div class="inv-empty">(keine Rezepte verfügbar)</div>
+        }
+        @for (r of c.recipes; track r.output) {
+          <div class="recipe-row">
+            <span class="recipe-out">{{ r.output }}</span>
+            <span class="recipe-cost">
+              @for (inp of r.inputs; track inp.kind; let last = $last) {
+                {{ inp.kind }} ×{{ inp.quantity }}@if (!last) {<span>,&nbsp;</span>}
+              }
+            </span>
+            <button type="button" (click)="craft(r.output)">Herstellen</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

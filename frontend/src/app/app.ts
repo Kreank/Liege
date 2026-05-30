@@ -15,6 +15,9 @@ import { PhaserGameComponent } from './game/phaser-game.component';
 import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
 import { ChatComponent } from './ui/chat/chat.component';
+import { ChestComponent } from './ui/chest/chest.component';
+import { CraftingComponent } from './ui/crafting/crafting.component';
+import { DialogComponent } from './ui/dialog/dialog.component';
 import { DownedOverlayComponent } from './ui/downed-overlay/downed-overlay.component';
 import { GroupInviteComponent } from './ui/group-invite/group-invite.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
@@ -28,6 +31,7 @@ import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.componen
 import { SkillsComponent } from './ui/skills/skills.component';
 import { SpellbookComponent } from './ui/spellbook/spellbook.component';
 import { TalentsComponent } from './ui/talents/talents.component';
+import { TradeComponent } from './ui/trade/trade.component';
 
 @Component({
   selector: 'app-root',
@@ -50,6 +54,10 @@ import { TalentsComponent } from './ui/talents/talents.component';
     CastBarComponent,
     ChatComponent,
     DownedOverlayComponent,
+    DialogComponent,
+    ChestComponent,
+    CraftingComponent,
+    TradeComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

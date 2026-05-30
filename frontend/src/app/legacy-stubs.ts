@@ -13,22 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Dialog-Panel (NPC-Talk Input + Antworten + Quest-Button).
-  //          Legacy `openDialog`, `sendDialog`, `closeDialog`.
-  'dialog',
-
-  // TODO F5+: Chest-Panel (Inventar-zu-Truhe-Transfer).
-  //          Legacy `openChest`, `closeChest`, `chest_transfer_*`.
-  'chest',
-
-  // TODO F5+: Crafting-Panel (Stationen + Hand-Crafting Recipes).
-  //          Legacy `openCrafting`, `craft`, `_renderCraftingRecipes`.
-  'crafting',
-
-  // TODO F5+: Trade-Panel (NPC-Shop Buy/Sell + Coin-Anzeige).
-  //          Legacy `openTrade`, `_renderTrade`, `buyItem`, `sellItem`.
-  'trade',
-
   // TODO F5+: Research-Panel (Tech-Tree-Invest + Pool-Anzeige).
   //          Legacy `toggleResearch`, `renderResearch`.
   'research',

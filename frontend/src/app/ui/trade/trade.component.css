@@ -1,0 +1,105 @@
+/* Übernommen aus legacy/style.css Z. 996-1047. */
+
+:host { display: contents; }
+
+.trade-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.trade-box {
+  width: 90%;
+  max-width: 720px;
+  background: rgba(20, 18, 14, 0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.trade-header {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e8d870;
+  font-weight: bold;
+}
+
+.trade-close {
+  background: none;
+  border: 1px solid #555;
+  color: #c8b88a;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.trade-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 10px 14px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.trade-cols .col-title {
+  color: #aaaa88;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.trade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid #4a3a20;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.trade-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  background: rgba(30, 24, 16, 0.5);
+}
+.trade-row:hover { background: rgba(50, 40, 24, 0.7); }
+.trade-row .name  { font-size: 12px; color: #c8b88a; }
+.trade-row .qty   { font-size: 10px; color: #aaaa88; }
+.trade-row .price { color: #ffd060; font-size: 11px; font-weight: bold; }
+.trade-row button {
+  background: rgba(80, 80, 40, 0.5);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 11px;
+  border-radius: 3px;
+}
+.trade-row button:hover { background: rgba(120, 90, 40, 0.7); }
+.trade-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+.trade-row.unaffordable { opacity: 0.55; }
+
+.inv-empty {
+  color: #807060;
+  font-size: 11px;
+  padding: 10px;
+  text-align: center;
+}

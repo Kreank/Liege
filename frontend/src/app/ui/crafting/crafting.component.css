@@ -1,0 +1,79 @@
+/* Übernommen aus legacy/style.css Z. 1049-1086+ (Crafting-Modal). */
+
+:host { display: contents; }
+
+.crafting-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.crafting-box {
+  width: 90%;
+  max-width: 720px;
+  background: rgba(20, 18, 14, 0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.crafting-header {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e8d870;
+  font-weight: bold;
+}
+
+.crafting-close {
+  background: none;
+  border: 1px solid #555;
+  color: #c8b88a;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.crafting-recipes {
+  overflow-y: auto;
+  padding: 10px 14px;
+  max-height: 50vh;
+}
+
+.recipe-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 4px;
+  border-bottom: 1px dashed #333;
+}
+
+.recipe-out  { color: #e8d870; flex: 1; }
+.recipe-cost { color: #aaaa88; font-size: 11px; flex: 2; }
+
+.recipe-row button {
+  background: rgba(80, 80, 40, 0.5);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.inv-empty {
+  color: #807060;
+  font-size: 11px;
+  padding: 10px;
+  text-align: center;
+}

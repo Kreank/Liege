@@ -78,6 +78,7 @@ export interface ItemAffix {
 export interface InventoryItem {
   readonly id: number;
   readonly kind: string;
+  readonly name: string;
   readonly quantity?: number;
   readonly quality?: ItemQuality;
   readonly equipped_slot?: EquipSlot | null;
@@ -85,6 +86,10 @@ export interface InventoryItem {
   readonly rolled_stats?: RolledStats;
   /** Backend-gerollter Cosmetic-Skin (Welle 25). */
   readonly cosmetic_skin?: string;
+  /** Custom-Name (z. B. „Brand-Klinge des Falken") — optional. */
+  readonly unique_name?: string;
+  /** Backend liefert die Kategorie für Tooltip + Filter. */
+  readonly category?: string;
 }
 
 /** Ground-Item (auf der Karte droppender Loot). */

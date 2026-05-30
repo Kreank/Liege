@@ -1,0 +1,40 @@
+@if (chest(); as c) {
+  <div class="chest-overlay">
+    <div class="chest-box">
+      <div class="chest-header">
+        <span>📦 Truhe</span>
+        <button type="button" class="chest-close" (click)="close()">Esc</button>
+      </div>
+      <div class="chest-cols">
+        <div>
+          <div class="col-title">Mein Beutel</div>
+          <div class="chest-list">
+            @if (playerItems().length === 0) {
+              <div class="inv-empty">(leer)</div>
+            }
+            @for (it of playerItems(); track it.id) {
+              <div class="chest-item-row">
+                <span class="name">{{ it.name }}</span>
+                <button type="button" (click)="transferToChest(it.id)">→ Truhe</button>
+              </div>
+            }
+          </div>
+        </div>
+        <div>
+          <div class="col-title">Truhen-Inhalt</div>
+          <div class="chest-list">
+            @if (c.items.length === 0) {
+              <div class="inv-empty">(leer)</div>
+            }
+            @for (it of c.items; track it.id) {
+              <div class="chest-item-row">
+                <span class="name">{{ it.name }}</span>
+                <button type="button" (click)="transferFromChest(it.id)">↑ Beutel</button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
