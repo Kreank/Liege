@@ -141,6 +141,28 @@ Läufen sichtbar als Log-Spam wenn das Wetter zufällig auf Regen springt.
 
 ---
 
+## 9. B10 — `items.ITEM_KINDS` ist ein latenter AttributeError
+
+**Ort:** `backend/main.py` (vor B10) bzw. jetzt `backend/ws/crafting.py`,
+Legendary-Naming-Block in `handle_craft`.
+
+**Symptom:** Beim Legendary-Crafting wird `items.ITEM_KINDS.get(...)`
+aufgerufen, wobei `items` die `ItemManager`-Instance ist (nicht das Modul).
+`ItemManager` hat keine `ITEM_KINDS`-Attribute → `AttributeError`. Wird vom
+umgebenden `try/except Exception: logging.exception(...)` abgefangen → kein
+Crash, aber Legendary-Items bekommen **nie** einen LLM-Namen oder Flavor.
+
+**Auswirkung:** Spielintern unsichtbar bis ein Spieler ein Legendary craftet
+und sich wundert, warum es keinen Unique-Namen hat. Ground-Truth bei
+trade-Block daneben ist `from items import ITEM_KINDS` — also dieselbe Story
+nur korrekt gelöst.
+
+**Fix:** sollte `from items import ITEM_KINDS` lokal importieren. Verschoben
+in separaten Bug-Fix-Push nach B-final. B10 spiegelt das alte Verhalten 1:1
+(Kommentar im Code).
+
+---
+
 ## 8. Smoke-Filter: weather / lightning_strike (B3, fixed)
 
 **Ort:** `backend/tools/ws_smoke.py` `ASYNC_BROADCAST_TYPES`.
