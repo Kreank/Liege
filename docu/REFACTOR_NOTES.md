@@ -216,3 +216,92 @@ F4 könnte Type-Friction zeigen → ggf. `skipLibCheck: true` in `tsconfig.app.
 json` setzen oder Phaser über `@ts-expect-error`-Wrapper isolieren.
 
 **Wer den Fix übernimmt:** Phase F4 (Phaser als Renderer), nicht jetzt.
+
+---
+
+## 12. F2 — STRUCTURE-Map enthielt im Legacy 26 Duplikat-Keys
+
+**Ort:** `frontend/legacy/app.js` `STRUCTURE` (Z. 605-820).
+
+**Symptom:** Welle 24 (notBuildable Stubs `barn_large`, `barn_small`, `cow_shed`, …)
+und Asset-Drop 2026-05-27b (baubare Farm-Gebäude mit `farm_*`-Sprites) deklarieren
+in derselben Object-Literal-`const STRUCTURE` denselben Key. JS schluckt das
+ohne Warnung — die spätere Property gewinnt. Strict-TS (`noImplicitAny` egal,
+aber `error TS1117: An object literal cannot have multiple properties with
+the same name`) hätte das in einem Object-Literal abgelehnt.
+
+**Migration:** Statt Object-Literal wird `STRUCTURE` über eine
+`buildStructureMap()`-Funktion mit `Record<string, StructureDef>` zusammengebaut.
+Late-Add wins (1:1 wie das JS-Verhalten); die früheren Welle-24-Stubs werden
+durch die `farm_*`-Varianten überschrieben. Endresultat ist bytegleich zur
+Legacy-Map.
+
+**Liste der überschriebenen Keys (Welle 24 → 2026-05-27b):** `barn_large`,
+`barn_small`, `stable`, `cow_shed`, `sheepfold`, `goat_pen`, `pigsty`,
+`henhouse`, `duck_pond`, `goose_pasture_marker`, `dovecote`, `cart_shed`,
+`dairy_house`, `smokehouse`, `hayloft`, `granary`, `water_trough`,
+`feed_trough`, `hay_bale`, `hay_stack`, `straw_bale`, `fence_gate_farm`,
+`wooden_fence_segment`, `milking_stool`, `cheese_press`, `nesting_box_egg`.
+
+**Auswirkung auf Refactor:** keine — Datenstruktur identisch. Wer das alte
+Welle-24-Sprite zurück will, muss explizit auf das `struct_<name>`-Asset
+zugreifen (das Asset existiert weiter).
+
+---
+
+## 13. F2 — Animations-Listen werden generiert statt 1:1 abgeschrieben
+
+**Ort:** `frontend/src/app/core/data/animations.ts`.
+
+**Symptom:** `WORLD_DETAIL_P2_ANIMAL_ANIMS` (48 Einträge) und
+`WORLD_DETAIL_P2_TRANSPORT_ANIMS` (16 Einträge) sind im Legacy als komplette
+Object-Arrays mit URL-Strings je 4 Richtungen je Animal/Vehicle ausgeschrieben.
+Alle Felder folgen demselben Schema (`/assets/animations/animals/<animal>/
+<direction>/walk_sheet.png` etc.); nur `frame_width/height` variieren pro
+Animal.
+
+**Migration:** Spec-Tupel `[animal, fw, fh]` + Generator `_buildAnimalAnims()`
+× 4 Richtungen produziert die identische Liste byteweise (selbe Reihenfolge:
+south/east/north/west pro Animal). Output ist `readonly AnimalAnim[]`,
+`as const`-frozen. Reduziert ~60 Zeilen URL-Boilerplate auf ein 12-Zeilen-Spec.
+
+**Auswirkung:** keine — Output identisch. Future-Friendly weil ein neues
+Animal hinzufügen jetzt nur ein Tupel ist statt 4 Zeilen × 5 Felder.
+
+---
+
+## 14. F2 — Helper-Funktionen aus dem Daten-Bereich NICHT migriert
+
+**Ort:** `frontend/legacy/app.js` Z. 580-2382 (mit Daten verflochten).
+
+**Status:** Diese Helper sind weder in F2 noch in F3 ein Migrations-Ziel —
+sie kommen in F4ff. mit der jeweiligen Component oder dem Service mit, der sie
+braucht:
+
+- `_allTypesInCat(cat)` (Z. 580) — Build-Menü-Iteration, F5+ Inventar/Hotbar.
+- `footprintFor(type)` (Z. 934) — Bridge/Renderer, F4.
+- `relativeTime(iso)` (Z. 964) — Chat/Events-Panel, F14.
+- `itemWeight(item)` (Z. 1107) — Inventar-Panel, F7.
+- `isWaterContainer/containerCapacity` (Z. 1158-1159) — Inventar/Use-Item, F7.
+- `splitCoins/formatCoinsHtml/formatCoinsText` (Z. 1168-1188) — HUD/Trade, F5+F-trade.
+- `_qualityMult/buildItemStatsHtml/findEquippedInSlot` (Z. 1190-1282) — Tooltips, F7.
+- `_equipDir/itemAssetPath/itemGroundScale/itemSpriteKey` (Z. 1878-1987) — Renderer-Bridge, F4.
+- `effectiveQuality` (Z. 2000) — Inventar-Tooltips, F7.
+- `proWeaponPath/proArmorPath/_proArmorAssetRarity/_ancientBladeForItem` (Z. 2330-2382) — Renderer, F4.
+
+Diese sind alle PURE-Funktionen über den portierten Daten — können in eine
+`core/util/`-Subfolder, sobald die jeweilige Component sie zieht. F2 ist
+deliberately data-only.
+
+---
+
+## 15. F2 — Bundle-Größe unverändert (Tree-Shaking)
+
+**Symptom:** `ng build` vor und nach F2 produziert identische 213.66 kB main-
+Bundle. Erwartet — nichts referenziert die `core/data`- oder `core/models`-
+Files, also tree-shaken raus. Strict-TS-Check läuft trotzdem über `tsc --noEmit
+-p tsconfig.app.json` (`src/**/*.ts` include), Exit 0.
+
+**Auswirkung:** Erst wenn F4+ tatsächlich `import { TILE } from './core/data'`
+schreibt, wandern die Daten ins Bundle. Dann wird ein realistischer Sprung
+nach oben sichtbar werden.
