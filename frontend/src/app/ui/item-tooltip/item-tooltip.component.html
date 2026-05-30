@@ -1,0 +1,17 @@
+@if (visible()) {
+  <div class="item-tooltip"
+       [class.pinned]="pinned()"
+       [style.left]="positionStyle().left"
+       [style.top]="positionStyle().top">
+    @if (pinned()) {
+      <div class="tt-close" (click)="closePinned()">×</div>
+    }
+    <div class="tt-name" [style.color]="nameColor()">{{ displayName() }}</div>
+    @if (qualityLabel()) {
+      <div class="tt-quality">Qualität: {{ qualityLabel() }}</div>
+    }
+    @if (categoryLabel()) {
+      <div class="tt-quality">Kategorie: {{ categoryLabel() }}</div>
+    }
+  </div>
+}

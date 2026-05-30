@@ -1,0 +1,13 @@
+@if (active(); as a) {
+  <div class="sign-inspect-overlay" (click)="close()">
+    <div class="sign-inspect-box" (click)="$event.stopPropagation()">
+      <div class="sign-inspect-header">
+        <span>🪧 {{ a.label }}</span>
+        <button type="button" class="sign-inspect-close" (click)="close()">×</button>
+      </div>
+      <div class="sign-inspect-body">
+        <img class="sign-inspect-img" [src]="imgSrc()" [alt]="a.label">
+      </div>
+    </div>
+  </div>
+}

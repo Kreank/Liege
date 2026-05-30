@@ -1,0 +1,49 @@
+/* Sign-Inspect — übernommen aus frontend/legacy/style.css Z. 666-695. */
+
+:host { display: contents; font-family: monospace; }
+
+.sign-inspect-overlay {
+  position: fixed; inset: 0; z-index: 160;
+  background: rgba(0,0,0,0.65);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.sign-inspect-box {
+  background: rgba(20,16,10,0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 0;
+  max-width: 90%; max-height: 92vh; min-width: 280px;
+  display: flex; flex-direction: column;
+  box-shadow: 0 0 24px rgba(0,0,0,0.7);
+}
+
+.sign-inspect-header {
+  padding: 10px 16px;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid #6a5a3a;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #e8d870; font-weight: bold; font-size: 16px;
+}
+
+.sign-inspect-close {
+  background: #402020;
+  border: 1px solid #a05050;
+  color: #fff;
+  cursor: pointer;
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.sign-inspect-body {
+  padding: 14px;
+  display: flex; justify-content: center; align-items: center;
+}
+
+.sign-inspect-img {
+  max-width: 100%; max-height: 70vh; min-width: 256px;
+  image-rendering: auto;
+}

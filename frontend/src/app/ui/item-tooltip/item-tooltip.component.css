@@ -1,0 +1,46 @@
+/* Item-Tooltip — übernommen aus frontend/legacy/style.css Z. 380-415. */
+
+:host {
+  display: contents;
+}
+
+.item-tooltip {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  background: rgba(15,12,8,0.97);
+  border: 1px solid #b89858;
+  padding: 8px 10px;
+  color: #c8b88a;
+  font-size: 11px;
+  font-family: monospace;
+  min-width: 180px;
+  max-width: 280px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.item-tooltip.pinned {
+  pointer-events: auto;
+  box-shadow: 0 0 12px rgba(255,208,96,0.4);
+}
+
+.tt-name {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.tt-quality {
+  font-size: 10px;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.tt-close {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  color: #806040;
+  cursor: pointer;
+  font-size: 14px;
+}

@@ -22,6 +22,9 @@
                 (dragover)="onDragOver($event)"
                 (drop)="onDropEquip($event, es.slot)"
                 (click)="es.item && unequip(es.item)"
+                (mouseenter)="es.item && showTooltip(es.item, $event)"
+                (mousemove)="es.item && moveTooltip($event)"
+                (mouseleave)="hideTooltip()"
               >
                 <span class="slot-label">{{ es.label }}</span>
                 @if (es.item && es.def) {
@@ -60,11 +63,13 @@
                   [class.masterwork]="slot.qualityClass === 'masterwork'"
                   [class.legendary]="slot.qualityClass === 'legendary'"
                   draggable="true"
-                  [attr.title]="slot.def?.name"
                   (dragstart)="onDragStart($event, bagPayload(slot.item))"
                   (click)="useOrEquip(slot.item)"
                   (contextmenu)="dropItem(slot.item, $event)"
                   (dblclick)="splitStack(slot.item, $event)"
+                  (mouseenter)="showTooltip(slot.item, $event)"
+                  (mousemove)="moveTooltip($event)"
+                  (mouseleave)="hideTooltip()"
                 >
                   @if (slot.def?.path) {
                     <img [src]="slot.def?.path" alt="" />

@@ -1,0 +1,45 @@
+@if (visible()) {
+  <div class="bestiary-overlay" (click)="close()">
+    <div class="bestiary-box" (click)="$event.stopPropagation()">
+      <div class="bestiary-header">
+        <span>📖 Bestiarium</span>
+        <input class="bestiary-search"
+               type="text"
+               placeholder="Suche…"
+               autocomplete="off"
+               [value]="filter()"
+               (input)="setFilter($event)">
+        <button type="button" class="bestiary-close" (click)="close()">Esc</button>
+      </div>
+      <div class="bestiary-body">
+        <div class="bestiary-grid">
+          @if (filtered().length === 0) {
+            <div class="bestiary-empty">Keine Treffer.</div>
+          }
+          @for (e of filtered(); track e.slug) {
+            <div class="bestiary-card" (click)="select(e)">
+              <img [src]="e.cell" loading="lazy" [alt]="e.name">
+              <div class="bestiary-card-name">{{ e.name }}</div>
+              <div class="bestiary-card-tier">T{{ e.tier }}</div>
+            </div>
+          }
+        </div>
+        @if (selected(); as s) {
+          <div class="bestiary-detail">
+            <img class="bd-portrait" [src]="s.cell" [alt]="s.name">
+            <div class="bd-name">{{ s.name }}</div>
+            <div class="bd-meta">
+              <span class="bd-tier">Tier {{ s.tier }}</span>
+              <span class="bd-section">{{ s.section }}</span>
+            </div>
+            <div class="bd-desc">
+              @for (line of s.cols; track line) {
+                <div class="bd-line">{{ line }}</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

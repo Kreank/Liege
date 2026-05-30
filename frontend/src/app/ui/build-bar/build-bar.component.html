@@ -1,0 +1,65 @@
+@if (visible()) {
+  <div class="build-bar">
+    <div class="build-bar-tabs">
+      @for (cat of categories; track cat.id) {
+        <button type="button"
+                class="bb-tab"
+                [class.active]="activeCategoryId() === cat.id"
+                (click)="selectCategory(cat.id)">
+          <span>{{ cat.icon }}</span> {{ cat.label }}
+        </button>
+      }
+    </div>
+    @if (subcategories().length > 0) {
+      <div class="build-bar-subtabs active">
+        @for (sub of subcategories(); track sub.id) {
+          <button type="button"
+                  class="bb-subtab"
+                  [class.active]="activeSubcategoryId() === sub.id"
+                  (click)="selectSubcategory(sub.id)">
+            <span>{{ sub.icon }}</span> {{ sub.label }}
+          </button>
+        }
+      </div>
+    }
+    <div class="build-palette">
+      @for (e of paletteEntries(); track e.type) {
+        <button type="button"
+                class="palette-btn"
+                [class.active]="selectedStruct() === e.type"
+                [title]="paletteTitle(e)"
+                (click)="selectStructure(e.type)">
+          @if (e.isSign && e.signSlug) {
+            <img class="palette-img" [src]="signIconUrl(e.signSlug)" alt="">
+          } @else {
+            <span class="palette-icon">{{ e.icon }}</span>
+          }
+          <span class="palette-label">{{ e.name }}</span>
+          @if (e.key) { <span class="palette-key">{{ e.key }}</span> }
+        </button>
+      }
+    </div>
+    <div class="build-bar-footer">
+      <label>Material:
+        <select class="build-material-select"
+                [value]="material()"
+                (change)="onMaterialChange($event)">
+          @for (m of materials; track m) {
+            <option [value]="m">{{ materialLabel[m] }}</option>
+          }
+        </select>
+      </label>
+      <span class="bb-info">Aktiv: <span class="bb-val">{{ selectedName() }}</span></span>
+      <span class="bb-info">Rotation:
+        <span class="bb-val">{{ rotation() }}°</span>
+        <span style="opacity:0.6">(R)</span>
+      </span>
+      <span class="bb-hint">Klick = setzen · Rechts = abreißen · B = beenden</span>
+      <div class="bb-touch-actions">
+        <button type="button" class="bb-touch-btn" title="Drehen" (click)="rotate()">↻</button>
+        <button type="button" class="bb-touch-btn close" title="Bauen beenden"
+                (click)="close()">×</button>
+      </div>
+    </div>
+  </div>
+}

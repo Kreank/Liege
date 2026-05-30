@@ -15,7 +15,7 @@
 // Bridge wird in `PhaserGameComponent` injiziert (Angular-side) und einmal
 // pro `Phaser.Game` an die Scene weitergegeben.
 
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 
 import type { ClientIntent } from '../models/ws-message.model';
 import { GameStateService } from './game-state.service';
@@ -26,6 +26,29 @@ export class GameBridgeService {
   /** READ-only Game-State (Phaser liest pro Frame Signals via `state.<sig>()`). */
   readonly state = inject(GameStateService);
   private readonly ws = inject(WebSocketService);
+
+  // ─── Build-Mode-State (F-extras-3 — Bridge zwischen Phaser-Input und
+  // Angular-UI). Phaser-Input (Taste B) ruft `toggleBuildMode()` über die
+  // Bridge; die Angular-`BuildBarComponent` reagiert via Signal. Material
+  // und Rotation sind ebenfalls Cross-Cutting (Build-Bar wählt sie, Phaser
+  // braucht sie beim Place-Click — wenn die Place-Logik in F-final aus
+  // dem Stub raus kommt, liest sie hier mit).
+  readonly buildMode = signal<boolean>(false);
+  readonly selectedStructure = signal<string | null>(null);
+  readonly selectedMaterial = signal<'stone' | 'wood' | 'straw'>('stone');
+  readonly placeRotation = signal<number>(0);
+
+  toggleBuildMode(): void {
+    this.buildMode.update((v) => !v);
+  }
+
+  setBuildMode(on: boolean): void {
+    this.buildMode.set(on);
+  }
+
+  rotatePlacement(): void {
+    this.placeRotation.update((deg) => (deg + 90) % 360);
+  }
 
   /**
    * Phaser → Server. Frame muss einen `type`-String haben; alles weitere ist

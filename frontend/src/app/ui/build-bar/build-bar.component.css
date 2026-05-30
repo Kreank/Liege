@@ -1,0 +1,166 @@
+/* Build-Bar — übernommen aus frontend/legacy/style.css Z. 594-724. */
+
+:host { display: contents; font-family: monospace; }
+
+.build-bar {
+  position: fixed; bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18,16,12,0.96);
+  border: 1px solid #6e5e3a;
+  color: #c8b88a;
+  font-size: 12px;
+  z-index: 60;
+  width: min(900px, 96vw);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+
+.build-bar-tabs {
+  display: flex; flex-wrap: wrap;
+  background: rgba(0,0,0,0.55);
+  border-bottom: 1px solid #6e5e3a;
+}
+
+.bb-tab {
+  flex: 1 1 auto;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #443524;
+  color: #9a8c66;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  transition: background 0.1s;
+}
+.bb-tab:last-child { border-right: none; }
+.bb-tab:hover { background: rgba(80,60,30,0.4); color: #d8c89a; }
+.bb-tab.active {
+  background: rgba(120,90,40,0.55);
+  color: #e8d870;
+  font-weight: bold;
+  border-bottom: 2px solid #e8d870;
+}
+
+.build-bar-subtabs {
+  display: none; flex-wrap: wrap; gap: 2px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.42);
+  border-bottom: 1px solid #443524;
+}
+.build-bar-subtabs.active { display: flex; }
+
+.bb-subtab {
+  background: rgba(30,24,16,0.7);
+  border: 1px solid #4a3a20;
+  color: #9a8c66;
+  padding: 4px 9px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 11px;
+  border-radius: 3px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.bb-subtab:hover { border-color: #c8b88a; color: #d8c89a; background: rgba(60,46,28,0.8); }
+.bb-subtab.active {
+  background: rgba(140,110,40,0.55);
+  color: #ffe070;
+  border-color: #c8b88a;
+}
+
+.build-palette {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 4px;
+  padding: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.25);
+}
+
+.palette-btn {
+  position: relative;
+  background: rgba(40,32,20,0.7);
+  border: 1px solid #555;
+  color: #c8b88a;
+  padding: 6px 4px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-height: 64px;
+  text-align: center;
+  border-radius: 2px;
+}
+.palette-btn:hover { border-color: #c8b88a; background: rgba(60,48,28,0.85); }
+.palette-btn.active {
+  background: rgba(140,110,40,0.6);
+  border-color: #e8d870;
+  color: #fff;
+  box-shadow: 0 0 6px rgba(232,216,112,0.4);
+}
+.palette-btn .palette-icon { font-size: 20px; line-height: 1; }
+.palette-btn .palette-img {
+  width: 40px; height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.palette-btn .palette-label {
+  font-size: 10px; line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.palette-btn .palette-key {
+  position: absolute; top: 2px; right: 4px;
+  color: #e8d870;
+  font-weight: bold; font-size: 9px;
+  opacity: 0.85;
+}
+
+.build-bar-footer {
+  display: flex; flex-wrap: wrap;
+  align-items: center; gap: 14px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.55);
+  border-top: 1px solid #443524;
+  font-size: 11px;
+}
+.build-bar-footer label {
+  display: flex; align-items: center; gap: 6px;
+  color: #aaa280;
+}
+.build-material-select {
+  background: #1a1410;
+  border: 1px solid #6e5e3a;
+  color: #e8d870;
+  padding: 3px 6px;
+  font-family: monospace; font-size: 11px;
+  cursor: pointer;
+}
+
+.bb-info { color: #aaa280; }
+.bb-info .bb-val { color: #e8d870; font-weight: bold; }
+.bb-hint { color: #777; margin-left: auto; font-size: 10px; }
+
+.bb-touch-actions {
+  display: flex; gap: 4px;
+}
+.bb-touch-btn {
+  background: rgba(40,32,20,0.8);
+  border: 1px solid #6e5e3a;
+  color: #e8d870;
+  width: 34px; height: 34px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 18px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.bb-touch-btn.close { background: #602020; border-color: #a04040; color: #fff; }
+
+@media (max-width: 720px) {
+  .build-bar { width: 98vw; bottom: 0; }
+  .bb-tab { font-size: 10px; padding: 6px 4px; }
+  .bb-hint { display: none; }
+}

@@ -12,6 +12,8 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { PhaserGameComponent } from './game/phaser-game.component';
+import { BestiaryComponent } from './ui/bestiary/bestiary.component';
+import { BuildBarComponent } from './ui/build-bar/build-bar.component';
 import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
 import { ChatComponent } from './ui/chat/chat.component';
@@ -24,11 +26,13 @@ import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
 import { FactionsComponent } from './ui/factions/factions.component';
 import { InventoryComponent } from './ui/inventory/inventory.component';
+import { ItemTooltipComponent } from './ui/item-tooltip/item-tooltip.component';
 import { LootRollComponent } from './ui/loot-roll/loot-roll.component';
 import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
 import { ResearchComponent } from './ui/research/research.component';
+import { SignInspectComponent } from './ui/sign-inspect/sign-inspect.component';
 import { SkillsComponent } from './ui/skills/skills.component';
 import { SpellbookComponent } from './ui/spellbook/spellbook.component';
 import { TalentsComponent } from './ui/talents/talents.component';
@@ -60,6 +64,10 @@ import { TradeComponent } from './ui/trade/trade.component';
     CraftingComponent,
     TradeComponent,
     ResearchComponent,
+    BuildBarComponent,
+    BestiaryComponent,
+    SignInspectComponent,
+    ItemTooltipComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

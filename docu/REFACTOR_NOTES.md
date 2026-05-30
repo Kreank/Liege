@@ -538,3 +538,38 @@ Heuristik (>=2000 verbündet, <=-500 feindlich, sonst neutral).
   ins Models-Barrel aufgenommen.
 - **Stub-Marker:** legacy-stubs verliert `research` + `bills` (jetzt 8
   offen statt 10).
+
+### F-extras-3 Build-Bar / Item-Tooltip / Bestiary / Sign-Inspect
+- **Bridge-Erweiterung:** `GameBridgeService` bekommt vier Signals:
+  `buildMode`, `selectedStructure`, `selectedMaterial`, `placeRotation`
+  + Helper `toggleBuildMode`, `setBuildMode`, `rotatePlacement`. Damit
+  ist die Naht zwischen Phaser-Input („B"-Taste schaltet build) und
+  Angular-UI (Build-Bar liest die Flag) sauber, Phaser hält keinen
+  Build-State mehr. `world-scene.ts` leitet `onToggleBuildMode` jetzt
+  durch die Bridge.
+- **Build-Bar (`ui/build-bar/`):** Tabs + Subtabs aus
+  `core/data/build-categories.ts`, Palette filtert `STRUCTURE` per
+  `NATURAL_STRUCTURE_TYPES` + `notBuildable`. Schilder kriegen statt
+  Emoji das echte 64er PNG. Material-Select, Rotation-Anzeige + Touch-
+  Buttons (Drehen, Schließen). Hotkeys sind absichtlich nicht in der
+  Component — Phaser-Input bleibt die einzige Quelle für „B".
+- **Tooltip-Service + Component:** Neuer `core/services/tooltip.service.ts`
+  ist die globale Anchor für Hover/Pin. `ui/item-tooltip/` rendert die
+  einzige DOM-Instanz (am Mauszeiger geclamped). Inventar
+  (Bag-Slots + Equip-Slots) ruft `show/move/hide` an. Hotbar bleibt bei
+  ihrem nativen `title`-Attribut (das ist ohnehin der Touch-Default).
+  Der Pinned-Tooltip mit Aktions-Buttons aus Legacy ist Hook-only
+  (Inventar hat eigene Action-Wege).
+- **Bestiary (`ui/bestiary/`):** Lädt `/assets/monsters/generated_
+  longlist/manifest.json` per `fetch` beim ersten Open, cached lokal.
+  Suchfeld + Grid + Detail-Sidebar. Tastatur `P` toggelt, `Esc`
+  schließt.  Hinweis: Diese Datei ist nicht identisch mit
+  `frontend/legacy/monsters_longlist_data.js` (das war eine reine
+  Sprite-Registry für den Renderer und wird vom Phaser-Asset-Loader
+  konsumiert, nicht von der UI — keine TS-Portierung nötig).
+- **Sign-Inspect (`ui/sign-inspect/`):** Liest neues Signal
+  `state.activeSignInspect()`; gefüttert vom `sign_inspect`-WS-Handler.
+  Modal mit 512er Master-Sign-Image, Hintergrund-Klick + `Esc`
+  schließen.
+- **Stub-Marker:** legacy-stubs verliert `build-bar`, `bestiary`,
+  `item-tooltip`, `sign-inspect` (jetzt 4 offen).

@@ -39,6 +39,7 @@ import type {
 } from '../../core/models/item.model';
 import { GameBridgeService } from '../../core/services/game-bridge.service';
 import { GameStateService } from '../../core/services/game-state.service';
+import { TooltipService } from '../../core/services/tooltip.service';
 
 /** Welche Slots werden in der Equip-Grid angezeigt (Reihenfolge = Legacy). */
 const EQUIP_SLOT_ORDER: readonly EquipSlot[] = EQUIP_SLOTS.map((s) => s.key);
@@ -75,6 +76,16 @@ const DND_MIME = 'application/json';
 export class InventoryComponent {
   private readonly state = inject(GameStateService);
   private readonly bridge = inject(GameBridgeService);
+  private readonly tooltip = inject(TooltipService);
+
+  // ─── Tooltip-Hover (F-extras-3) ──────────────────────────────────────
+  showTooltip(item: InventoryItem, ev: MouseEvent): void {
+    this.tooltip.show(item, ev.clientX, ev.clientY);
+  }
+  moveTooltip(ev: MouseEvent): void {
+    this.tooltip.move(ev.clientX, ev.clientY);
+  }
+  hideTooltip(): void { this.tooltip.hide(); }
 
   readonly visible = signal<boolean>(false);
 

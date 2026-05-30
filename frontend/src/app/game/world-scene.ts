@@ -83,9 +83,9 @@ export class WorldScene extends Phaser.Scene {
   private lastSentMoveTile: { x: number; y: number } | null = null;
   /** Lokaler Sprint-Zustand — wir senden nur on/off-Edges an den Server. */
   private sprintSent = false;
-  /** Build-Mode-Flag — F4c verwaltet nur die Flag, die UI-Anzeige (Build-
-   *  Bar etc.) kommt mit dem entsprechenden Angular-Panel in F5+. */
-  private buildMode = false;
+  /** Build-Mode lebt seit F-extras-3 als Signal in der `GameBridgeService`,
+   *  damit die Angular-`BuildBarComponent` reagieren kann. Wir lesen pro
+   *  Click den aktuellen Wert von dort. */
 
   constructor() {
     super({ key: 'WorldScene' });
@@ -143,8 +143,7 @@ export class WorldScene extends Phaser.Scene {
       onTileClick: (pos) => this.handleTileClick(pos.x, pos.y),
       onSprintChange: (on) => this.handleSprintChange(on),
       onToggleBuildMode: () => {
-        this.buildMode = !this.buildMode;
-        // TODO F5+: Build-Bar-UI öffnen/schließen (legacy-stubs.ts:`build-bar`).
+        this.bridge.toggleBuildMode();
       },
     });
 
@@ -214,10 +213,11 @@ export class WorldScene extends Phaser.Scene {
    * (F5+: `build-bar` in legacy-stubs.ts).
    */
   private handleTileClick(tileX: number, tileY: number): void {
-    if (this.buildMode) {
-      // TODO F5+: place_structure mit Rotation + Material (siehe Build-Bar
-      // im legacy-stubs.ts). Hier nur Skeleton — bewusst kein Default-Send,
-      // weil das Backend einen Type-Param erwartet.
+    if (this.bridge.buildMode()) {
+      // TODO F-final: place_structure mit Rotation + Material verdrahten.
+      // Die Build-Bar (F-extras-3) liefert bereits selectedStructure +
+      // selectedMaterial + placeRotation als Signals — die Place-Click-
+      // Logik im Renderer ist nicht Teil der UI-Migration.
       return;
     }
 

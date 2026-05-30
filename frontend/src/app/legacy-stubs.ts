@@ -13,27 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Build-Bar + Place-Ghost-Tooltip (Material-Auswahl, Rotation-Label).
-  //          Legacy `toggleBuildMode`, `_populatePaletteOnce`,
-  //          `_refreshRotationLabel`, `_refreshPlaceGhost`.
-  //          Anmerkung: Der **Place-Ghost-Sprite** selbst (Phaser-Image über
-  //          dem Cursor) gehört zur Render-Schicht und kommt in F4c mit der
-  //          Build-Mode-Input-Logik; nur das DOM-Overlay (Build-Bar, Material-
-  //          Toggle) bleibt UI.
-  'build-bar',
-
-  // TODO F5+: Bestiary-Overlay (Monster-Grid + Suche).
-  //          Legacy `toggleBestiary`, `renderBestiaryGrid`.
-  'bestiary',
-
-  // TODO F5+: Item-Tooltip (Hover + Pin per Long-Press/Right-Click).
-  //          Legacy `_showItemTooltip`, `pinItemTooltip`, `unpinItemTooltip`.
-  'item-tooltip',
-
-  // TODO F5+: Sign-Inspect-Overlay (Welle 51 — Schild-Lese-Modal).
-  //          Legacy `openSignInspect`, `closeSignInspect`.
-  'sign-inspect',
-
   // TODO F5+: Minimap (DOM-Canvas, kein Phaser — wird per `drawMinimap`
   //          gemalt). Eventuell als Angular-Component mit `<canvas>`.
   'minimap',
