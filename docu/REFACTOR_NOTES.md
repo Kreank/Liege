@@ -305,3 +305,72 @@ Files, also tree-shaken raus. Strict-TS-Check läuft trotzdem über `tsc --noEmi
 **Auswirkung:** Erst wenn F4+ tatsächlich `import { TILE } from './core/data'`
 schreibt, wandern die Daten ins Bundle. Dann wird ein realistischer Sprung
 nach oben sichtbar werden.
+
+---
+
+## 16. F3 — ServerMessage als Bag-Type statt Diskriminator-Union
+
+**Ort:** `frontend/src/app/core/models/ws-message.model.ts`.
+
+**Symptom:** Erster Versuch typte `ServerMessage = InitMessage |
+UnknownServerMessage`. Strict-TS akzeptiert das auf dem `isInitMessage`-True-
+Pfad sauber, aber auf dem Else-Pfad bleibt `msg` ein
+`InitMessage|UnknownServerMessage` — und Felder wie `msg['x']` werfen
+`TS7053: Element implicitly has an 'any' type`, weil `InitMessage` keine
+String-Index-Signatur hat. Negativ-Guard (`isGenericMessage`) bringt nichts
+— die Union-Reduktion klappt strukturell nicht (InitMessage hat keine
+Substruktur-Beziehung zu UnknownServerMessage).
+
+**Entscheidung:** `ServerMessage` IST `UnknownServerMessage` (Bag-Type mit
+String-Index-Signatur). `InitMessage` bleibt als voll-getypte Schnittmenge
+verfügbar und wird per `isInitMessage`-Guard zu `ServerMessage & InitMessage`
+verfeinert. So sind alle Handler-Bodies sauber `unknown`-getypt, kein
+`any`, und der Init-Pfad behält volle Typsicherheit.
+
+**Vorteile:**
+- `_handlePlayerMoved(msg)` etc. sehen `msg['x']: unknown` → expliziter Cast
+  `msg['x'] as number` zwingt die Migration, jeden Feld-Zugriff bewusst zu
+  type-en.
+- Kein `as any`-Lückenfüller. 0× `any` in `core/`.
+
+**Trade-off:** Jeder Feld-Zugriff im Handler braucht einen `as TYPE` —
+zusätzliche Tipparbeit, aber dokumentierter Vertrag. Sobald F5+ die UI-
+Components die einzelnen Domänen anfasst, können sie pro Type ein eigenes
+voll-getyptes Interface bauen und über einen weiteren `is...`-Guard
+narrowen (gleiches Pattern wie `InitMessage`).
+
+---
+
+## 17. F3 — Kein DI für GameStateService, kein UI-Side-Effect-Routing
+
+**Ort:** `frontend/src/app/core/services/game-state.service.ts`.
+
+**Status:** Der Service nimmt eingehende WS-Messages und befüllt Signals.
+UI-Side-Effects wie Sound (`playSfx('hit_flesh')`), Floating-Damage-Numbers,
+Camera-Shake, Visual-Effects, Toasts und Modal-Trigger (`crafting_open`,
+`chest_open`, `trade_open`, `sign_inspect`, `quest_board_open`) sind im
+Legacy direkt in `handleMsg` verstreut. Wir machen das hier **nicht**.
+
+**Warum nicht:** Diese Side-Effects gehören in F4 (Phaser → Visual-Effects,
+Camera) bzw. F5+ (Component-spezifische Modals). Würden wir sie in
+`GameStateService` reinpacken, wäre der Service nicht testbar und hätte
+Output-Side-Effects auf die DOM/Audio-Layer — Anti-Pattern.
+
+**Konsequenz:** Diese Messages werden im switch zwar erkannt, aber bewusst
+no-op behandelt (siehe Kommentare "UI-Side-Effect, F4ff"). Bei der Migration
+der jeweiligen UI-Component zieht diese sich die zugehörigen Messages über
+einen separaten Subscribe auf `WebSocketService.messages$` (oder über einen
+gezielten Signal-Effect am eigenen Panel-State).
+
+---
+
+## 18. F3 — Bundle-Größe immer noch unverändert
+
+**Symptom:** Vor und nach F3 produziert `ng build` 213.66 kB main. Services
+sind nirgends injected, Tree-Shaking entfernt sie komplett. Strict-TS-Check
+über `tsc --noEmit -p tsconfig.app.json` läuft trotzdem über alle Files.
+
+**Auswirkung:** Erst F4 (PhaserGameComponent injectet WebSocketService +
+GameStateService und ruft `.connect()` im Constructor) lässt das Bundle real
+wachsen — vermutlich um ~12-18 kB für RxJS Subject + die State-Service-
+Branches, je nachdem wie aggressiv Angular die Switch-Cases reinpullt.

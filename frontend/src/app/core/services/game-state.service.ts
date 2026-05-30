@@ -1,0 +1,714 @@
+// GameStateService — die Single Source of Truth für UI-Zustände.
+//
+// Abonniert `WebSocketService.messages$` und befüllt Angular-Signals nach
+// Message-Type. UI-Komponenten lesen diese Signals (read-only) und reagieren
+// per Change-Detection. Schreibend bewegen sich nur die hier definierten
+// Message-Handler — Components senden Intents direkt über `WebSocketService`.
+//
+// F3-Scope: Spiegelung des Legacy-`handleMsg`-Switch-Statements für die
+// Message-Types, die State-Updates auslösen. UI-Side-Effects (Sound, Visual-
+// Effects, Toasts, Camera-Shake) bleiben außen vor — die wandern in F4ff. in
+// die jeweils zuständige Component bzw. einen separaten `FeedbackService`.
+//
+// Logging-Politik: Unbekannte Message-Types loggen wir mit `console.warn`
+// einmalig pro Type — hilft beim Debugging, ohne den Console-Stream zu
+// fluten (siehe `_unknownWarned`-Set).
+
+import { Injectable, inject, signal } from '@angular/core';
+
+import type { Chunk, DungeonMarker, Structure, WorldEvent } from '../models/chunk.model';
+import type { Group, GroupInvite } from '../models/group.model';
+import type { GroundItem, InventoryItem } from '../models/item.model';
+import type { NPC } from '../models/npc.model';
+import type {
+  OnlinePlayer,
+  PlayerAttributes,
+  PlayerSnapshot,
+  PlayerStats,
+  StatusEffect,
+} from '../models/player.model';
+import type { FactionReputation, Quest } from '../models/quest.model';
+import type { SpellState, TalentTree } from '../models/talent.model';
+import type { TimeSnapshot, WeatherSnapshot } from '../models/time.model';
+import type {
+  InitMessage,
+  ServerMessage,
+  UnknownServerMessage,
+} from '../models/ws-message.model';
+import { isInitMessage } from '../models/ws-message.model';
+import { WebSocketService } from './websocket.service';
+
+/**
+ * Lokaler Alias: nach dem `isInitMessage`-Narrowing reduziert sich der Type
+ * auf `UnknownServerMessage`, weil das die zweite Variante des Diskriminator-
+ * Unions ist. Mit dieser Hilfs-Alias haben Felder wie `msg['x']` eine echte
+ * `unknown`-Signatur statt `never`.
+ */
+type GenericMsg = UnknownServerMessage;
+
+/** Helper-Lookup für `inventory_update`-Format-A (Slot-Move löscht alte Slot-
+ *  Markierung am vorherigen Item). */
+function _stripPreviousSlot(
+  items: readonly InventoryItem[],
+  incoming: InventoryItem,
+): InventoryItem[] {
+  if (!incoming.equipped_slot) return items.slice();
+  return items.map((it) => {
+    if (it.id === incoming.id) return it;
+    if (it.equipped_slot === incoming.equipped_slot) {
+      return { ...it, equipped_slot: null };
+    }
+    return it;
+  });
+}
+
+@Injectable({ providedIn: 'root' })
+export class GameStateService {
+  private readonly ws = inject(WebSocketService);
+
+  // ─── Spieler-State ────────────────────────────────────────────────────
+  readonly player = signal<PlayerSnapshot | null>(null);
+  readonly stats = signal<PlayerStats | null>(null);
+  readonly attributes = signal<PlayerAttributes | null>(null);
+  readonly statusEffects = signal<readonly StatusEffect[]>([]);
+
+  // ─── Inventar + Wallet ───────────────────────────────────────────────
+  readonly inventory = signal<readonly InventoryItem[]>([]);
+  readonly walletCopper = signal<number>(0);
+
+  // ─── Party + Loot ────────────────────────────────────────────────────
+  readonly party = signal<Group | null>(null);
+  readonly partyInvites = signal<readonly GroupInvite[]>([]);
+
+  // ─── Quests + Factions ───────────────────────────────────────────────
+  readonly quests = signal<readonly Quest[]>([]);
+  readonly factions = signal<readonly FactionReputation[]>([]);
+
+  // ─── Talents + Spells ────────────────────────────────────────────────
+  readonly talents = signal<TalentTree | null>(null);
+  readonly spells = signal<SpellState>({ catalog: [], learned: [] });
+
+  // ─── Welt-Zustand (für Renderer in F4) ───────────────────────────────
+  readonly time = signal<TimeSnapshot | null>(null);
+  readonly weather = signal<WeatherSnapshot | null>(null);
+  readonly chunks = signal<readonly Chunk[]>([]);
+  readonly structures = signal<readonly Structure[]>([]);
+  readonly dungeons = signal<readonly DungeonMarker[]>([]);
+  readonly npcsVisible = signal<readonly NPC[]>([]);
+  readonly itemsGround = signal<readonly GroundItem[]>([]);
+  readonly events = signal<readonly WorldEvent[]>([]);
+  readonly players = signal<Readonly<Record<string, OnlinePlayer>>>({});
+
+  // ─── Meta ────────────────────────────────────────────────────────────
+  readonly worldSeed = signal<number | string | null>(null);
+  readonly chunkSize = signal<number>(32);
+  readonly needsCharacterCreation = signal<boolean>(false);
+
+  /** Tracking, welche unbekannten Types wir schon gewarnt haben (1× je Type). */
+  private readonly _unknownWarned = new Set<string>();
+
+  constructor() {
+    // Subscribe lebenslang (Service ist root-singleton → kein Cleanup nötig).
+    this.ws.messages$.subscribe((msg) => this._dispatch(msg));
+  }
+
+  // ─── Dispatch ─────────────────────────────────────────────────────────
+
+  private _dispatch(msg: GenericMsg): void {
+    if (isInitMessage(msg)) {
+      this._handleInit(msg);
+      return;
+    }
+    // `ServerMessage` IST `UnknownServerMessage` (Bag-Type) — kein Else-
+    // Narrowing nötig, der `init`-Pfad ist oben behandelt.
+    this._dispatchGeneric(msg);
+  }
+
+  private _dispatchGeneric(msg: GenericMsg): void {
+    switch (msg.type) {
+      // ─── Player ────────────────────────────────────────────────────
+      case 'player_moved':         this._handlePlayerMoved(msg); break;
+      case 'player_joined':        this._handlePlayerJoined(msg); break;
+      case 'player_left':          this._handlePlayerLeft(msg); break;
+      case 'player_damaged':       this._patchPlayer({ hp: msg['hp'] as number, max_hp: msg['max_hp'] as number }); break;
+      case 'player_healed':        this._patchPlayer({ hp: msg['hp'] as number, max_hp: msg['max_hp'] as number }); break;
+      case 'player_mana':          this._patchPlayer({ mana: msg['mana'] as number, max_mana: msg['max_mana'] as number }); break;
+      case 'player_needs':         this._handlePlayerNeeds(msg); break;
+      case 'player_downed':        this._patchPlayer({ is_downed: true }); break;
+      case 'player_respawned':     this._handlePlayerRespawned(msg); break;
+      case 'player_died':          /* nur Toast — kein Self-State */ break;
+      case 'player_downed_visible':
+      case 'player_revived_visible':
+        // Visualisierung in F4 — State-Service ignoriert.
+        break;
+      case 'body_part_damaged':    this._handleBodyPartDamaged(msg); break;
+      case 'sprint_state':         this._patchPlayer({ is_sprinting: msg['on'] === true }); break;
+      case 'rest_start':           this._patchPlayer({ is_resting: true }); break;
+      case 'rest_end':             this._patchPlayer({ is_resting: false }); break;
+      case 'attributes_update':
+      case 'attrs_update':         this._handleAttributesUpdate(msg); break;
+      case 'status_effects':       this._handleStatusEffects(msg); break;
+
+      // ─── Inventar ──────────────────────────────────────────────────
+      case 'inventory_add':        this._handleInventoryAdd(msg); break;
+      case 'inventory_update':     this._handleInventoryUpdate(msg); break;
+      case 'inventory_remove':     this._handleInventoryRemove(msg); break;
+      case 'inventory_full_refresh': this._handleInventoryFullRefresh(msg); break;
+      case 'wallet_update':        this._handleWalletUpdate(msg); break;
+      case 'trade_coins':          this._handleWalletUpdate(msg); break;
+
+      // ─── NPCs + Items am Boden ─────────────────────────────────────
+      case 'npc_spawned':          this._handleNpcSpawned(msg); break;
+      case 'npc_moved':            this._handleNpcMoved(msg); break;
+      case 'npc_damaged':          this._handleNpcDamaged(msg); break;
+      case 'npc_died':             this._handleNpcDied(msg); break;
+      case 'npc_attacked':
+      case 'npc_goal':
+      case 'npc_speech':
+      case 'npc_mood':
+      case 'npc_reply':
+      case 'npc_quest_status':
+        // UI-Side-Effects (Sprechblase, Mood-Icon) — kein State-Update.
+        break;
+
+      case 'item_spawned':         this._handleItemSpawned(msg); break;
+      case 'item_picked_up':       this._handleItemPickedUp(msg); break;
+
+      // ─── Strukturen ────────────────────────────────────────────────
+      case 'structure_placed':     this._handleStructurePlaced(msg); break;
+      case 'structure_replaced':   this._handleStructureReplaced(msg); break;
+      case 'structure_removed':    this._handleStructureRemoved(msg); break;
+      case 'structure_damaged':    this._handleStructureDamaged(msg); break;
+      case 'structure_repaired':   this._handleStructureDamaged(msg); break;
+      case 'structure_upgraded':   this._handleStructureUpgraded(msg); break;
+
+      // ─── Chunks + Welt ─────────────────────────────────────────────
+      case 'chunks':               this._handleChunks(msg); break;
+      case 'event':                this._handleEvent(msg); break;
+      case 'weather':              this._handleWeather(msg); break;
+
+      // ─── Zeit ───────────────────────────────────────────────────────
+      case 'time_update':          this._handleTimeUpdate(msg); break;
+
+      // ─── Party / Loot ───────────────────────────────────────────────
+      case 'group_state':          this.party.set((msg['group'] as Group | null) ?? null); break;
+      case 'group_invite_received': this._handleGroupInviteReceived(msg); break;
+      case 'group_invite_sent':    /* nur Sender-Feedback */ break;
+      case 'group_disbanded':      this.party.set(null); break;
+      case 'group_kicked':         this.party.set(null); break;
+      case 'group_member_left':    /* group_state folgt auf dem Fuß */ break;
+      case 'group_member_online':
+      case 'group_member_offline':
+        this._handleGroupMemberStatus(msg);
+        break;
+      case 'group_converted':      this._handleGroupConverted(msg); break;
+      case 'group_chat':           /* Chat-Log in eigenem Service später */ break;
+      case 'group_error':
+      case 'raid_error':           /* Toast — kein State */ break;
+      case 'raid_started':         /* Visual-Event */ break;
+      case 'loot_roll_started':
+      case 'loot_roll_voted':
+      case 'loot_roll_resolved':
+      case 'loot_rule_changed':
+        // Loot-Overlay-State kommt in F12 mit der UI-Component.
+        break;
+
+      // ─── Quests + Factions ──────────────────────────────────────────
+      case 'quests_update':        this._handleQuestsUpdate(msg); break;
+      case 'quest_new':            this._handleQuestNew(msg); break;
+      case 'quest_progress':       this._handleQuestProgress(msg); break;
+      case 'quest_closed':         this._handleQuestClosed(msg); break;
+      case 'factions_update':      this._handleFactionsUpdate(msg); break;
+      case 'quest_board_open':     /* UI-Trigger */ break;
+
+      // ─── Talents + Spells ───────────────────────────────────────────
+      case 'talents_update':       this._handleTalentsUpdate(msg); break;
+      case 'talent_learned':       this._handleTalentLearned(msg); break;
+      case 'spell_learned':        this._handleSpellLearned(msg); break;
+      case 'cast_started':
+      case 'cast_interrupted':
+      case 'cast_finished':
+        // Cast-Bar-State kommt in F13 mit der Cast-Bar-Component.
+        break;
+
+      // ─── Crafting / Trade / Bills / Research ────────────────────────
+      case 'crafting_open':
+      case 'sign_inspect':
+      case 'trade_open':
+      case 'chest_open':
+      case 'chest_add':
+      case 'chest_remove':
+        // UI-Modals — bekommen ihren eigenen Service in F7/F11.
+        break;
+      case 'bills_update':
+      case 'bill_progress':
+      case 'bill_done':
+      case 'bill_blocked':
+      case 'research_update':
+      case 'research_pool_update':
+        // Workshop/Research-Panel-State kommt in F-Bills/F-Research.
+        break;
+      case 'skill_xp':             /* Floating-Text, kein persistent state hier */ break;
+
+      // ─── Dungeons / Disasters / Misc ────────────────────────────────
+      case 'dungeon_enter':
+      case 'dungeon_exit':
+      case 'dungeon_floor_change':
+      case 'dungeon_collapsed':
+      case 'dungeon_sense':
+      case 'dungeon_chest_opened':
+      case 'trap_triggered':
+      case 'disaster_started':
+      case 'disaster_ended':
+      case 'lightning_strike':
+      case 'earthquake_shake':
+      case 'visual_effect':
+      case 'character_created':
+      case 'character_name_check':
+      case 'toast':
+      case 'chat':
+        // Reine UI-/Audio-Effekte oder Modals — keine Signals zu updaten.
+        break;
+
+      default:
+        this._warnUnknown(msg.type);
+        break;
+    }
+  }
+
+  // ─── Handlers ─────────────────────────────────────────────────────────
+
+  private _handleInit(msg: InitMessage): void {
+    this.needsCharacterCreation.set(msg.needs_character_creation);
+    this.worldSeed.set(msg.world_seed);
+    this.chunkSize.set(msg.chunk_size);
+
+    this.player.set({
+      player_id: msg.player_id,
+      hp: msg.hp,
+      max_hp: msg.max_hp,
+      mana: msg.mana,
+      max_mana: msg.max_mana,
+      hunger: msg.hunger,
+      max_hunger: msg.max_hunger,
+      stamina: msg.stamina,
+      max_stamina: msg.max_stamina,
+      thirst: msg.thirst,
+      max_thirst: msg.max_thirst,
+      x: msg.spawn.x,
+      y: msg.spawn.y,
+      power_tier: msg.power_tier,
+      body_parts: msg.body_parts,
+      attributes: msg.attributes,
+      stats: msg.stats,
+      skills: msg.skills,
+      preset: msg.preset,
+    });
+    if (msg.stats) this.stats.set(msg.stats);
+    if (msg.attributes) this.attributes.set(msg.attributes);
+
+    this.inventory.set(msg.inventory);
+    this.walletCopper.set(msg.wallet_copper);
+    this.players.set(msg.players);
+    this.chunks.set(msg.chunks);
+    this.structures.set(msg.structures);
+    this.dungeons.set(msg.dungeons);
+    this.npcsVisible.set(msg.npcs);
+    this.itemsGround.set(msg.items_ground);
+    this.events.set(msg.events);
+
+    if (msg.time) this.time.set(msg.time);
+    if (msg.quests) this.quests.set(msg.quests);
+    if (msg.factions) this.factions.set(msg.factions);
+    if (msg.talents) this.talents.set(msg.talents);
+    this.spells.set({
+      catalog: msg.spell_catalog ?? [],
+      learned: msg.learned_spells ?? [],
+    });
+
+    this.party.set(msg.group ?? null);
+    this.partyInvites.set(msg.group_invites ?? []);
+  }
+
+  // ── Player ──
+
+  private _patchPlayer(patch: Partial<PlayerSnapshot>): void {
+    const cur = this.player();
+    if (!cur) return;
+    this.player.set({ ...cur, ...patch });
+  }
+
+  private _handlePlayerMoved(msg: GenericMsg): void {
+    const id = String(msg['player_id']);
+    const x = msg['x'] as number;
+    const y = msg['y'] as number;
+    const cur = this.players();
+    const existing = cur[id];
+    if (!existing) return;
+    this.players.set({ ...cur, [id]: { ...existing, x, y } });
+  }
+
+  private _handlePlayerJoined(msg: GenericMsg): void {
+    const id = String(msg['player_id']);
+    const entry: OnlinePlayer = {
+      player_id: msg['player_id'] as number,
+      name: (msg['name'] as string) ?? id,
+      x: msg['x'] as number,
+      y: msg['y'] as number,
+      preset: (msg['preset'] as string | null) ?? null,
+    };
+    this.players.set({ ...this.players(), [id]: entry });
+  }
+
+  private _handlePlayerLeft(msg: GenericMsg): void {
+    const id = String(msg['player_id']);
+    const cur = { ...this.players() };
+    delete cur[id];
+    this.players.set(cur);
+  }
+
+  private _handlePlayerNeeds(msg: GenericMsg): void {
+    this._patchPlayer({
+      hunger: msg['hunger'] as number | undefined ?? this.player()?.hunger ?? 0,
+      thirst: msg['thirst'] as number | undefined ?? this.player()?.thirst ?? 0,
+      stamina: msg['stamina'] as number | undefined ?? this.player()?.stamina ?? 0,
+      max_hunger: msg['max_hunger'] as number | undefined ?? this.player()?.max_hunger ?? 0,
+      max_thirst: msg['max_thirst'] as number | undefined ?? this.player()?.max_thirst ?? 0,
+      max_stamina: msg['max_stamina'] as number | undefined ?? this.player()?.max_stamina ?? 0,
+    });
+  }
+
+  private _handlePlayerRespawned(msg: GenericMsg): void {
+    this._patchPlayer({
+      hp: msg['hp'] as number,
+      max_hp: msg['max_hp'] as number,
+      x: msg['x'] as number,
+      y: msg['y'] as number,
+      is_downed: false,
+    });
+  }
+
+  private _handleBodyPartDamaged(msg: GenericMsg): void {
+    const part = msg['part'] as string | undefined;
+    const hp = msg['hp'] as number | undefined;
+    const max = msg['max_hp'] as number | undefined;
+    if (!part || hp == null || max == null) return;
+    const cur = this.player();
+    if (!cur || !cur.body_parts) return;
+    const next = cur.body_parts.map((bp) =>
+      bp.name === part ? { ...bp, hp, max_hp: max, damaged: hp < max } : bp,
+    );
+    this._patchPlayer({ body_parts: next });
+  }
+
+  private _handleAttributesUpdate(msg: GenericMsg): void {
+    const attrs = msg['attributes'] as PlayerAttributes | undefined;
+    if (attrs) {
+      this.attributes.set(attrs);
+      this._patchPlayer({ attributes: attrs });
+    }
+    const stats = msg['stats'] as PlayerStats | undefined;
+    if (stats) {
+      this.stats.set(stats);
+      this._patchPlayer({ stats });
+    }
+  }
+
+  private _handleStatusEffects(msg: GenericMsg): void {
+    const effects = msg['effects'] as readonly StatusEffect[] | undefined;
+    this.statusEffects.set(effects ?? []);
+  }
+
+  // ── Inventory ──
+
+  private _handleInventoryAdd(msg: GenericMsg): void {
+    const item = msg['item'] as InventoryItem | undefined;
+    if (!item) return;
+    const cur = this.inventory();
+    const idx = cur.findIndex((it) => it.id === item.id);
+    if (idx >= 0) {
+      const next = cur.slice();
+      next[idx] = item;
+      this.inventory.set(next);
+    } else {
+      this.inventory.set([...cur, item]);
+    }
+  }
+
+  private _handleInventoryUpdate(msg: GenericMsg): void {
+    const cur = this.inventory();
+    // Format A: voll {item: {...}} (z. B. equipped_slot Change)
+    const item = msg['item'] as InventoryItem | undefined;
+    if (item) {
+      let next: InventoryItem[];
+      if (item.equipped_slot) {
+        next = _stripPreviousSlot(cur, item);
+      } else {
+        next = cur.slice();
+      }
+      const idx = next.findIndex((it) => it.id === item.id);
+      if (idx >= 0) next[idx] = item;
+      else next.push(item);
+      this.inventory.set(next);
+      return;
+    }
+    // Format B: schlank {item_id, quantity} (Stack-Decrement)
+    const itemId = msg['item_id'] as number | undefined;
+    const quantity = msg['quantity'] as number | undefined;
+    if (itemId != null && quantity != null) {
+      const next = cur.map((it) =>
+        it.id === itemId ? { ...it, quantity } : it,
+      );
+      this.inventory.set(next);
+    }
+  }
+
+  private _handleInventoryRemove(msg: GenericMsg): void {
+    const itemId = msg['item_id'] as number | undefined;
+    if (itemId == null) return;
+    this.inventory.set(this.inventory().filter((it) => it.id !== itemId));
+  }
+
+  private _handleInventoryFullRefresh(msg: GenericMsg): void {
+    const items = msg['inventory'] as readonly InventoryItem[] | undefined;
+    if (items) this.inventory.set(items);
+  }
+
+  private _handleWalletUpdate(msg: GenericMsg): void {
+    const copper = msg['wallet_copper'] as number | undefined ?? msg['copper'] as number | undefined;
+    if (copper != null) this.walletCopper.set(copper);
+  }
+
+  // ── NPCs + Ground-Items ──
+
+  private _handleNpcSpawned(msg: GenericMsg): void {
+    const npc = msg['npc'] as NPC | undefined;
+    if (!npc) return;
+    this.npcsVisible.set([...this.npcsVisible(), npc]);
+  }
+
+  private _handleNpcMoved(msg: GenericMsg): void {
+    const id = msg['npc_id'] as number | undefined;
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (id == null || x == null || y == null) return;
+    this.npcsVisible.set(
+      this.npcsVisible().map((n) => (n.id === id ? { ...n, x, y } : n)),
+    );
+  }
+
+  private _handleNpcDamaged(msg: GenericMsg): void {
+    const id = msg['npc_id'] as number | undefined;
+    const hp = msg['hp'] as number | undefined;
+    const maxHp = msg['max_hp'] as number | undefined;
+    if (id == null) return;
+    this.npcsVisible.set(
+      this.npcsVisible().map((n) =>
+        n.id === id ? { ...n, hp: hp ?? n.hp, max_hp: maxHp ?? n.max_hp } : n,
+      ),
+    );
+  }
+
+  private _handleNpcDied(msg: GenericMsg): void {
+    const id = msg['npc_id'] as number | undefined;
+    if (id == null) return;
+    this.npcsVisible.set(this.npcsVisible().filter((n) => n.id !== id));
+  }
+
+  private _handleItemSpawned(msg: GenericMsg): void {
+    const item = msg['item'] as GroundItem | undefined;
+    if (!item) return;
+    this.itemsGround.set([...this.itemsGround(), item]);
+  }
+
+  private _handleItemPickedUp(msg: GenericMsg): void {
+    const id = msg['item_id'] as number | undefined;
+    if (id == null) return;
+    this.itemsGround.set(this.itemsGround().filter((g) => g.id !== id));
+  }
+
+  // ── Strukturen ──
+
+  private _handleStructurePlaced(msg: GenericMsg): void {
+    const s = msg['structure'] as Structure | undefined;
+    if (!s) return;
+    this.structures.set([...this.structures(), s]);
+  }
+
+  private _handleStructureReplaced(msg: GenericMsg): void {
+    const s = msg['structure'] as Structure | undefined;
+    if (!s) return;
+    const next = this.structures().filter(
+      (cur) => !(cur.x === s.x && cur.y === s.y),
+    );
+    next.push(s);
+    this.structures.set(next);
+  }
+
+  private _handleStructureRemoved(msg: GenericMsg): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null) return;
+    this.structures.set(
+      this.structures().filter((s) => !(s.x === x && s.y === y)),
+    );
+  }
+
+  private _handleStructureDamaged(msg: GenericMsg): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    const hp = msg['durability'] as number | undefined;
+    const maxHp = msg['max_durability'] as number | undefined;
+    if (x == null || y == null) return;
+    this.structures.set(
+      this.structures().map((s) =>
+        s.x === x && s.y === y
+          ? { ...s, hp: hp ?? s.hp, max_hp: maxHp ?? s.max_hp }
+          : s,
+      ),
+    );
+  }
+
+  private _handleStructureUpgraded(msg: GenericMsg): void {
+    const s = msg['structure'] as Structure | undefined;
+    if (!s) return;
+    this._handleStructureReplaced(msg);
+  }
+
+  // ── Welt ──
+
+  private _handleChunks(msg: GenericMsg): void {
+    const incoming = msg['chunks'] as readonly Chunk[] | undefined;
+    if (!incoming || incoming.length === 0) return;
+    // Merge: Chunks mit gleicher (cx,cy) ersetzen, neue dazu.
+    const map = new Map<string, Chunk>();
+    for (const c of this.chunks()) map.set(`${c.cx},${c.cy}`, c);
+    for (const c of incoming) map.set(`${c.cx},${c.cy}`, c);
+    this.chunks.set(Array.from(map.values()));
+  }
+
+  private _handleEvent(msg: GenericMsg): void {
+    const ev = msg['event'] as WorldEvent | undefined;
+    if (!ev) return;
+    // Frontend hält letzte ~50 Events — der Renderer/Chronik-Panel limitiert
+    // sich selbst.
+    this.events.set([...this.events(), ev]);
+  }
+
+  private _handleWeather(msg: GenericMsg): void {
+    const kind = msg['kind'] as string | undefined;
+    const intensity = msg['intensity'] as number | undefined;
+    if (!kind) return;
+    this.weather.set({ kind, intensity: intensity ?? 0 });
+  }
+
+  private _handleTimeUpdate(msg: GenericMsg): void {
+    const t = msg['time'] as TimeSnapshot | undefined;
+    if (t) this.time.set(t);
+  }
+
+  // ── Party ──
+
+  private _handleGroupInviteReceived(msg: GenericMsg): void {
+    const inv = msg['invite'] as GroupInvite | undefined;
+    if (!inv) return;
+    this.partyInvites.set([...this.partyInvites(), inv]);
+  }
+
+  private _handleGroupMemberStatus(msg: GenericMsg): void {
+    const cur = this.party();
+    const playerId = msg['player_id'] as number | undefined;
+    if (!cur || playerId == null) return;
+    const online = msg.type === 'group_member_online';
+    const next: Group = {
+      ...cur,
+      members: cur.members.map((m) =>
+        m.player_id === playerId ? { ...m, online } : m,
+      ),
+    };
+    this.party.set(next);
+  }
+
+  private _handleGroupConverted(msg: GenericMsg): void {
+    const cur = this.party();
+    if (!cur) return;
+    const kind = msg['kind'] as 'party' | 'raid' | undefined;
+    if (!kind) return;
+    this.party.set({ ...cur, kind });
+  }
+
+  // ── Quests + Factions ──
+
+  private _handleQuestsUpdate(msg: GenericMsg): void {
+    const quests = msg['quests'] as readonly Quest[] | undefined;
+    if (quests) this.quests.set(quests);
+  }
+
+  private _handleQuestNew(msg: GenericMsg): void {
+    const q = msg['quest'] as Quest | undefined;
+    if (!q) return;
+    this.quests.set([...this.quests(), q]);
+  }
+
+  private _handleQuestProgress(msg: GenericMsg): void {
+    const q = msg['quest'] as Quest | undefined;
+    if (!q) return;
+    this.quests.set(
+      this.quests().map((cur) => (cur.quest_id === q.quest_id ? q : cur)),
+    );
+  }
+
+  private _handleQuestClosed(msg: GenericMsg): void {
+    const id = msg['quest_id'] as number | undefined;
+    if (id == null) return;
+    this.quests.set(this.quests().filter((q) => q.quest_id !== id));
+  }
+
+  private _handleFactionsUpdate(msg: GenericMsg): void {
+    const facs = msg['factions'] as readonly FactionReputation[] | undefined;
+    if (facs) this.factions.set(facs);
+  }
+
+  // ── Talents + Spells ──
+
+  private _handleTalentsUpdate(msg: GenericMsg): void {
+    const tree = msg['talents'] as TalentTree | undefined;
+    if (tree) this.talents.set(tree);
+  }
+
+  private _handleTalentLearned(msg: GenericMsg): void {
+    const tree = msg['talents'] as TalentTree | undefined;
+    if (tree) {
+      this.talents.set(tree);
+      return;
+    }
+    const learnedId = msg['talent_id'] as string | undefined;
+    if (!learnedId) return;
+    const cur = this.talents();
+    if (!cur) return;
+    if (cur.learned.includes(learnedId)) return;
+    this.talents.set({ ...cur, learned: [...cur.learned, learnedId] });
+  }
+
+  private _handleSpellLearned(msg: GenericMsg): void {
+    const learned = msg['learned'] as readonly string[] | undefined;
+    if (learned) {
+      this.spells.set({ ...this.spells(), learned });
+      return;
+    }
+    const id = msg['spell_id'] as string | undefined;
+    if (!id) return;
+    const cur = this.spells();
+    if (cur.learned.includes(id)) return;
+    this.spells.set({ ...cur, learned: [...cur.learned, id] });
+  }
+
+  // ── Misc ──
+
+  private _warnUnknown(type: string): void {
+    if (this._unknownWarned.has(type)) return;
+    this._unknownWarned.add(type);
+    // eslint-disable-next-line no-console
+    console.warn('Unknown WS type:', type);
+  }
+}
