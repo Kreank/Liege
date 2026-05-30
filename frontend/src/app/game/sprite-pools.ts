@@ -65,6 +65,19 @@ export class SpritePool<T, S extends Phaser.GameObjects.GameObject> {
     return this.sprites.get(key);
   }
 
+  /**
+   * Entfernt einen Sprite-Eintrag aus der Pool-Map OHNE `destroy()` zu rufen.
+   * Caller übernimmt die Lifetime — z. B. für Death-Animations, die nach
+   * Ablauf selbst `destroy()` aufrufen. Nachfolgende `sync()`-Calls werden
+   * den Key NICHT mehr finden und somit auch kein neues Sprite spawnen
+   * (solange der State-Eintrag weg ist).
+   */
+  detach(key: string | number): S | undefined {
+    const s = this.sprites.get(key);
+    if (s) this.sprites.delete(key);
+    return s;
+  }
+
   /** Alle Sprites entfernen (z. B. bei Scene-Shutdown). */
   destroyAll(): void {
     for (const [k, sprite] of this.sprites) {

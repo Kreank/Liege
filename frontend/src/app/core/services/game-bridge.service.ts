@@ -16,8 +16,9 @@
 // pro `Phaser.Game` an die Scene weitergegeben.
 
 import { Injectable, inject, signal } from '@angular/core';
+import type { Observable } from 'rxjs';
 
-import type { ClientIntent } from '../models/ws-message.model';
+import type { ClientIntent, ServerMessage } from '../models/ws-message.model';
 import { GameStateService } from './game-state.service';
 import { WebSocketService } from './websocket.service';
 
@@ -26,6 +27,15 @@ export class GameBridgeService {
   /** READ-only Game-State (Phaser liest pro Frame Signals via `state.<sig>()`). */
   readonly state = inject(GameStateService);
   private readonly ws = inject(WebSocketService);
+
+  /**
+   * Roher Server-Message-Stream. Wird vom Phaser-Renderer für **transiente**
+   * FX abonniert (Damage-Numbers, Hit-Sparks, `visual_effect`-Animationen),
+   * die NICHT durch Signal-Updates abgedeckt sind (Signals halten nur den
+   * persistenten State — der `dmg`-Wert eines `npc_damaged`-Frames ist nach
+   * dem Tick wieder weg).
+   */
+  readonly messages$: Observable<ServerMessage> = this.ws.messages$;
 
   // ─── Build-Mode-State (F-extras-3 — Bridge zwischen Phaser-Input und
   // Angular-UI). Phaser-Input (Taste B) ruft `toggleBuildMode()` über die
