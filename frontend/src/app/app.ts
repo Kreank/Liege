@@ -17,6 +17,7 @@ import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
 import { FactionsComponent } from './ui/factions/factions.component';
 import { InventoryComponent } from './ui/inventory/inventory.component';
+import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { SkillsComponent } from './ui/skills/skills.component';
 import { TalentsComponent } from './ui/talents/talents.component';
@@ -34,6 +35,7 @@ import { TalentsComponent } from './ui/talents/talents.component';
     CharacterComponent,
     QuestsComponent,
     FactionsComponent,
+    PartyFrameComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

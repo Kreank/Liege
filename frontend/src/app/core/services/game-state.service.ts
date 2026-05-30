@@ -617,13 +617,16 @@ export class GameStateService {
 
   private _handleGroupMemberStatus(msg: GenericMsg): void {
     const cur = this.party();
-    const playerId = msg['player_id'] as number | undefined;
-    if (!cur || playerId == null) return;
+    // Backend nennt das Feld `player_name` (oder `name`), nicht `player_id`.
+    const playerName =
+      (msg['player_name'] as string | undefined) ??
+      (msg['name'] as string | undefined);
+    if (!cur || !playerName) return;
     const online = msg.type === 'group_member_online';
     const next: Group = {
       ...cur,
       members: cur.members.map((m) =>
-        m.player_id === playerId ? { ...m, online } : m,
+        m.name === playerName ? { ...m, online } : m,
       ),
     };
     this.party.set(next);
@@ -632,7 +635,7 @@ export class GameStateService {
   private _handleGroupConverted(msg: GenericMsg): void {
     const cur = this.party();
     if (!cur) return;
-    const kind = msg['kind'] as 'party' | 'raid' | undefined;
+    const kind = msg['kind'] as Group['kind'] | undefined;
     if (!kind) return;
     this.party.set({ ...cur, kind });
   }

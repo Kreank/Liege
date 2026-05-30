@@ -1,0 +1,31 @@
+@if (visible()) {
+  <div class="party-frame">
+    <div class="pf-header">
+      <span class="pf-title">{{ title() }}</span>
+      <span class="pf-count">{{ countLabel() }}</span>
+    </div>
+    <div class="pf-members">
+      @for (sec of sections(); track sec.subParty) {
+        @if (sec.showHeader) {
+          <div class="pf-sub">— Sub-Party {{ sec.subParty }} —</div>
+        }
+        @for (row of sec.rows; track row.name) {
+          <div class="pf-member"
+               [class.offline]="!row.online"
+               [class.you]="row.isYou">
+            <span class="pf-role" [class]="row.role" [title]="row.role">{{ row.roleSymbol }}</span>
+            <span class="pf-name">{{ row.displayName }}</span>
+          </div>
+        }
+      }
+    </div>
+    @if (isLeader()) {
+      <div class="pf-leader-actions">
+        <button type="button" class="pf-raid-btn" (click)="triggerRaid()">⚔️ Raid starten</button>
+      </div>
+    }
+    <div class="pf-hint">
+      /invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband
+    </div>
+  </div>
+}

@@ -13,10 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Party-Frame (4-Slot Member-HUD, Health/Mana pro Member).
-  //          Legacy `renderPartyFrame`, `updatePartyMember`.
-  'party-frame',
-
   // TODO F5+: Loot-Roll-Overlay (Need/Greed/Pass-Buttons + Timer).
   //          Legacy `showLootRollOverlay`, `_handleLootRollStarted`.
   'loot-roll',
