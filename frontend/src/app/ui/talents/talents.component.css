@@ -36,7 +36,20 @@
 }
 
 .talents-list { padding: 8px 14px; overflow-y: auto; flex: 1; }
-.talents-empty { color: #888; font-style: italic; padding: 14px; text-align: center; }
+.talents-empty { color: #aaa; padding: 18px; text-align: center; font-style: normal; }
+.talents-empty-title { color: #e8c870; font-weight: bold; font-size: 13px; margin-bottom: 8px; }
+.talents-empty-hint  { color: #a09080; font-size: 11px; line-height: 1.5; margin-bottom: 10px; }
+.talents-empty-hint strong { color: #ffd060; }
+.talents-empty-learned { font-size: 10px; color: #88aa88; }
+.talents-empty-tag {
+  display: inline-block;
+  background: rgba(40,60,30,0.5);
+  border: 1px solid #80a080;
+  padding: 1px 6px;
+  margin: 2px;
+  border-radius: 2px;
+  color: #c0e0c0;
+}
 
 .talent-row {
   display: grid;

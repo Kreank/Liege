@@ -7,7 +7,23 @@
       </div>
       <div class="talents-list">
         @if (rows().length === 0) {
-          <div class="talents-empty">Kein Talentbaum verfügbar.</div>
+          <div class="talents-empty">
+            <div class="talents-empty-title">Noch keine Talente verfügbar</div>
+            <div class="talents-empty-hint">
+              Du hast <strong>{{ points() }}</strong> Talent-Punkt(e).
+              Trainiere Skills (Holzfällen, Bergbau, Kampf, …), um neue Talente
+              freizuschalten — der Baum öffnet sich automatisch, sobald du
+              die nötigen Skill-Stufen erreichst.
+            </div>
+            @if (learnedList().length > 0) {
+              <div class="talents-empty-learned">
+                Bereits gelernt:
+                @for (id of learnedList(); track id) {
+                  <span class="talents-empty-tag">{{ id }}</span>
+                }
+              </div>
+            }
+          </div>
         }
         @for (row of rows(); track row.node.id) {
           <div

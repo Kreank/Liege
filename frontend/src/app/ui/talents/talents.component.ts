@@ -50,6 +50,12 @@ export class TalentsComponent {
 
   readonly points = computed<number>(() => this.state.talents()?.points ?? 0);
 
+  /** Liste der gelernten Talent-IDs — auch sichtbar wenn der Tree leer ist,
+   *  damit der Spieler seinen Fortschritt sieht (H1.2). */
+  readonly learnedList = computed<readonly string[]>(
+    () => this.state.talents()?.learned ?? [],
+  );
+
   readonly rows = computed<readonly TalentRow[]>(() => {
     const tree = this.state.talents();
     if (!tree) return [];
