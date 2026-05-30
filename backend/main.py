@@ -283,22 +283,9 @@ async def admin_page():
     return FileResponse("../frontend/legacy/admin.html")
 
 
-@app.get("/manifest.webmanifest")
-async def pwa_manifest():
-    return FileResponse(
-        "../frontend/legacy/manifest.webmanifest",
-        media_type="application/manifest+json",
-    )
-
-
-@app.get("/sw.js")
-async def pwa_sw():
-    # Muss von root serviert werden, damit der Scope `/` ist.
-    return FileResponse(
-        "../frontend/legacy/sw.js",
-        media_type="application/javascript",
-        headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
-    )
+# Manifest + Service-Worker (ngsw-worker.js, ngsw.json, safety-worker.js)
+# werden seit F-PWA vom Angular-Build erzeugt und über den `/`-Static-Mount
+# am Ende der Datei ausgeliefert. Keine dedizierten Routes nötig.
 
 
 CHUNK_SEND_RADIUS = 3  # 7x7 Chunks (224×224 Tiles) um Spieler
