@@ -68,6 +68,7 @@ from ws.context import WsContext
 from ws.dispatcher import dispatch as ws_dispatch
 import ws.movement  # noqa: F401 — registriert move/sprint im Dispatcher
 import ws.bills  # noqa: F401 — registriert add_bill/remove_bill/list_bills
+import ws.research  # noqa: F401 — registriert invest_research
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
@@ -3225,18 +3226,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 await quests.mark_closed(quest_id)
                 await websocket.send_json({"type": "quest_closed", "quest_id": quest_id})
                 await websocket.send_json({"type": "toast", "text": "✅ Quest abgegeben!"})
-
-            elif mtype == "invest_research":
-                node_id = data.get("node_id", "")
-                points = max(1, min(10, int(data.get("points", 1))))
-                result = await research.invest(player_id, node_id, points)
-                if result is not None:
-                    await websocket.send_json({"type": "research_update", **result})
-                    if result["done"]:
-                        await websocket.send_json({
-                            "type": "toast",
-                            "text": f"🔬 Forschung abgeschlossen: {research.RESEARCH_NODES[node_id]['name']}",
-                        })
 
             elif mtype == "talk_to_npc":
                 npc_id = int(data.get("npc_id", 0))
