@@ -2,71 +2,126 @@
   <div class="cc-overlay" role="dialog" aria-modal="true" aria-labelledby="cc-title">
     <div class="cc-card">
       <h2 class="cc-title" id="cc-title">Charakter erstellen</h2>
-      <p class="cc-subtitle">
-        Wähle einen Namen und ein Erscheinungsbild — du kannst nicht zurück.
-      </p>
 
-      <div class="cc-field">
-        <label class="cc-label" for="cc-name">Name</label>
-        <div class="cc-name-row">
-          <input
-            id="cc-name"
-            class="cc-name-input"
-            type="text"
-            autocomplete="off"
-            spellcheck="false"
-            maxlength="24"
-            [value]="name()"
-            (input)="onNameInput($any($event.target).value)"
-          />
-          <span
-            class="cc-name-icon"
-            [class.ok]="nameStatus() === 'ok'"
-            [class.bad]="nameStatus() === 'taken' || nameStatus() === 'invalid'"
-            [class.busy]="nameStatus() === 'checking'"
-          >{{ statusIcon() }}</span>
+      @if (step() === 1) {
+        <p class="cc-subtitle">
+          Schritt 1 von 2 — Name und Erscheinungsbild.
+        </p>
+
+        <div class="cc-field">
+          <label class="cc-label" for="cc-name">Name</label>
+          <div class="cc-name-row">
+            <input
+              id="cc-name"
+              class="cc-name-input"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              maxlength="24"
+              [value]="name()"
+              (input)="onNameInput($any($event.target).value)"
+            />
+            <span
+              class="cc-name-icon"
+              [class.ok]="nameStatus() === 'ok'"
+              [class.bad]="nameStatus() === 'taken' || nameStatus() === 'invalid'"
+              [class.busy]="nameStatus() === 'checking'"
+            >{{ statusIcon() }}</span>
+          </div>
+          @if (nameError(); as err) {
+            <div class="cc-name-error">{{ err }}</div>
+          }
         </div>
-        @if (nameError(); as err) {
-          <div class="cc-name-error">{{ err }}</div>
-        }
-      </div>
 
-      <div class="cc-field">
-        <div class="cc-label">Erscheinungsbild</div>
-        <div class="cc-preset-grid">
-          @for (p of presets; track p.key) {
+        <div class="cc-field">
+          <div class="cc-label">Erscheinungsbild</div>
+          <div class="cc-preset-grid">
+            @for (p of presets; track p.key) {
+              <button
+                type="button"
+                class="cc-preset-card"
+                [class.selected]="selectedPreset() === p.key"
+                (click)="selectPreset(p.key)"
+              >
+                <img
+                  class="cc-preset-preview"
+                  [src]="p.preview"
+                  [alt]="p.label"
+                  draggable="false"
+                />
+                <div class="cc-preset-label">{{ p.label }}</div>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="cc-actions">
+          <button
+            type="button"
+            class="cc-submit"
+            [disabled]="!canProceed()"
+            (click)="proceedToStep2()"
+          >
+            Weiter →
+          </button>
+        </div>
+      } @else {
+        <p class="cc-subtitle">
+          Schritt 2 von 2 — Verteile deine {{ pool() }} Startpunkte auf die Attribute.
+          Nicht-verteilte Punkte bleiben im Pool und können später (Taste C) verteilt werden.
+        </p>
+
+        <div class="cc-pool-banner" [class.warn]="remaining() < 0">
+          Verbleibend: <strong>{{ remaining() }}</strong> / {{ pool() }} Punkt(e)
+        </div>
+
+        <div class="cc-attr-list">
+          @for (m of attrMeta; track m.key) {
+            <div class="cc-attr-row">
+              <div class="cc-attr-info">
+                <div class="cc-attr-label">{{ m.label }}</div>
+                <div class="cc-attr-desc">{{ m.desc }}</div>
+              </div>
+              <div class="cc-attr-ctrl">
+                <button
+                  type="button"
+                  class="cc-attr-btn"
+                  [disabled]="valueOf(m.key) <= 0"
+                  (click)="adjust(m.key, -1)"
+                >−</button>
+                <span class="cc-attr-value">+{{ valueOf(m.key) }}</span>
+                <button
+                  type="button"
+                  class="cc-attr-btn"
+                  [disabled]="remaining() <= 0"
+                  (click)="adjust(m.key, 1)"
+                >+</button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="cc-actions cc-actions-split">
+          <button type="button" class="cc-back" (click)="backToStep1()">← Zurück</button>
+          <div class="cc-actions-right">
+            @if (spent() > 0) {
+              <button type="button" class="cc-reset" (click)="resetAllocation()">Reset</button>
+            }
             <button
               type="button"
-              class="cc-preset-card"
-              [class.selected]="selectedPreset() === p.key"
-              (click)="selectPreset(p.key)"
+              class="cc-submit"
+              [disabled]="!canSubmit()"
+              (click)="createCharacter()"
             >
-              <img
-                class="cc-preset-preview"
-                [src]="p.preview"
-                [alt]="p.label"
-                draggable="false"
-              />
-              <div class="cc-preset-label">{{ p.label }}</div>
+              @if (creating()) {
+                Erstelle …
+              } @else {
+                Charakter erstellen
+              }
             </button>
-          }
+          </div>
         </div>
-      </div>
-
-      <div class="cc-actions">
-        <button
-          type="button"
-          class="cc-submit"
-          [disabled]="!canSubmit()"
-          (click)="createCharacter()"
-        >
-          @if (creating()) {
-            Erstelle …
-          } @else {
-            Charakter erstellen
-          }
-        </button>
-      </div>
+      }
     </div>
   </div>
 }

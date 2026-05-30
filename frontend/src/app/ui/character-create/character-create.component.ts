@@ -8,7 +8,10 @@
 // Backend-Vertrag (siehe ws/character.py):
 //   • Client → `character_check_name { name }`
 //   • Server → `character_name_check  { name, available, reason }`
-//   • Client → `character_create      { name, preset }`
+//   • Client → `character_create      { name, preset, allocated? }`
+//     - `allocated` (optional dict): Pre-Allocation der Initial-Pool-Punkte.
+//       Backend akzeptiert das Feld; nicht-allokierte Punkte bleiben im
+//       `unspent`-Pool und können später via `allocate_attr` verteilt werden.
 //   • Server → `character_created { ... }` + neues `init` mit
 //             `needs_character_creation: false` → das `needsCharacterCreation`-
 //             Signal flippt automatisch auf false → `visible` wird false.
@@ -17,6 +20,13 @@
 // 6 vom Asset-Loader vorgeladenen Walk-Cycles. Andere Werte würde der Renderer
 // auf `wanderer_cloak` (Default) zurückfallen lassen, also bieten wir nur die
 // echten 6 zur Auswahl an.
+//
+// Step-Flow (H1.1, 2026-05-31):
+//   Step 1 — Name + Preset.    [„Weiter" → Step 2]
+//   Step 2 — Attribute (6×).    [„Charakter erstellen" → submit + close]
+// Pool defaultet auf 5 Punkte (Backend-Default in services/player_state.py);
+// nicht-verteilte Punkte landen im server-seitigen `unspent`-Pool und bleiben
+// nach dem Modal-Close im Character-Panel (Taste C) für später verfügbar.
 
 import {
   ChangeDetectionStrategy,
@@ -26,6 +36,7 @@ import {
   signal,
 } from '@angular/core';
 
+import type { PlayerAttributes } from '../../core/models/player.model';
 import { GameStateService } from '../../core/services/game-state.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 
@@ -33,6 +44,12 @@ interface PresetOption {
   readonly key: string;
   readonly label: string;
   readonly preview: string;
+}
+
+interface AttrMeta {
+  readonly key: keyof Omit<PlayerAttributes, 'unspent'>;
+  readonly label: string;
+  readonly desc: string;
 }
 
 const PRESETS: ReadonlyArray<PresetOption> = [
@@ -44,12 +61,37 @@ const PRESETS: ReadonlyArray<PresetOption> = [
   { key: 'wild_ranger',    label: 'Wildhüter',    preview: '/assets/animations/player_presets/wild_ranger/idle_1.png' },
 ];
 
+const ATTR_META: ReadonlyArray<AttrMeta> = [
+  { key: 'strength',     label: '💪 Stärke',       desc: 'Schaden + Tragelast' },
+  { key: 'dexterity',    label: '🎯 Geschick',     desc: 'Crit + Angriffstempo' },
+  { key: 'intelligence', label: '🧠 Intelligenz',  desc: 'Manapool + Zauber' },
+  { key: 'constitution', label: '❤️ Konstitution', desc: 'HP + Ausdauer' },
+  { key: 'wisdom',       label: '🕯️ Weisheit',     desc: 'Mana-Regen + Resistenzen' },
+  { key: 'charisma',     label: '🎭 Charisma',     desc: 'Preise + Quests' },
+];
+
 type NameStatus = 'idle' | 'checking' | 'ok' | 'taken' | 'invalid';
 
 const MIN_NAME_LEN = 3;
 const MAX_NAME_LEN = 24;
+/** Default-Pool, falls Backend-Init `attributes.unspent` nicht liefert.
+ *  Hartcodiert auf 5 weil das der Backend-Default in services/player_state.py
+ *  ist (siehe `INITIAL_UNSPENT_POINTS`). */
+const DEFAULT_POOL = 5;
 /** Client-seitige Vor-Validierung (Backend macht autoritativ noch eine eigene). */
 const NAME_RE = /^[A-Za-zÄÖÜäöüß0-9_\- ]+$/;
+
+type AttrKey = AttrMeta['key'];
+type AllocationMap = Readonly<Record<AttrKey, number>>;
+
+const EMPTY_ALLOC: AllocationMap = {
+  strength: 0,
+  dexterity: 0,
+  intelligence: 0,
+  constitution: 0,
+  wisdom: 0,
+  charisma: 0,
+};
 
 @Component({
   selector: 'app-character-create',
@@ -73,11 +115,39 @@ export class CharacterCreateComponent {
   readonly selectedPreset = signal<string>(PRESETS[0].key);
   readonly creating = signal<boolean>(false);
 
+  /** Step 1 = Name+Preset, Step 2 = Attribute. */
+  readonly step = signal<1 | 2>(1);
+
+  /** Pro-Attribut allokierte Bonus-Punkte (zusätzlich zum Backend-Baseline).
+   *  Werden mit `character_create` mitgeschickt; Server validiert die Summe
+   *  gegen `unspent` und ignoriert Überzüge. */
+  readonly allocated = signal<AllocationMap>(EMPTY_ALLOC);
+
+  /** Backend liefert im `init`-Frame ggf. `attributes.unspent` — wir lesen
+   *  das, sonst Default 5. Liest reaktiv: wenn der `init`-Frame mit Pool
+   *  noch nachkommt, springt das Modal automatisch an. */
+  readonly pool = computed<number>(() => {
+    const a = this.state.attributes() ?? this.state.player()?.attributes ?? null;
+    return a?.unspent ?? DEFAULT_POOL;
+  });
+
+  readonly spent = computed<number>(() => {
+    const a = this.allocated();
+    return ATTR_META.reduce((sum, m) => sum + (a[m.key] ?? 0), 0);
+  });
+
+  readonly remaining = computed<number>(() => this.pool() - this.spent());
+
+  readonly attrMeta: ReadonlyArray<AttrMeta> = ATTR_META;
   readonly presets: ReadonlyArray<PresetOption> = PRESETS;
 
   /** Submit nur wenn Name vom Server bestätigt UND wir nicht gerade senden. */
-  readonly canSubmit = computed<boolean>(
+  readonly canProceed = computed<boolean>(
     () => this.nameStatus() === 'ok' && !this.creating(),
+  );
+
+  readonly canSubmit = computed<boolean>(
+    () => this.canProceed() && this.step() === 2 && this.remaining() >= 0,
   );
 
   constructor() {
@@ -140,14 +210,47 @@ export class CharacterCreateComponent {
     this.selectedPreset.set(key);
   }
 
+  proceedToStep2(): void {
+    if (!this.canProceed()) return;
+    this.step.set(2);
+  }
+
+  backToStep1(): void {
+    this.step.set(1);
+  }
+
+  adjust(key: AttrKey, delta: number): void {
+    const cur = this.allocated();
+    const next = (cur[key] ?? 0) + delta;
+    if (next < 0) return;
+    if (delta > 0 && this.remaining() <= 0) return;
+    this.allocated.set({ ...cur, [key]: next });
+  }
+
+  resetAllocation(): void {
+    this.allocated.set(EMPTY_ALLOC);
+  }
+
   createCharacter(): void {
     if (!this.canSubmit()) return;
     this.creating.set(true);
-    this.ws.send({
-      type: 'character_create',
-      name: this.name(),
-      preset: this.selectedPreset(),
-    });
+    // Allokation nur senden, wenn der Spieler mind. 1 Punkt verteilt hat.
+    // Backend akzeptiert das Feld auch leer/missing — kein Pflichtfeld.
+    const alloc = this.allocated();
+    if (this.spent() > 0) {
+      this.ws.send({
+        type: 'character_create',
+        name: this.name(),
+        preset: this.selectedPreset(),
+        allocated: { ...alloc },
+      });
+    } else {
+      this.ws.send({
+        type: 'character_create',
+        name: this.name(),
+        preset: this.selectedPreset(),
+      });
+    }
   }
 
   /** Icon neben dem Namensfeld — kompakte visuelle Statusrückmeldung. */
@@ -159,5 +262,10 @@ export class CharacterCreateComponent {
       case 'invalid':  return '✗';
       default:         return '';
     }
+  }
+
+  /** Template-Helper — liest aktuellen Allokations-Wert für ein Attribut. */
+  valueOf(key: AttrKey): number {
+    return this.allocated()[key] ?? 0;
   }
 }
