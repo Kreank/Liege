@@ -1,0 +1,9 @@
+@if (visible()) {
+  <div class="cast-bar">
+    <div class="cast-bar-icon" [style.background-image]="iconStyle()"></div>
+    <div class="cast-bar-progress">
+      <div class="cast-bar-fill" [style.width.%]="progressPct()"></div>
+      <div class="cast-bar-label">{{ spell()?.name ?? 'Zauber' }}</div>
+    </div>
+  </div>
+}

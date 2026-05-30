@@ -1,0 +1,111 @@
+/* Übernommen aus legacy/style.css Z. 325-377 (Welle 25 Spellbook). */
+
+:host { display: contents; }
+
+.spellbook-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spellbook-box {
+  width: min(640px, 95vw);
+  max-height: 86vh;
+  background: rgba(20, 18, 30, 0.97);
+  border: 2px solid #6080b0;
+  border-radius: 6px;
+  padding: 12px;
+  color: #c8d8ff;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+}
+
+.spellbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #b0c8ff;
+}
+
+.sb-close {
+  background: #404060;
+  color: #fff;
+  border: 1px solid #6080b0;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.spellbook-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.sb-tab {
+  background: rgba(40, 40, 60, 0.8);
+  color: #c0c0d0;
+  border: 1px solid #404060;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: monospace;
+}
+.sb-tab.active {
+  background: rgba(80, 100, 160, 0.6);
+  color: #fff;
+  border-color: #6080b0;
+}
+
+.spellbook-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  gap: 8px;
+  padding: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.sb-spell {
+  width: 76px;
+  height: 90px;
+  cursor: grab;
+  background: rgba(30, 30, 50, 0.85);
+  border: 2px solid #506080;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+.sb-spell:hover { border-color: #80a0ff; background: rgba(50, 60, 100, 0.9); }
+.sb-spell.locked { opacity: 0.4; cursor: not-allowed; }
+.sb-spell img { width: 48px; height: 48px; object-fit: contain; }
+.sb-spell .sb-name {
+  font-size: 9px;
+  color: #c0d0ff;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+.sb-spell .sb-skill { font-size: 8px; color: #ff8080; }
+
+.spellbook-detail {
+  margin-top: 8px;
+  padding: 8px;
+  min-height: 60px;
+  background: rgba(15, 15, 25, 0.85);
+  border: 1px solid #404060;
+  font-size: 12px;
+  color: #b0c0e0;
+  line-height: 1.4;
+}
+
+.sb-meta { opacity: 0.8; }

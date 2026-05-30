@@ -12,6 +12,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { PhaserGameComponent } from './game/phaser-game.component';
+import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
 import { GroupInviteComponent } from './ui/group-invite/group-invite.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
@@ -23,6 +24,7 @@ import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
 import { SkillsComponent } from './ui/skills/skills.component';
+import { SpellbookComponent } from './ui/spellbook/spellbook.component';
 import { TalentsComponent } from './ui/talents/talents.component';
 
 @Component({
@@ -42,6 +44,8 @@ import { TalentsComponent } from './ui/talents/talents.component';
     LootRollComponent,
     RaidSelectorComponent,
     GroupInviteComponent,
+    SpellbookComponent,
+    CastBarComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

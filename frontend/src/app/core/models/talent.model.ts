@@ -15,12 +15,22 @@ export interface TalentTree {
   readonly tree?: readonly TalentNode[];
 }
 
+/** Schule des Zaubers — Spellbook-Tabs filtern darauf. */
+export type SpellSchool = 'healer' | 'mage';
+
+/** Spell-Definitions-Eintrag aus dem Backend-Catalog (siehe
+ *  `backend/spells.py::SPELLS`). */
 export interface SpellEntry {
   readonly id: string;
   readonly name: string;
   readonly description?: string;
   readonly mana_cost?: number;
-  readonly cast_ms?: number;
+  readonly cast_time_ms?: number;
+  readonly cooldown_ms?: number;
+  readonly skill_req?: number;
+  readonly icon_path?: string;
+  readonly school?: SpellSchool;
+  readonly target_kind?: 'self' | 'group' | 'enemy' | 'tile' | 'downed';
   readonly tier?: number;
 }
 

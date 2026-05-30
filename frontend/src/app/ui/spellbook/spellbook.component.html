@@ -1,0 +1,38 @@
+@if (visible()) {
+  <div class="spellbook-overlay" (click)="close()">
+    <div class="spellbook-box" (click)="$event.stopPropagation()">
+      <div class="spellbook-header">
+        <span>✦ Zauberbuch</span>
+        <button type="button" class="sb-close" (click)="close()">P / Esc</button>
+      </div>
+      <div class="spellbook-tabs">
+        @for (s of schools; track s.id) {
+          <button type="button" class="sb-tab"
+                  [class.active]="school() === s.id"
+                  (click)="selectSchool(s.id)">{{ s.label }}</button>
+        }
+      </div>
+      <div class="spellbook-grid">
+        @for (t of tiles(); track t.id) {
+          <div class="sb-spell" [class.locked]="t.locked" (click)="pickTile(t)">
+            @if (t.icon) {
+              <img [src]="t.icon" [alt]="t.name">
+            }
+            <div class="sb-name">{{ t.name }}</div>
+            @if (!t.meetsReq) {
+              <div class="sb-skill">Lvl {{ t.skillReq }}</div>
+            }
+          </div>
+        }
+      </div>
+      <div class="spellbook-detail">
+        @if (selectedDetail(); as d) {
+          <strong>{{ d.title }}</strong> — {{ d.description }}<br>
+          <span class="sb-meta">{{ d.meta }}</span>
+        } @else {
+          Ziehe einen Zauber in einen Hotbar-Slot, um ihn dort zu binden.
+        }
+      </div>
+    </div>
+  </div>
+}

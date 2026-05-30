@@ -1,0 +1,55 @@
+/* Übernommen aus legacy/style.css Z. 295-323. */
+
+:host { display: contents; }
+
+.cast-bar {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 49;
+  display: flex;
+  width: 280px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid #80a0ff;
+  border-radius: 4px;
+  color: #c8d8ff;
+  font-family: monospace;
+  align-items: center;
+  gap: 8px;
+}
+
+.cast-bar-icon {
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.cast-bar-progress {
+  flex: 1;
+  height: 18px;
+  background: rgba(20, 20, 40, 0.9);
+  border: 1px solid #5070a0;
+  position: relative;
+  overflow: hidden;
+}
+
+.cast-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4080ff 0%, #80c0ff 100%);
+}
+
+.cast-bar-label {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 11px;
+  line-height: 18px;
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
+}

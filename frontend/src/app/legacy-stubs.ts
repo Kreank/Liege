@@ -13,11 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Spellbook + Cast-Bar (Welle 25 — Schulen, Cooldowns).
-  //          Legacy `toggleSpellbook`, `_refreshSpellbook`, `_updateCastBar`.
-  'spellbook',
-  'cast-bar',
-
   // TODO F5+: Chat-Box (Eingabe + Verlauf, Global/Group/Whisper).
   //          Legacy `setupChatConsole`, `appendChatLine`.
   'chat',

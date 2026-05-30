@@ -61,7 +61,8 @@ export interface InitMessage {
   readonly active_disasters?: readonly { readonly kind: string; readonly intensity?: number }[];
   readonly stats?: PlayerStats;
   readonly power_tier?: number;
-  readonly spell_catalog?: readonly SpellEntry[];
+  /** Backend sendet einen Dict (kind→def) ohne `id`-Feld pro Eintrag. */
+  readonly spell_catalog?: Readonly<Record<string, Omit<SpellEntry, 'id'>>>;
   readonly learned_spells?: readonly string[];
   readonly talents?: {
     readonly learned: readonly string[];

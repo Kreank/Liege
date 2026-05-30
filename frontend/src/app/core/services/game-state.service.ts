@@ -28,7 +28,7 @@ import type {
   StatusEffect,
 } from '../models/player.model';
 import type { FactionReputation, Quest } from '../models/quest.model';
-import type { SpellState, TalentTree } from '../models/talent.model';
+import type { SpellEntry, SpellState, TalentTree } from '../models/talent.model';
 import type { TimeSnapshot, WeatherSnapshot } from '../models/time.model';
 import type {
   InitMessage,
@@ -95,6 +95,13 @@ export class GameStateService {
   // ─── Talents + Spells ────────────────────────────────────────────────
   readonly talents = signal<TalentTree | null>(null);
   readonly spells = signal<SpellState>({ catalog: [], learned: [] });
+  /** Aktiver Cast — F13. Backend sendet `cast_started`, `cast_interrupted`,
+   *  `cast_finished`. Während gecastet wird, ist die Cast-Bar sichtbar. */
+  readonly activeCast = signal<{
+    readonly spell_id: string;
+    readonly started_at_ms: number;
+    readonly duration_ms: number;
+  } | null>(null);
 
   // ─── Welt-Zustand (für Renderer in F4) ───────────────────────────────
   readonly time = signal<TimeSnapshot | null>(null);
@@ -234,11 +241,9 @@ export class GameStateService {
       case 'talents_update':       this._handleTalentsUpdate(msg); break;
       case 'talent_learned':       this._handleTalentLearned(msg); break;
       case 'spell_learned':        this._handleSpellLearned(msg); break;
-      case 'cast_started':
+      case 'cast_started':         this._handleCastStarted(msg); break;
       case 'cast_interrupted':
-      case 'cast_finished':
-        // Cast-Bar-State kommt in F13 mit der Cast-Bar-Component.
-        break;
+      case 'cast_finished':        this.activeCast.set(null); break;
 
       // ─── Crafting / Trade / Bills / Research ────────────────────────
       case 'crafting_open':
@@ -330,8 +335,15 @@ export class GameStateService {
     if (msg.quests) this.quests.set(msg.quests);
     if (msg.factions) this.factions.set(msg.factions);
     if (msg.talents) this.talents.set(msg.talents);
+    // Backend sendet `spell_catalog` als dict (kind → def). Wir bauen daraus
+    // einen Array mit `id`-Feld, damit UI über ein einheitliches Format
+    // iterieren kann.
+    const catalogDict = msg.spell_catalog ?? {};
+    const catalog: SpellEntry[] = Object.entries(catalogDict).map(
+      ([id, def]) => ({ id, ...def }),
+    );
     this.spells.set({
-      catalog: msg.spell_catalog ?? [],
+      catalog,
       learned: msg.learned_spells ?? [],
     });
 
@@ -744,6 +756,17 @@ export class GameStateService {
     if (!cur) return;
     if (cur.learned.includes(learnedId)) return;
     this.talents.set({ ...cur, learned: [...cur.learned, learnedId] });
+  }
+
+  private _handleCastStarted(msg: GenericMsg): void {
+    const spellId = msg['spell_id'] as string | undefined;
+    const duration = msg['cast_time_ms'] as number | undefined;
+    if (!spellId) return;
+    this.activeCast.set({
+      spell_id: spellId,
+      duration_ms: duration ?? 0,
+      started_at_ms: Date.now(),
+    });
   }
 
   private _handleSpellLearned(msg: GenericMsg): void {
