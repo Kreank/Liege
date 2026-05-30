@@ -11,4 +11,8 @@
 <app-character></app-character>
 <app-quests></app-quests>
 <app-factions></app-factions>
-<app-party-frame></app-party-frame>
+<app-party-frame (openRaidSelector)="openRaidSelector()"></app-party-frame>
+<app-loot-roll></app-loot-roll>
+<app-raid-selector [visible]="raidSelectorVisible()"
+                   (close)="closeRaidSelector()"></app-raid-selector>
+<app-group-invite></app-group-invite>

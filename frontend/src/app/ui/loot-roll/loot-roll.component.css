@@ -1,0 +1,67 @@
+/* Übernommen aus legacy/style.css Z. 1727-1749. */
+
+:host { display: contents; }
+
+.loot-roll-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loot-roll-box {
+  background: #1a1814;
+  border: 2px solid #d4a050;
+  padding: 18px 22px;
+  min-width: 320px;
+  max-width: 90vw;
+  color: #ddd;
+  font-family: monospace;
+  text-align: center;
+}
+
+.loot-roll-title {
+  font-size: 16px;
+  color: #f0c878;
+  margin-bottom: 10px;
+}
+
+.loot-roll-body {
+  font-size: 13px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.loot-roll-hint {
+  color: #888;
+  font-size: 11px;
+}
+
+.loot-roll-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.lr-btn {
+  padding: 8px 14px;
+  font-family: monospace;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #888;
+  background: #2a2620;
+  color: #ddd;
+}
+
+.lr-need  { border-color: #c85040; color: #f0a090; }
+.lr-greed { border-color: #c8a050; color: #f0d090; }
+.lr-pass  { border-color: #888; }
+
+.loot-roll-timer {
+  font-size: 11px;
+  color: #888;
+  margin-top: 10px;
+}

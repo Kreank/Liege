@@ -1,0 +1,66 @@
+/* Übernommen aus legacy/style.css Z. 1751-1776. */
+
+:host { display: contents; }
+
+.raid-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.raid-selector-box {
+  background: #1a1814;
+  border: 2px solid #a05050;
+  padding: 18px 22px;
+  min-width: 320px;
+  max-width: 90vw;
+  color: #ddd;
+  font-family: monospace;
+  text-align: center;
+}
+
+.raid-selector-title {
+  font-size: 16px;
+  color: #e09080;
+  margin-bottom: 8px;
+}
+
+.raid-selector-body {
+  font-size: 12px;
+  margin-bottom: 14px;
+  color: #aaa;
+}
+
+.raid-selector-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.raid-tier-btn {
+  padding: 8px 12px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #6a4040;
+  background: #261d1d;
+  color: #d4b8a8;
+  text-align: left;
+}
+.raid-tier-btn:hover { background: #382727; color: #f0c8a8; }
+
+.raid-selector-actions { margin-top: 12px; }
+
+.raid-cancel-btn {
+  padding: 6px 14px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #666;
+  background: #2a2620;
+  color: #aaa;
+}

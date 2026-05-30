@@ -9,16 +9,19 @@
 //     GameStateService. Keine Angular-Routen — die UI ist ein einziger
 //     Bildschirm + Overlays.
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { PhaserGameComponent } from './game/phaser-game.component';
 import { CharacterComponent } from './ui/character/character.component';
+import { GroupInviteComponent } from './ui/group-invite/group-invite.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
 import { FactionsComponent } from './ui/factions/factions.component';
 import { InventoryComponent } from './ui/inventory/inventory.component';
+import { LootRollComponent } from './ui/loot-roll/loot-roll.component';
 import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
+import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
 import { SkillsComponent } from './ui/skills/skills.component';
 import { TalentsComponent } from './ui/talents/talents.component';
 
@@ -36,9 +39,20 @@ import { TalentsComponent } from './ui/talents/talents.component';
     QuestsComponent,
     FactionsComponent,
     PartyFrameComponent,
+    LootRollComponent,
+    RaidSelectorComponent,
+    GroupInviteComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {}
+export class App {
+  /** Visibility-Flag für den Raid-Selector. Wird vom PartyFrame über
+   *  `openRaidSelector` gehoben — bleibt im App-Shell, weil der Selector
+   *  parteneigen ein eigenes Modal ist und nicht Teil des PartyFrames. */
+  readonly raidSelectorVisible = signal<boolean>(false);
+
+  openRaidSelector(): void { this.raidSelectorVisible.set(true); }
+  closeRaidSelector(): void { this.raidSelectorVisible.set(false); }
+}

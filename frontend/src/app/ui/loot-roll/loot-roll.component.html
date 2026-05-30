@@ -1,0 +1,17 @@
+@if (visible()) {
+  <div class="loot-roll-overlay">
+    <div class="loot-roll-box">
+      <div class="loot-roll-title">🎲 Loot-Roll</div>
+      <div class="loot-roll-body">
+        <b>{{ itemLabel() }}</b><br>
+        <span class="loot-roll-hint">Need wenn du es brauchst, Greed sonst</span>
+      </div>
+      <div class="loot-roll-actions">
+        <button type="button" class="lr-btn lr-need"  (click)="vote('need')">⚔️ Need</button>
+        <button type="button" class="lr-btn lr-greed" (click)="vote('greed')">💰 Greed</button>
+        <button type="button" class="lr-btn lr-pass"  (click)="vote('pass')">✗ Pass</button>
+      </div>
+      <div class="loot-roll-timer">{{ remainingS() }} s</div>
+    </div>
+  </div>
+}

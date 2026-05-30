@@ -79,6 +79,14 @@ export class GameStateService {
   // ─── Party + Loot ────────────────────────────────────────────────────
   readonly party = signal<Group | null>(null);
   readonly partyInvites = signal<readonly GroupInvite[]>([]);
+  /** Aktiver Loot-Roll (F12 — Overlay). Genau einer aktiv zur Zeit; Backend
+   *  serialisiert das im `loot_rolls`-Modul. */
+  readonly activeLootRoll = signal<{
+    readonly roll_id: number;
+    readonly item: { readonly kind: string; readonly quantity?: number; readonly quality?: string };
+    readonly expires_in_s: number;
+    readonly started_at_ms: number;
+  } | null>(null);
 
   // ─── Quests + Factions ───────────────────────────────────────────────
   readonly quests = signal<readonly Quest[]>([]);
@@ -206,11 +214,12 @@ export class GameStateService {
       case 'group_error':
       case 'raid_error':           /* Toast — kein State */ break;
       case 'raid_started':         /* Visual-Event */ break;
-      case 'loot_roll_started':
+      case 'loot_roll_started':    this._handleLootRollStarted(msg); break;
+      case 'loot_roll_resolved':   this.activeLootRoll.set(null); break;
       case 'loot_roll_voted':
-      case 'loot_roll_resolved':
       case 'loot_rule_changed':
-        // Loot-Overlay-State kommt in F12 mit der UI-Component.
+        // loot_voted: nur Live-Vote-Count, der Overlay zeigt das nicht; das
+        // Lootrule-Update wird vom späteren Party-Settings-Panel konsumiert.
         break;
 
       // ─── Quests + Factions ──────────────────────────────────────────
@@ -610,9 +619,53 @@ export class GameStateService {
   // ── Party ──
 
   private _handleGroupInviteReceived(msg: GenericMsg): void {
-    const inv = msg['invite'] as GroupInvite | undefined;
-    if (!inv) return;
-    this.partyInvites.set([...this.partyInvites(), inv]);
+    // Backend-Format (ws/social.py::handle_group_invite): die Felder liegen
+    // flach im Frame: invite_id, group_id, from, kind, expires_at.
+    const inviteId = msg['invite_id'] as number | undefined;
+    const groupId = msg['group_id'] as number | undefined;
+    const from = msg['from'] as string | undefined;
+    const kind = msg['kind'] as GroupInvite['kind'] | undefined;
+    if (inviteId == null || groupId == null || !from || !kind) {
+      // Defensiv: alternativ verschachteltes invite-Objekt (Legacy-Format).
+      const inv = msg['invite'] as GroupInvite | undefined;
+      if (inv) this.partyInvites.set([...this.partyInvites(), inv]);
+      return;
+    }
+    const invite: GroupInvite = {
+      invite_id: inviteId,
+      group_id: groupId,
+      from,
+      kind,
+      expires_at: msg['expires_at'] as string | undefined,
+    };
+    this.partyInvites.set([...this.partyInvites(), invite]);
+  }
+
+  /** Entfernt eine Einladung aus dem State (UI hat sie beantwortet). */
+  consumeInvite(inviteId: number): void {
+    this.partyInvites.set(
+      this.partyInvites().filter((i) => i.invite_id !== inviteId),
+    );
+  }
+
+  private _handleLootRollStarted(msg: GenericMsg): void {
+    const rollId = msg['roll_id'] as number | undefined;
+    const item = msg['item'] as {
+      readonly kind: string;
+      readonly quantity?: number;
+      readonly quality?: string;
+    } | undefined;
+    if (rollId == null || !item) return;
+    this.activeLootRoll.set({
+      roll_id: rollId,
+      item,
+      expires_in_s: (msg['expires_in_s'] as number | undefined) ?? 20,
+      started_at_ms: Date.now(),
+    });
+  }
+
+  clearLootRoll(): void {
+    this.activeLootRoll.set(null);
   }
 
   private _handleGroupMemberStatus(msg: GenericMsg): void {

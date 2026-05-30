@@ -1,0 +1,17 @@
+@if (visible) {
+  <div class="raid-selector-overlay" (click)="close.emit()">
+    <div class="raid-selector-box" (click)="$event.stopPropagation()">
+      <div class="raid-selector-title">⚔️ Raid auslösen</div>
+      <div class="raid-selector-body">Wähle einen Schwierigkeitsgrad. Cooldown 15 min.</div>
+      <div class="raid-selector-tiers">
+        @for (t of tiers; track t.tier) {
+          <button type="button" class="raid-tier-btn"
+                  (click)="pickTier(t.tier)">{{ t.label }}</button>
+        }
+      </div>
+      <div class="raid-selector-actions">
+        <button type="button" class="raid-cancel-btn" (click)="close.emit()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+}

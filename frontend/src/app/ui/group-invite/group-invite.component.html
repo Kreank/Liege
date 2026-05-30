@@ -1,0 +1,15 @@
+@if (visible() && invite(); as inv) {
+  <div class="group-invite-overlay">
+    <div class="group-invite-box">
+      <div class="group-invite-title">📜 Gruppen-Einladung</div>
+      <div class="group-invite-body">
+        <b>{{ inv.from }}</b> lädt dich in eine <b>{{ kindLabel() }}</b> ein.<br>
+        <span class="gi-hint">Einladung läuft in 60s ab</span>
+      </div>
+      <div class="group-invite-actions">
+        <button type="button" class="gi-accept"  (click)="accept()">✓ Annehmen</button>
+        <button type="button" class="gi-decline" (click)="decline()">✗ Ablehnen</button>
+      </div>
+    </div>
+  </div>
+}

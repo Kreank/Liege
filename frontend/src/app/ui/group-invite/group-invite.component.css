@@ -1,0 +1,57 @@
+/* Übernommen aus legacy/style.css Z. 1692-1715. */
+
+:host { display: contents; }
+
+.group-invite-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.group-invite-box {
+  background: #1a1814;
+  border: 2px solid #c8b88a;
+  padding: 18px 22px;
+  min-width: 280px;
+  max-width: 90vw;
+  color: #ddd;
+  font-family: monospace;
+  text-align: center;
+}
+
+.group-invite-title {
+  font-size: 16px;
+  color: #c8b88a;
+  margin-bottom: 10px;
+}
+
+.group-invite-body {
+  font-size: 13px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.gi-hint { color: #888; font-size: 11px; }
+
+.group-invite-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.group-invite-actions button {
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #888;
+  background: #2a2620;
+  color: #ddd;
+}
+
+.gi-accept  { border-color: #6aa050; color: #b0e090; }
+.gi-decline { border-color: #a05050; color: #e09090; }

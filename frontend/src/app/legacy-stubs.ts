@@ -13,18 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Loot-Roll-Overlay (Need/Greed/Pass-Buttons + Timer).
-  //          Legacy `showLootRollOverlay`, `_handleLootRollStarted`.
-  'loot-roll',
-
-  // TODO F5+: Raid-Selector-Overlay (Party-Konvertierung zu Raid).
-  //          Legacy `openRaidSelector`.
-  'raid-selector',
-
-  // TODO F5+: Group-Invite-Overlay (Annehmen/Ablehnen Pop-up).
-  //          Legacy `showGroupInvite`.
-  'group-invite',
-
   // TODO F5+: Spellbook + Cast-Bar (Welle 25 — Schulen, Cooldowns).
   //          Legacy `toggleSpellbook`, `_refreshSpellbook`, `_updateCastBar`.
   'spellbook',
