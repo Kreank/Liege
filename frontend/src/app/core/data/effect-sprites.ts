@@ -1,6 +1,58 @@
-// EFFECT_SPRITES — Effekt-Kind → URL-Path zum Effekt-Sprite.
-//
-// Foundation-Stub (2026-05-30). Parallel-Subagent B füllt diese Map aus
-// `assets/effects/*.png`. Der `AssetLoaderService` registriert beim Boot
-// alles, was hier drin steht als Phaser-Texture (key = `effect_<kind>`).
-export const EFFECT_SPRITES: Readonly<Record<string, string>> = {};
+// Auto-generiert aus assets/animations/professional/* + assets/effects/* (Welle render-data, 2026-05-30).
+// Effect-Key -> erstes Frame des Anim-Loops (Phaser nutzt es als Static-Sprite-Repraesentation).
+// Subagent A's Loader kann diese Pfade direkt verwenden, oder per Konvention die
+// restlichen Frames durch _01->_02..._NN substituieren.
+
+/** Effect-Key -> absoluter Path zum (ersten) Frame. */
+export const EFFECT_SPRITES: Readonly<Record<string, string>> = {
+  biome_desert_dust:           '/assets/animations/professional/biomes/desert_dust/desert_dust_01.png',
+  biome_desert_heat_haze:      '/assets/animations/professional/biomes/desert_heat_haze/desert_heat_haze_01.png',
+  biome_jungle_humidity_motes: '/assets/animations/professional/biomes/jungle_humidity_motes/jungle_humidity_motes_01.png',
+  biome_jungle_leaf_drift:     '/assets/animations/professional/biomes/jungle_leaf_drift/jungle_leaf_drift_01.png',
+  biome_swamp_mist:            '/assets/animations/professional/biomes/swamp_mist/swamp_mist_01.png',
+  biome_volcanic_ash:          '/assets/animations/professional/biomes/volcanic_ash/volcanic_ash_01.png',
+  disaster_ash_rain:           '/assets/animations/disasters/ash_rain/ash_flake_falling_anim_01.png',
+  disaster_forest_fire:        '/assets/animations/disasters/forest_fire/ember_rise_anim_01.png',
+  disaster_locust_swarm:       '/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_01.png',
+  disaster_scorching_heat:     '/assets/animations/disasters/scorching_heat/heat_shimmer_anim_01.png',
+  disaster_thunderstorm:       '/assets/animations/disasters/thunderstorm/lightning_flash_sky_anim_01.png',
+  disaster_toxic_fog:          '/assets/animations/disasters/toxic_fog/toxic_bubble_burst_anim_01.png',
+  fireball_explosion:          '/assets/animations/professional/combat_magic/fireball_explosion/fireball_explosion_01.png',
+  heal_glow:                   '/assets/effects/heal_glow.png',
+  heal_pulse:                  '/assets/animations/professional/combat_magic/heal_pulse/heal_pulse_01.png',
+  hit_spark:                   '/assets/animations/professional/combat_magic/hit_spark/hit_spark_01.png',
+  holy_shield_aura:            '/assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_01.png',
+  ice_impact:                  '/assets/animations/professional/combat_magic/ice_impact/ice_impact_01.png',
+  ice_shard:                   '/assets/effects/ice_shard.png',
+  ice_spell:                   '/assets/animations/professional/combat_magic/ice_spell/ice_spell_01.png',
+  lightning_bolt_projectile:   '/assets/animations/professional/combat_magic/lightning_bolt_projectile/lightning_bolt_projectile.png',
+  lightning_strike:            '/assets/animations/professional/combat_magic/lightning_strike/lightning_strike_01.png',
+  magic_circle:                '/assets/animations/professional/combat_magic/magic_circle/magic_circle_01.png',
+  poison_cloud:                '/assets/animations/professional/combat_magic/poison_cloud/poison_cloud_01.png',
+  pro_weather_fog_dense:       '/assets/animations/professional/weather/fog_dense/fog_dense_01.png',
+  pro_weather_fog_light:       '/assets/animations/professional/weather/fog_light/fog_light_01.png',
+  pro_weather_rain_downpour:   '/assets/animations/professional/weather/rain_downpour/rain_downpour_01.png',
+  pro_weather_rain_heavy:      '/assets/animations/professional/weather/rain_heavy/rain_heavy_01.png',
+  pro_weather_rain_light:      '/assets/animations/professional/weather/rain_light/rain_light_01.png',
+  pro_weather_rain_medium:     '/assets/animations/professional/weather/rain_medium/rain_medium_01.png',
+  pro_weather_snow_blizzard:   '/assets/animations/professional/weather/snow_blizzard/snow_blizzard_01.png',
+  pro_weather_snow_heavy:      '/assets/animations/professional/weather/snow_heavy/snow_heavy_01.png',
+  pro_weather_snow_light:      '/assets/animations/professional/weather/snow_light/snow_light_01.png',
+  pro_weather_snow_medium:     '/assets/animations/professional/weather/snow_medium/snow_medium_01.png',
+  pro_weather_storm_lightning: '/assets/animations/professional/weather/storm_lightning/storm_lightning_01.png',
+  shadow:                      '/assets/effects/shadow.png',
+  sword_slash_arc:             '/assets/animations/professional/combat_magic/sword_slash_arc/sword_slash_arc_01.png',
+  weather_fog_dense:           '/assets/animations/weather/fog_dense_1.png',
+  weather_fog_light:           '/assets/animations/weather/fog_light_1.png',
+  weather_rain_downpour:       '/assets/animations/weather/rain_downpour_1.png',
+  weather_rain_heavy:          '/assets/animations/weather/rain_heavy_1.png',
+  weather_rain_light:          '/assets/animations/weather/rain_light_1.png',
+  weather_rain_medium:         '/assets/animations/weather/rain_medium_1.png',
+  weather_snow_blizzard:       '/assets/animations/weather/snow_blizzard_1.png',
+  weather_snow_heavy:          '/assets/animations/weather/snow_heavy_1.png',
+  weather_snow_light:          '/assets/animations/weather/snow_light_1.png',
+  weather_snow_medium:         '/assets/animations/weather/snow_medium_1.png',
+  weather_storm_lightning:     '/assets/animations/weather/storm_lightning_1.png',
+  weather_swamp_mist:          '/assets/animations/weather/swamp_mist_1.png',
+  wind_slash_spell:            '/assets/animations/professional/combat_magic/wind_slash_spell/wind_slash_icon.png',
+};

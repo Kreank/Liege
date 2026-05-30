@@ -1,12 +1,12 @@
 // Auto-generiert aus Asset-Manifests (Welle render-data, 2026-05-30).
 // Quelle: assets/monsters/world_sprites/generated_longlist/manifest.json (133 creature_*)
-//         assets/monsters/overworld_pool/manifest.json (30 overworld_*)
-//         assets/monsters/world_sprites/legacy_33/manifest.json (35 legacy-kinds)
-// Bei Asset-Re-Roll Datei via tools/render_data/gen_monster_sprites.py neu generieren.
+//         assets/monsters/overworld_pool/manifest.json              (30  overworld_*)
+//         assets/monsters/world_sprites/legacy_33/manifest.json     (35  legacy-kinds, 96px)
+// Phaser-AssetLoader importiert dies via @core/data Barrel-Export.
 
-/** Monster-Kind -> absoluter Path zum 128px Welt-Sprite (Default-Facing East). */
+/** Monster-Kind -> absoluter Path zum Welt-Sprite (Default-Facing East). */
 export const MONSTER_SPRITES: Readonly<Record<string, string>> = {
-  // -- generated_longlist (133 creature_*) ----------------------------------
+  // -- generated_longlist (133 creature_*, 128px) ---------------------------
   creature_marsh_rat_swarm:               '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_marsh_rat_swarm_world_128.png',
   creature_carrion_crow:                  '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_carrion_crow_world_128.png',
   creature_giant_centipede:               '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_giant_centipede_world_128.png',
@@ -141,7 +141,7 @@ export const MONSTER_SPRITES: Readonly<Record<string, string>> = {
   creature_falcon_companion:              '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_falcon_companion_world_128.png',
   creature_pack_ox:                       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_pack_ox_world_128.png',
 
-  // -- overworld_pool (30 overworld_*) --------------------------------------
+  // -- overworld_pool (30 overworld_*, 128px) -------------------------------
   overworld_undead_shambler:          '/assets/monsters/overworld_pool/sprites_128/overworld_undead_shambler_world_128.png',
   overworld_undead_skeleton_warrior:  '/assets/monsters/overworld_pool/sprites_128/overworld_undead_skeleton_warrior_world_128.png',
   overworld_undead_skeleton_archer:   '/assets/monsters/overworld_pool/sprites_128/overworld_undead_skeleton_archer_world_128.png',
@@ -211,7 +211,7 @@ export const MONSTER_SPRITES: Readonly<Record<string, string>> = {
   zombie:         '/assets/monsters/world_sprites/legacy_33/sprites_96/zombie_world_96.png',
 };
 
-/** Monster-Kind -> 128px West-gespiegelt. Fuer creature_ / overworld_ Pools vorhanden. */
+/** Monster-Kind -> West-gespiegeltes 128px-Sprite (nur creature_ und overworld_ Praefixe). */
 export const MONSTER_SPRITES_MIRRORED: Readonly<Record<string, string>> = {
   // creature_*
   creature_marsh_rat_swarm:               '/assets/monsters/world_sprites/generated_longlist/sprites_128_mirrored/creature_marsh_rat_swarm_world_128_west.png',
@@ -546,39 +546,39 @@ export const MONSTER_ICONS: Readonly<Record<string, string>> = {
   overworld_apex_cliff_kraken_arm:        '/assets/monsters/overworld_pool/icons_64/overworld_apex_cliff_kraken_arm_icon_64.png',
   overworld_aberrant_eyeless_pilgrim:     '/assets/monsters/overworld_pool/icons_64/overworld_aberrant_eyeless_pilgrim_icon_64.png',
   overworld_aberrant_star_mote_imp:       '/assets/monsters/overworld_pool/icons_64/overworld_aberrant_star_mote_imp_icon_64.png',
-  goblin:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/goblin_icon_64.png',
-  wolf:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/wolf_icon_64.png',
-  skeleton:                               '/assets/monsters/world_sprites/legacy_33/icons_64/skeleton_icon_64.png',
-  spider:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/spider_icon_64.png',
-  slime:                                  '/assets/monsters/world_sprites/legacy_33/icons_64/slime_icon_64.png',
-  rat:                                    '/assets/monsters/world_sprites/legacy_33/icons_64/rat_icon_64.png',
-  bat:                                    '/assets/monsters/world_sprites/legacy_33/icons_64/bat_icon_64.png',
-  zombie:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/zombie_icon_64.png',
   bandit:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/bandit_icon_64.png',
-  robber:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/robber_icon_64.png',
-  thief:                                  '/assets/monsters/world_sprites/legacy_33/icons_64/thief_icon_64.png',
-  boar:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/boar_icon_64.png',
+  bat:                                    '/assets/monsters/world_sprites/legacy_33/icons_64/bat_icon_64.png',
   bear:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/bear_icon_64.png',
-  stag:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/stag_icon_64.png',
-  lynx:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/lynx_icon_64.png',
-  cougar:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/cougar_icon_64.png',
-  wolverine:                              '/assets/monsters/world_sprites/legacy_33/icons_64/wolverine_icon_64.png',
-  dire_wolf:                              '/assets/monsters/world_sprites/legacy_33/icons_64/dire_wolf_icon_64.png',
-  wolf_alpha:                             '/assets/monsters/world_sprites/legacy_33/icons_64/wolf_alpha_icon_64.png',
+  boar:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/boar_icon_64.png',
   cave_bear:                              '/assets/monsters/world_sprites/legacy_33/icons_64/cave_bear_icon_64.png',
-  polar_bear:                             '/assets/monsters/world_sprites/legacy_33/icons_64/polar_bear_icon_64.png',
-  crocodile:                              '/assets/monsters/world_sprites/legacy_33/icons_64/crocodile_icon_64.png',
   cobra:                                  '/assets/monsters/world_sprites/legacy_33/icons_64/cobra_icon_64.png',
-  slimelet:                               '/assets/monsters/world_sprites/legacy_33/icons_64/slimelet_icon_64.png',
-  fae_mite:                               '/assets/monsters/world_sprites/legacy_33/icons_64/fae_mite_icon_64.png',
-  gloom_moth:                             '/assets/monsters/world_sprites/legacy_33/icons_64/gloom_moth_icon_64.png',
-  ember_newt:                             '/assets/monsters/world_sprites/legacy_33/icons_64/ember_newt_icon_64.png',
-  ember_rat:                              '/assets/monsters/world_sprites/legacy_33/icons_64/ember_rat_icon_64.png',
-  shadow_bat:                             '/assets/monsters/world_sprites/legacy_33/icons_64/shadow_bat_icon_64.png',
-  thorn_scarab:                           '/assets/monsters/world_sprites/legacy_33/icons_64/thorn_scarab_icon_64.png',
+  cougar:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/cougar_icon_64.png',
+  crocodile:                              '/assets/monsters/world_sprites/legacy_33/icons_64/crocodile_icon_64.png',
   crystal_beetle:                         '/assets/monsters/world_sprites/legacy_33/icons_64/crystal_beetle_icon_64.png',
   crystal_tick:                           '/assets/monsters/world_sprites/legacy_33/icons_64/crystal_tick_icon_64.png',
-  frost_sprite:                           '/assets/monsters/world_sprites/legacy_33/icons_64/frost_sprite_icon_64.png',
+  dire_wolf:                              '/assets/monsters/world_sprites/legacy_33/icons_64/dire_wolf_icon_64.png',
+  ember_newt:                             '/assets/monsters/world_sprites/legacy_33/icons_64/ember_newt_icon_64.png',
+  ember_rat:                              '/assets/monsters/world_sprites/legacy_33/icons_64/ember_rat_icon_64.png',
+  fae_mite:                               '/assets/monsters/world_sprites/legacy_33/icons_64/fae_mite_icon_64.png',
   fire_imp:                               '/assets/monsters/world_sprites/legacy_33/icons_64/fire_imp_icon_64.png',
+  frost_sprite:                           '/assets/monsters/world_sprites/legacy_33/icons_64/frost_sprite_icon_64.png',
+  gloom_moth:                             '/assets/monsters/world_sprites/legacy_33/icons_64/gloom_moth_icon_64.png',
+  goblin:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/goblin_icon_64.png',
+  lynx:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/lynx_icon_64.png',
   mushroom_imp:                           '/assets/monsters/world_sprites/legacy_33/icons_64/mushroom_imp_icon_64.png',
+  polar_bear:                             '/assets/monsters/world_sprites/legacy_33/icons_64/polar_bear_icon_64.png',
+  rat:                                    '/assets/monsters/world_sprites/legacy_33/icons_64/rat_icon_64.png',
+  robber:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/robber_icon_64.png',
+  shadow_bat:                             '/assets/monsters/world_sprites/legacy_33/icons_64/shadow_bat_icon_64.png',
+  skeleton:                               '/assets/monsters/world_sprites/legacy_33/icons_64/skeleton_icon_64.png',
+  slime:                                  '/assets/monsters/world_sprites/legacy_33/icons_64/slime_icon_64.png',
+  slimelet:                               '/assets/monsters/world_sprites/legacy_33/icons_64/slimelet_icon_64.png',
+  spider:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/spider_icon_64.png',
+  stag:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/stag_icon_64.png',
+  thief:                                  '/assets/monsters/world_sprites/legacy_33/icons_64/thief_icon_64.png',
+  thorn_scarab:                           '/assets/monsters/world_sprites/legacy_33/icons_64/thorn_scarab_icon_64.png',
+  wolf:                                   '/assets/monsters/world_sprites/legacy_33/icons_64/wolf_icon_64.png',
+  wolf_alpha:                             '/assets/monsters/world_sprites/legacy_33/icons_64/wolf_alpha_icon_64.png',
+  wolverine:                              '/assets/monsters/world_sprites/legacy_33/icons_64/wolverine_icon_64.png',
+  zombie:                                 '/assets/monsters/world_sprites/legacy_33/icons_64/zombie_icon_64.png',
 };

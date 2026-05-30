@@ -15,3 +15,8 @@ export * from './equip-slots';
 export * from './items';
 export * from './npc-sprites';
 export * from './animations';
+// Welle render-data, 2026-05-30 — statische Sprite-Manifeste fuer Phaser-Loader.
+export * from './monster-sprites';
+export * from './structure-sprites';
+export * from './item-sprites';
+export * from './effect-sprites';
