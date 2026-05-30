@@ -374,3 +374,78 @@ sind nirgends injected, Tree-Shaking entfernt sie komplett. Strict-TS-Check
 GameStateService und ruft `.connect()` im Constructor) lässt das Bundle real
 wachsen — vermutlich um ~12-18 kB für RxJS Subject + die State-Service-
 Branches, je nachdem wie aggressiv Angular die Switch-Cases reinpullt.
+
+---
+
+## 19. F4 — Ambivalente Stellen zwischen Render und UI
+
+Legacy `WorldScene` (`frontend/legacy/app.js` Z. 2415-10090) vermischt Render-
+Code mit DOM-/UI-Code in einzelnen Methoden. F4a-c zieht **nur** den reinen
+Render- und Input-Anteil rüber; die DOM-Anteile bleiben für F5+ liegen.
+Folgende Stellen sind ambivalent (Render-Teile **und** DOM-Teile in einer
+Methode) — bei der Panel-Migration in F5+ jeweils einzeln aufschlüsseln:
+
+- **`create()` Z. ~3118-3402.** Phaser-Setup (Animationen, Input-Handler) und
+  DOM-Event-Wires (Dialog-Buttons, Close-Buttons, Spellbook-Tabs, Settings)
+  sind verschachtelt. F4a/c hat den Phaser-Teil rausgezogen; der DOM-
+  Bind-Teil wandert mit den jeweiligen Panels (siehe `legacy-stubs.ts`).
+- **`update()` Z. 9953-10067.** Movement-Loop (Phaser, in F4c migriert) plus
+  DOM-Updates (`updateUI(x,y)` schreibt #coords, #tile-name) plus
+  `drawMinimap()`. F4c sendet nur das `move`-Intent — die Minimap und die
+  Coord-Anzeige sind F5+ HUD.
+- **`toggleBuildMode()` Z. 3404-3415.** Build-Mode-Zustand (Phaser, müsste
+  in F4c gehören) ist mit `document.getElementById('build-bar').style` und
+  `document.body.classList` direkt verdrahtet. F4c hat einen Flag-Toggle
+  ohne UI-Wirkung — die Build-Bar selber kommt mit F5+ (`build-bar` in
+  legacy-stubs).
+- **`onPointerDown(pointer)` (im Legacy nicht zitiert, Suchstelle
+  `this.input.on('pointerdown'...)`).** Macht im Build-Mode `place_structure`
+  mit Material+Rotation, sonst Klick-Targeting (NPC-Talk, Item-Pickup,
+  Sign-Inspect). F4c bringt das Klick-Targeting (Move/NPC/Item/Use). Place-
+  Structure-Click wartet auf Build-Bar-UI.
+- **`_wake()` (Bett-Schlaf-Wake).** Sendet Backend-`wake`-Intent UND
+  schließt das Downed-Overlay über DOM. F4c lässt das beim Legacy — Wake
+  kommt mit dem Downed-Overlay-Panel in F5+.
+
+## 20. F4 — Asset-Preload absichtlich minimal
+
+Legacy preloadet ~200 Image-Keys + dutzende Sprite-Atlases (Spell-Anims,
+Walk-Cycle pro Preset × Dir × Frame, Wall-Auto-Tiling × Material, Pro-Weapon-
+Skins, Armor-Slots × Rarity, Wetter-Frames, Biome-Ambient, …). F4 lädt aus-
+schließlich die zehn Biome-Tile-PNGs.
+
+**Warum:** Lokale Spielbarkeit ist im Refactoring-Auftrag explizit irrelevant
+(Server hat die Legacy-Version weiter). Das vollständige Preload kommt mit
+F-final, wenn die UI komplett migriert ist und ein neuer Asset-Manifest-
+Loader das Legacy-Tabellen-Triple (`SKIN_POOL_PRELOAD`, `INSPIRED_WEAPON_SLUGS`,
+`PRO_MONSTERS`, `LONGLIST_MONSTERS`, `ANIMATED_NPC_KINDS`, `WORLD_POLISH_ANIMS`,
+…) ablöst. F4 nutzt Fallback-Rectangles wenn ein Texture fehlt — sicht-
+bar in der Demo, aber bricht das TypeScript-Build nicht.
+
+## 21. F4 — Keine Animation, kein Walk-Cycle, kein Tween
+
+Spieler-/NPC-Sprites sind in F4 statische Phaser-Image / Rectangle.
+Walk-Cycle aus `data/animations.ts` (Preset-Walk-Config, NPC_FLIP_LR_KINDS,
+ANIMATED_NPC_KINDS, ANIMATED_MONSTER_KINDS) ist NICHT verdrahtet — Legacy
+hat dafür `_updateWalkFrame()`, `playOverlayAnim()`, ~600 Z. Sprite-
+State-Maschinerie. Das migriert F-final als eigene Render-Subphase
+zusammen mit dem Asset-Manifest-Loader (siehe §20).
+
+## 22. F4 — Bridge-Zone-Disziplin
+
+`PhaserGameComponent.ngAfterViewInit` ruft `ngZone.runOutsideAngular()` für
+das `Phaser.Game`-Init **und** den `ws.connect()`. Das Phaser-Loop läuft
+damit definiert außerhalb der Zone (kein Change-Detection-Sturm bei 60 FPS).
+
+`GameBridgeService.sendIntent` ruft `WebSocketService.send` — beides sind
+read-only-Operationen aus Angular-Sicht (Signal-Werte werden nicht
+geschrieben), also Zone-Polution irrelevant. Phaser **liest** Signals (via
+`bridge.state.<sig>()`) — auch das ist Zone-rein, weil Signal-Reads keine
+Side-Effects haben.
+
+`GameStateService._dispatch` schreibt Signals in Reaktion auf WS-Messages.
+Das passiert auf dem `messages$`-Observable-Tick und wird durch die RxJS-
+Subscription gepatcht — läuft in der Zone, in der `connect()` aufgerufen
+wurde (= außerhalb, weil wir das im Phaser-Component machen). Sobald F5+ eine
+UI-Komponente bindet, muss die Component das `signal()`-Read explizit in
+die Zone holen (z. B. via `effect()` mit Default-Schedule).

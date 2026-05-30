@@ -12,7 +12,10 @@
 //            Fallback-Sprites (Phaser-Graphics Rect) wenn das echte Texture
 //            nicht im Cache ist — strikte Asset-Vollständigkeit kommt erst
 //            mit der UI-Migration (F5+).
-// F4c kommt: Klick→Move, Tasten, Kamera-Follow.
+// F4c-Scope: Input → Intent (Klick = Move, SHIFT = Sprint, B = Build-Toggle).
+//            Kamera-Follow auf den eigenen Spieler. Keine Pfadfindung im
+//            Frontend — die `move`-Message ist schon das Pathfind-Intent
+//            (Backend führt den Pfad).
 
 import Phaser from 'phaser';
 
@@ -22,6 +25,7 @@ import type { GroundItem } from '../core/models/item.model';
 import type { NPC } from '../core/models/npc.model';
 import type { OnlinePlayer } from '../core/models/player.model';
 import type { GameBridgeService } from '../core/services/game-bridge.service';
+import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
 
 /** Init-Daten, die `PhaserGameComponent` per `scene.start('WorldScene',{...})` durchreicht. */
@@ -74,6 +78,15 @@ export class WorldScene extends Phaser.Scene {
   private groundItemPool!: SpritePool<GroundItem, Phaser.GameObjects.GameObject>;
   private lastGroundItemsRef: readonly GroundItem[] | null = null;
 
+  // ─── Kamera-Follow + Local Sprint-State (F4c) ────────────────────────
+  /** Letzte Spieler-Tile-Position für Move-Intent-Deduplication. */
+  private lastSentMoveTile: { x: number; y: number } | null = null;
+  /** Lokaler Sprint-Zustand — wir senden nur on/off-Edges an den Server. */
+  private sprintSent = false;
+  /** Build-Mode-Flag — F4c verwaltet nur die Flag, die UI-Anzeige (Build-
+   *  Bar etc.) kommt mit dem entsprechenden Angular-Panel in F5+. */
+  private buildMode = false;
+
   constructor() {
     super({ key: 'WorldScene' });
   }
@@ -124,6 +137,22 @@ export class WorldScene extends Phaser.Scene {
       create: (g) => this.createGroundItemSprite(g),
       update: (s, g) => this.updateMovableSprite(s, g.x, g.y),
     });
+
+    // ─── Input → Intents ──────────────────────────────────────────────
+    setupInput(this, {
+      onTileClick: (pos) => this.handleTileClick(pos.x, pos.y),
+      onSprintChange: (on) => this.handleSprintChange(on),
+      onToggleBuildMode: () => {
+        this.buildMode = !this.buildMode;
+        // TODO F5+: Build-Bar-UI öffnen/schließen (legacy-stubs.ts:`build-bar`).
+      },
+    });
+
+    // ─── Kamera-Setup ─────────────────────────────────────────────────
+    // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
+    // keine Bounds (Phaser-Default = unbegrenzt). Die Follow-Logik im
+    // `update()` setzt die Kamera auf die Spieler-Position.
+    this.cameras.main.setRoundPixels(true);
   }
 
   override update(_time: number, _delta: number): void {
@@ -155,6 +184,88 @@ export class WorldScene extends Phaser.Scene {
       this.lastGroundItemsRef = groundItems;
       this.groundItemPool.sync(groundItems);
     }
+
+    // ─── Kamera-Follow auf den eigenen Spieler ─────────────────────────
+    // Wir lesen die kanonische Position aus `state.player()` (nicht den
+    // Pool-Sprite), damit Kamera auch dann folgt, wenn das Sprite (noch)
+    // nicht im Pool ist (Edge-Case: kurz vor erstem `players`-Update).
+    const me = this.bridge.state.player();
+    if (me) {
+      const px = me.x * TILE_SIZE + TILE_SIZE / 2;
+      const py = me.y * TILE_SIZE + TILE_SIZE / 2;
+      this.cameras.main.centerOn(px, py);
+    }
+  }
+
+  // ─── Input-Handler (F4c) ──────────────────────────────────────────────
+
+  /**
+   * Klick auf Tile → entscheide kontextuell:
+   *   1. NPC am Ziel? → talk_to_npc (friendly) bzw. attack_npc (hostile).
+   *   2. Ground-Item am Ziel? → pick_item.
+   *   3. Struktur am Ziel? → use_structure (Tür, Chest, Bed, Stairs …).
+   *   4. Sonst: move-Intent zum Ziel.
+   *
+   * Backend macht die eigentliche Pfadfindung / Validierung. Das Frontend
+   * sendet nur das Intent — die Antwort kommt als `player_moved`/„closed".
+   *
+   * F4c-Limit: Wir prüfen nur Ziel-Tile-Kollisionen, kein Hover-Highlight.
+   * Build-Mode-Place-Click (mit Rotation) kommt mit der Build-Bar-Migration
+   * (F5+: `build-bar` in legacy-stubs.ts).
+   */
+  private handleTileClick(tileX: number, tileY: number): void {
+    if (this.buildMode) {
+      // TODO F5+: place_structure mit Rotation + Material (siehe Build-Bar
+      // im legacy-stubs.ts). Hier nur Skeleton — bewusst kein Default-Send,
+      // weil das Backend einen Type-Param erwartet.
+      return;
+    }
+
+    // 1) NPC?
+    const npcs = this.bridge.state.npcsVisible();
+    const npcHere = npcs.find((n) => n.x === tileX && n.y === tileY);
+    if (npcHere) {
+      if (npcHere.hostile) {
+        this.bridge.sendAttackNpc(npcHere.id);
+      } else {
+        this.bridge.sendTalkToNpc(npcHere.id);
+      }
+      return;
+    }
+
+    // 2) Ground-Item?
+    const groundItems = this.bridge.state.itemsGround();
+    const itemHere = groundItems.find((g) => g.x === tileX && g.y === tileY);
+    if (itemHere) {
+      this.bridge.sendPickItem(itemHere.id);
+      return;
+    }
+
+    // 3) Struktur?
+    const structures = this.bridge.state.structures();
+    const structHere = structures.find((s) => s.x === tileX && s.y === tileY);
+    if (structHere) {
+      this.bridge.sendUseStructure(tileX, tileY);
+      return;
+    }
+
+    // 4) Move-Intent. Dedup: gleicher Ziel-Tile innerhalb derselben
+    // Click-Sequenz → nicht erneut senden (Spam-Schutz, Legacy-Verhalten).
+    if (
+      this.lastSentMoveTile &&
+      this.lastSentMoveTile.x === tileX &&
+      this.lastSentMoveTile.y === tileY
+    ) {
+      return;
+    }
+    this.lastSentMoveTile = { x: tileX, y: tileY };
+    this.bridge.sendMove(tileX, tileY);
+  }
+
+  private handleSprintChange(on: boolean): void {
+    if (on === this.sprintSent) return;
+    this.sprintSent = on;
+    this.bridge.sendSprint(on);
   }
 
   // ─── Tile-Layer-Rendering ──────────────────────────────────────────────
