@@ -217,6 +217,17 @@ ITEM_KINDS = {
     "rope_coil":        {"category": "resource", "name": "Seil-Rolle",       "sprite": "/assets/tools/rope_coil.png"},
 }
 
+# Welle 35: Monster-Drop-Items (146 neue Slugs für creature_*- und
+# overworld_*-Mob-Loot). Definitionen aus `monster_drop_items.py` werden
+# per setdefault gemerged — bestehende ITEM_KINDS-Einträge gewinnen.
+try:
+    import monster_drop_items as _mdi
+    for _k, _v in _mdi.DROP_ITEMS.items():
+        ITEM_KINDS.setdefault(_k, _v)
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.items").exception("monster_drop_items merge failed")
+
 EQUIP_SLOTS = ["weapon", "helmet", "chestplate", "gloves", "shield", "boots", "ring", "amulet", "tool"]
 
 # Welle 36: stackable Kategorien (gleich-kind-items mergen in einer Row mit quantity)
