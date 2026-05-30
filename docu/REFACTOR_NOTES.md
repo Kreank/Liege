@@ -706,3 +706,26 @@ Aus den Refactor-Notes-Sektionen 1-23 plus Aufgaben aus dieser Phase:
     war nur im Legacy-`app.js` und ist nach F-final weg. Bis zu
     einer Migration ist das Audio-System de facto stumm.
 
+---
+
+## 25. Welle 35 — fehlende Status-Effekt-Kinds (`swift`/`speed`/`strength`)
+
+**Ort:** `backend/status_effects.py` — DOT_EFFECTS + HOT_EFFECTS sind aktuell
+nur `burning`, `poisoned`, `bleeding`, `blessed`, `shielded` und `slowed`.
+
+**Symptom:** Bei den Use-Effekten für Monster-Drop-Foods (`strider_meat` —
+Geplant: +5% Speed 60s) und für die `witch_brew`-Rolls "speed" und "strength"
+gibt es keinen passenden Effekt-Kind. Aktuell als Workaround:
+- `strider_meat`-Speed-Buff KOMPLETT WEGGELASSEN (kein Effekt).
+- `witch_brew` speed/strength → fallback auf `blessed` (HoT), liefert also
+  faktisch nur Heilung statt Buff. Cosmetic-Toast zeigt aber den geplanten
+  Buff-Namen, damit das Spielerlebnis stimmt.
+
+**Fix-Plan:** Neue Effekt-Kinds `swift` (Speed-Multiplikator) und `strong`
+(Damage-Multiplikator) in `status_effects.py` einführen + im Combat-Loop
+auswerten. Danach Workaround-Branches in `ws/inventory.py` (`handle_use_item`
+→ witch_brew + Monster-Food-Side-Effects) aufräumen.
+
+**Wer den Fix übernimmt:** separater Pass in der nächsten Welle, wenn der
+Combat-Multiplikator-Mechanismus eh ausgebaut wird.
+
