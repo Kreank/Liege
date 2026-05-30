@@ -84,8 +84,8 @@ YIELD_PER_HIT = {
     "tree_oak":      [("wood", 1, 2, 100), ("apple", 0, 1, 35)],
     "tree_pine":     [("wood", 1, 2, 100)],
     "tree_dead":     [("wood", 1, 1, 100)],
-    "tree_stump":    [("wood", 1, 1, 100)],
-    "fallen_log":    [("wood", 1, 2, 100)],
+    "tree_stump":    [("wood", 1, 2, 100)],
+    "fallen_log":    [("wood", 2, 3, 100)],
     # Erze hier NICHT als Default — kommen via BONUS_YIELDS_BY_BIOME /
     # MOUNTAIN_ADJACENT_BONUS, sodass Mithril & Co. nur in passenden Gebieten
     # auftauchen und nicht irgendwo auf der Wiese.
@@ -111,7 +111,7 @@ YIELD_PER_HIT = {
     "sack":          [("plant_fiber", 1, 2, 80), ("cloth", 0, 1, 40)],
     "fence":         [("wood", 1, 1, 100)],
     "ruin_pillar":   [("stone", 1, 1, 100)],
-    "rubble":        [("stone", 1, 1, 100)],
+    "rubble":        [("stone", 2, 3, 100)],   # Hand-Stein (NO_TOOL) — Early-Game-Quelle
     "statue_broken": [("stone", 1, 1, 100)],
     "shipwreck":     [("wood", 1, 2, 100), ("cloth", 0, 1, 30), ("gold_ore", 0, 1, 8)],
     "dock_straight": [("wood", 1, 1, 100)],

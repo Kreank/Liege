@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
 
@@ -370,7 +371,10 @@ async def lifespan(app: FastAPI):
     global world
     await db.init_db()
     await llm.init_llm()
-    world = await World.load_or_create(seed=42)
+    # World-Seed (env-überschreibbar). Reset 2026-05-30: neuer Seed → frische
+    # Landkarte. Für künftige Resets einfach WORLD_SEED-Env ändern (oder hier).
+    world = await World.load_or_create(
+        seed=int(os.environ.get("WORLD_SEED", "20260530")))
     await structures.load()
     await npcs.load()
     # Welle 27: Faction-System seeden + bestehende NPCs zuweisen
