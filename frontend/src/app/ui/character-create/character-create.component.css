@@ -1,0 +1,167 @@
+/* Erst-Login-Pflicht-Modal. Höchster z-index — liegt über Phaser, HUD,
+ * Inventar und allen anderen Panels. Kein Schließen-Button: der Spieler MUSS
+ * einen Charakter anlegen, um ins Spiel zu kommen. */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.cc-overlay {
+  position: fixed; inset: 0;
+  /* Über allem — Inventory liegt bei 150, Dialog bei 200, der Build-Bar
+   * und Tooltips bei ~400. Wir nageln uns auf 9999. */
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex; justify-content: center; align-items: flex-start;
+  overflow-y: auto;
+}
+
+.cc-card {
+  width: 92%;
+  max-width: 600px;
+  margin: 5vh auto;
+  background: #1a1812;
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.cc-title {
+  margin: 0 0 4px 0;
+  color: #e8d870;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.cc-subtitle {
+  margin: 0 0 24px 0;
+  color: #8a7e5a;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.cc-field {
+  margin-bottom: 24px;
+}
+
+.cc-label {
+  display: block;
+  color: #aaaa88;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+/* ── Name-Input ─────────────────────────────────────────────────────── */
+
+.cc-name-row {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.cc-name-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #555;
+  color: #e8d870;
+  font-family: monospace;
+  font-size: 14px;
+  outline: none;
+}
+.cc-name-input:focus { border-color: #c8b88a; }
+
+.cc-name-icon {
+  display: inline-block;
+  width: 24px;
+  text-align: center;
+  font-size: 16px;
+  color: #888;
+}
+.cc-name-icon.ok    { color: #88c870; }
+.cc-name-icon.bad   { color: #d05050; }
+.cc-name-icon.busy  { color: #c8b88a; }
+
+.cc-name-error {
+  color: #d05050;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+/* ── Preset-Grid ────────────────────────────────────────────────────── */
+
+.cc-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.cc-preset-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #444;
+  padding: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: inherit;
+  font-family: inherit;
+}
+.cc-preset-card:hover {
+  border-color: #8a7e5a;
+  background: rgba(60, 48, 28, 0.4);
+}
+.cc-preset-card.selected {
+  border-color: #c8b88a;
+  background: rgba(80, 64, 32, 0.5);
+}
+
+.cc-preset-preview {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.cc-preset-label {
+  color: #c8b88a;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ── Submit ─────────────────────────────────────────────────────────── */
+
+.cc-actions {
+  display: flex; justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.cc-submit {
+  padding: 10px 20px;
+  background: rgba(80, 80, 40, 0.55);
+  border: 1px solid #c8b88a;
+  color: #e8d870;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  transition: background 0.15s;
+}
+.cc-submit:hover:not(:disabled) {
+  background: rgba(120, 120, 60, 0.6);
+}
+.cc-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Schmaler Viewport (Mobile) ─────────────────────────────────────── */
+@media (max-width: 520px) {
+  .cc-card { padding: 20px; margin: 2vh auto; }
+  .cc-preset-grid { grid-template-columns: repeat(2, 1fr); }
+  .cc-preset-preview { width: 80px; height: 80px; }
+}

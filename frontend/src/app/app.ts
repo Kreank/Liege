@@ -16,6 +16,7 @@ import { BestiaryComponent } from './ui/bestiary/bestiary.component';
 import { BuildBarComponent } from './ui/build-bar/build-bar.component';
 import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
+import { CharacterCreateComponent } from './ui/character-create/character-create.component';
 import { ChatComponent } from './ui/chat/chat.component';
 import { ChestComponent } from './ui/chest/chest.component';
 import { CraftingComponent } from './ui/crafting/crafting.component';
@@ -53,6 +54,7 @@ import { TradeComponent } from './ui/trade/trade.component';
     SkillsComponent,
     TalentsComponent,
     CharacterComponent,
+    CharacterCreateComponent,
     QuestsComponent,
     FactionsComponent,
     PartyFrameComponent,
