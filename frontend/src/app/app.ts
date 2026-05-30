@@ -29,6 +29,7 @@ import { InventoryComponent } from './ui/inventory/inventory.component';
 import { ItemTooltipComponent } from './ui/item-tooltip/item-tooltip.component';
 import { LootRollComponent } from './ui/loot-roll/loot-roll.component';
 import { MinimapComponent } from './ui/minimap/minimap.component';
+import { MobileControlsComponent } from './ui/mobile-controls/mobile-controls.component';
 import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
@@ -74,6 +75,7 @@ import { TradeComponent } from './ui/trade/trade.component';
     MinimapComponent,
     SettingsComponent,
     TopRightLinksComponent,
+    MobileControlsComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

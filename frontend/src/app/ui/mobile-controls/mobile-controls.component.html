@@ -1,0 +1,38 @@
+@if (enabled()) {
+  <!-- Joystick-Capture-Zone: unsichtbares Feld im unteren Bilddrittel.
+       Verhindert, dass der Tile-Klick im Phaser-Canvas durchschlägt. -->
+  <div #zone
+       class="touch-zone"
+       (touchstart)="onZoneTouchStart($event)"
+       aria-hidden="true">
+  </div>
+
+  <!-- Joystick-Ring + Thumb. Position folgt dem aufsetzenden Finger. -->
+  <div class="touch-joystick"
+       [class.active]="joystickActive()"
+       [style.width.px]="outerSize"
+       [style.height.px]="outerSize"
+       [style.transform]="outerTransform()"
+       aria-hidden="true">
+    <div class="touch-joystick-thumb"
+         [style.width.px]="thumbSize"
+         [style.height.px]="thumbSize"
+         [style.marginLeft.px]="-thumbSize / 2"
+         [style.marginTop.px]="-thumbSize / 2"
+         [style.transform]="thumbTransform()">
+    </div>
+  </div>
+
+  <!-- Action-Buttons rechts unten. Toggeln die jeweiligen Overlays. -->
+  <div class="touch-actions">
+    @for (btn of buttons; track btn.title) {
+      <button type="button"
+              class="touch-btn"
+              [title]="btn.title"
+              (touchstart)="onButtonTap($event, btn)"
+              (click)="onButtonTap($event, btn)">
+        {{ btn.label }}
+      </button>
+    }
+  </div>
+}

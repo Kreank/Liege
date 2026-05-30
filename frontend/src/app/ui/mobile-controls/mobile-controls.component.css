@@ -1,0 +1,103 @@
+/* Touch-Joystick + Action-Buttons.
+   Z-Ordnung relativ zum Rest: Joystick liegt unter Action-Buttons aber über
+   den Game-Panels, damit der Daumen die Action-Buttons immer erwischt, auch
+   wenn ein Overlay halb darüber liegt. */
+
+.touch-zone {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 33vh;
+  z-index: 140;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.touch-joystick {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: rgba(15, 15, 22, 0.45);
+  border: 2px solid rgba(200, 184, 138, 0.55);
+  border-radius: 50%;
+  z-index: 150;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-9999px, -9999px);
+  transition: opacity 0.12s linear;
+}
+
+.touch-joystick.active {
+  opacity: 1;
+}
+
+.touch-joystick-thumb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: rgba(200, 184, 138, 0.7);
+  border: 2px solid #c8b88a;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.touch-actions {
+  position: fixed;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 56px 56px 56px;
+  gap: 8px;
+  z-index: 220;
+}
+
+.touch-btn {
+  width: 56px;
+  height: 56px;
+  background: rgba(15, 15, 22, 0.7);
+  border: 2px solid rgba(200, 184, 138, 0.6);
+  color: #c8b88a;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.touch-btn:active {
+  background: rgba(200, 184, 138, 0.3);
+}
+
+@media (orientation: portrait) and (max-width: 720px) {
+  .touch-actions {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    grid-template-columns: repeat(5, 52px);
+    gap: 6px;
+  }
+  .touch-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 13px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .touch-actions {
+    grid-template-columns: 56px;
+    right: 8px;
+    bottom: 8px;
+  }
+}
