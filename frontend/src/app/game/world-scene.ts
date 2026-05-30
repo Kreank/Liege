@@ -27,6 +27,7 @@
 //      neu berechnet, damit Add/Remove benachbarter Tiles korrekt anpassen.
 
 import Phaser from 'phaser';
+import type { Subscription } from 'rxjs';
 
 import {
   ANIMATED_NPC_KINDS,
@@ -42,6 +43,7 @@ import type { Chunk, Structure } from '../core/models/chunk.model';
 import type { GroundItem } from '../core/models/item.model';
 import type { NPC } from '../core/models/npc.model';
 import type { OnlinePlayer } from '../core/models/player.model';
+import type { ServerMessage } from '../core/models/ws-message.model';
 import type { GameBridgeService } from '../core/services/game-bridge.service';
 import type { AssetLoaderService } from './asset-loader.service';
 import {
@@ -49,8 +51,10 @@ import {
   type WalkDirection,
 } from './asset-loader.service';
 import type { WalkAnimationsService } from './walk-animations.service';
+import { COMBAT_FX } from './combat-fx';
 import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
+import { VISUAL_EFFECTS } from './visual-effects';
 import {
   buildStructureLookup,
   familyOf,
@@ -149,6 +153,8 @@ export class WorldScene extends Phaser.Scene {
   private lastSentMoveTile: { x: number; y: number } | null = null;
   /** Lokaler Sprint-Zustand — wir senden nur on/off-Edges an den Server. */
   private sprintSent = false;
+  /** Subscription auf den WS-Message-Stream (für transiente FX). */
+  private fxSub: Subscription | null = null;
   /** Build-Mode lebt seit F-extras-3 als Signal in der `GameBridgeService`,
    *  damit die Angular-`BuildBarComponent` reagieren kann. Wir lesen pro
    *  Click den aktuellen Wert von dort. */
@@ -232,6 +238,19 @@ export class WorldScene extends Phaser.Scene {
     // keine Bounds (Phaser-Default = unbegrenzt). Die Follow-Logik im
     // `update()` setzt die Kamera auf die Spieler-Position.
     this.cameras.main.setRoundPixels(true);
+
+    // ─── FX-Wiring: WS → Damage-Numbers, Sparks, Death, visual_effect ──
+    this.fxSub = this.bridge.messages$.subscribe((msg) => this.handleFxMessage(msg));
+
+    // Scene-Shutdown räumt Subscription auf (Phaser-Hook).
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.fxSub?.unsubscribe();
+      this.fxSub = null;
+    });
+    this.events.once(Phaser.Scenes.Events.DESTROY, () => {
+      this.fxSub?.unsubscribe();
+      this.fxSub = null;
+    });
   }
 
   override update(_time: number, _delta: number): void {
@@ -715,6 +734,153 @@ export class WorldScene extends Phaser.Scene {
     const p = players[String(key)];
     if (!p) return null;
     return this.assetLoader.resolvePlayerPreset(p.preset);
+  }
+
+  // ─── FX-Handler (WS-Stream → Phaser-Animations) ─────────────────────
+
+  /**
+   * Dispatch transienter Server-Events auf die FX-Layer. State-Updates
+   * (HP, Position) macht der `GameStateService` parallel — wir lesen hier
+   * nur die Delta-Felder (dmg, amount), die nach dem Frame verloren wären.
+   */
+  private handleFxMessage(msg: ServerMessage): void {
+    switch (msg.type) {
+      case 'npc_damaged':
+        this.fxNpcDamaged(msg);
+        return;
+      case 'npc_died':
+        this.fxNpcDied(msg);
+        return;
+      case 'player_damaged':
+        this.fxPlayerDamaged(msg);
+        return;
+      case 'player_healed':
+        this.fxPlayerHealed(msg);
+        return;
+      case 'structure_damaged':
+        this.fxStructureDamaged(msg);
+        return;
+      case 'structure_removed':
+        this.fxStructureRemoved(msg);
+        return;
+      case 'visual_effect':
+        this.fxVisualEffect(msg);
+        return;
+      default:
+        return;
+    }
+  }
+
+  private fxNpcDamaged(msg: ServerMessage): void {
+    const npcId = msg['npc_id'] as number | undefined;
+    const dmg = msg['dmg'] as number | undefined;
+    if (npcId == null) return;
+    // Position aus dem aktuellen NPC-Snapshot — der Sprite kann im Pool
+    // schon weiter gewandert sein als der zuletzt vom State gerenderte
+    // Wert. Wir nehmen den State, das passt zum Sprite-Tween.
+    const npc = this.bridge.state.npcsVisible().find((n) => n.id === npcId);
+    if (!npc) return;
+    const center = COMBAT_FX.tileCenter(npc.x, npc.y);
+    COMBAT_FX.spawnHitSpark(this, center.x, center.y);
+    if (dmg != null && dmg > 0) {
+      COMBAT_FX.spawnFloatingNumber(this, {
+        x: center.x,
+        y: center.y,
+        text: `-${dmg}`,
+        kind: 'phys',
+      });
+    }
+  }
+
+  private fxNpcDied(msg: ServerMessage): void {
+    const npcId = msg['npc_id'] as number | undefined;
+    if (npcId == null) return;
+    // Sprite aus dem Pool detachen, damit der nächste sync() es nicht
+    // zusätzlich destroyed (State entfernt den NPC ebenfalls in diesem Tick).
+    const sprite = this.npcPool.detach(npcId);
+    if (!sprite) return;
+    // Aktuelle Sprite-Position aus dem Transform lesen — robuster als
+    // erneuter State-Lookup nach dem State-Update.
+    const withXY = sprite as Phaser.GameObjects.GameObject & { x: number; y: number };
+    COMBAT_FX.spawnDeathFade(this, sprite, {
+      x: withXY.x,
+      y: withXY.y,
+      onDone: () => {
+        sprite.destroy();
+        this.npcTracks.delete(npcId);
+      },
+    });
+  }
+
+  private fxPlayerDamaged(msg: ServerMessage): void {
+    const dmg = msg['dmg'] as number | undefined;
+    const me = this.bridge.state.player();
+    if (!me) return;
+    const center = COMBAT_FX.tileCenter(me.x, me.y);
+    if (dmg != null && dmg > 0) {
+      COMBAT_FX.spawnFloatingNumber(this, {
+        x: center.x,
+        y: center.y,
+        text: `-${dmg}`,
+        kind: 'phys',
+      });
+      COMBAT_FX.spawnHitSpark(this, center.x, center.y);
+      COMBAT_FX.screenShake(this, dmg);
+    }
+  }
+
+  private fxPlayerHealed(msg: ServerMessage): void {
+    const amount = msg['amount'] as number | undefined;
+    const me = this.bridge.state.player();
+    if (!me) return;
+    const center = COMBAT_FX.tileCenter(me.x, me.y);
+    if (amount != null && amount > 0) {
+      COMBAT_FX.spawnFloatingNumber(this, {
+        x: center.x,
+        y: center.y,
+        text: `+${amount}`,
+        kind: 'heal',
+      });
+    }
+  }
+
+  private fxStructureDamaged(msg: ServerMessage): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null) return;
+    const center = COMBAT_FX.tileCenter(x, y);
+    COMBAT_FX.spawnHitSpark(this, center.x, center.y);
+  }
+
+  private fxStructureRemoved(msg: ServerMessage): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null) return;
+    // Kleiner Particle-Burst beim Wegnehmen — Sprite selbst wird vom
+    // structurePool.sync() im nächsten Tick destroyed.
+    const center = COMBAT_FX.tileCenter(x, y);
+    for (let i = 0; i < 5; i++) {
+      const ang = (i / 5) * Math.PI * 2;
+      const dot = this.add.circle(center.x, center.y, 3, 0xddccaa, 0.9);
+      dot.setDepth(60);
+      this.tweens.add({
+        targets: dot,
+        x: center.x + Math.cos(ang) * 20,
+        y: center.y + Math.sin(ang) * 20,
+        alpha: 0,
+        duration: 400,
+        ease: 'Cubic.easeOut',
+        onComplete: () => dot.destroy(),
+      });
+    }
+  }
+
+  private fxVisualEffect(msg: ServerMessage): void {
+    const kind = msg['kind'] as string | undefined;
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (!kind || x == null || y == null) return;
+    VISUAL_EFFECTS.spawn(this, { kind, x, y });
   }
 }
 
