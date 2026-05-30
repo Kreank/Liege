@@ -25,12 +25,16 @@ import type { GroundItem } from '../core/models/item.model';
 import type { NPC } from '../core/models/npc.model';
 import type { OnlinePlayer } from '../core/models/player.model';
 import type { GameBridgeService } from '../core/services/game-bridge.service';
+import type { AssetLoaderService } from './asset-loader.service';
+import type { WalkAnimationsService } from './walk-animations.service';
 import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
 
 /** Init-Daten, die `PhaserGameComponent` per `scene.start('WorldScene',{...})` durchreicht. */
 export interface WorldSceneInitData {
   readonly bridge: GameBridgeService;
+  readonly assetLoader: AssetLoaderService;
+  readonly walkAnimations: WalkAnimationsService;
 }
 
 /** Render-Tiefen (Z-Order). */
@@ -54,6 +58,10 @@ const FALLBACK_COLORS = {
 export class WorldScene extends Phaser.Scene {
   /** Bridge wird in `init()` aus den Scene-Start-Daten gesetzt. */
   private bridge!: GameBridgeService;
+  /** Sprite-Registry (NPC-Walk-Frames, Player-Presets, statische Sprites). */
+  private assetLoader!: AssetLoaderService;
+  /** Phaser-Animation-Definitions (Walk/Idle). */
+  private walkAnimations!: WalkAnimationsService;
 
   // ─── Tile-Layer ─────────────────────────────────────────────────────
   private readonly chunkContainers = new Map<string, Phaser.GameObjects.Container>();
@@ -96,15 +104,22 @@ export class WorldScene extends Phaser.Scene {
   // daher kein `override`-Keyword möglich.
   init(data: WorldSceneInitData): void {
     this.bridge = data.bridge;
+    this.assetLoader = data.assetLoader;
+    this.walkAnimations = data.walkAnimations;
   }
 
   preload(): void {
-    // Nur die Tile-Texturen für F4a. Sprites/Strukturen folgen in F4b —
-    // bzw. nutzen Fallback-Rect, wenn das Texture nicht geladen ist (siehe
-    // `getOrFallback*`-Helpers unten).
+    // Tile-Texturen (F4a).
     for (const def of Object.values(TILE)) {
       this.load.image(def.sprite, `/assets/tiles/${this.tileFilename(def.sprite)}`);
     }
+    // Statische Sprites (Monster/Struct/Item/Effect) + Walk-Cycle-Frames.
+    // F-render-foundation (2026-05-30): zentralisiert über AssetLoaderService.
+    this.assetLoader.preloadAll(this.load);
+    // 404er soll die Scene NICHT crashen — Fallback-Rect rendert dann.
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      console.warn('[WorldScene] asset 404 — falling back to magenta rect:', file.key, file.url);
+    });
   }
 
   /** `tile_grass` → `grass.png`. */
@@ -146,6 +161,11 @@ export class WorldScene extends Phaser.Scene {
         this.bridge.toggleBuildMode();
       },
     });
+
+    // ─── Walk-Animations registrieren ─────────────────────────────────
+    // Nach `preload()` sind alle Frame-Texturen im Cache — jetzt definieren
+    // wir pro Kind × Richtung eine Phaser-Animation.
+    this.walkAnimations.createAnimations(this);
 
     // ─── Kamera-Setup ─────────────────────────────────────────────────
     // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
@@ -354,11 +374,11 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createPlayerSprite(p: OnlinePlayer): Phaser.GameObjects.GameObject {
-    // Legacy nutzt walking-anim aus PRESET_WALK_CFG mit 4 Richtungen × 2 Frames.
-    // F4b: Standbild aus Preset-Texture (falls geladen), sonst blauer Rect-
-    // Fallback. Walk-Anim kommt mit F4c (Input + Bewegungs-Tracking) oder
-    // einer F4c-Subphase.
-    const tex = p.preset ? `player_${p.preset}_idle` : 'player_default';
+    // F-render-foundation: Player nutzt Walk-Cycle-Frame `idle_1` des Presets
+    // als Standbild. Wenn der `preset` null/leer ist, resolved der
+    // AssetLoader auf `wanderer_cloak` (Default).
+    const preset = this.assetLoader.resolvePlayerPreset(p.preset);
+    const tex = `player_${preset}_idle`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.player, TILE_SIZE);
     const isMe = this.bridge.state.player()?.player_id === p.player_id;
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = isMe
@@ -368,32 +388,31 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createNpcSprite(n: NPC): Phaser.GameObjects.GameObject {
-    // Texture-Key folgt Legacy-Konvention: `npc_<kind>` für humans,
-    // `monster_<kind>` für creatures, `animal_<kind>` für Nutztiere.
-    // Wir versuchen `npc_<kind>` zuerst; Fallback ist ein roter Rect.
-    const tex = n.sprite_variant ?? `npc_${n.kind}`;
+    // F-render-foundation: AssetLoader hat für jedes ANIMATED_NPC_KINDS-Kind
+    // ein Idle-Frame als `npc_<kind>`-Texture geladen. Wir prüfen erst
+    // sprite_variant (z. B. bandit_axe), dann den Standard-Key.
+    const variantTex = n.sprite_variant ? `npc_${n.sprite_variant}` : null;
+    const baseTex = this.assetLoader.textureKeyFor(n.kind) ?? `npc_${n.kind}`;
+    const tex = variantTex && this.textures.exists(variantTex) ? variantTex : baseTex;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.npc, TILE_SIZE);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.NPCS;
     return obj;
   }
 
   private createStructureSprite(s: Structure): Phaser.GameObjects.GameObject {
-    // Strukturen-Texture-Key folgt Legacy: `struct_<type>`. Bei Wänden mit
-    // Material-Variant würde Legacy `wall_<material>_<bitmask>` nutzen — das
-    // ist F4-out-of-scope (Wall-Auto-Tiling kommt in F-final oder als
-    // separate Render-Subphase).
-    const tex = `struct_${s.type}`;
+    // F-render-foundation: AssetLoader kennt den Type-Key bereits aus
+    // STRUCTURE_SPRITES (Subagent B liefert die Map). Falls leer → Fallback.
+    const tex = this.assetLoader.textureKeyFor(s.type) ?? `struct_${s.type}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.structure, TILE_SIZE);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.STRUCTURES;
     return obj;
   }
 
   private createGroundItemSprite(g: GroundItem): Phaser.GameObjects.GameObject {
-    // Item-Texture-Key folgt Legacy: `item_<kind>`. Legacy nutzt eine
-    // Item-Path-Map (ITEM[kind].sprite, plus Pro-Asset-Pools). F4b verzichtet
-    // darauf und fällt auf den Fallback zurück — die Pro-Asset-Pipeline
-    // wandert mit dem Inventar-Panel (F7) komplett ins UI.
-    const tex = `item_${g.kind}`;
+    // F-render-foundation: AssetLoader kennt den Item-Key aus ITEM_SPRITES
+    // (Subagent B). Pro-Asset-Pipeline (Quality/Cosmetic-Skin) kommt mit
+    // dem Inventar-Panel (F7).
+    const tex = this.assetLoader.textureKeyFor(g.kind) ?? `item_${g.kind}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.groundItem, TILE_SIZE * 0.5);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.GROUND_ITEMS;
     return obj;

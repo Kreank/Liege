@@ -30,6 +30,8 @@ import Phaser from 'phaser';
 
 import { GameBridgeService } from '../core/services/game-bridge.service';
 import { WebSocketService } from '../core/services/websocket.service';
+import { AssetLoaderService } from './asset-loader.service';
+import { WalkAnimationsService } from './walk-animations.service';
 import { WorldScene, type WorldSceneInitData } from './world-scene';
 
 @Component({
@@ -58,6 +60,8 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
   private readonly ngZone = inject(NgZone);
   private readonly bridge = inject(GameBridgeService);
   private readonly ws = inject(WebSocketService);
+  private readonly assetLoader = inject(AssetLoaderService);
+  private readonly walkAnimations = inject(WalkAnimationsService);
 
   private game: Phaser.Game | null = null;
 
@@ -81,8 +85,12 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
         scene: [WorldScene],
       };
       this.game = new Phaser.Game(config);
-      // Scene-Init-Daten: die Bridge weiterreichen.
-      const initData: WorldSceneInitData = { bridge: this.bridge };
+      // Scene-Init-Daten: Bridge + Render-Foundation-Services weiterreichen.
+      const initData: WorldSceneInitData = {
+        bridge: this.bridge,
+        assetLoader: this.assetLoader,
+        walkAnimations: this.walkAnimations,
+      };
       this.game.scene.start('WorldScene', initData);
     });
 
