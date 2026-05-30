@@ -85,6 +85,9 @@ ASYNC_BROADCAST_TYPES = {
     # FX, die durch Welt-Events ausgelöst werden
     "earthquake_shake",
     "visual_effect",
+    # weather_worker (Sturm, Regen, Gewitter)
+    "weather",
+    "lightning_strike",
     # status_effects-Worker
     "status_effects",
 }

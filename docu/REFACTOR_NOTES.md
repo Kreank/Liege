@@ -123,3 +123,31 @@ müssen. B2 löst diese Wrapper über `WsContext` final auf.
   nicht von services.player_state abhängt.
 
 **Keine Logik-Änderungen entdeckt.** ws_smoke diff leer (3× hintereinander).
+
+---
+
+## 7. `weather_worker._rain_water_plantings` — `column "x" does not exist`
+
+**Ort:** `backend/weather_worker.py:97`.
+
+**Symptom:** Bei Regen-Tick wirft asyncpg `UndefinedColumnError: column "x"`.
+Worker fängt es ab (loggt Traceback), Welt läuft weiter — kein Crash. Nur
+visuelles Rauschen in den Logs.
+
+**Auswirkung auf Refactor:** keine (Worker, kein WS-Handler), zwischen B3-Smoke-
+Läufen sichtbar als Log-Spam wenn das Wetter zufällig auf Regen springt.
+
+**Wer den Fix übernimmt:** separater Bug-Fix-Push nach B-final.
+
+---
+
+## 8. Smoke-Filter: weather / lightning_strike (B3, fixed)
+
+**Ort:** `backend/tools/ws_smoke.py` `ASYNC_BROADCAST_TYPES`.
+
+**Symptom:** B3 Lauf 2 zeigte `weather` (intensity-Update) und
+`lightning_strike` (Position) als Diff — beides aus `weather_worker`,
+das alle ~15s Wetterzustände wechselt und bei Gewitter Blitze platziert.
+
+**Fix:** beide in `ASYNC_BROADCAST_TYPES` aufgenommen. Keine Backend-
+Änderung — wie schon bei `npc_goal` reines Test-Tooling.
