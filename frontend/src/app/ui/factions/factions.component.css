@@ -1,0 +1,73 @@
+/* Faktionen-Panel. Übernommen aus `frontend/legacy/style.css` Z. 418-452. */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.factions-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.factions-box {
+  width: 90%; max-width: 540px;
+  background: rgba(20,18,14,0.97);
+  border: 1px solid #b88858;
+  color: #c8b88a; font-size: 12px;
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+}
+
+.factions-header {
+  padding: 10px 14px; background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid #555;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #e8b870; font-weight: bold;
+}
+
+.factions-close {
+  background: none; border: 1px solid #555;
+  color: #c8b88a; padding: 3px 10px;
+  cursor: pointer; font-family: monospace;
+}
+
+.factions-list { padding: 10px 14px; overflow-y: auto; }
+.factions-empty { color: #807060; font-style: italic; padding: 14px; text-align: center; }
+
+.faction-row {
+  display: grid;
+  grid-template-columns: 18px 1fr 80px 110px;
+  gap: 8px; padding: 6px 0; align-items: center;
+  border-bottom: 1px dashed #443a20;
+}
+
+.faction-dot { width: 14px; height: 14px; border-radius: 50%; background: #888; }
+.faction-dot.tier-hostile    { background: #c84a4a; }
+.faction-dot.tier-unfriendly { background: #c89048; }
+.faction-dot.tier-neutral    { background: #888; }
+.faction-dot.tier-friendly   { background: #60c068; }
+.faction-dot.tier-allied     { background: #4080d0; }
+
+.faction-name { color: #e8c870; }
+
+.faction-bar {
+  width: 80px; height: 8px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #555;
+  position: relative;
+}
+.faction-bar-fill { position: absolute; top: 0; bottom: 0; }
+.faction-bar-fill--pos { background: #50a050; }
+.faction-bar-fill--neg { background: #a05050; }
+
+.faction-tier {
+  font-size: 10px; text-align: center;
+  padding: 2px 4px; border-radius: 3px;
+}
+.faction-tier.hostile    { background: #802020; color: #ffcccc; }
+.faction-tier.unfriendly { background: #604030; color: #ffdda0; }
+.faction-tier.neutral    { background: #404040; color: #c0c0c0; }
+.faction-tier.friendly   { background: #306030; color: #c0ffc0; }
+.faction-tier.allied     { background: #2050a0; color: #c0e0ff; }

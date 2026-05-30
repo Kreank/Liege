@@ -15,6 +15,7 @@ import { PhaserGameComponent } from './game/phaser-game.component';
 import { CharacterComponent } from './ui/character/character.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
+import { FactionsComponent } from './ui/factions/factions.component';
 import { InventoryComponent } from './ui/inventory/inventory.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { SkillsComponent } from './ui/skills/skills.component';
@@ -32,6 +33,7 @@ import { TalentsComponent } from './ui/talents/talents.component';
     TalentsComponent,
     CharacterComponent,
     QuestsComponent,
+    FactionsComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
