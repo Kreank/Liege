@@ -737,3 +737,17 @@ async def _try_place_world_chest(world, structure_manager, connection_manager,
             })
         return chest
     return None
+
+
+# ─── Welle 34c: WS-Side Helper (extrahiert aus main.py) ──────────────────────
+
+async def populate_chunks_bg(world, structures, manager, npcs, chunks) -> None:
+    """Background-Population eines Chunks-Sets — broadcastet structure_placed pro Item."""
+    try:
+        for c in chunks:
+            await populate_chunk_if_needed(
+                world, structures, manager, c["cx"], c["cy"],
+                npc_manager=npcs,
+            )
+    except Exception:
+        logging.getLogger("liege.populate_bg").exception("Background-Populate fehlgeschlagen")

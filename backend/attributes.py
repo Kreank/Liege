@@ -174,3 +174,43 @@ ATTR_LABELS = {
     "krit_schaden": ("✨ Krit-Schaden",   "Multiplier bei kritischen Treffern"),
     "schleichen":   ("👤 Schleichen",     "Reduziert Aggro-Reichweite, Diebe-Skills"),
 }
+
+
+# ─── Welle 34c: WS-Side Attribute-Helpers (extrahiert aus main.py) ───────────
+
+async def compute_attributes(items, player_name: str) -> dict:
+    """Sammelt Skills + Equipment + Talents und berechnet Attribute."""
+    import skills
+    import talents
+    import body_parts
+    sk = await skills.get_skills(player_name)
+    inv = await items.get_inventory(player_name)
+    equipped = [it for it in inv if it.get("equipped_slot")]
+    te = await talents.aggregate_effects(player_name)
+    bp = await body_parts.get_body_parts(player_name)
+    attrs = calculate_attributes(sk, equipped, te, bp)
+    return {"values": attrs, "labels": ATTR_LABELS}
+
+
+async def build_stat_sheet(items, player_name: str) -> dict:
+    """Vollständiges Stat-Sheet (Welle 15): Attribute + Allokation + Resistances."""
+    import player_stats as _ps
+    import talents
+    import body_parts
+    inv = await items.get_inventory(player_name)
+    equipped = [it for it in inv if it.get("equipped_slot")]
+    te = await talents.aggregate_effects(player_name)
+    bp = await body_parts.get_body_parts(player_name)
+    sheet = await _ps.get_stat_sheet(player_name, equipped, te, bp)
+    sheet["labels"] = ATTR_LABELS
+    return sheet
+
+
+async def send_attrs_update(items, websocket, player_name: str) -> None:
+    """Schickt einen frischen Stat-Sheet-Snapshot. Bei jedem Equip/Allocation."""
+    import logging
+    try:
+        sheet = await build_stat_sheet(items, player_name)
+        await websocket.send_json({"type": "attrs_update", "stats": sheet})
+    except Exception:
+        logging.exception("attrs_update fehlgeschlagen")

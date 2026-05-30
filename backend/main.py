@@ -62,6 +62,7 @@ from world import World
 from structures import StructureManager
 from events import EventManager
 from npcs import NPCManager
+import npcs as npcs_mod
 from items import ItemManager
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
@@ -76,294 +77,126 @@ items = ItemManager()
 import items as _items_module
 _items_module.set_global_item_manager(items)
 import currency
+from services import player_state as _player_state
+from services import player_equipment as _player_equipment
+from services.player_comms import send_to_player as _send_to_player_svc
+from services.player_equipment import (
+    get_equipped_weapon_kind, get_equipped_tool_kind, has_tool_for_skill,
+    TOOL_FOR_SKILL, PROP_SKILL, TOOL_HINT, NO_TOOL_PROPS,
+)
+from services.player_state import (
+    load_or_create_player as _load_or_create_player_svc,
+    heal_player as _heal_player_svc,
+    damage_player as _damage_player_svc,
+    is_downed, do_respawn as _do_respawn_svc,
+    restore_mana as _restore_mana_svc,
+    refund_mana as _refund_mana_svc,
+    DEFAULT_SPAWN_CENTER,
+    downed_state as _downed_state,
+)
 world: World | None = None
 
 
+# ─── Dünne Bind-Wrapper für Helper aus services/* + Geschwister-Modulen ────
+# Damit die hunderten Aufrufstellen weiter nur den player_id übergeben können
+# und nicht jedes Mal `manager`/`world`/… explizit mitschreiben müssen, binden
+# wir hier die Modul-Globals ein einziges Mal. B2 löst das später via WsContext
+# vollständig auf.
+
 async def _push_wallet(player_id: str, gained: int | None = None) -> None:
-    """Schickt den aktuellen Geldbeutel-Stand an einen Spieler. `gained` (Kupfer)
-    triggert zusätzlich einen Gewinn-Toast."""
-    ws = manager.connections.get(player_id)
-    if ws is None:
-        return
-    try:
-        bal = await currency.balance(player_id)
-        await ws.send_json({"type": "wallet_update", "copper": bal})
-        if gained:
-            await ws.send_json({"type": "toast",
-                                "text": f"💰 +{currency.format(gained)}"})
-    except Exception:
-        logging.debug("wallet push failed for %s", player_id)
+    await currency.push_wallet(manager, player_id, gained=gained)
 
 
 async def _group_snapshot(player_id: str) -> dict | None:
-    """Komplettes Group-Bild für einen Spieler (oder None wenn nicht in Gruppe)."""
-    g = await groups.get_group_for(player_id)
-    if not g:
-        return None
-    members = await groups.get_members(g["id"])
-    member_states = []
-    for m in members:
-        pid = m["player_name"]
-        pos = manager.get_players().get(pid)
-        member_states.append({
-            "name": pid,
-            "role": m["role"],
-            "sub_party": m["sub_party"],
-            "online": pid in manager.connections,
-            "x": pos["x"] if pos else None,
-            "y": pos["y"] if pos else None,
-        })
-    return {
-        "id": g["id"],
-        "kind": g["kind"],
-        "leader": g["leader"],
-        "name": g["name"],
-        "loot_rule": g["loot_rule"],
-        "your_role": g["role"],
-        "members": member_states,
-    }
+    return await groups.group_snapshot(manager, player_id)
 
 
 async def _broadcast_to_group(group_id: int, message: dict,
                               exclude: str | None = None) -> None:
-    """Sendet `message` an alle online Mitglieder einer Gruppe."""
-    names = await groups.get_member_names(group_id)
-    for pid in names:
-        if pid == exclude:
-            continue
-        ws = manager.connections.get(pid)
-        if ws is None:
-            continue
-        try:
-            await ws.send_json(message)
-        except Exception:
-            pass
+    await groups.broadcast_to_group(manager, group_id, message, exclude=exclude)
 
 
 async def _push_group_state(player_id: str) -> None:
-    """Schickt dem Spieler sein aktuelles group_state-Snapshot."""
-    ws = manager.connections.get(player_id)
-    if ws is None:
-        return
-    snap = await _group_snapshot(player_id)
-    try:
-        await ws.send_json({"type": "group_state", "group": snap})
-    except Exception:
-        pass
+    await groups.push_group_state(manager, player_id)
 
 
 async def _push_group_state_to_all_members(group_id: int) -> None:
-    names = await groups.get_member_names(group_id)
-    for pid in names:
-        await _push_group_state(pid)
+    await groups.push_group_state_to_all_members(manager, group_id)
 
 
-GROUP_XP_SHARE_RADIUS = 30   # Tiles um den NPC, in denen Group-Members XP teilen
-GROUP_XP_BONUS_FACTOR = 1.2  # +20% Gesamt-XP wenn Kill in Gruppe geht
-LOOT_ROLL_RADIUS = 15        # Tiles um den Drop, in denen Need/Greed-Roll greift
+# Re-Export der Konstanten, falls anderswo importiert
+GROUP_XP_SHARE_RADIUS = combat.GROUP_XP_SHARE_RADIUS
+GROUP_XP_BONUS_FACTOR = combat.GROUP_XP_BONUS_FACTOR
+LOOT_ROLL_RADIUS = loot.LOOT_ROLL_RADIUS
 
 
 async def _drop_loot_for_npc(killer_id: str, npc: dict,
                               drop_x: int, drop_y: int) -> None:
-    """Tier-aware Loot-Drop für einen NPC-Kill. Ersetzt die alte Inline-Logik
-    aus loot.roll_loot + roll_boss_equipment in den 3 Kill-Pfaden.
-
-    - Overworld-Mob: alte loot.roll_loot + boss-equip wenn BOSS_KIND
-    - Dungeon-Mob: tier+role-skalierte loot.roll_dungeon_loot mit Quality
-    Broadcastet item_spawned + triggert Loot-Rolls + Key-Items."""
-    import npc_worker as _nw
-    npc_kind = npc["kind"]
-    npc_world = (npc.get("world_id") or "overworld")
-    is_dungeon = npc_world.startswith("dungeon:")
-    coins_copper = 0   # Welle 33: Münz-Drops fließen in den Geldbeutel statt auf den Boden
-
-    if is_dungeon:
-        # Dungeon-Tier + Theme aus DB lesen
-        try:
-            parts = npc_world.split(":")
-            dungeon_id = int(parts[1])
-            dungeon = await dungeon_instance.get_dungeon(dungeon_id)
-        except Exception:
-            dungeon = None
-        tier = (dungeon or {}).get("tier", dungeon_tiers.TIER_SMALL)
-        theme = (dungeon or {}).get("theme", "cave")
-        import dungeon_themes as _dth
-        theme_data = _dth.THEMES.get(theme, {})
-        # Role bestimmen
-        if npc_kind in _nw.BOSS_KINDS:
-            role = "boss"
-        elif npc_kind in loot.PACK_LEADER_KINDS:
-            role = "leader"
-        else:
-            role = "trash"
-        drops = loot.roll_dungeon_loot(npc_kind, tier, role, theme_data)
-        for kind, quality in drops:
-            if currency.is_currency(kind):
-                coins_copper += currency.coin_to_copper(kind)
-                continue
-            d = await items.spawn_on_ground(kind, drop_x, drop_y,
-                                             quality_kind=quality)
-            if d is not None:
-                await manager.broadcast({"type": "item_spawned", "item": d})
-                try: await _maybe_start_loot_roll(killer_id, d)
-                except Exception: logging.exception("loot-roll start failed")
-    else:
-        # Overworld: bisherige Logik
-        for drop_kind in loot.roll_loot(npc_kind):
-            if currency.is_currency(drop_kind):
-                coins_copper += currency.coin_to_copper(drop_kind)
-                continue
-            d = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
-            if d is not None:
-                await manager.broadcast({"type": "item_spawned", "item": d})
-                try: await _maybe_start_loot_roll(killer_id, d)
-                except Exception: logging.exception("loot-roll start failed")
-        if npc_kind in _nw.BOSS_KINDS:
-            boss_eq = loot.roll_boss_equipment()
-            if boss_eq:
-                eq_kind, eq_q = boss_eq
-                d = await items.spawn_on_ground(eq_kind, drop_x, drop_y,
-                                                 quality_kind=eq_q)
-                if d is not None:
-                    await manager.broadcast({"type": "item_spawned", "item": d})
-                    try: await _maybe_start_loot_roll(killer_id, d)
-                    except Exception: logging.exception("loot-roll start failed")
-
-    # Key-Item-Drops (Boss + Pack-Leader) — gilt in beiden Welten
-    try:
-        _kl = await skills.get_skill_level(killer_id, "combat")
-        for _key in loot.roll_dungeon_key_drops(npc_kind, _kl):
-            d = await items.spawn_on_ground(_key, drop_x, drop_y)
-            if d is not None:
-                await manager.broadcast({"type": "item_spawned", "item": d})
-    except Exception:
-        logging.exception("key-item drop failed")
-
-    # Welle 33: gesammelte Münzen dem Killer gutschreiben + Geldbeutel pushen
-    if coins_copper > 0:
-        try:
-            await currency.add(killer_id, coins_copper)
-            await _push_wallet(killer_id, gained=coins_copper)
-        except Exception:
-            logging.exception("coin credit failed")
+    await loot.drop_loot_for_npc(manager, items, killer_id, npc, drop_x, drop_y)
 
 
 async def _maybe_start_loot_roll(killer_id: str, dropped: dict) -> None:
-    """Wenn der Killer in einer Gruppe mit loot_rule='need_greed' ist und der
-    Drop rollwürdig (Equipment/Magic/Affix/Unique), starte einen Roll unter
-    den Member-Spielern im LOOT_ROLL_RADIUS. Sonst nichts: Free-for-All bleibt
-    das Default und der Drop liegt schlicht auf dem Boden."""
-    if dropped is None or not loot_rolls.is_rollable(dropped):
-        return
-    g = await groups.get_group_for(killer_id)
-    if not g or g.get("loot_rule") != "need_greed":
-        return
-    member_names = await groups.get_member_names(g["id"])
-    drop_x = int(dropped.get("x", 0))
-    drop_y = int(dropped.get("y", 0))
-    eligible: set[str] = set()
-    for pid in member_names:
-        pos = manager.get_players().get(pid)
-        if pos is None:
-            continue
-        if max(abs(pos["x"] - drop_x), abs(pos["y"] - drop_y)) <= LOOT_ROLL_RADIUS:
-            eligible.add(pid)
-    if not eligible:
-        return
-
-    async def _broadcast(msg, recipients):
-        for pid in recipients:
-            ws_t = manager.connections.get(pid)
-            if ws_t is None:
-                continue
-            try: await ws_t.send_json(msg)
-            except Exception: pass
-
-    async def _finalize(state):
-        # Wenn ein Gewinner feststeht: pickup direkt ins Inventar des Winners,
-        # damit man nicht erst zum Boden laufen muss. Wenn niemand gerollt hat
-        # (alle pass) → Item bleibt als FFA-Drop liegen.
-        winner = state.get("winner")
-        if not winner:
-            return
-        picked = await items.pickup(state["item"]["id"], winner)
-        if picked is None:
-            return
-        await manager.broadcast({"type": "item_picked_up",
-                                 "item_id": state["item"]["id"]})
-        ws_w = manager.connections.get(winner)
-        if ws_w is not None:
-            if picked["id"] != state["item"]["id"]:
-                try: await ws_w.send_json({
-                    "type": "inventory_update",
-                    "item_id": picked["id"],
-                    "quantity": int(picked.get("quantity", 1)),
-                })
-                except Exception: pass
-            else:
-                try: await ws_w.send_json({"type": "inventory_add", "item": picked})
-                except Exception: pass
-
-    await loot_rolls.start_roll(dropped, g["id"], eligible, _broadcast, _finalize)
+    await loot.maybe_start_loot_roll(manager, items, killer_id, dropped)
 
 
 async def _gain_combat_xp_with_share(killer_id: str, amount: int,
                                      npc_x: int, npc_y: int) -> list[tuple[str, dict]]:
-    """Combat-XP-Vergabe mit Gruppen-Split.
-    - Killer nicht in Gruppe: bekommt volle XP allein.
-    - Sonst: alle Group-Mitglieder im 30-Tile-Radius teilen (amount × 1.2) / N.
-      Der +20%-Bonus belohnt Gruppieren, /N verhindert, dass Gruppen-Grinding
-      Solo-Kills nominal überlegen ist.
-    Return: liste (player_name, xp_result_dict) für alle die XP bekommen haben."""
-    g = await groups.get_group_for(killer_id)
-    if not g:
-        r = await skills.gain_xp(killer_id, "combat", amount)
-        return [(killer_id, r)] if r else []
-    member_names = await groups.get_member_names(g["id"])
-    nearby: list[str] = []
-    for pid in member_names:
-        pos = manager.get_players().get(pid)
-        if pos is None:
-            continue
-        if max(abs(pos["x"] - npc_x), abs(pos["y"] - npc_y)) <= GROUP_XP_SHARE_RADIUS:
-            nearby.append(pid)
-    if not nearby:
-        nearby = [killer_id]  # Safety: Killer war wohl gerade off-Position
-    share = max(1, int(round(amount * GROUP_XP_BONUS_FACTOR / len(nearby))))
-    out: list[tuple[str, dict]] = []
-    for pid in nearby:
-        r = await skills.gain_xp(pid, "combat", share)
-        if r:
-            # gained + group_share helfen dem Frontend einen "geteilt mit Gruppe"-
-            # Toast zu zeigen statt nur "+24 XP".
-            r["gained"] = share
-            if len(nearby) > 1:
-                r["group_share"] = {
-                    "members": len(nearby),
-                    "bonus_pct": int((GROUP_XP_BONUS_FACTOR - 1) * 100),
-                }
-            out.append((pid, r))
-    return out
+    return await combat.gain_combat_xp_with_share(manager, killer_id, amount, npc_x, npc_y)
 
 
 async def _find_drop_xy(x: int, y: int) -> tuple[int, int]:
-    """Return a coordinate suitable for ground-loot near (x, y).
+    return await loot.find_drop_xy(world, structures, x, y)
 
-    If (x, y) is walkable and not blocked by a structure, returns it as-is.
-    Otherwise searches outward in a spiral up to radius 3 for the first
-    walkable, non-blocked tile. Falls back to (x, y) if nothing is found.
-    """
-    if world is not None and await world.is_walkable(x, y) and not structures.blocks(x, y):
-        return x, y
-    for radius in range(1, 4):
-        for dy in range(-radius, radius + 1):
-            for dx in range(-radius, radius + 1):
-                if abs(dx) != radius and abs(dy) != radius:
-                    continue
-                nx, ny = x + dx, y + dy
-                if world is not None and await world.is_walkable(nx, ny) and not structures.blocks(nx, ny):
-                    return nx, ny
-    return x, y
+
+async def _send_to_player(player_id: str, payload: dict) -> None:
+    await _send_to_player_svc(manager, player_id, payload)
+
+
+# Player-Lifecycle-Bind-Wrapper (gleiches Muster wie oben — main.py-Code ruft
+# sie weiter mit kurzem Signatures auf; services-Funktionen bekommen Globals).
+
+async def load_or_create_player(name: str) -> dict:
+    return await _load_or_create_player_svc(world, structures, name)
+
+
+async def heal_player(name: str, amount: int) -> None:
+    await _heal_player_svc(manager, name, amount)
+
+
+async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
+                        dmg_type: str = "physical") -> None:
+    await _damage_player_svc(manager, name, dmg, source_npc_id, dmg_type)
+
+
+async def _do_respawn(name: str, in_place: bool = False) -> None:
+    await _do_respawn_svc(manager, world, structures, name, in_place=in_place)
+
+
+async def restore_mana(name: str, amount: int) -> None:
+    await _restore_mana_svc(manager, name, amount)
+
+
+async def _refund_mana(player_id: str, amount: int) -> None:
+    await _refund_mana_svc(manager, player_id, amount)
+
+
+async def _apply_heal_aggro(player_id: str, x: int, y: int, threat: int) -> None:
+    await combat.apply_heal_aggro(npcs, player_id, x, y, threat)
+
+
+async def _apply_spell_effects(player_id: str, spell_id: str,
+                                 spell: dict, target: dict) -> None:
+    await spells.apply_spell_effects(
+        manager, npcs, player_id, spell_id, spell, target,
+        heal_player_fn=heal_player,
+        do_respawn_fn=_do_respawn,
+        is_downed_fn=is_downed,
+        send_to_player_fn=_send_to_player,
+        find_drop_xy_fn=_find_drop_xy,
+        drop_loot_for_npc_fn=_drop_loot_for_npc,
+        gain_combat_xp_with_share_fn=_gain_combat_xp_with_share,
+        downed_state=_downed_state,
+    )
 
 
 @asynccontextmanager
@@ -375,6 +208,8 @@ async def lifespan(app: FastAPI):
     # Landkarte. Für künftige Resets einfach WORLD_SEED-Env ändern (oder hier).
     world = await World.load_or_create(
         seed=int(os.environ.get("WORLD_SEED", "20260530")))
+    # services.player_state braucht world+structures für _downed_timer→do_respawn
+    _player_state.init(world, structures)
     await structures.load()
     await npcs.load()
     # Welle 27: Faction-System seeden + bestehende NPCs zuweisen
@@ -511,41 +346,15 @@ async def pwa_sw():
     )
 
 
-DEFAULT_SPAWN_CENTER = (60, 40)  # nahe Mitte der Legacy-Welt
 CHUNK_SEND_RADIUS = 3  # 7x7 Chunks (224×224 Tiles) um Spieler
 
 
 async def _active_dungeon_markers() -> list[dict]:
-    """Aktive Dungeon-Eingänge (für Minimap-Ortung). Client blendet sie nur im
-    Spür-Radius ein, daher reicht die volle Liste (Cap ~28)."""
-    rows = await db.pool().fetch(
-        "SELECT tier, entrance_x, entrance_y FROM dungeons "
-        "WHERE expires_at > NOW() AND entrance_x IS NOT NULL"
-    )
-    return [{"x": r["entrance_x"], "y": r["entrance_y"], "tier": r["tier"]}
-            for r in rows]
+    return await dungeons.active_dungeon_markers()
 
 
 async def _dungeon_floor_payload(dungeon_id: int, floor_idx: int) -> dict:
-    """Zusatz-Daten für dungeon_enter/floor_change: Theme-Tint, sichtbare
-    Features (Kisten/Decor/ausgelöste Fallen) und die NPCs dieser Floor."""
-    import dungeon_themes
-    dungeon = await dungeon_instance.get_dungeon(dungeon_id)
-    theme = dungeon["theme"] if dungeon else "cave"
-    td = dungeon_themes.THEMES.get(theme, {})
-    world_id = f"dungeon:{dungeon_id}:{floor_idx}"
-    return {
-        "theme": theme,
-        "theme_data": {
-            "label":         td.get("label"),
-            "wall_tint":     td.get("wall_tint"),
-            "floor_tint":    td.get("floor_tint"),
-            "ambient_color": td.get("ambient_color"),
-            "ambient":       td.get("ambient"),
-        },
-        "features": await dungeon_instance.visible_features(dungeon_id, floor_idx),
-        "npcs":     dungeon_instance.npcs_in_world(npcs, world_id),
-    }
+    return await dungeons.dungeon_floor_payload(npcs, dungeon_id, floor_idx)
 
 
 _DUNGEON_TRAP_DMG = {
@@ -563,616 +372,37 @@ _TRAP_LABEL = {
 
 
 def _overworld_npcs_near(x: int, y: int, radius: int = 0) -> list:
-    """Overworld-NPCs im Umkreis (für Rückkehr aus dem Dungeon → Client lädt
-    seine NPC-Sprites neu)."""
-    r = radius or (CHUNK_SEND_RADIUS * 32 + 32)
-    return [n for n in npcs.all()
-            if (n.get("world_id") or "overworld") == "overworld"
-            and abs(n["x"] - x) <= r and abs(n["y"] - y) <= r]
+    return npcs_mod.overworld_npcs_near(npcs, x, y, radius)
 
 
 async def _populate_chunks_bg(chunks) -> None:
-    """Background-Population eines Chunks-Sets — broadcastet structure_placed pro Item."""
-    try:
-        for c in chunks:
-            await world_populator.populate_chunk_if_needed(
-                world, structures, manager, c["cx"], c["cy"],
-                npc_manager=npcs,
-            )
-    except Exception:
-        logging.getLogger("liege.populate_bg").exception("Background-Populate fehlgeschlagen")
+    await world_populator.populate_chunks_bg(world, structures, manager, npcs, chunks)
 
 
 async def _sync_learned_spells(player_name: str) -> list[str]:
-    """Welle 25: schaltet jeden Spell automatisch frei, dessen skill_req der
-    Spieler erreicht hat. Returns Liste neu freigeschalteter spell-IDs."""
-    magic_lvl = await skills.get_skill_level(player_name, "magic")
-    eligible = [
-        sid for sid, s in spells.SPELLS.items()
-        if magic_lvl >= int(s.get("skill_req", 0))
-    ]
-    if not eligible:
-        return []
-    existing_rows = await db.pool().fetch(
-        "SELECT spell_kind FROM learned_spells WHERE player_name = $1",
-        player_name,
-    )
-    existing = {r["spell_kind"] for r in existing_rows}
-    new_ones = [sid for sid in eligible if sid not in existing]
-    for sid in new_ones:
-        await db.pool().execute(
-            "INSERT INTO learned_spells (player_name, spell_kind) "
-            "VALUES ($1, $2) ON CONFLICT DO NOTHING",
-            player_name, sid,
-        )
-    return new_ones
+    return await spells.sync_learned_for_player(player_name)
 
 
 async def _list_learned_spells(player_name: str) -> list[str]:
-    rows = await db.pool().fetch(
-        "SELECT spell_kind FROM learned_spells WHERE player_name = $1",
-        player_name,
-    )
-    return [r["spell_kind"] for r in rows]
+    return await spells.list_learned_for_player(player_name)
 
 
 async def _compute_attributes(player_name: str) -> dict:
-    """Sammelt Skills + Equipment + Talents und berechnet Attribute."""
-    sk = await skills.get_skills(player_name)
-    inv = await items.get_inventory(player_name)
-    equipped = [it for it in inv if it.get("equipped_slot")]
-    te = await talents.aggregate_effects(player_name)
-    bp = await body_parts.get_body_parts(player_name)
-    attrs = attributes.calculate_attributes(sk, equipped, te, bp)
-    return {"values": attrs, "labels": attributes.ATTR_LABELS}
+    return await attributes.compute_attributes(items, player_name)
 
 
 async def _build_stat_sheet(player_name: str) -> dict:
-    """Vollständiges Stat-Sheet (Welle 15): Attribute + Allokation + Resistances."""
-    import player_stats as _ps
-    inv = await items.get_inventory(player_name)
-    equipped = [it for it in inv if it.get("equipped_slot")]
-    te = await talents.aggregate_effects(player_name)
-    bp = await body_parts.get_body_parts(player_name)
-    sheet = await _ps.get_stat_sheet(player_name, equipped, te, bp)
-    sheet["labels"] = attributes.ATTR_LABELS
-    return sheet
+    return await attributes.build_stat_sheet(items, player_name)
 
 
 async def _send_attrs_update(websocket, player_name: str) -> None:
-    """Schickt einen frischen Stat-Sheet-Snapshot. Bei jedem Equip/Allocation."""
-    try:
-        sheet = await _build_stat_sheet(player_name)
-        await websocket.send_json({"type": "attrs_update", "stats": sheet})
-    except Exception:
-        logging.exception("attrs_update fehlgeschlagen")
-
-
-async def load_or_create_player(name: str) -> dict:
-    row = await db.pool().fetchrow(
-        "SELECT x, y, hp, max_hp, mana, max_mana, hunger, max_hunger, "
-        "stamina, max_stamina, thirst, max_thirst FROM players WHERE name = $1", name
-    )
-    if row is not None:
-        await db.pool().execute(
-            "UPDATE players SET last_seen = NOW() WHERE name = $1", name
-        )
-        spawn = {
-            "x": row["x"], "y": row["y"],
-            "hp": row["hp"], "max_hp": row["max_hp"],
-            "mana": row["mana"], "max_mana": row["max_mana"],
-            "hunger": row["hunger"], "max_hunger": row["max_hunger"],
-            "stamina": row["stamina"], "max_stamina": row["max_stamina"],
-            "thirst": row["thirst"], "max_thirst": row["max_thirst"],
-        }
-        walkable = await world.is_walkable(spawn["x"], spawn["y"])
-        if not walkable or structures.blocks(spawn["x"], spawn["y"]):
-            new_pos = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
-            spawn["x"], spawn["y"] = new_pos["x"], new_pos["y"]
-            await db.pool().execute(
-                "UPDATE players SET x = $1, y = $2 WHERE name = $3",
-                spawn["x"], spawn["y"], name,
-            )
-        return spawn
-
-    pos = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
-    await db.pool().execute(
-        "INSERT INTO players (name, x, y) VALUES ($1, $2, $3)",
-        name, pos["x"], pos["y"],
-    )
-    return {
-        "x": pos["x"], "y": pos["y"],
-        "hp": combat.PLAYER_MAX_HP, "max_hp": combat.PLAYER_MAX_HP,
-        "mana": combat.PLAYER_MAX_MANA, "max_mana": combat.PLAYER_MAX_MANA,
-        "hunger": 100, "max_hunger": 100,
-        "stamina": 100, "max_stamina": 100,
-    }
-
-
-async def get_equipped_weapon_kind(player_name: str) -> str | None:
-    row = await db.pool().fetchrow(
-        "SELECT kind FROM items WHERE owner = $1 AND equipped_slot = 'weapon'",
-        player_name,
-    )
-    return row["kind"] if row else None
-
-
-async def get_equipped_tool_kind(player_name: str) -> str | None:
-    row = await db.pool().fetchrow(
-        "SELECT kind FROM items WHERE owner = $1 AND equipped_slot = 'tool'",
-        player_name,
-    )
-    return row["kind"] if row else None
-
-
-# Welche Tools/Waffen welchem Harvest-Skill genügen
-# Werden gegen items.equipped_slot IN ('tool', 'weapon') geprüft.
-TOOL_FOR_SKILL = {
-    "mining":       {"pickaxe"},
-    "woodcutting":  {"axe"},
-    "gathering":    {"sickle", "scythe", "hoe", "shovel"},  # Sichel (tool), Sense (weapon), oder Hacke/Schaufel
-    "construction": {"hammer"},
-}
-
-# Welche Strukturen welches Tool brauchen.
-# Mapping prop_type → skill_name. Default ist "gathering" (Sichel/Hacke).
-PROP_SKILL = {
-    # Holz → Axt
-    "tree_oak": "woodcutting", "tree_pine": "woodcutting", "tree_dead": "woodcutting",
-    "tree_stump": "woodcutting", "fallen_log": "woodcutting", "palm_tree": "woodcutting",
-    "swamp_log": "woodcutting",
-    "broken_cart": "woodcutting", "barrel": "woodcutting", "crate": "woodcutting",
-    "fence": "woodcutting", "dock_straight": "woodcutting", "dock_corner": "woodcutting",
-    "wooden_bridge": "woodcutting", "shipwreck": "woodcutting", "boat_small": "woodcutting",
-    "driftwood": "woodcutting", "camp_tent": "woodcutting",
-    # Stein → Spitzhacke
-    "rock_small": "mining", "rock_large": "mining", "rock_mossy": "mining",
-    "ruin_pillar": "mining", "rubble": "mining", "statue_broken": "mining",
-    "gravestone": "mining", "lava_rock": "mining", "snow_rock": "mining",
-    "ice_crystal": "mining", "anchor": "mining", "cooking_pot": "mining",
-    # Pflanzen/Stoff → Sichel/Hacke/Schaufel
-    "bush": "gathering", "tall_grass": "gathering", "flowers": "gathering",
-    "mushrooms": "gathering", "reeds": "gathering", "lily_pads": "gathering",
-    "sack": "gathering", "fishing_net": "gathering",
-    "cactus": "gathering", "desert_skull": "gathering", "dry_bush": "gathering",
-    "jungle_flower": "gathering", "jungle_vines": "gathering",
-    "frozen_bush": "gathering", "swamp_bubbles": "gathering",
-    "bones_scatter": "gathering",
-}
-
-# Tool-Hint-Text pro Skill für UI-Feedback
-TOOL_HINT = {
-    "mining":      "⛏️ Du brauchst eine Spitzhacke",
-    "woodcutting": "🪓 Du brauchst eine Axt",
-    "gathering":   "🌿 Du brauchst eine Sichel oder Hacke",
-}
-
-# Basic-Props die OHNE Tool harvestbar bleiben — wichtig damit neue Spieler
-# überhaupt Wood/Stone für die ersten Tools bekommen.
-NO_TOOL_PROPS = {"tree_stump", "fallen_log", "rubble", "driftwood"}
-
-
-async def has_tool_for_skill(player_name: str, skill: str) -> bool:
-    """Prüft ob ein passendes Tool/Waffe equipped ist für diesen Skill."""
-    tools = TOOL_FOR_SKILL.get(skill, set())
-    if not tools:
-        return False
-    row = await db.pool().fetchrow(
-        "SELECT 1 FROM items WHERE owner = $1 "
-        "AND equipped_slot IN ('tool', 'weapon') AND kind = ANY($2::text[]) LIMIT 1",
-        player_name, list(tools),
-    )
-    return row is not None
-
-
-async def heal_player(name: str, amount: int) -> None:
-    """Heilt einen Spieler bis max_hp. Broadcastet player_healed.
-    Bei voller Heilung werden auch Body-Parts wiederhergestellt."""
-    row = await db.pool().fetchrow("SELECT hp, max_hp, x, y FROM players WHERE name = $1", name)
-    if row is None:
-        return
-    new_hp = min(row["max_hp"], row["hp"] + amount)
-    # Heiltrank o.ä. mit großem Heal heilt auch Body-Parts
-    if amount >= 25:
-        await body_parts.heal_all_parts(name)
-    if new_hp == row["hp"]:
-        return
-    await db.pool().execute("UPDATE players SET hp = $1 WHERE name = $2", new_hp, name)
-    ws = manager.connections.get(name)
-    if ws is not None:
-        await ws.send_json({
-            "type":   "player_healed",
-            "hp":     new_hp,
-            "max_hp": row["max_hp"],
-            "amount": new_hp - row["hp"],
-        })
-    await manager.broadcast({
-        "type": "visual_effect",
-        "kind": "heal_glow",
-        "x":    row["x"],
-        "y":    row["y"],
-    })
-
-
-# ─── Welle 25 — Down-State + Respawn ─────────────────────────────────────────
-# Spieler bei HP=0 ist 30s "downed": kann nicht ziehen, nimmt keinen Damage,
-# kann von Mitspielern wiederbelebt werden (Resurrection-Spell) oder sich per
-# force_respawn-Button am Spawn-Punkt selbst respawnen.
-DOWNED_DURATION_S = 30.0
-
-# player_name → {downed_at: epoch, x, y, task: asyncio.Task}
-_downed_state: dict[str, dict] = {}
-
-
-def is_downed(player_name: str) -> bool:
-    return player_name in _downed_state
-
-
-async def _enter_downed_state(name: str) -> None:
-    if is_downed(name):
-        return
-    row = await db.pool().fetchrow(
-        "SELECT x, y FROM players WHERE name = $1", name,
-    )
-    if row is None:
-        return
-    px, py = row["x"], row["y"]
-    await db.pool().execute("UPDATE players SET hp = 0 WHERE name = $1", name)
-    # Aktiven Cast cleanen
-    spell_caster.cleanup_player(name)
-    # 30s-Timer
-    task = asyncio.create_task(_downed_timer(name))
-    _downed_state[name] = {
-        "downed_at":  time.time(),
-        "x":          px, "y": py,
-        "task":       task,
-    }
-    await _send_to_player(name, {
-        "type":       "player_downed",
-        "duration_s": DOWNED_DURATION_S,
-        "x":          px, "y": py,
-    })
-    await manager.broadcast({
-        "type": "player_downed_visible", "player_id": name,
-        "x":    px, "y": py,
-    }, exclude=name)
-
-
-async def _downed_timer(name: str) -> None:
-    try:
-        await asyncio.sleep(DOWNED_DURATION_S)
-        if is_downed(name):
-            await _do_respawn(name, in_place=False)
-    except asyncio.CancelledError:
-        pass
-    except Exception:
-        logging.exception("downed_timer failed for %s", name)
-
-
-async def _do_respawn(name: str, in_place: bool = False) -> None:
-    """Respawn am Spawn-Punkt (oder in-place bei Resurrection). Räumt
-    Down-State, setzt full HP."""
-    state = _downed_state.pop(name, None)
-    if state and state.get("task"):
-        try:
-            state["task"].cancel()
-        except Exception:
-            pass
-    row = await db.pool().fetchrow(
-        "SELECT max_hp, spawn_x, spawn_y FROM players WHERE name = $1", name,
-    )
-    if row is None:
-        return
-    if in_place and state:
-        x, y = state["x"], state["y"]
-    elif row["spawn_x"] is not None and row["spawn_y"] is not None:
-        # Welle 25: Heim-Spawn (Bett/Lagerfeuer). Falls die Position inzwischen
-        # blockiert ist, suche ein freies Nachbar-Tile.
-        hx, hy = int(row["spawn_x"]), int(row["spawn_y"])
-        if (await world.is_walkable(hx, hy)) and not structures.blocks(hx, hy):
-            x, y = hx, hy
-        else:
-            spawn = await world.find_spawn(hx, hy)
-            x, y = spawn["x"], spawn["y"]
-    else:
-        spawn = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
-        x, y = spawn["x"], spawn["y"]
-    await db.pool().execute(
-        "UPDATE players SET hp = max_hp, x = $1, y = $2 WHERE name = $3",
-        x, y, name,
-    )
-    manager.update_player(name, x, y)
-    await _send_to_player(name, {
-        "type":   "player_respawned",
-        "x":      x, "y": y,
-        "hp":     row["max_hp"], "max_hp": row["max_hp"],
-        "in_place": in_place,
-    })
-    await manager.broadcast({
-        "type": "player_moved", "player_id": name, "x": x, "y": y,
-    }, exclude=name)
-    await manager.broadcast({
-        "type": "player_revived_visible", "player_id": name,
-    }, exclude=name)
-
-
-async def restore_mana(name: str, amount: int) -> None:
-    row = await db.pool().fetchrow("SELECT mana, max_mana FROM players WHERE name = $1", name)
-    if row is None:
-        return
-    new_mana = min(row["max_mana"], row["mana"] + amount)
-    if new_mana == row["mana"]:
-        return
-    await db.pool().execute("UPDATE players SET mana = $1 WHERE name = $2", new_mana, name)
-    ws = manager.connections.get(name)
-    if ws is not None:
-        await ws.send_json({
-            "type":     "player_mana",
-            "mana":     new_mana,
-            "max_mana": row["max_mana"],
-        })
-
-
-# ─── Welle 25 — Spell-Caster Callbacks ───────────────────────────────────────
-
-async def _send_to_player(player_id: str, payload: dict) -> None:
-    ws = manager.connections.get(player_id)
-    if ws is not None:
-        try:
-            await ws.send_json(payload)
-        except Exception:
-            logging.exception("send_to_player failed")
-
-
-async def _refund_mana(player_id: str, amount: int) -> None:
-    await restore_mana(player_id, amount)
-
-
-async def _apply_heal_aggro(player_id: str, x: int, y: int, threat: int) -> None:
-    """Heilen zieht Aggro — feindliche Mobs in 8-Tile-Radius werden auf den
-    Heiler aufmerksam (setzen ihn als preferred_target via npc_worker)."""
-    try:
-        import npc_worker as _nw
-        for n in npcs.all():
-            if n["kind"] not in combat.CREATURE_KINDS:
-                continue
-            if abs(n["x"] - x) + abs(n["y"] - y) <= 8:
-                # Mark Spieler als next target — npc_worker._try_aggression liest das
-                _nw.HEAL_THREAT[n["id"]] = (player_id, time.time() + 12)
-    except Exception:
-        logging.exception("heal-aggro failed")
-
-
-async def _apply_spell_effects(player_id: str, spell_id: str,
-                                 spell: dict, target: dict) -> None:
-    """Wendet die effects-Liste eines Spells an. Target ist ein Dict mit
-    optional x/y/npc_id. Mana ist bereits beim Cast-Start abgezogen."""
-    target_kind = spell.get("target_kind", "self")
-
-    # FX-Animation broadcasten — auf Ziel-Position (für AoE/single) oder
-    # Caster-Position (für self/group).
-    fx_kind = spell.get("fx_anim")
-    pinfo = manager.get_players().get(player_id, {})
-    fx_x = target.get("x", pinfo.get("x", 0))
-    fx_y = target.get("y", pinfo.get("y", 0))
-    if fx_kind:
-        await manager.broadcast({
-            "type": "visual_effect", "kind": fx_kind,
-            "x": fx_x, "y": fx_y,
-        })
-
-    # Sammle Affected-Targets je nach target_kind
-    affected_npcs: list[dict] = []
-    affected_players: list[str] = []
-
-    if target_kind == "self":
-        affected_players = [player_id]
-    elif target_kind == "single":
-        npc_id = target.get("npc_id")
-        if npc_id is not None:
-            n = npcs.get(int(npc_id))
-            if n is not None:
-                affected_npcs = [n]
-    elif target_kind == "aoe":
-        radius = int(spell.get("radius", 2))
-        tx, ty = int(target.get("x", 0)), int(target.get("y", 0))
-        affected_npcs = [
-            n for n in npcs.all()
-            if n["kind"] in combat.CREATURE_KINDS
-               and abs(n["x"] - tx) + abs(n["y"] - ty) <= radius
-        ]
-    elif target_kind == "ground":
-        radius = int(spell.get("radius", 4))
-        tx, ty = int(target.get("x", 0)), int(target.get("y", 0))
-        affected_npcs = [
-            n for n in npcs.all()
-            if n["kind"] in combat.CREATURE_KINDS
-               and abs(n["x"] - tx) + abs(n["y"] - ty) <= radius
-        ]
-    elif target_kind == "group":
-        radius = int(spell.get("radius", 6))
-        px, py = pinfo.get("x", 0), pinfo.get("y", 0)
-        for pname, pdata in manager.get_players().items():
-            if abs(pdata.get("x", 0) - px) + abs(pdata.get("y", 0) - py) <= radius:
-                affected_players.append(pname)
-    elif target_kind == "downed":
-        # Welle 25: Resurrection — sucht nahe gefallene Mitspieler
-        rng = int(spell.get("range", 4))
-        px, py = pinfo.get("x", 0), pinfo.get("y", 0)
-        for dname, dstate in _downed_state.items():
-            if dname == player_id:
-                continue   # Caster selbst kann nicht casten (er ist down)
-            if abs(dstate["x"] - px) + abs(dstate["y"] - py) <= rng:
-                affected_players.append(dname)
-
-    # Apply effects
-    for eff in spell.get("effects", []):
-        ekind = eff.get("kind")
-        if ekind == "revive":
-            # Welle 25: Resurrection auf affected_players (downed)
-            for pname in affected_players:
-                if is_downed(pname):
-                    await _do_respawn(pname, in_place=True)
-        elif ekind == "heal":
-            amount = int(eff.get("amount", 0))
-            for pname in affected_players:
-                await heal_player(pname, amount)
-        elif ekind == "damage":
-            amount = int(eff.get("amount", 0))
-            dmg_type = eff.get("damage_type", "magic")
-            for n in affected_npcs:
-                final = combat.apply_creature_resists(n["kind"], amount, dmg_type=dmg_type)
-                result = await npcs.damage(n["id"], final)
-                if result is None:
-                    drop_x, drop_y = await _find_drop_xy(n["x"], n["y"])
-                    await _drop_loot_for_npc(player_id, n, drop_x, drop_y)
-                    await manager.broadcast({
-                        "type": "npc_died", "npc_id": n["id"],
-                        "killed_by": player_id, "name": n["name"],
-                    })
-                    # Quest-Hook auch bei Spell-Kills
-                    try:
-                        updated_q = await quests.on_creature_killed(player_id, n["kind"], 1)
-                        for q in updated_q:
-                            await _send_to_player(player_id,
-                                                  {"type": "quest_progress", "quest": q})
-                        stage_q = await quest_stages.on_player_event(
-                            player_id, "kill",
-                            {"creature_kind": n["kind"], "count": 1},
-                        )
-                        for q in stage_q:
-                            await _send_to_player(player_id,
-                                                  {"type": "quest_progress", "quest": q})
-                    except Exception:
-                        logging.exception("quest hook (spell-kill) failed")
-                    # Combat-XP-Share auch bei Spell-Kills (analog Melee-Kill)
-                    try:
-                        _shares = await _gain_combat_xp_with_share(
-                            player_id, max(2, final // 2), n["x"], n["y"]
-                        )
-                        for _pid, _xr in _shares:
-                            ws_t = manager.connections.get(_pid)
-                            if ws_t is not None:
-                                try: await ws_t.send_json({"type": "skill_xp", **_xr})
-                                except Exception: pass
-                    except Exception:
-                        logging.exception("xp share (spell-kill) failed")
-                else:
-                    await manager.broadcast({
-                        "type": "npc_damaged", "npc_id": n["id"],
-                        "hp": result["hp"], "max_hp": result["max_hp"],
-                        "dmg": final, "by": player_id,
-                    })
-        elif ekind == "status":
-            sname = eff.get("effect")
-            mag = int(eff.get("magnitude", 0))
-            dur = int(eff.get("duration", 5))
-            if sname is None:
-                continue
-            # Auf Player (self/group) → status_effects.apply("player", ...)
-            for pname in affected_players:
-                try:
-                    await status_effects.apply("player", pname, sname, mag, dur)
-                    effs = await status_effects.list_for_target("player", pname)
-                    await _send_to_player(pname, {"type": "status_effects", "effects": effs})
-                except Exception:
-                    logging.exception("status apply player failed")
-            # Auf NPCs (single/aoe/ground) → npc-status
-            for n in affected_npcs:
-                try:
-                    await status_effects.apply("npc", str(n["id"]), sname, mag, dur)
-                except Exception:
-                    logging.exception("status apply npc failed")
-
-    # Magic-XP basierend auf Mana-Cost
-    mana_cost = int(spell.get("mana_cost", 0))
-    if mana_cost > 0:
-        xp_result = await skills.gain_xp(player_id, "magic", 5 + mana_cost // 2)
-        if xp_result:
-            await _send_to_player(player_id, {"type": "skill_xp", **xp_result})
+    await attributes.send_attrs_update(items, websocket, player_name)
 
 
 # Cooldown-Tracking für Heal-Strukturen: dict[(player_name, struct_id)] → timestamp
 _heal_cooldowns: dict[tuple[str, int], float] = {}
 # Cooldown-Tracking für Dungeon-Encounter (1 Eintrag pro Spieler)
 _dungeon_cooldowns: dict[str, float] = {}
-
-
-async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
-                        dmg_type: str = "physical") -> None:
-    """Wendet Schaden auf einen Spieler an. Wenn HP ≤ 0 → Respawn.
-    Berücksichtigt Armor-Defense + Shield-Status + Element-Resistance."""
-    # Welle 23 — Godmode während Character-Creation: kein Schaden bevor
-    # der Spieler den Character bestätigt hat.
-    cc_row = await db.pool().fetchrow(
-        "SELECT character_created FROM players WHERE name = $1", name,
-    )
-    if cc_row is None or not cc_row["character_created"]:
-        return
-    # Welle 25: Downed-Spieler nehmen keinen Schaden mehr.
-    if is_downed(name):
-        return
-    # Welle 25: Damage unterbricht aktiven Cast (Standard-RPG-Verhalten).
-    if spell_caster.is_casting(name):
-        spell_caster.interrupt(name, "damage_taken")
-    # Armor-Defense gilt nur für physical-Damage (Welle 15)
-    import item_stats as _is
-    if dmg_type == "physical":
-        rows = await db.pool().fetch(
-            "SELECT kind, quality FROM items WHERE owner = $1 "
-            "AND equipped_slot IN ('helmet','chestplate','shield','boots')",
-            name,
-        )
-        total_def = sum(_is.armor_defense(r["kind"], r["quality"]) for r in rows)
-        dr_pct = _is.damage_reduction(total_def)
-        dmg = max(1, int(round(dmg * (1.0 - dr_pct))))
-    else:
-        # Element/Magic: Player-Resistance anwenden (kombiniert DB-Basis
-        # + Affix-Boni von equipped). Lookup nur DB-Basis hier (schnell);
-        # Affix-Boni werden separat bei Equipping in der DB aufaddiert über
-        # apply_equipment_to_resists()… für jetzt: nur Basis.
-        try:
-            import player_stats as _ps
-            resist = await _ps.player_resistance(name, dmg_type)
-            dmg = _ps.apply_resist_to_damage(dmg, resist)
-        except Exception:
-            pass
-    # Status-Effekt 'shielded'
-    try:
-        import status_effects as _se
-        shield_factor = await _se.damage_reduction_for("player", name)
-        dmg = max(1, int(round(dmg * shield_factor)))
-    except Exception:
-        pass
-    # Erst Body-Part-Damage (atmosphärisch + Effekte)
-    part_result = await body_parts.damage_random_part(name, dmg)
-    if part_result:
-        ws_part = manager.connections.get(name)
-        if ws_part is not None:
-            await ws_part.send_json({"type": "body_part_damaged", **part_result})
-    row = await db.pool().fetchrow(
-        "SELECT hp, max_hp FROM players WHERE name = $1", name
-    )
-    if row is None:
-        return
-    new_hp = max(0, row["hp"] - dmg)
-    if new_hp == 0:
-        # Welle 25: Spieler geht in DOWNED-State (30s) statt sofort respawn.
-        # Ressurrection-Spell oder force_respawn beenden den Zustand früher.
-        await _enter_downed_state(name)
-        return
-    await db.pool().execute(
-        "UPDATE players SET hp = $1 WHERE name = $2", new_hp, name
-    )
-    ws = manager.connections.get(name)
-    if ws is not None:
-        await ws.send_json({
-            "type":  "player_damaged",
-            "hp":    new_hp,
-            "max_hp": row["max_hp"],
-            "by":    source_npc_id,
-            "dmg":   dmg,
-        })
 
 
 @app.websocket("/ws")

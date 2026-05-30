@@ -96,3 +96,19 @@ async def spend(player_name: str, copper: int) -> bool:
         player_name, copper,
     )
     return row is not None
+
+
+async def push_wallet(manager, player_id: str, gained: int | None = None) -> None:
+    """Schickt den aktuellen Geldbeutel-Stand an einen Spieler. `gained` (Kupfer)
+    triggert zusätzlich einen Gewinn-Toast."""
+    ws = manager.connections.get(player_id)
+    if ws is None:
+        return
+    try:
+        bal = await balance(player_id)
+        await ws.send_json({"type": "wallet_update", "copper": bal})
+        if gained:
+            await ws.send_json({"type": "toast",
+                                "text": f"💰 +{format(gained)}"})
+    except Exception:
+        log.debug("wallet push failed for %s", player_id)

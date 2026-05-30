@@ -750,3 +750,67 @@ try:
 except Exception:
     import logging as _lg
     _lg.getLogger("liege.combat").exception("monster_longlist merge failed")
+
+
+# ─── Welle 34c: WS-Side Combat-Helpers (extrahiert aus main.py) ──────────────
+
+GROUP_XP_SHARE_RADIUS = 30   # Tiles um den NPC, in denen Group-Members XP teilen
+GROUP_XP_BONUS_FACTOR = 1.2  # +20% Gesamt-XP wenn Kill in Gruppe geht
+
+
+async def gain_combat_xp_with_share(manager, killer_id: str, amount: int,
+                                     npc_x: int, npc_y: int) -> list[tuple[str, dict]]:
+    """Combat-XP-Vergabe mit Gruppen-Split.
+    - Killer nicht in Gruppe: bekommt volle XP allein.
+    - Sonst: alle Group-Mitglieder im 30-Tile-Radius teilen (amount × 1.2) / N.
+      Der +20%-Bonus belohnt Gruppieren, /N verhindert, dass Gruppen-Grinding
+      Solo-Kills nominal überlegen ist.
+    Return: liste (player_name, xp_result_dict) für alle die XP bekommen haben."""
+    import groups as _groups
+    import skills
+    g = await _groups.get_group_for(killer_id)
+    if not g:
+        r = await skills.gain_xp(killer_id, "combat", amount)
+        return [(killer_id, r)] if r else []
+    member_names = await _groups.get_member_names(g["id"])
+    nearby: list[str] = []
+    for pid in member_names:
+        pos = manager.get_players().get(pid)
+        if pos is None:
+            continue
+        if max(abs(pos["x"] - npc_x), abs(pos["y"] - npc_y)) <= GROUP_XP_SHARE_RADIUS:
+            nearby.append(pid)
+    if not nearby:
+        nearby = [killer_id]  # Safety: Killer war wohl gerade off-Position
+    share = max(1, int(round(amount * GROUP_XP_BONUS_FACTOR / len(nearby))))
+    out: list[tuple[str, dict]] = []
+    for pid in nearby:
+        r = await skills.gain_xp(pid, "combat", share)
+        if r:
+            # gained + group_share helfen dem Frontend einen "geteilt mit Gruppe"-
+            # Toast zu zeigen statt nur "+24 XP".
+            r["gained"] = share
+            if len(nearby) > 1:
+                r["group_share"] = {
+                    "members": len(nearby),
+                    "bonus_pct": int((GROUP_XP_BONUS_FACTOR - 1) * 100),
+                }
+            out.append((pid, r))
+    return out
+
+
+async def apply_heal_aggro(npcs, player_id: str, x: int, y: int, threat: int) -> None:
+    """Heilen zieht Aggro — feindliche Mobs in 8-Tile-Radius werden auf den
+    Heiler aufmerksam (setzen ihn als preferred_target via npc_worker)."""
+    import time as _time
+    import logging as _logging
+    try:
+        import npc_worker as _nw
+        for n in npcs.all():
+            if n["kind"] not in CREATURE_KINDS:
+                continue
+            if abs(n["x"] - x) + abs(n["y"] - y) <= 8:
+                # Mark Spieler als next target — npc_worker._try_aggression liest das
+                _nw.HEAL_THREAT[n["id"]] = (player_id, _time.time() + 12)
+    except Exception:
+        _logging.exception("heal-aggro failed")

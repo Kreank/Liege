@@ -61,6 +61,7 @@ ASYNC_BROADCAST_TYPES = {
     "npc_spawned",
     "npc_damaged",
     "npc_died",
+    "npc_goal",
     # ambient chatter / dev_chat
     "npc_chatter",
     "ambient_chatter",

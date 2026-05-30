@@ -369,3 +369,186 @@ try:
 except Exception:
     import logging as _lg
     _lg.getLogger("liege.loot").exception("monster_longlist loot merge failed")
+
+
+# ─── Welle 34c: WS-Side Loot-Helpers (extrahiert aus main.py) ────────────────
+# Die folgenden Helper enthalten die Loot-Drop-Orchestrierung (Broadcast,
+# Loot-Roll-Start, Currency-Gutschrift). Sie greifen auf viele Module zu, daher
+# werden alle Manager/Module per Parameter durchgereicht.
+
+import logging as _logging
+_log_ws = _logging.getLogger("liege.loot.ws")
+
+GROUP_XP_SHARE_RADIUS = 30   # Tiles um den NPC, in denen Group-Members XP teilen
+GROUP_XP_BONUS_FACTOR = 1.2  # +20% Gesamt-XP wenn Kill in Gruppe geht
+LOOT_ROLL_RADIUS = 15        # Tiles um den Drop, in denen Need/Greed-Roll greift
+
+
+async def find_drop_xy(world, structures, x: int, y: int) -> tuple[int, int]:
+    """Return a coordinate suitable for ground-loot near (x, y).
+
+    If (x, y) is walkable and not blocked by a structure, returns it as-is.
+    Otherwise searches outward in a spiral up to radius 3 for the first
+    walkable, non-blocked tile. Falls back to (x, y) if nothing is found.
+    """
+    if world is not None and await world.is_walkable(x, y) and not structures.blocks(x, y):
+        return x, y
+    for radius in range(1, 4):
+        for dy in range(-radius, radius + 1):
+            for dx in range(-radius, radius + 1):
+                if abs(dx) != radius and abs(dy) != radius:
+                    continue
+                nx, ny = x + dx, y + dy
+                if world is not None and await world.is_walkable(nx, ny) and not structures.blocks(nx, ny):
+                    return nx, ny
+    return x, y
+
+
+async def maybe_start_loot_roll(manager, items, killer_id: str, dropped: dict) -> None:
+    """Wenn der Killer in einer Gruppe mit loot_rule='need_greed' ist und der
+    Drop rollwürdig (Equipment/Magic/Affix/Unique), starte einen Roll unter
+    den Member-Spielern im LOOT_ROLL_RADIUS. Sonst nichts: Free-for-All bleibt
+    das Default und der Drop liegt schlicht auf dem Boden."""
+    import groups as _groups
+    import loot_rolls
+    if dropped is None or not loot_rolls.is_rollable(dropped):
+        return
+    g = await _groups.get_group_for(killer_id)
+    if not g or g.get("loot_rule") != "need_greed":
+        return
+    member_names = await _groups.get_member_names(g["id"])
+    drop_x = int(dropped.get("x", 0))
+    drop_y = int(dropped.get("y", 0))
+    eligible: set[str] = set()
+    for pid in member_names:
+        pos = manager.get_players().get(pid)
+        if pos is None:
+            continue
+        if max(abs(pos["x"] - drop_x), abs(pos["y"] - drop_y)) <= LOOT_ROLL_RADIUS:
+            eligible.add(pid)
+    if not eligible:
+        return
+
+    async def _broadcast(msg, recipients):
+        for pid in recipients:
+            ws_t = manager.connections.get(pid)
+            if ws_t is None:
+                continue
+            try: await ws_t.send_json(msg)
+            except Exception: pass
+
+    async def _finalize(state):
+        # Wenn ein Gewinner feststeht: pickup direkt ins Inventar des Winners,
+        # damit man nicht erst zum Boden laufen muss. Wenn niemand gerollt hat
+        # (alle pass) → Item bleibt als FFA-Drop liegen.
+        winner = state.get("winner")
+        if not winner:
+            return
+        picked = await items.pickup(state["item"]["id"], winner)
+        if picked is None:
+            return
+        await manager.broadcast({"type": "item_picked_up",
+                                 "item_id": state["item"]["id"]})
+        ws_w = manager.connections.get(winner)
+        if ws_w is not None:
+            if picked["id"] != state["item"]["id"]:
+                try: await ws_w.send_json({
+                    "type": "inventory_update",
+                    "item_id": picked["id"],
+                    "quantity": int(picked.get("quantity", 1)),
+                })
+                except Exception: pass
+            else:
+                try: await ws_w.send_json({"type": "inventory_add", "item": picked})
+                except Exception: pass
+
+    await loot_rolls.start_roll(dropped, g["id"], eligible, _broadcast, _finalize)
+
+
+async def drop_loot_for_npc(manager, items, killer_id: str, npc: dict,
+                             drop_x: int, drop_y: int) -> None:
+    """Tier-aware Loot-Drop für einen NPC-Kill. Ersetzt die alte Inline-Logik
+    aus loot.roll_loot + roll_boss_equipment in den 3 Kill-Pfaden.
+
+    - Overworld-Mob: alte roll_loot + boss-equip wenn BOSS_KIND
+    - Dungeon-Mob: tier+role-skalierte roll_dungeon_loot mit Quality
+    Broadcastet item_spawned + triggert Loot-Rolls + Key-Items."""
+    import npc_worker as _nw
+    import currency
+    import dungeon_instance
+    import dungeon_tiers
+    import skills
+    npc_kind = npc["kind"]
+    npc_world = (npc.get("world_id") or "overworld")
+    is_dungeon = npc_world.startswith("dungeon:")
+    coins_copper = 0   # Welle 33: Münz-Drops fließen in den Geldbeutel statt auf den Boden
+
+    if is_dungeon:
+        # Dungeon-Tier + Theme aus DB lesen
+        try:
+            parts = npc_world.split(":")
+            dungeon_id = int(parts[1])
+            dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+        except Exception:
+            dungeon = None
+        tier = (dungeon or {}).get("tier", dungeon_tiers.TIER_SMALL)
+        theme = (dungeon or {}).get("theme", "cave")
+        import dungeon_themes as _dth
+        theme_data = _dth.THEMES.get(theme, {})
+        # Role bestimmen
+        if npc_kind in _nw.BOSS_KINDS:
+            role = "boss"
+        elif npc_kind in PACK_LEADER_KINDS:
+            role = "leader"
+        else:
+            role = "trash"
+        drops = roll_dungeon_loot(npc_kind, tier, role, theme_data)
+        for kind, quality in drops:
+            if currency.is_currency(kind):
+                coins_copper += currency.coin_to_copper(kind)
+                continue
+            d = await items.spawn_on_ground(kind, drop_x, drop_y,
+                                             quality_kind=quality)
+            if d is not None:
+                await manager.broadcast({"type": "item_spawned", "item": d})
+                try: await maybe_start_loot_roll(manager, items, killer_id, d)
+                except Exception: _log_ws.exception("loot-roll start failed")
+    else:
+        # Overworld: bisherige Logik
+        for drop_kind in roll_loot(npc_kind):
+            if currency.is_currency(drop_kind):
+                coins_copper += currency.coin_to_copper(drop_kind)
+                continue
+            d = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
+            if d is not None:
+                await manager.broadcast({"type": "item_spawned", "item": d})
+                try: await maybe_start_loot_roll(manager, items, killer_id, d)
+                except Exception: _log_ws.exception("loot-roll start failed")
+        if npc_kind in _nw.BOSS_KINDS:
+            boss_eq = roll_boss_equipment()
+            if boss_eq:
+                eq_kind, eq_q = boss_eq
+                d = await items.spawn_on_ground(eq_kind, drop_x, drop_y,
+                                                 quality_kind=eq_q)
+                if d is not None:
+                    await manager.broadcast({"type": "item_spawned", "item": d})
+                    try: await maybe_start_loot_roll(manager, items, killer_id, d)
+                    except Exception: _log_ws.exception("loot-roll start failed")
+
+    # Key-Item-Drops (Boss + Pack-Leader) — gilt in beiden Welten
+    try:
+        _kl = await skills.get_skill_level(killer_id, "combat")
+        for _key in roll_dungeon_key_drops(npc_kind, _kl):
+            d = await items.spawn_on_ground(_key, drop_x, drop_y)
+            if d is not None:
+                await manager.broadcast({"type": "item_spawned", "item": d})
+    except Exception:
+        _log_ws.exception("key-item drop failed")
+
+    # Welle 33: gesammelte Münzen dem Killer gutschreiben + Geldbeutel pushen
+    if coins_copper > 0:
+        try:
+            await currency.add(killer_id, coins_copper)
+            await currency.push_wallet(manager, killer_id, gained=coins_copper)
+        except Exception:
+            _log_ws.exception("coin credit failed")

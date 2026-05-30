@@ -606,3 +606,68 @@ async def reaper_loop(connection_manager) -> None:
             raise
         except Exception:
             log.exception("Groups-Reaper-Iteration fehlgeschlagen")
+
+
+# — WS-Push-Helper (Welle 34c: aus main.py extrahiert) ———————————————————
+
+async def group_snapshot(manager, player_id: str) -> dict | None:
+    """Komplettes Group-Bild für einen Spieler (oder None wenn nicht in Gruppe)."""
+    g = await get_group_for(player_id)
+    if not g:
+        return None
+    members = await get_members(g["id"])
+    member_states = []
+    for m in members:
+        pid = m["player_name"]
+        pos = manager.get_players().get(pid)
+        member_states.append({
+            "name": pid,
+            "role": m["role"],
+            "sub_party": m["sub_party"],
+            "online": pid in manager.connections,
+            "x": pos["x"] if pos else None,
+            "y": pos["y"] if pos else None,
+        })
+    return {
+        "id": g["id"],
+        "kind": g["kind"],
+        "leader": g["leader"],
+        "name": g["name"],
+        "loot_rule": g["loot_rule"],
+        "your_role": g["role"],
+        "members": member_states,
+    }
+
+
+async def broadcast_to_group(manager, group_id: int, message: dict,
+                              exclude: str | None = None) -> None:
+    """Sendet `message` an alle online Mitglieder einer Gruppe."""
+    names = await get_member_names(group_id)
+    for pid in names:
+        if pid == exclude:
+            continue
+        ws = manager.connections.get(pid)
+        if ws is None:
+            continue
+        try:
+            await ws.send_json(message)
+        except Exception:
+            pass
+
+
+async def push_group_state(manager, player_id: str) -> None:
+    """Schickt dem Spieler sein aktuelles group_state-Snapshot."""
+    ws = manager.connections.get(player_id)
+    if ws is None:
+        return
+    snap = await group_snapshot(manager, player_id)
+    try:
+        await ws.send_json({"type": "group_state", "group": snap})
+    except Exception:
+        pass
+
+
+async def push_group_state_to_all_members(manager, group_id: int) -> None:
+    names = await get_member_names(group_id)
+    for pid in names:
+        await push_group_state(manager, pid)

@@ -71,3 +71,40 @@ def encounter_story(drops: list[str], damage: int,
         damage_text = " Du kommst unversehrt zurück."
     n = len(drops)
     return f"{theme_intro} Du steigst hinab und kehrst mit {n} Gegenständen zurück.{damage_text}"
+
+
+# ─── Welle 34c: WS-Side Dungeon-Helpers (extrahiert aus main.py) ─────────────
+
+async def active_dungeon_markers() -> list[dict]:
+    """Aktive Dungeon-Eingänge (für Minimap-Ortung). Client blendet sie nur im
+    Spür-Radius ein, daher reicht die volle Liste (Cap ~28)."""
+    import db
+    rows = await db.pool().fetch(
+        "SELECT tier, entrance_x, entrance_y FROM dungeons "
+        "WHERE expires_at > NOW() AND entrance_x IS NOT NULL"
+    )
+    return [{"x": r["entrance_x"], "y": r["entrance_y"], "tier": r["tier"]}
+            for r in rows]
+
+
+async def dungeon_floor_payload(npcs, dungeon_id: int, floor_idx: int) -> dict:
+    """Zusatz-Daten für dungeon_enter/floor_change: Theme-Tint, sichtbare
+    Features (Kisten/Decor/ausgelöste Fallen) und die NPCs dieser Floor."""
+    import dungeon_themes
+    import dungeon_instance
+    dungeon = await dungeon_instance.get_dungeon(dungeon_id)
+    theme = dungeon["theme"] if dungeon else "cave"
+    td = dungeon_themes.THEMES.get(theme, {})
+    world_id = f"dungeon:{dungeon_id}:{floor_idx}"
+    return {
+        "theme": theme,
+        "theme_data": {
+            "label":         td.get("label"),
+            "wall_tint":     td.get("wall_tint"),
+            "floor_tint":    td.get("floor_tint"),
+            "ambient_color": td.get("ambient_color"),
+            "ambient":       td.get("ambient"),
+        },
+        "features": await dungeon_instance.visible_features(dungeon_id, floor_idx),
+        "npcs":     dungeon_instance.npcs_in_world(npcs, world_id),
+    }

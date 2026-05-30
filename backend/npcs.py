@@ -155,3 +155,17 @@ class NPCManager:
         )
         # Älteste zuerst
         return [{"role": r["role"], "text": r["text"]} for r in reversed(rows)]
+
+
+# ─── Welle 34c: WS-Side NPC-Helper (extrahiert aus main.py) ──────────────────
+
+CHUNK_SEND_RADIUS = 3  # synchron mit main.py
+
+
+def overworld_npcs_near(npc_manager, x: int, y: int, radius: int = 0) -> list:
+    """Overworld-NPCs im Umkreis (für Rückkehr aus dem Dungeon → Client lädt
+    seine NPC-Sprites neu)."""
+    r = radius or (CHUNK_SEND_RADIUS * 32 + 32)
+    return [n for n in npc_manager.all()
+            if (n.get("world_id") or "overworld") == "overworld"
+            and abs(n["x"] - x) <= r and abs(n["y"] - y) <= r]
