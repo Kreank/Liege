@@ -171,10 +171,19 @@ export class AssetLoaderService {
       // animierte Render-Pfade registriert — Key folgt der NPC_SPRITE.sprite-
       // Konvention (z. B. `npc_guard`). Damit hat der Pool sofort ein
       // sichtbares Sprite, auch wenn keine Walk-Anim aktiv ist.
+      //
+      // Welle render-fix (2026-05-31): NICHT mehr `${kind}__idle` als Map-Key
+      // verwenden — das war ein toter Eintrag, denn `textureKeyFor(n.kind)`
+      // sucht nach `kind`, nicht nach `${kind}__idle`. Stattdessen direkt
+      // `kind` als Key registrieren, damit ANIMATED_NPC_KINDS auch im
+      // statischen Render-Pfad eine valide Texture haben. Wenn MONSTER_SPRITES
+      // einen Eintrag fuer denselben Key hat (z. B. `bandit`), gewinnt der
+      // hier (NPC-Idle ist konsistenter mit dem Walk-Cycle als das alte
+      // legacy_33 96px-Asset).
       const npcSprite = NPC_SPRITE[kind];
       if (npcSprite) {
         this.registerSingle(
-          `${kind}__idle`,
+          kind,
           npcSprite.sprite,
           `/assets/animations/characters/${kind}/idle_1.png`,
         );

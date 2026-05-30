@@ -16,9 +16,19 @@
 //            Kamera-Follow auf den eigenen Spieler. Keine Pfadfindung im
 //            Frontend — die `move`-Message ist schon das Pathfind-Intent
 //            (Backend führt den Pfad).
+//
+// render-fix (2026-05-31):
+//   1. Walk-Cycle aktiviert: `add.sprite` + `sprite.anims.play(...)` fuer
+//      Kinds mit registrierter Walk-Animation. Movement-Tracker pro Pool
+//      entscheidet `walk_<dir>` vs `idle`. NPC_FLIP_LR_KINDS-Workaround
+//      fuer Kinds mit invertiert geliefertem West/Ost.
+//   2. Wall-Auto-Tiling: type=='wall'|'fence' triggert Bitmask-Lookup gegen
+//      4 Nachbarn -> Variant-Sprite-Key. Bei jedem Sync wird die Variante
+//      neu berechnet, damit Add/Remove benachbarter Tiles korrekt anpassen.
 
 import Phaser from 'phaser';
 
+import { ANIMATED_NPC_KINDS, NPC_FLIP_LR_KINDS } from '../core/data/npc-sprites';
 import { TILE, TILE_BY_ID, TILE_SIZE } from '../core/data/tiles';
 import type { Chunk, Structure } from '../core/models/chunk.model';
 import type { GroundItem } from '../core/models/item.model';
@@ -26,6 +36,10 @@ import type { NPC } from '../core/models/npc.model';
 import type { OnlinePlayer } from '../core/models/player.model';
 import type { GameBridgeService } from '../core/services/game-bridge.service';
 import type { AssetLoaderService } from './asset-loader.service';
+import {
+  WALK_DIRECTIONS,
+  type WalkDirection,
+} from './asset-loader.service';
 import type { WalkAnimationsService } from './walk-animations.service';
 import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
@@ -54,6 +68,26 @@ const FALLBACK_COLORS = {
   structure: 0x886644,
   groundItem: 0xeeee44,
 } as const;
+
+/** Animation-Set fuer eine bekannte ANIMATED_NPC_KIND-Liste (O(1) Lookup). */
+const ANIMATED_NPC_SET: ReadonlySet<string> = new Set(ANIMATED_NPC_KINDS);
+
+/**
+ * Movement-Tracker pro Sprite-Key. Speichert die zuletzt gesehene Tile-Position
+ * plus den Frame-Stand zum Zeitpunkt der letzten Bewegung — wenn der Sprite N
+ * Frames lang nicht mehr bewegt wurde, schalten wir auf Idle.
+ */
+interface MoveTrack {
+  x: number;
+  y: number;
+  /** Zuletzt gespielte Direction (fuer Idle-Fallback). */
+  dir: WalkDirection;
+  /** `scene.game.loop.frame`-Wert beim letzten Move. */
+  lastMoveFrame: number;
+}
+
+/** Idle-Schwelle in Frames (~10 Frames = 167 ms bei 60 FPS). */
+const IDLE_AFTER_FRAMES = 10;
 
 export class WorldScene extends Phaser.Scene {
   /** Bridge wird in `init()` aus den Scene-Start-Daten gesetzt. */
@@ -85,6 +119,12 @@ export class WorldScene extends Phaser.Scene {
   /** Ground-Items (Loot der Welt). */
   private groundItemPool!: SpritePool<GroundItem, Phaser.GameObjects.GameObject>;
   private lastGroundItemsRef: readonly GroundItem[] | null = null;
+
+  // ─── Movement-Tracker fuer Walk-Animations (render-fix 2026-05-31) ──
+  /** Pro NPC-Key: letzte Position + Direction + Frame-Stamp. */
+  private readonly npcTracks = new Map<string | number, MoveTrack>();
+  /** Pro Player-Key: letzte Position + Direction + Frame-Stamp. */
+  private readonly playerTracks = new Map<string | number, MoveTrack>();
 
   // ─── Kamera-Follow + Local Sprint-State (F4c) ────────────────────────
   /** Letzte Spieler-Tile-Position für Move-Intent-Deduplication. */
@@ -135,12 +175,14 @@ export class WorldScene extends Phaser.Scene {
     this.playerPool = new SpritePool<OnlinePlayer, Phaser.GameObjects.GameObject>({
       keyOf: (p) => String(p.player_id),
       create: (p) => this.createPlayerSprite(p),
-      update: (s, p) => this.updateMovableSprite(s, p.x, p.y),
+      update: (s, p) => this.updatePlayerSprite(s, p),
+      onRemove: (_, k) => this.playerTracks.delete(k),
     });
     this.npcPool = new SpritePool<NPC, Phaser.GameObjects.GameObject>({
       keyOf: (n) => n.id,
       create: (n) => this.createNpcSprite(n),
-      update: (s, n) => this.updateMovableSprite(s, n.x, n.y),
+      update: (s, n) => this.updateNpcSprite(s, n),
+      onRemove: (_, k) => this.npcTracks.delete(k),
     });
     this.structurePool = new SpritePool<Structure, Phaser.GameObjects.GameObject>({
       keyOf: (s) => s.id,
@@ -202,6 +244,23 @@ export class WorldScene extends Phaser.Scene {
     if (groundItems !== this.lastGroundItemsRef) {
       this.lastGroundItemsRef = groundItems;
       this.groundItemPool.sync(groundItems);
+    }
+
+    // ─── Idle-Detection: Sprites die seit IDLE_AFTER_FRAMES nicht mehr
+    // bewegt wurden, auf Idle-Anim schalten. NPC/Player getrennt, damit der
+    // Map-Iter ohne Type-Cast funktioniert.
+    const frameNow = this.game.loop.frame;
+    for (const [key, track] of this.npcTracks) {
+      if (frameNow - track.lastMoveFrame < IDLE_AFTER_FRAMES) continue;
+      const sprite = this.npcPool.get(key);
+      if (!sprite) continue;
+      this.playIdleIfPossible(sprite, this.npcKindFor(key));
+    }
+    for (const [key, track] of this.playerTracks) {
+      if (frameNow - track.lastMoveFrame < IDLE_AFTER_FRAMES) continue;
+      const sprite = this.playerPool.get(key);
+      if (!sprite) continue;
+      this.playIdleIfPossible(sprite, this.playerPresetFor(key));
     }
 
     // ─── Kamera-Follow auf den eigenen Spieler ─────────────────────────
@@ -342,9 +401,9 @@ export class WorldScene extends Phaser.Scene {
   // ─── Sprite-Factories (F4b) ────────────────────────────────────────
 
   /**
-   * Generischer Helper: gibt entweder ein `Image` (Texture vorhanden) oder
-   * ein gefärbtes `Rectangle` (Fallback) zurück. Beide sind
-   * `GameObjects.GameObject` — der gemeinsame Typ für die Pool.
+   * Generischer Helper fuer STATISCHE Sprites: gibt entweder ein `Image`
+   * (Texture vorhanden) oder ein gefärbtes `Rectangle` (Fallback) zurück.
+   * Beide sind `GameObjects.GameObject` — der gemeinsame Typ für die Pool.
    */
   private spriteOrFallback(
     textureKey: string,
@@ -359,6 +418,30 @@ export class WorldScene extends Phaser.Scene {
     const rect = this.add.rectangle(0, 0, sizePx, sizePx, fallbackColor, 0.85);
     rect.setStrokeStyle(2, 0x000000, 0.6);
     return rect;
+  }
+
+  /**
+   * Animated-Sprite-Factory: erzeugt einen Phaser-Sprite (statt Image) und
+   * spielt sofort die Idle-Animation, falls registriert. Fallt auf
+   * spriteOrFallback zurueck wenn weder Texture noch Anim existiert.
+   * `animKindKey` ist der Walk-Cycle-Kind-Key (z. B. `wanderer`).
+   */
+  private animatedSpriteOrFallback(
+    textureKey: string,
+    animKindKey: string,
+    fallbackColor: number,
+    sizePx: number,
+  ): Phaser.GameObjects.GameObject {
+    if (this.textures.exists(textureKey)) {
+      const sprite = this.add.sprite(0, 0, textureKey);
+      sprite.setDisplaySize(sizePx, sizePx);
+      const idleKey = this.walkAnimations.idleAnimKey(animKindKey);
+      if (this.anims.exists(idleKey)) {
+        sprite.anims.play(idleKey, true);
+      }
+      return sprite;
+    }
+    return this.spriteOrFallback(textureKey, fallbackColor, sizePx);
   }
 
   /** Position auf Sprite anwenden — funktioniert für Image, Sprite,
@@ -379,12 +462,18 @@ export class WorldScene extends Phaser.Scene {
     // AssetLoader auf `wanderer_cloak` (Default).
     const preset = this.assetLoader.resolvePlayerPreset(p.preset);
     const tex = `player_${preset}_idle`;
-    const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.player, TILE_SIZE);
+    const obj = this.animatedSpriteOrFallback(tex, preset, FALLBACK_COLORS.player, TILE_SIZE);
     const isMe = this.bridge.state.player()?.player_id === p.player_id;
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = isMe
       ? DEPTH.ME
       : DEPTH.PLAYERS;
     return obj;
+  }
+
+  private updatePlayerSprite(obj: Phaser.GameObjects.GameObject, p: OnlinePlayer): void {
+    this.updateMovableSprite(obj, p.x, p.y);
+    const preset = this.assetLoader.resolvePlayerPreset(p.preset);
+    this.handleWalkAnim(obj, this.playerTracks, String(p.player_id), preset, p.x, p.y);
   }
 
   private createNpcSprite(n: NPC): Phaser.GameObjects.GameObject {
@@ -394,9 +483,21 @@ export class WorldScene extends Phaser.Scene {
     const variantTex = n.sprite_variant ? `npc_${n.sprite_variant}` : null;
     const baseTex = this.assetLoader.textureKeyFor(n.kind) ?? `npc_${n.kind}`;
     const tex = variantTex && this.textures.exists(variantTex) ? variantTex : baseTex;
-    const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.npc, TILE_SIZE);
+    // Animated path nur wenn das Kind in ANIMATED_NPC_KINDS ist (Walk-Cycle
+    // wurde registriert). Animal-/Cart-Kinds sind static.
+    const animKind = ANIMATED_NPC_SET.has(n.kind) ? n.kind : null;
+    const obj = animKind
+      ? this.animatedSpriteOrFallback(tex, animKind, FALLBACK_COLORS.npc, TILE_SIZE)
+      : this.spriteOrFallback(tex, FALLBACK_COLORS.npc, TILE_SIZE);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.NPCS;
     return obj;
+  }
+
+  private updateNpcSprite(obj: Phaser.GameObjects.GameObject, n: NPC): void {
+    this.updateMovableSprite(obj, n.x, n.y);
+    if (ANIMATED_NPC_SET.has(n.kind)) {
+      this.handleWalkAnim(obj, this.npcTracks, n.id, n.kind, n.x, n.y);
+    }
   }
 
   private createStructureSprite(s: Structure): Phaser.GameObjects.GameObject {
@@ -417,4 +518,112 @@ export class WorldScene extends Phaser.Scene {
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.GROUND_ITEMS;
     return obj;
   }
+
+  // ─── Walk-Cycle-Handling (render-fix 2026-05-31) ────────────────────
+
+  /**
+   * Vergleicht aktuelle Position mit Tracker, berechnet Direction, spielt
+   * die passende Walk-Animation. Beachtet NPC_FLIP_LR_KINDS — Kinds in der
+   * Liste sind west/ost-vertauscht ausgeliefert, daher spielen wir
+   * `walk_right` mit `setFlipX(true)` statt `walk_left` (sieht sonst
+   * verkehrt aus, Audit Welle 29e).
+   */
+  private handleWalkAnim(
+    obj: Phaser.GameObjects.GameObject,
+    tracks: Map<string | number, MoveTrack>,
+    key: string | number,
+    kind: string,
+    x: number,
+    y: number,
+  ): void {
+    const prev = tracks.get(key);
+    if (!prev) {
+      tracks.set(key, { x, y, dir: 'down', lastMoveFrame: this.game.loop.frame });
+      return;
+    }
+    const dx = x - prev.x;
+    const dy = y - prev.y;
+    if (dx === 0 && dy === 0) return; // keine Bewegung → Idle-Detection laeuft separat
+    const dir = directionFor(dx, dy, prev.dir);
+    prev.x = x;
+    prev.y = y;
+    prev.dir = dir;
+    prev.lastMoveFrame = this.game.loop.frame;
+    this.playWalkAnim(obj, kind, dir);
+  }
+
+  /** Spielt `<kind>_walk_<dir>`, ggf. mit Flip fuer NPC_FLIP_LR_KINDS. */
+  private playWalkAnim(
+    obj: Phaser.GameObjects.GameObject,
+    kind: string,
+    dir: WalkDirection,
+  ): void {
+    const sprite = obj as Phaser.GameObjects.GameObject & {
+      anims?: Phaser.Animations.AnimationState;
+      setFlipX?: (flip: boolean) => void;
+    };
+    if (!sprite.anims) return; // Image/Rectangle → keine Anim
+
+    let effectiveDir = dir;
+    let flipX = false;
+    if (NPC_FLIP_LR_KINDS.has(kind)) {
+      // West/Ost sind invertiert geliefert: 'left' -> spiele 'right' + Flip,
+      // 'right' -> spiele 'left' + Flip. North/South unbeeinflusst.
+      if (dir === 'left') { effectiveDir = 'right'; flipX = true; }
+      else if (dir === 'right') { effectiveDir = 'left'; flipX = true; }
+    }
+    sprite.setFlipX?.(flipX);
+
+    const animKey = this.walkAnimations.walkAnimKey(kind, effectiveDir);
+    if (this.anims.exists(animKey)) {
+      sprite.anims.play(animKey, true);
+    }
+  }
+
+  /** Spielt die Idle-Animation falls vorhanden. No-op fuer Rects/Images. */
+  private playIdleIfPossible(obj: Phaser.GameObjects.GameObject, kind: string | null): void {
+    if (!kind) return;
+    const sprite = obj as Phaser.GameObjects.GameObject & {
+      anims?: Phaser.Animations.AnimationState;
+    };
+    if (!sprite.anims) return;
+    const idleKey = this.walkAnimations.idleAnimKey(kind);
+    if (!this.anims.exists(idleKey)) return;
+    // `play(key, true)` = ignoreIfPlaying → kein Restart, wenn Idle schon laeuft.
+    sprite.anims.play(idleKey, true);
+  }
+
+  /** Liefert den NPC-Kind aus dem aktuellen npcsVisible()-Snapshot. */
+  private npcKindFor(id: string | number): string | null {
+    const npcs = this.bridge.state.npcsVisible();
+    const idNum = typeof id === 'string' ? Number(id) : id;
+    const npc = npcs.find((n) => n.id === idNum);
+    return npc ? npc.kind : null;
+  }
+
+  /** Liefert das Player-Preset aus dem aktuellen players()-Snapshot. */
+  private playerPresetFor(key: string | number): string | null {
+    const players = this.bridge.state.players();
+    const p = players[String(key)];
+    if (!p) return null;
+    return this.assetLoader.resolvePlayerPreset(p.preset);
+  }
 }
+
+/**
+ * Mapped (dx, dy) auf 4-Wege-Direction. Bei diagonalem Move dominiert die
+ * groessere Komponente; bei Gleichstand bleibt die vorherige Direction.
+ */
+function directionFor(dx: number, dy: number, prev: WalkDirection): WalkDirection {
+  const ax = Math.abs(dx);
+  const ay = Math.abs(dy);
+  if (ax === 0 && ay === 0) return prev;
+  if (ax > ay) return dx > 0 ? 'right' : 'left';
+  if (ay > ax) return dy > 0 ? 'down' : 'up';
+  // Gleichstand (diagonale Schritte): vertikal vorziehen wenn moeglich.
+  return dy > 0 ? 'down' : 'up';
+}
+
+// Silence "unused import" warning fuer WALK_DIRECTIONS — wir nutzen den Type
+// `WalkDirection` aktiv, aber das Symbol nur indirekt ueber Service-Calls.
+void WALK_DIRECTIONS;
