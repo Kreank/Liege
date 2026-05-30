@@ -31,6 +31,7 @@ import Phaser from 'phaser';
 import { GameBridgeService } from '../core/services/game-bridge.service';
 import { WebSocketService } from '../core/services/websocket.service';
 import { AssetLoaderService } from './asset-loader.service';
+import { EffectAnimationsService } from './effect-animations.service';
 import { WalkAnimationsService } from './walk-animations.service';
 import { WorldScene, type WorldSceneInitData } from './world-scene';
 
@@ -62,6 +63,7 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
   private readonly ws = inject(WebSocketService);
   private readonly assetLoader = inject(AssetLoaderService);
   private readonly walkAnimations = inject(WalkAnimationsService);
+  private readonly effectAnimations = inject(EffectAnimationsService);
 
   private game: Phaser.Game | null = null;
 
@@ -90,6 +92,7 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
         bridge: this.bridge,
         assetLoader: this.assetLoader,
         walkAnimations: this.walkAnimations,
+        effectAnimations: this.effectAnimations,
       };
       this.game.scene.start('WorldScene', initData);
     });

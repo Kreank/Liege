@@ -6,8 +6,15 @@
 // generischen Sprite-Fade aus der `EFFECT_SPRITES`-Map (AssetLoader hat den
 // Texture-Key bereits als `effect_<kind>` registriert).
 //
-// Drei spezialisierte Animationen + Generic-Fallback:
-//   • hit_spark     — siehe `combat-fx.ts::spawnHitSpark`
+// G4 (2026-05-31):
+//   Multi-Frame-Pfad zuerst: wenn `EFFECT_ANIMATIONS[kind]` existiert UND
+//   die Phaser-Animation `fx_<kind>` registriert ist, spawnen wir einen
+//   Phaser.Sprite, spielen `fx_<kind>` einmal und zerstören den Sprite im
+//   `animationcomplete`-Hook. Damit sehen Fireball/Lightning/Pestwolke
+//   wie echte Effekte aus, nicht wie stehende Bilder mit Alpha-Tween.
+//
+// Fallback-Pfade (in Reihenfolge):
+//   • hit_spark     — siehe `combat-fx.ts::spawnHitSpark` (existierende Logik)
 //   • poison_cloud  — Tile-grosse grüne Wolke, alpha 0.6→0 / 1500ms
 //   • heal_pulse    — grüner Ring, scale 0.5→2.0 / 500ms
 //   • generic       — falls `effect_<kind>`-Texture existiert: scale 0.5→1.2,
@@ -15,6 +22,7 @@
 
 import Phaser from 'phaser';
 
+import { EFFECT_ANIMATIONS } from '../core/data/effect-sprites';
 import { TILE_SIZE } from '../core/data/tiles';
 import { COMBAT_FX } from './combat-fx';
 
@@ -36,6 +44,11 @@ export const VISUAL_EFFECTS = {
       x: args.x * TILE_SIZE + TILE_SIZE / 2,
       y: args.y * TILE_SIZE + TILE_SIZE / 2,
     };
+
+    // ── G4-Pfad: Multi-Frame-Anim, falls vorhanden + registriert. ────────
+    if (spawnMultiFrameAnim(scene, args.kind, center.x, center.y)) return;
+
+    // Legacy-Fallbacks (single-Frame).
     switch (args.kind) {
       case 'hit_spark':
         COMBAT_FX.spawnHitSpark(scene, center.x, center.y);
@@ -53,7 +66,36 @@ export const VISUAL_EFFECTS = {
   },
 } as const;
 
-/** Grüne, Tile-grosse Wolke. */
+/**
+ * G4 Multi-Frame-Anim-Pfad. Returnt true wenn die Animation gespielt wurde
+ * (Caller skippt dann die Fallbacks).
+ */
+function spawnMultiFrameAnim(
+  scene: Phaser.Scene,
+  kind: string,
+  x: number,
+  y: number,
+): boolean {
+  const spec = EFFECT_ANIMATIONS[kind];
+  if (!spec) return false;
+  const animKey = `fx_${kind}`;
+  if (!scene.anims.exists(animKey)) return false;
+
+  // Erstes Frame als Boot-Texture (Phaser braucht eine valide initiale Texture).
+  const firstFrameKey = `effect_anim_${kind}_01`;
+  if (!scene.textures.exists(firstFrameKey)) return false;
+
+  const sprite = scene.add.sprite(x, y, firstFrameKey);
+  sprite.setOrigin(0.5, 0.5);
+  sprite.setDepth(DEPTH_FX);
+  const size = TILE_SIZE * spec.tileScale;
+  sprite.setDisplaySize(size, size);
+  sprite.once('animationcomplete', () => sprite.destroy());
+  sprite.anims.play(animKey);
+  return true;
+}
+
+/** Grüne, Tile-grosse Wolke (Legacy-Fallback). */
 function spawnPoisonCloud(scene: Phaser.Scene, x: number, y: number): void {
   const texKey = 'effect_poison_cloud';
   let obj: Phaser.GameObjects.GameObject & {
@@ -81,7 +123,7 @@ function spawnPoisonCloud(scene: Phaser.Scene, x: number, y: number): void {
   });
 }
 
-/** Grüner Ring, der nach aussen pulst. */
+/** Grüner Ring, der nach aussen pulst (Legacy-Fallback). */
 function spawnHealPulse(scene: Phaser.Scene, x: number, y: number): void {
   const texKey = 'effect_heal_pulse';
   let obj: Phaser.GameObjects.GameObject & {

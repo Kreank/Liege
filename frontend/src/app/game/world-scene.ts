@@ -50,8 +50,10 @@ import {
   WALK_DIRECTIONS,
   type WalkDirection,
 } from './asset-loader.service';
+import type { EffectAnimationsService } from './effect-animations.service';
 import type { WalkAnimationsService } from './walk-animations.service';
 import { COMBAT_FX } from './combat-fx';
+import { DisasterOverlay } from './disaster-overlay';
 import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
 import { VISUAL_EFFECTS } from './visual-effects';
@@ -68,6 +70,7 @@ export interface WorldSceneInitData {
   readonly bridge: GameBridgeService;
   readonly assetLoader: AssetLoaderService;
   readonly walkAnimations: WalkAnimationsService;
+  readonly effectAnimations: EffectAnimationsService;
 }
 
 /** Render-Tiefen (Z-Order). */
@@ -115,6 +118,10 @@ export class WorldScene extends Phaser.Scene {
   private assetLoader!: AssetLoaderService;
   /** Phaser-Animation-Definitions (Walk/Idle). */
   private walkAnimations!: WalkAnimationsService;
+  /** Phaser-Animation-Definitions (Spell-FX, Disaster-Layer) — G4. */
+  private effectAnimations!: EffectAnimationsService;
+  /** Disaster-Overlay (Tint, Particle-Emitter, Lightning-Bolts) — G4. */
+  private disasterOverlay: DisasterOverlay | null = null;
 
   // ─── Tile-Layer ─────────────────────────────────────────────────────
   private readonly chunkContainers = new Map<string, Phaser.GameObjects.Container>();
@@ -170,6 +177,7 @@ export class WorldScene extends Phaser.Scene {
     this.bridge = data.bridge;
     this.assetLoader = data.assetLoader;
     this.walkAnimations = data.walkAnimations;
+    this.effectAnimations = data.effectAnimations;
   }
 
   preload(): void {
@@ -232,6 +240,10 @@ export class WorldScene extends Phaser.Scene {
     // Nach `preload()` sind alle Frame-Texturen im Cache — jetzt definieren
     // wir pro Kind × Richtung eine Phaser-Animation.
     this.walkAnimations.createAnimations(this);
+    // G4: Spell-FX + Disaster-Layer-Anims registrieren.
+    this.effectAnimations.createAnimations(this);
+    // G4: Disaster-Overlay initialisieren (Tint/Particle/Bolt).
+    this.disasterOverlay = new DisasterOverlay(this, this.effectAnimations);
 
     // ─── Kamera-Setup ─────────────────────────────────────────────────
     // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
@@ -766,9 +778,48 @@ export class WorldScene extends Phaser.Scene {
       case 'visual_effect':
         this.fxVisualEffect(msg);
         return;
+      case 'disaster_started':
+        this.fxDisasterStarted(msg);
+        return;
+      case 'disaster_ended':
+        this.fxDisasterEnded(msg);
+        return;
+      case 'earthquake_shake':
+        this.fxEarthquake(msg);
+        return;
+      case 'lightning_strike':
+        this.fxLightningStrike(msg);
+        return;
       default:
         return;
     }
+  }
+
+  private fxDisasterStarted(msg: ServerMessage): void {
+    const kind = msg['kind'] as string | undefined;
+    if (!kind || !this.disasterOverlay) return;
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    this.disasterOverlay.startDisaster(kind, { x: x ?? null, y: y ?? null });
+  }
+
+  private fxDisasterEnded(msg: ServerMessage): void {
+    const kind = msg['kind'] as string | undefined;
+    if (!kind || !this.disasterOverlay) return;
+    this.disasterOverlay.endDisaster(kind);
+  }
+
+  private fxEarthquake(msg: ServerMessage): void {
+    const intensity = (msg['intensity'] as number | undefined) ?? 0.01;
+    const durationMs = (msg['duration_ms'] as number | undefined) ?? 600;
+    this.cameras.main.shake(durationMs, Math.min(0.05, intensity));
+  }
+
+  private fxLightningStrike(msg: ServerMessage): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null || !this.disasterOverlay) return;
+    this.disasterOverlay.spawnLightningBolt(x, y);
   }
 
   private fxNpcDamaged(msg: ServerMessage): void {

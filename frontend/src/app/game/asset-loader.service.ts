@@ -30,7 +30,13 @@ import {
 import { MONSTER_SPRITES } from '../core/data/monster-sprites';
 import { STRUCTURE_SPRITES } from '../core/data/structure-sprites';
 import { ITEM_SPRITES } from '../core/data/item-sprites';
-import { EFFECT_SPRITES } from '../core/data/effect-sprites';
+import {
+  DISASTER_LAYERS,
+  EFFECT_ANIMATIONS,
+  EFFECT_SPRITES,
+  type DisasterLayerSpec,
+  type EffectAnimationSpec,
+} from '../core/data/effect-sprites';
 
 /** Walk-Cycle-Frame-Set für ein Kind (NPC oder Player-Preset). */
 export interface WalkCycleSpec {
@@ -68,10 +74,20 @@ export class AssetLoaderService {
   /** Walk-Cycles pro Kind (NPC, Player-Preset). */
   private readonly walkCycles = new Map<string, WalkCycleSpec>();
 
+  /** Effect-Multi-Frame-Anims (G4): kind → spec. Pro Spec gibt es ein
+   *  Texture pro Frame mit Key `effect_anim_<kind>_<NN>`. */
+  private readonly effectAnims = new Map<string, EffectAnimationSpec>();
+
+  /** Disaster-Layer-Anims (G4): layer-key → spec. Texture-Keys
+   *  `disaster_anim_<layer>_<NN>`. */
+  private readonly disasterLayers = new Map<string, DisasterLayerSpec>();
+
   constructor() {
     this.loadStaticManifests();
     this.loadNpcWalkCycles();
     this.loadPlayerPresetWalkCycles();
+    this.loadEffectAnimations();
+    this.loadDisasterLayers();
   }
 
   // ─── Public API ─────────────────────────────────────────────────────
@@ -91,6 +107,37 @@ export class AssetLoaderService {
   /** Liefert alle registrierten Walk-Cycle-Kinds. */
   allWalkCycleKinds(): readonly string[] {
     return [...this.walkCycles.keys()];
+  }
+
+  /** Liefert die Effect-Animation-Spec für ein Kind oder null. */
+  effectAnimationFor(kind: string): EffectAnimationSpec | null {
+    return this.effectAnims.get(kind) ?? null;
+  }
+
+  /** Iterator über alle Effect-Anim-Specs (für die FX-Animations-Registry). */
+  allEffectAnimations(): readonly EffectAnimationSpec[] {
+    return [...this.effectAnims.values()];
+  }
+
+  /** Iterator über alle Disaster-Layer-Specs. */
+  allDisasterLayers(): readonly DisasterLayerSpec[] {
+    return [...this.disasterLayers.values()];
+  }
+
+  /** Liefert die Disaster-Layer-Specs für einen Disaster-Kind. */
+  disasterLayersFor(kind: string): readonly DisasterLayerSpec[] {
+    const layers = DISASTER_LAYERS[kind];
+    return layers ?? [];
+  }
+
+  /** Texture-Key-Konvention für Effect-Anim-Frame. */
+  effectFrameKey(kind: string, frameIdx1: number): string {
+    return `effect_anim_${kind}_${pad2(frameIdx1)}`;
+  }
+
+  /** Texture-Key-Konvention für Disaster-Layer-Frame. */
+  disasterFrameKey(layerKey: string, frameIdx1: number): string {
+    return `disaster_anim_${layerKey}_${pad2(frameIdx1)}`;
   }
 
   /** Resolved den effektiven Player-Preset-Key (Default wenn null/leer). */
@@ -122,6 +169,16 @@ export class AssetLoaderService {
     // 2) Walk-Cycles (NPCs + Player-Presets): pro Richtung pro Frame.
     for (const [, spec] of this.walkCycles) {
       this.preloadWalkCycle(loader, spec);
+    }
+
+    // 3) Effect-Multi-Frame-Anims (G4).
+    for (const [, spec] of this.effectAnims) {
+      this.preloadEffectAnim(loader, spec);
+    }
+
+    // 4) Disaster-Layer-Anims (G4).
+    for (const [, spec] of this.disasterLayers) {
+      this.preloadDisasterLayer(loader, spec);
     }
   }
 
@@ -223,12 +280,56 @@ export class AssetLoaderService {
     );
   }
 
+  /**
+   * Registriert alle Multi-Frame-Effect-Anims aus EFFECT_ANIMATIONS.
+   * Pro Effect-Kind landet die Spec in `effectAnims`; die einzelnen Frames
+   * werden beim Phaser-Preload als `effect_anim_<kind>_<NN>` geladen.
+   */
+  private loadEffectAnimations(): void {
+    for (const [kind, spec] of Object.entries(EFFECT_ANIMATIONS)) {
+      this.effectAnims.set(kind, spec);
+    }
+  }
+
+  /** Registriert alle Disaster-Layer-Anims aus DISASTER_LAYERS. */
+  private loadDisasterLayers(): void {
+    for (const layers of Object.values(DISASTER_LAYERS)) {
+      for (const spec of layers) {
+        this.disasterLayers.set(spec.key, spec);
+      }
+    }
+  }
+
   // ─── Private: Helpers ───────────────────────────────────────────────
 
   /** Registriert ein Single-Sprite (PNG → Texture). */
   private registerSingle(kind: string, textureKey: string, path: string): void {
     this.singleSprites.set(kind, path);
     this.kindToTextureKey.set(kind, textureKey);
+  }
+
+  /** Lädt alle Frames einer Effect-Anim (`effect_anim_<kind>_<NN>`). */
+  private preloadEffectAnim(
+    loader: Phaser.Loader.LoaderPlugin,
+    spec: EffectAnimationSpec,
+  ): void {
+    for (let n = 1; n <= spec.frameCount; n++) {
+      const key = this.effectFrameKey(spec.kind, n);
+      if (loader.textureManager.exists(key)) continue;
+      loader.image(key, `${spec.baseUrl}/${spec.prefix}${pad2(n)}.png`);
+    }
+  }
+
+  /** Lädt alle Frames einer Disaster-Layer-Anim. */
+  private preloadDisasterLayer(
+    loader: Phaser.Loader.LoaderPlugin,
+    spec: DisasterLayerSpec,
+  ): void {
+    for (let n = 1; n <= spec.frameCount; n++) {
+      const key = this.disasterFrameKey(spec.key, n);
+      if (loader.textureManager.exists(key)) continue;
+      loader.image(key, `${spec.baseUrl}/${spec.prefix}${pad2(n)}.png`);
+    }
   }
 
   /** Lädt alle Frames eines Walk-Cycles (8 walk + optional 2 idle). */
@@ -251,4 +352,9 @@ export class AssetLoaderService {
       }
     }
   }
+}
+
+/** Format eine 1-indexierte Zahl als 2-stelligen String (`5` → `05`). */
+function pad2(n: number): string {
+  return n < 10 ? `0${n}` : String(n);
 }
