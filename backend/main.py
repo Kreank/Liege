@@ -1,7 +1,20 @@
+"""Liege backend entry-point.
+
+Schlanke Hülle nach B-final: App-Setup + lifespan + HTTP-Routes +
+Statik-Mounts + dünner /ws-Endpoint. Alle WS-Message-Branches leben
+jetzt in `backend/ws/<domain>.py` und registrieren sich beim Import
+im Dispatcher.
+
+`load_or_create_player`, der init-Payload-Builder und die
+disconnect-Cleanup nutzen weiterhin die Service-Funktionen direkt;
+ein paar dünne Bind-Wrapper (`damage_player`, `heal_player`,
+`_apply_spell_effects` …) bleiben, weil Hintergrund-Worker und
+spell_caster-Callbacks sie als fertig-konfigurierten Callable
+brauchen.
+"""
 import asyncio
 import logging
 import os
-import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -14,74 +27,70 @@ from auth_routes import router as auth_router
 from dev_chat import dev_chat_handler
 import db
 import llm
-import combat
-import dialog
+import bill_queue
+import body_parts
+import currency
 import disaster_state
 import dungeons
 import event_worker
+import factions
 import farm_worker
-import harvest
+import groups
 import item_worker
-import loot
-import loot_rolls
 import needs
-import body_parts
-import bill_queue
 import npc_mood
 import npc_worker
-import player_events
-import quality
+import power_budget
+import quests
+import raid_director
 import recipes
 import research
 import respawn_worker
 import skills
-import raid_director
-import time_system
-import weather_worker
-import quests
+import spell_caster
+import spells
 import status_effects
 import talents
-import affixes
-import item_namer
-import quest_generator
-import region_history
-import npc_memory
-import factions
-import groups
-import quest_stages
-import dungeon_instance
-import dungeon_tiers
-import attributes
-import trade
+import time_system
+import weather_worker
 import world_populator
-import power_budget
-import spells
-import spell_caster
 from ws_manager import ConnectionManager
 from world import World
 from structures import StructureManager
 from events import EventManager
 from npcs import NPCManager
-import npcs as npcs_mod
 from items import ItemManager
+
+from services import player_state as _player_state
+from services.player_state import (
+    load_or_create_player as _load_or_create_player_svc,
+    heal_player as _heal_player_svc,
+    damage_player as _damage_player_svc,
+    do_respawn as _do_respawn_svc,
+    refund_mana as _refund_mana_svc,
+    downed_state as _downed_state,
+)
+from services.player_comms import send_to_player as _send_to_player_svc
+
 from ws.context import WsContext
 from ws.dispatcher import dispatch as ws_dispatch
-import ws.movement  # noqa: F401 — registriert move/sprint im Dispatcher
-import ws.bills  # noqa: F401 — registriert add_bill/remove_bill/list_bills
-import ws.research  # noqa: F401 — registriert invest_research
-import ws.dialog  # noqa: F401 — registriert talk_to_npc
-import ws.trade  # noqa: F401 — registriert open_trade/buy_item/sell_item
-import ws.loot  # noqa: F401 — registriert loot_vote/set_loot_rule
-import ws.raid  # noqa: F401 — registriert raid_trigger_manual/dev_*/force_respawn
-import ws.crafting  # noqa: F401 — registriert open_hand_crafting/craft
-import ws.character  # noqa: F401 — registriert wake/allocate_attr/learn_*/cast_learned/list_*/character_*
-import ws.inventory  # noqa: F401 — registriert split/merge/equip/unequip/use_item/pick/drop/chest_*
-import ws.quests  # noqa: F401 — registriert list_quests/query_npc_quests/accept_quest_*/quest_turn_in/claim_quest_reward
-import ws.social  # noqa: F401 — registriert chat + group_*
-import ws.structures  # noqa: F401 — registriert dungeon_chest/place/toggle_door/remove/attack/repair/upgrade/use_structure/fill/water/drink_*
-import ws.combat  # noqa: F401 — registriert attack_npc + cast_spell
+import ws.movement     # noqa: F401 — registriert move/sprint
+import ws.bills        # noqa: F401 — registriert add_bill/remove_bill/list_bills
+import ws.research     # noqa: F401 — registriert invest_research
+import ws.dialog       # noqa: F401 — registriert talk_to_npc
+import ws.trade        # noqa: F401 — registriert open_trade/buy_item/sell_item
+import ws.loot         # noqa: F401 — registriert loot_vote/set_loot_rule
+import ws.raid         # noqa: F401 — registriert raid_trigger_manual/dev_*/force_respawn
+import ws.crafting     # noqa: F401 — registriert open_hand_crafting/craft
+import ws.character    # noqa: F401 — registriert wake/allocate_attr/learn_*/cast_learned/list_*/character_*
+import ws.inventory    # noqa: F401 — registriert split/merge/equip/unequip/use_item/pick/drop/chest_*
+import ws.quests       # noqa: F401 — registriert list_quests/query_npc_quests/accept_quest_*/quest_turn_in/claim_quest_reward
+import ws.social       # noqa: F401 — registriert chat + group_*
+import ws.structures   # noqa: F401 — registriert dungeon_chest/place/toggle_door/remove/attack/repair/upgrade/use_structure/fill/water/drink_*
+import ws.combat       # noqa: F401 — registriert attack_npc + cast_spell
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
 manager = ConnectionManager()
 structures = StructureManager()
@@ -92,94 +101,22 @@ items = ItemManager()
 # können, ohne den item_manager als Parameter durchreichen zu müssen.
 import items as _items_module
 _items_module.set_global_item_manager(items)
-import currency
-from services import player_state as _player_state
-from services import player_equipment as _player_equipment
-from services.player_comms import send_to_player as _send_to_player_svc
-from services.player_equipment import (
-    get_equipped_weapon_kind, get_equipped_tool_kind, has_tool_for_skill,
-    TOOL_FOR_SKILL, PROP_SKILL, TOOL_HINT, NO_TOOL_PROPS,
-)
-from services.player_state import (
-    load_or_create_player as _load_or_create_player_svc,
-    heal_player as _heal_player_svc,
-    damage_player as _damage_player_svc,
-    is_downed, do_respawn as _do_respawn_svc,
-    restore_mana as _restore_mana_svc,
-    refund_mana as _refund_mana_svc,
-    DEFAULT_SPAWN_CENTER,
-    downed_state as _downed_state,
-)
 world: World | None = None
 
 
-# ─── Dünne Bind-Wrapper für Helper aus services/* + Geschwister-Modulen ────
-# Damit die hunderten Aufrufstellen weiter nur den player_id übergeben können
-# und nicht jedes Mal `manager`/`world`/… explizit mitschreiben müssen, binden
-# wir hier die Modul-Globals ein einziges Mal. B2 löst das später via WsContext
-# vollständig auf.
-
-async def _push_wallet(player_id: str, gained: int | None = None) -> None:
-    await currency.push_wallet(manager, player_id, gained=gained)
-
-
-async def _group_snapshot(player_id: str) -> dict | None:
-    return await groups.group_snapshot(manager, player_id)
-
-
-async def _broadcast_to_group(group_id: int, message: dict,
-                              exclude: str | None = None) -> None:
-    await groups.broadcast_to_group(manager, group_id, message, exclude=exclude)
-
-
-async def _push_group_state(player_id: str) -> None:
-    await groups.push_group_state(manager, player_id)
-
-
-async def _push_group_state_to_all_members(group_id: int) -> None:
-    await groups.push_group_state_to_all_members(manager, group_id)
-
-
-# Re-Export der Konstanten, falls anderswo importiert
-GROUP_XP_SHARE_RADIUS = combat.GROUP_XP_SHARE_RADIUS
-GROUP_XP_BONUS_FACTOR = combat.GROUP_XP_BONUS_FACTOR
-LOOT_ROLL_RADIUS = loot.LOOT_ROLL_RADIUS
-
-
-async def _drop_loot_for_npc(killer_id: str, npc: dict,
-                              drop_x: int, drop_y: int) -> None:
-    await loot.drop_loot_for_npc(manager, items, killer_id, npc, drop_x, drop_y)
-
-
-async def _maybe_start_loot_roll(killer_id: str, dropped: dict) -> None:
-    await loot.maybe_start_loot_roll(manager, items, killer_id, dropped)
-
-
-async def _gain_combat_xp_with_share(killer_id: str, amount: int,
-                                     npc_x: int, npc_y: int) -> list[tuple[str, dict]]:
-    return await combat.gain_combat_xp_with_share(manager, killer_id, amount, npc_x, npc_y)
-
-
-async def _find_drop_xy(x: int, y: int) -> tuple[int, int]:
-    return await loot.find_drop_xy(world, structures, x, y)
-
-
-async def _send_to_player(player_id: str, payload: dict) -> None:
-    await _send_to_player_svc(manager, player_id, payload)
-
-
-# Player-Lifecycle-Bind-Wrapper (gleiches Muster wie oben — main.py-Code ruft
-# sie weiter mit kurzem Signatures auf; services-Funktionen bekommen Globals).
-
-async def load_or_create_player(name: str) -> dict:
-    return await _load_or_create_player_svc(world, structures, name)
-
+# ─── Bind-Wrapper für Hintergrund-Worker + spell_caster-Callbacks ─────
+# Die Worker (needs.run, status_effects.run, npc_worker.wander_loop …) und
+# der spell_caster brauchen Callables mit fixen Signatures (player_id,
+# amount). Hier binden wir die Service-Funktionen einmalig an die
+# Modul-Globals. Aufrufer in ws/<domain>.py rufen die services-Funktionen
+# direkt — diese Wrapper sind ausschließlich für die Hintergrund-Tasks.
 
 async def heal_player(name: str, amount: int) -> None:
     await _heal_player_svc(manager, name, amount)
 
 
-async def damage_player(name: str, dmg: int, source_npc_id: int | None = None,
+async def damage_player(name: str, dmg: int,
+                        source_npc_id: int | None = None,
                         dmg_type: str = "physical") -> None:
     await _damage_player_svc(manager, name, dmg, source_npc_id, dmg_type)
 
@@ -188,29 +125,34 @@ async def _do_respawn(name: str, in_place: bool = False) -> None:
     await _do_respawn_svc(manager, world, structures, name, in_place=in_place)
 
 
-async def restore_mana(name: str, amount: int) -> None:
-    await _restore_mana_svc(manager, name, amount)
-
-
 async def _refund_mana(player_id: str, amount: int) -> None:
     await _refund_mana_svc(manager, player_id, amount)
 
 
+async def _send_to_player(player_id: str, payload: dict) -> None:
+    await _send_to_player_svc(manager, player_id, payload)
+
+
 async def _apply_heal_aggro(player_id: str, x: int, y: int, threat: int) -> None:
+    import combat
     await combat.apply_heal_aggro(npcs, player_id, x, y, threat)
 
 
 async def _apply_spell_effects(player_id: str, spell_id: str,
-                                 spell: dict, target: dict) -> None:
+                                spell: dict, target: dict) -> None:
+    import loot
+    import combat
     await spells.apply_spell_effects(
         manager, npcs, player_id, spell_id, spell, target,
         heal_player_fn=heal_player,
         do_respawn_fn=_do_respawn,
-        is_downed_fn=is_downed,
+        is_downed_fn=_player_state.is_downed,
         send_to_player_fn=_send_to_player,
-        find_drop_xy_fn=_find_drop_xy,
-        drop_loot_for_npc_fn=_drop_loot_for_npc,
-        gain_combat_xp_with_share_fn=_gain_combat_xp_with_share,
+        find_drop_xy_fn=lambda x, y: loot.find_drop_xy(world, structures, x, y),
+        drop_loot_for_npc_fn=lambda kid, npc, dx, dy:
+            loot.drop_loot_for_npc(manager, items, kid, npc, dx, dy),
+        gain_combat_xp_with_share_fn=lambda kid, amt, nx, ny:
+            combat.gain_combat_xp_with_share(manager, kid, amt, nx, ny),
         downed_state=_downed_state,
     )
 
@@ -243,7 +185,6 @@ async def lifespan(app: FastAPI):
         logging.exception("region_difficulty init_schema failed (non-fatal)")
     # Welle 24: Disaster-State (Blutmond, Sterbende Sonne, Pest, ...)
     try:
-        import disaster_state
         await disaster_state.init_schema()
     except Exception:
         logging.exception("disaster_state init_schema failed (non-fatal)")
@@ -256,7 +197,8 @@ async def lifespan(app: FastAPI):
             await npcs.load()
     except Exception:
         logging.exception("Personality-Backfill fehlgeschlagen (non-fatal)")
-    # Populate läuft jetzt on-demand pro Chunk beim Connect/Chunk-Cross (siehe populate_chunk_if_needed)
+    # Populate läuft jetzt on-demand pro Chunk beim Connect/Chunk-Cross
+    # (siehe populate_chunk_if_needed)
 
     event_task = asyncio.create_task(
         event_worker.run(events, manager, world, npcs, structures)
@@ -365,49 +307,6 @@ async def pwa_sw():
 CHUNK_SEND_RADIUS = 3  # 7x7 Chunks (224×224 Tiles) um Spieler
 
 
-async def _active_dungeon_markers() -> list[dict]:
-    return await dungeons.active_dungeon_markers()
-
-
-async def _dungeon_floor_payload(dungeon_id: int, floor_idx: int) -> dict:
-    return await dungeons.dungeon_floor_payload(npcs, dungeon_id, floor_idx)
-
-
-
-def _overworld_npcs_near(x: int, y: int, radius: int = 0) -> list:
-    return npcs_mod.overworld_npcs_near(npcs, x, y, radius)
-
-
-async def _populate_chunks_bg(chunks) -> None:
-    await world_populator.populate_chunks_bg(world, structures, manager, npcs, chunks)
-
-
-async def _sync_learned_spells(player_name: str) -> list[str]:
-    return await spells.sync_learned_for_player(player_name)
-
-
-async def _list_learned_spells(player_name: str) -> list[str]:
-    return await spells.list_learned_for_player(player_name)
-
-
-async def _compute_attributes(player_name: str) -> dict:
-    return await attributes.compute_attributes(items, player_name)
-
-
-async def _build_stat_sheet(player_name: str) -> dict:
-    return await attributes.build_stat_sheet(items, player_name)
-
-
-async def _send_attrs_update(websocket, player_name: str) -> None:
-    await attributes.send_attrs_update(items, websocket, player_name)
-
-
-# Cooldown-Tracking für Heal-Strukturen: dict[(player_name, struct_id)] → timestamp
-_heal_cooldowns: dict[tuple[str, int], float] = {}
-# Cooldown-Tracking für Dungeon-Encounter (1 Eintrag pro Spieler)
-_dungeon_cooldowns: dict[str, float] = {}
-
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     user = await auth.get_user_from_ws(websocket)
@@ -416,7 +315,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=1008)
         return
     player_id = user["name"]
-    state = await load_or_create_player(player_id)
+    state = await _load_or_create_player_svc(world, structures, player_id)
     spawn = {"x": state["x"], "y": state["y"]}
     await manager.connect(websocket, player_id, spawn["x"], spawn["y"])
 
@@ -424,7 +323,8 @@ async def websocket_endpoint(websocket: WebSocket):
     pcx, pcy, _, _ = World.world_to_chunk(spawn["x"], spawn["y"])
     chunks = await world.ensure_chunks_around(pcx, pcy, radius=CHUNK_SEND_RADIUS)
     # Populate als Background-Task, nicht-blockierend
-    asyncio.create_task(_populate_chunks_bg(chunks))
+    asyncio.create_task(
+        world_populator.populate_chunks_bg(world, structures, manager, npcs, chunks))
 
     # Strukturen / Items / NPCs auf nahen Bereich filtern um Init-Payload klein zu halten
     view_radius = CHUNK_SEND_RADIUS * 32 + 32  # ~7 Chunks
@@ -442,6 +342,11 @@ async def websocket_endpoint(websocket: WebSocket):
     needs_creation = not (char_row and char_row["character_created"])
     preset = char_row["preset"] if char_row else None
 
+    # Welle 25: Spell-Catalog für UI; sync_learned aktualisiert die Liste
+    # vorher (auto-unlock anhand Magic-Skill).
+    await spells.sync_learned_for_player(player_id)
+    learned_spells = await spells.list_learned_for_player(player_id)
+
     await websocket.send_json({
         "type": "init",
         "player_id": player_id,
@@ -452,7 +357,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "world_seed": world.seed,
         "players": manager.get_players(),
         "structures": nearby_structs,
-        "dungeons": await _active_dungeon_markers(),   # Minimap-Ortung (Spür-Radius)
+        "dungeons": await dungeons.active_dungeon_markers(),   # Minimap-Ortung
         "events": await events.recent(20),
         "npcs": nearby_npcs,
         "items_ground": nearby_items,
@@ -475,14 +380,12 @@ async def websocket_endpoint(websocket: WebSocket):
         "time":     time_system.snapshot(),
         "quests":   await quests.list_for_player(player_id),
         "factions":     await factions.list_all_reputations(player_id),
-        "attributes":   await _compute_attributes(player_id),
+        "attributes":   await __import__("attributes").compute_attributes(items, player_id),
         "active_disasters": await disaster_state.list_active(),
-        "stats":        await _build_stat_sheet(player_id),
+        "stats":        await __import__("attributes").build_stat_sheet(items, player_id),
         "power_tier":   await power_budget.player_power_tier(player_id),
-        # Welle 25: Spells anhand Magic-Skill freischalten, dann liefern
         "spell_catalog": spells.SPELLS,
-        "learned_spells": (await _sync_learned_spells(player_id),
-                            await _list_learned_spells(player_id))[1],
+        "learned_spells": learned_spells,
         "talents": {
             "learned":      await talents.list_learned(player_id),
             "points":       await talents.get_talent_points(player_id),
@@ -492,17 +395,18 @@ async def websocket_endpoint(websocket: WebSocket):
                                 await talents.get_talent_points(player_id),
                             ),
         },
-        "group":         await _group_snapshot(player_id),
+        "group":         await groups.group_snapshot(manager, player_id),
         "group_invites": await groups.list_invites_for(player_id),
     })
 
-    # Welle 31: falls Spieler Party-Leader ist und gerade reconnected, Reaper-Timer löschen
+    # Welle 31: falls Spieler Party-Leader ist und gerade reconnected,
+    # Reaper-Timer löschen
     _g = await groups.get_group_for(player_id)
     if _g and _g["kind"] == "party" and _g["leader"] == player_id:
         groups.mark_leader_online(_g["id"])
     # Alle Mitarbeiter-Anzeigen aktualisieren (Online-Status)
     if _g:
-        await _broadcast_to_group(_g["id"], {
+        await groups.broadcast_to_group(manager, _g["id"], {
             "type": "group_member_online", "player_name": player_id,
         }, exclude=player_id)
 
@@ -529,16 +433,10 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_json()
-            mtype = data.get("type")
-
-            # Phase B2 (hybrid): erst neuen Dispatcher fragen, sonst Fallback
-            # in die alte if/elif-Kette. Mit jeder weiteren B-Phase wandern
-            # Branches in ws/<domain>.py und werden hier aus dem Monolithen
-            # entfernt.
-            if await ws_dispatch(ctx, data):
-                continue
-
-            pass  # all messages handled by ws_dispatch above
+            # B-final: alle Branches sind in ws/<domain>.py extrahiert,
+            # der Dispatcher ist die einzige Anlaufstelle. Unbekannte
+            # Message-Types werden still ignoriert.
+            await ws_dispatch(ctx, data)
 
     except WebSocketDisconnect:
         # Welle 25: aktiven Cast + Cooldowns räumen, Down-Timer canceln
@@ -554,7 +452,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if _g:
                 if _g["kind"] == "party" and _g["leader"] == player_id:
                     groups.mark_leader_offline(_g["id"])
-                await _broadcast_to_group(_g["id"], {
+                await groups.broadcast_to_group(manager, _g["id"], {
                     "type": "group_member_offline", "player_name": player_id,
                 }, exclude=player_id)
         except Exception:
