@@ -27,7 +27,13 @@ import type {
   PlayerStats,
   StatusEffect,
 } from '../models/player.model';
+import type { Bill } from '../models/bill.model';
 import type { FactionReputation, Quest } from '../models/quest.model';
+import type {
+  ResearchAge,
+  ResearchBranch,
+  ResearchNode,
+} from '../models/research.model';
 import type { SpellEntry, SpellState, TalentTree } from '../models/talent.model';
 import type { TimeSnapshot, WeatherSnapshot } from '../models/time.model';
 import type {
@@ -170,6 +176,26 @@ export class GameStateService {
     readonly text: string;
   }[]>([]);
 
+  // ─── Research (F-extras-2) ───────────────────────────────────────────
+  /** Research-Tree: Node-Map + Pool + Branch/Age-Definitionen. */
+  readonly research = signal<{
+    readonly nodes: Readonly<Record<string, ResearchNode>>;
+    readonly pool: number;
+    readonly branches: readonly ResearchBranch[];
+    readonly ages: readonly ResearchAge[];
+  }>({ nodes: {}, pool: 0, branches: [], ages: [] });
+
+  // ─── Bills (F-extras-2) ──────────────────────────────────────────────
+  /** Aktive Workshop-Aufträge (alle Stationen). UI filtert pro Station. */
+  readonly bills = signal<readonly Bill[]>([]);
+
+  // ─── Sign-Inspect (F-extras-3) ───────────────────────────────────────
+  /** Aktives Sign-Inspect-Modal (Welle 51 — Schild-Lese-Modal). */
+  readonly activeSignInspect = signal<{
+    readonly slug: string;
+    readonly label: string;
+  } | null>(null);
+
   // ─── Meta ────────────────────────────────────────────────────────────
   readonly worldSeed = signal<number | string | null>(null);
   readonly chunkSize = signal<number>(32);
@@ -308,17 +334,13 @@ export class GameStateService {
       case 'chest_open':           this._handleChestOpen(msg); break;
       case 'chest_add':            this._handleChestAdd(msg); break;
       case 'chest_remove':         this._handleChestRemove(msg); break;
-      case 'sign_inspect':
-        // Sign-Inspect-Overlay kommt in F-extras-3 mit der UI-Component.
-        break;
-      case 'bills_update':
-      case 'bill_progress':
-      case 'bill_done':
-      case 'bill_blocked':
-      case 'research_update':
-      case 'research_pool_update':
-        // Workshop/Research-Panel-State kommt in F-Bills/F-Research.
-        break;
+      case 'sign_inspect':         this._handleSignInspect(msg); break;
+      case 'bills_update':         this._handleBillsUpdate(msg); break;
+      case 'bill_progress':        this._handleBillProgress(msg); break;
+      case 'bill_done':            this._handleBillDone(msg); break;
+      case 'bill_blocked':         this._handleBillBlocked(msg); break;
+      case 'research_update':      this._handleResearchUpdate(msg); break;
+      case 'research_pool_update': this._handleResearchPoolUpdate(msg); break;
       case 'skill_xp':             /* Floating-Text, kein persistent state hier */ break;
 
       // ─── Dungeons / Disasters / Misc ────────────────────────────────
@@ -406,6 +428,28 @@ export class GameStateService {
 
     this.party.set(msg.group ?? null);
     this.partyInvites.set(msg.group_invites ?? []);
+
+    // Welle 22+30: research kommt als {nodes,pool,branches,ages} oder als
+    // platter nodes-dict (Legacy-Format, frontend/legacy/app.js Z. 5080-5089).
+    if (msg.research && typeof msg.research === 'object') {
+      const rObj = msg.research as Record<string, unknown>;
+      if ('nodes' in rObj) {
+        this.research.set({
+          nodes: (rObj['nodes'] as Readonly<Record<string, ResearchNode>>) ?? {},
+          pool: (rObj['pool'] as number | undefined) ?? 0,
+          branches: (rObj['branches'] as readonly ResearchBranch[] | undefined) ?? [],
+          ages: (rObj['ages'] as readonly ResearchAge[] | undefined) ?? [],
+        });
+      } else {
+        // Legacy: msg.research IST das Nodes-Dict
+        this.research.set({
+          nodes: msg.research as Readonly<Record<string, ResearchNode>>,
+          pool: 0,
+          branches: [],
+          ages: [],
+        });
+      }
+    }
   }
 
   // ── Player ──
@@ -1008,6 +1052,111 @@ export class GameStateService {
     }
     this.chatLog.set(next);
   }
+
+  // ── Research (F-extras-2) ──
+
+  private _handleResearchUpdate(msg: GenericMsg): void {
+    const cur = this.research();
+    // Fehler-Branch (not_enough_points): nur Pool aktualisieren, Nodes
+    // unverändert (Legacy frontend/legacy/app.js Z. 5998-6001).
+    if (msg['error'] === 'not_enough_points') {
+      const pool = msg['pool'] as number | undefined;
+      if (pool != null) this.research.set({ ...cur, pool });
+      return;
+    }
+    const nodeId = msg['node_id'] as string | undefined;
+    const points = msg['points'] as number | undefined;
+    const done = msg['done'] as boolean | undefined;
+    const pool = msg['pool'] as number | undefined;
+    if (!nodeId) {
+      if (pool != null) this.research.set({ ...cur, pool });
+      return;
+    }
+    const node = cur.nodes[nodeId];
+    if (!node) {
+      if (pool != null) this.research.set({ ...cur, pool });
+      return;
+    }
+    const updatedNode: ResearchNode = {
+      ...node,
+      points: points ?? node.points,
+      done: done ?? node.done,
+    };
+    const nextNodes: Record<string, ResearchNode> = { ...cur.nodes, [nodeId]: updatedNode };
+    // Wenn dieser Knoten fertig wurde, alle Folge-Knoten available schalten
+    // (Legacy frontend/legacy/app.js Z. 6010-6013).
+    if (done) {
+      for (const [otherId, other] of Object.entries(cur.nodes)) {
+        if (otherId === nodeId) continue;
+        const prereqs = other.prereq ?? [];
+        if (prereqs.includes(nodeId) && !other.available) {
+          nextNodes[otherId] = { ...other, available: true };
+        }
+      }
+    }
+    this.research.set({
+      ...cur,
+      nodes: nextNodes,
+      pool: pool ?? cur.pool,
+    });
+  }
+
+  private _handleResearchPoolUpdate(msg: GenericMsg): void {
+    const pool = msg['pool'] as number | undefined;
+    if (pool == null) return;
+    this.research.set({ ...this.research(), pool });
+  }
+
+  // ── Bills (F-extras-2) ──
+
+  private _handleBillsUpdate(msg: GenericMsg): void {
+    const bills = msg['bills'] as readonly Bill[] | undefined;
+    this.bills.set(bills ?? []);
+  }
+
+  private _handleBillProgress(msg: GenericMsg): void {
+    const billId = msg['bill_id'] as number | undefined;
+    const completed = msg['completed'] as number | undefined;
+    const target = msg['target'] as number | undefined;
+    if (billId == null) return;
+    this.bills.set(
+      this.bills().map((b) =>
+        b.id === billId
+          ? {
+              ...b,
+              completed: completed ?? b.completed,
+              target_count: target ?? b.target_count,
+              status: 'active',
+            }
+          : b,
+      ),
+    );
+  }
+
+  private _handleBillDone(msg: GenericMsg): void {
+    const billId = msg['bill_id'] as number | undefined;
+    if (billId == null) return;
+    this.bills.set(this.bills().filter((b) => b.id !== billId));
+  }
+
+  private _handleBillBlocked(msg: GenericMsg): void {
+    const billId = msg['bill_id'] as number | undefined;
+    if (billId == null) return;
+    this.bills.set(
+      this.bills().map((b) => (b.id === billId ? { ...b, status: 'blocked' } : b)),
+    );
+  }
+
+  // ── Sign-Inspect (F-extras-3) ──
+
+  private _handleSignInspect(msg: GenericMsg): void {
+    const slug = msg['slug'] as string | undefined;
+    if (!slug) return;
+    const label = (msg['label'] as string | undefined) ?? slug;
+    this.activeSignInspect.set({ slug, label });
+  }
+
+  closeSignInspect(): void { this.activeSignInspect.set(null); }
 
   // ── Misc ──
 

@@ -28,6 +28,7 @@ import { LootRollComponent } from './ui/loot-roll/loot-roll.component';
 import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
+import { ResearchComponent } from './ui/research/research.component';
 import { SkillsComponent } from './ui/skills/skills.component';
 import { SpellbookComponent } from './ui/spellbook/spellbook.component';
 import { TalentsComponent } from './ui/talents/talents.component';
@@ -58,6 +59,7 @@ import { TradeComponent } from './ui/trade/trade.component';
     ChestComponent,
     CraftingComponent,
     TradeComponent,
+    ResearchComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

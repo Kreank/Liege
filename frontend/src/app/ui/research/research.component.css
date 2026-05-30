@@ -1,0 +1,140 @@
+/* Research-Panel — übernommen aus frontend/legacy/style.css Z. 109-145.
+   Inline-Style-Cluster aus Legacy `refreshResearchUI` werden als Klassen
+   herausgezogen (DOM ist jetzt deklarativ statt innerHTML-konstruiert). */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.research-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.research-box {
+  width: 92%; max-width: 720px;
+  background: rgba(20,18,14,0.97); border: 1px solid #c8a868;
+  color: #c8b88a; font-size: 13px;
+  display: flex; flex-direction: column; max-height: 86vh;
+}
+
+.research-header {
+  padding: 10px 14px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #555;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #e8c870; font-weight: bold;
+}
+
+.research-close {
+  background: none; border: 1px solid #555;
+  color: #c8b88a; padding: 3px 10px;
+  cursor: pointer; font-family: monospace;
+}
+
+.research-list {
+  padding: 8px 14px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.research-pool-banner {
+  background: rgba(60,40,15,0.7);
+  border: 1px solid #a07840;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #ffd060;
+}
+.research-pool-hint {
+  color: #a09060; font-size: 11px; margin-left: 6px;
+}
+
+.research-empty { padding: 14px; color: #807060; font-style: italic; }
+
+.research-tabs {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin-bottom: 4px;
+}
+
+.research-tab {
+  padding: 6px 10px; font-size: 12px; cursor: pointer;
+  background: #302418; color: #c8b88a;
+  border: 1px solid #6e5e3a; border-radius: 3px;
+  font-family: monospace;
+  opacity: 0.75;
+}
+.research-tab.active {
+  background: #604030; opacity: 1;
+}
+
+.research-tree {
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.age-block {
+  border: 1px solid #443524; border-radius: 4px;
+  padding: 8px;
+  background: rgba(20,16,10,0.55);
+}
+.age-header {
+  color: #e8d870; font-size: 13px; font-weight: bold;
+  margin-bottom: 6px;
+}
+.age-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px;
+}
+
+.node-card {
+  background: rgba(40,32,20,0.85);
+  border: 1px solid #6e5e3a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.node-card.done   { background: rgba(40,100,40,0.6); border-color: #60c060 !important; }
+.node-card.locked { background: rgba(30,30,30,0.7); opacity: 0.55; }
+.node-card.partial { background: rgba(80,60,20,0.7); border-color: #e8a040 !important; }
+
+.node-head {
+  display: flex; align-items: center; gap: 6px;
+}
+.node-icon { font-size: 18px; }
+.node-name { color: #e8d870; }
+.node-check { color: #60e060; }
+
+.node-desc {
+  font-size: 11px; color: #a09060; line-height: 1.3;
+}
+.node-tp {
+  font-size: 11px; color: #c08040;
+}
+.node-tp.has { color: #60c060; }
+.node-prereq {
+  font-size: 10px; color: #808080;
+}
+.node-bar {
+  background: #1a1410; border: 1px solid #443524;
+  height: 12px; position: relative; border-radius: 2px;
+  overflow: hidden;
+}
+.node-bar-fill {
+  height: 100%; transition: width 0.2s;
+}
+.node-bar-text {
+  position: absolute; inset: 0;
+  text-align: center; font-size: 10px;
+  line-height: 12px; color: #fff;
+  text-shadow: 1px 1px 1px #000;
+}
+.node-actions {
+  display: flex; gap: 4px;
+}
+.node-actions button {
+  padding: 3px 8px; font-size: 11px; flex: 1; cursor: pointer;
+  background: #503018; color: #c8b88a;
+  border: 1px solid #6e5e3a; border-radius: 2px;
+  font-family: monospace;
+}
+.node-actions button:disabled {
+  opacity: 0.4; cursor: not-allowed;
+}

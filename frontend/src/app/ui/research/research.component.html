@@ -1,0 +1,92 @@
+@if (visible()) {
+  <div class="research-overlay" (click)="close()">
+    <div class="research-box" (click)="$event.stopPropagation()">
+      <div class="research-header">
+        <span>🔬 Forschung</span>
+        <button type="button" class="research-close" (click)="close()">R / Esc</button>
+      </div>
+      <div class="research-list">
+        <div class="research-pool-banner">
+          <b>🔬 Forschungs-Pool: {{ pool() }}</b>
+          <span class="research-pool-hint">
+            · Quests, Skill-Level-Ups, Forschungs-Items, alle 2h +1
+          </span>
+        </div>
+
+        @if (empty()) {
+          <div class="research-empty">Noch keine Forschungs-Knoten verfügbar.</div>
+        } @else {
+          <div class="research-tabs">
+            <button type="button"
+                    class="research-tab"
+                    [class.active]="activeBranch() === 'all'"
+                    (click)="setBranch('all')">🌳 Alle</button>
+            @for (b of branches(); track b.id) {
+              <button type="button"
+                      class="research-tab"
+                      [class.active]="activeBranch() === b.id"
+                      [style.background]="branchTabBg(b.id, b.color)"
+                      (click)="setBranch(b.id)">{{ b.icon }} {{ b.label }}</button>
+            }
+          </div>
+
+          <div class="research-tree">
+            @for (block of ageBlocks(); track block.age.id) {
+              <div class="age-block">
+                <div class="age-header">
+                  {{ block.age.icon }} {{ block.age.label }} (Tier {{ block.age.tier }})
+                </div>
+                <div class="age-grid">
+                  @for (cell of block.cells; track cell.id) {
+                    <div class="node-card"
+                         [class.done]="cell.node.done"
+                         [class.locked]="!cell.node.available"
+                         [class.partial]="!cell.node.done && cell.node.points > 0"
+                         [style.border-color]="cell.branchColor">
+                      <div class="node-head">
+                        <span class="node-icon">{{ cell.node.icon || '🔬' }}</span>
+                        <b class="node-name">{{ cell.node.name }}</b>
+                        @if (cell.node.done) { <span class="node-check">✓</span> }
+                      </div>
+                      @if (cell.node.desc) {
+                        <div class="node-desc">{{ cell.node.desc }}</div>
+                      }
+                      @if (cell.node.tech_print) {
+                        <div class="node-tp"
+                             [class.has]="cell.node.has_tech_print">
+                          {{ cell.node.has_tech_print ? '✓ ' : '⚠️ benötigt: ' }}{{ cell.node.tech_print }}
+                        </div>
+                      }
+                      @if (!cell.node.available && cell.node.prereq && cell.node.prereq.length > 0) {
+                        <div class="node-prereq">🔒 nach: {{ cell.node.prereq.join(', ') }}</div>
+                      }
+                      <div class="node-bar">
+                        <div class="node-bar-fill"
+                             [style.background]="cell.branchColor"
+                             [style.width.%]="cell.pct"></div>
+                        <div class="node-bar-text">{{ cell.progressText }}</div>
+                      </div>
+                      @if (!cell.node.done) {
+                        <div class="node-actions">
+                          <button type="button"
+                                  [disabled]="!canInvest(cell, 1)"
+                                  (click)="invest(cell.id, 1)">+1</button>
+                          <button type="button"
+                                  [disabled]="!canInvest(cell, 5)"
+                                  (click)="invest(cell.id, 5)">+5</button>
+                          <button type="button"
+                                  [disabled]="!canInvest(cell, 25)"
+                                  (click)="invest(cell.id, 25)">+25</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

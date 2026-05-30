@@ -5,6 +5,7 @@
         <span>🔨 {{ stationLabel() }}</span>
         <button type="button" class="crafting-close" (click)="close()">Esc</button>
       </div>
+      <app-bills></app-bills>
       <div class="crafting-recipes">
         @if (c.recipes.length === 0) {
           <div class="inv-empty">(keine Rezepte verfügbar)</div>
@@ -18,6 +19,8 @@
               }
             </span>
             <button type="button" (click)="craft(r.output)">Herstellen</button>
+            <button type="button" class="bill-btn" title="Auftrag für 5 Stück"
+                    (click)="addBill(r.output, 5)">×5</button>
           </div>
         }
       </div>

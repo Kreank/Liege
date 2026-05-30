@@ -1,0 +1,22 @@
+@if (visible()) {
+  <div class="bills-section">
+    <div class="bills-header">📋 Aufträge (laufen im Hintergrund)</div>
+    <div class="bills-list">
+      @if (rows().length === 0) {
+        <div class="bills-empty">— keine Aufträge —</div>
+      } @else {
+        @for (row of rows(); track row.id) {
+          <div class="bill-row">
+            <span class="bill-name">{{ row.displayName }}</span>
+            <span class="bill-progress">{{ row.progress }}</span>
+            <span class="bill-status" [class.active]="row.statusClass === 'active'"
+                                     [class.blocked]="row.statusClass === 'blocked'">
+              {{ row.status }}
+            </span>
+            <button type="button" class="bill-remove" (click)="remove(row.id)">×</button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+}

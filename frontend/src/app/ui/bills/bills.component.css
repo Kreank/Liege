@@ -1,0 +1,65 @@
+/* Bills-Panel — eingebettet ins Crafting-Overlay (oberhalb der Rezepte).
+   Übernommen aus frontend/legacy/style.css Z. 1087-1098.
+   Positionierung kommt vom Parent (Crafting-Komponente); diese Component
+   liefert nur den Block. */
+
+:host {
+  display: block;
+  font-family: monospace;
+}
+
+.bills-section {
+  padding: 6px 14px 4px;
+  border-bottom: 1px solid #4a3a20;
+  max-height: 20vh;
+  overflow-y: auto;
+  background: rgba(40,20,8,0.4);
+}
+
+.bills-header {
+  font-size: 11px;
+  color: #cfa060;
+  margin-bottom: 4px;
+}
+
+.bills-empty {
+  font-size: 10px;
+  color: #806040;
+}
+
+.bill-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 11px;
+}
+
+.bill-row .bill-name {
+  flex: 1;
+  color: #e8d8a0;
+}
+
+.bill-row .bill-progress {
+  color: #a0c8a0;
+  min-width: 60px;
+  text-align: right;
+}
+
+.bill-row .bill-status {
+  font-size: 10px;
+  min-width: 70px;
+  text-align: center;
+}
+.bill-row .bill-status.blocked { color: #d04040; }
+.bill-row .bill-status.active  { color: #80c080; }
+
+.bill-row .bill-remove {
+  background: #602020;
+  border: 1px solid #a04040;
+  color: #fff;
+  cursor: pointer;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+}

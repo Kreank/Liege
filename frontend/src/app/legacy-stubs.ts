@@ -13,14 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Research-Panel (Tech-Tree-Invest + Pool-Anzeige).
-  //          Legacy `toggleResearch`, `renderResearch`.
-  'research',
-
-  // TODO F5+: Bills-Panel (Workshop-Aufträge, add/remove Bill).
-  //          Legacy `renderBills`, `addBill`, `removeBill`.
-  'bills',
-
   // TODO F5+: Build-Bar + Place-Ghost-Tooltip (Material-Auswahl, Rotation-Label).
   //          Legacy `toggleBuildMode`, `_populatePaletteOnce`,
   //          `_refreshRotationLabel`, `_refreshPlaceGhost`.

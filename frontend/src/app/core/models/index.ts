@@ -14,4 +14,6 @@ export * from './quest.model';
 export * from './talent.model';
 export * from './chunk.model';
 export * from './time.model';
+export * from './research.model';
+export * from './bill.model';
 export * from './ws-message.model';

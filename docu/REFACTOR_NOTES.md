@@ -520,3 +520,21 @@ Heuristik (>=2000 verbündet, <=-500 feindlich, sonst neutral).
 - **Stub-Marker**: `frontend/src/app/legacy-stubs.ts` ist nach F10
   um sieben Einträge schlanker (`hud, hotbar, inventory, skills,
   talents, character, quests, factions`).
+
+### F-extras-2 Research / Bills
+- **Research:** Neue Component `ui/research/`. Bindet an neues Signal
+  `state.research()` (Form `{nodes,pool,branches,ages}`). `init`-Handler
+  akzeptiert sowohl das nested-Format (Welle 22+30) als auch ein
+  Legacy-Nodes-Dict-only-Format. Branch-Tabs filtern; pro Age ein Block
+  mit Knoten-Karten (Icon, Desc, Tech-Print-Hinweis, Progress-Bar,
+  +1/+5/+25-Buttons). Sendet `invest_research`. Tastatur `R` toggelt.
+- **Bills:** Component `ui/bills/` als Sub-Panel des Crafting-Overlays
+  (rendert sich nur wenn `activeCrafting()` gesetzt ist). Eigenes Signal
+  `state.bills()`. WS-Handler für `bills_update`, `bill_progress`,
+  `bill_done`, `bill_blocked`. `CraftingComponent` triggert
+  `list_bills` per `effect()` beim Station-Wechsel und exponiert einen
+  `addBill`-Knopf an jeder Rezept-Zeile (`×5`).
+- **Models:** `core/models/research.model.ts` + `core/models/bill.model.ts`,
+  ins Models-Barrel aufgenommen.
+- **Stub-Marker:** legacy-stubs verliert `research` + `bills` (jetzt 8
+  offen statt 10).
