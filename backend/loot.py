@@ -360,8 +360,10 @@ def roll_dungeon_key_drops(npc_kind: str, killer_combat_level: int) -> list[str]
 
 
 # ── Welle 34: Monster-Longlist-Loot mergen ───────────────────────────────────
-# Tier-skalierte Drop-Tabellen für die 128 generated_longlist-Monster. Münzen
-# fließen via _drop_loot_for_npc in den Geldbeutel; Equipment via Boss/Chests.
+# Section/Tier-spezifische Drop-Tabellen für die 128 generated_longlist-Monster
+# (mit slug-overrides für iconic Bosses wie lich_archivist, ancient_dragon_lord,
+# boss_volcano_smith_demon, ...). Münzen fließen via _drop_loot_for_npc in den
+# Geldbeutel; Equipment via Boss/Chests.
 try:
     import monster_longlist as _ml
     for _k, _tbl in _ml.LOOT.items():
@@ -369,6 +371,18 @@ try:
 except Exception:
     import logging as _lg
     _lg.getLogger("liege.loot").exception("monster_longlist loot merge failed")
+
+# ── Welle 35: Overworld-Monster-Pool-Loot mergen ─────────────────────────────
+# Slug-spezifische Drops für die 30 overworld_*-Mobs (rotten_flesh,
+# goblin_ear, wisp_essence, drake_scale, kraken_ink, …) — direkt aus
+# overworld_monster.md.
+try:
+    import overworld_monster_pool as _op
+    for _k, _tbl in _op.LOOT.items():
+        LOOT_TABLE.setdefault(_k, _tbl)
+except Exception:
+    import logging as _lg
+    _lg.getLogger("liege.loot").exception("overworld_monster_pool loot merge failed")
 
 
 # ─── Welle 34c: WS-Side Loot-Helpers (extrahiert aus main.py) ────────────────
