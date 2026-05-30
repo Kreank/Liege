@@ -1,4 +1,5 @@
-/* Hotbar — übernommen aus `frontend/legacy/style.css` Z. 227-265. */
+/* Hotbar — übernommen aus `frontend/legacy/style.css` Z. 227-265,
+   um Drag-Drop-States + Cooldown-Overlay (F-extras-4) erweitert. */
 
 :host {
   display: contents;
@@ -25,13 +26,18 @@
   padding: 0;
   font-family: inherit;
   color: inherit;
+  transition: border-color 80ms ease-out, box-shadow 80ms ease-out;
 }
-.hotbar-slot:hover { border-color: #c8b88a; }
+.hotbar-slot:hover { border-color: #c8b88a; box-shadow: 0 0 6px rgba(200,184,138,0.4); }
 .hotbar-slot.active {
   border-color: #ffd060;
   box-shadow: 0 0 8px rgba(255,208,96,0.5);
 }
+/* Vollständig leerer Slot (kein kind zugewiesen). */
 .hotbar-slot.empty { opacity: 0.4; }
+/* Slot belegt, aber zugehöriges Item nicht im Inventar. */
+.hotbar-slot.missing { opacity: 0.5; }
+.hotbar-slot.missing .hotbar-slot__icon { filter: grayscale(1); opacity: 0.7; }
 .hotbar-slot.equipped { box-shadow: 0 0 8px rgba(120,200,80,0.7); }
 
 .hotbar-slot__icon {
@@ -55,3 +61,22 @@
   pointer-events: none;
 }
 .hotbar-slot__count--equipped { color: #80f080; }
+
+/* Cooldown-Overlay (Hook für Welle G4). Rendert nur, wenn
+   cooldownRemaining > 0. Aktuell rein optisch — die Kreis-Animation
+   kommt mit dem echten Backend-Hook. */
+.hotbar-slot.on-cooldown::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.hotbar-slot__cooldown {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffd060; font-size: 14px; font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
+  pointer-events: none;
+  z-index: 1;
+}

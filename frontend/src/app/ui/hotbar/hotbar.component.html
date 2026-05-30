@@ -5,11 +5,21 @@
       class="hotbar-slot"
       [class.active]="slot.active"
       [class.empty]="slot.empty"
+      [class.missing]="slot.missing"
       [class.equipped]="slot.equipped"
+      [class.on-cooldown]="slot.cooldownRemaining > 0"
       [attr.title]="slot.tooltip"
       [attr.aria-label]="slot.def ? slot.def.name : 'Slot ' + slot.key + ' (leer)'"
+      [attr.draggable]="slot.kind ? 'true' : null"
       (click)="activate(slot.index)"
       (contextmenu)="clearSlot(slot.index, $event)"
+      (dragstart)="onSlotDragStart($event, slot.index)"
+      (dragover)="onSlotDragOver($event)"
+      (drop)="onSlotDrop($event, slot.index)"
+      (dragend)="onSlotDragEnd($event, slot.index)"
+      (mouseenter)="showSlotTooltip(slot, $event)"
+      (mousemove)="moveTooltip($event)"
+      (mouseleave)="hideTooltip()"
     >
       <span class="hotbar-slot__key">{{ slot.key }}</span>
       @if (slot.def?.path) {
@@ -18,7 +28,10 @@
       @if (slot.count > 1) {
         <span class="hotbar-slot__count">{{ slot.count }}</span>
       } @else if (slot.equipped && slot.def?.slot) {
-        <span class="hotbar-slot__count hotbar-slot__count--equipped">✓</span>
+        <span class="hotbar-slot__count hotbar-slot__count--equipped">&#10003;</span>
+      }
+      @if (slot.cooldownRemaining > 0) {
+        <span class="hotbar-slot__cooldown">{{ slot.cooldownLabel }}</span>
       }
     </button>
   }
