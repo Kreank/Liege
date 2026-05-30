@@ -1,0 +1,25 @@
+@if (visible()) {
+  <div class="skills-overlay" (click)="close()">
+    <div class="skills-box" (click)="$event.stopPropagation()">
+      <div class="skills-header">
+        <span>📚 Fähigkeiten</span>
+        <button type="button" class="skills-close" (click)="close()">K / Esc</button>
+      </div>
+      <div class="skills-list">
+        @if (rows().length === 0) {
+          <div class="skills-empty">Noch keine Fähigkeiten.</div>
+        }
+        @for (row of rows(); track row.kind) {
+          <div class="skill-row">
+            <span class="skill-icon">{{ row.icon }}</span>
+            <span class="skill-name">{{ row.label }}</span>
+            <span class="skill-level">Stufe {{ row.level }}</span>
+            <div class="skill-progress" [attr.title]="row.xp + ' / ' + row.xpNext + ' XP'">
+              <div class="skill-progress-fill" [style.width.%]="row.pct"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

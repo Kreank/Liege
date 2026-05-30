@@ -13,18 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Skills-Panel (Skill-XP-Progress, Skill-Level).
-  //          Legacy `toggleSkills`, `renderSkills`.
-  'skills',
-
-  // TODO F5+: Talente-Panel (Tree-Renderer, Lern-Buttons).
-  //          Legacy `toggleTalents`, `renderTalentsTree`, `learnTalent`.
-  'talents',
-
-  // TODO F5+: Character/Attribute-Panel (allocate Punkte, Stat-Sheet).
-  //          Legacy `toggleAttributes`, `renderAttributes`.
-  'character',
-
   // TODO F5+: Quests-Panel (aktive Quests, Lore-Quests, Accept/Turn-in).
   //          Legacy `toggleQuests`, `renderQuests`.
   'quests',

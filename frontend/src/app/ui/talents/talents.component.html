@@ -1,0 +1,43 @@
+@if (visible()) {
+  <div class="talents-overlay" (click)="close()">
+    <div class="talents-box" (click)="$event.stopPropagation()">
+      <div class="talents-header">
+        <span>🌟 Talente <span class="talents-points">{{ points() }} Punkte</span></span>
+        <button type="button" class="talents-close" (click)="close()">T / Esc</button>
+      </div>
+      <div class="talents-list">
+        @if (rows().length === 0) {
+          <div class="talents-empty">Kein Talentbaum verfügbar.</div>
+        }
+        @for (row of rows(); track row.node.id) {
+          <div
+            class="talent-row"
+            [class.locked]="row.status === 'locked'"
+            [class.learned]="row.status === 'learned'"
+            [class.available]="row.status === 'available'"
+          >
+            <div class="talent-icon">🌟</div>
+            <div>
+              <div class="talent-name">{{ row.node.name }}</div>
+              @if (row.node.description) {
+                <div class="talent-desc">{{ row.node.description }}</div>
+              }
+              <div class="talent-meta">Tier {{ row.node.tier }} · {{ row.node.cost }} Punkt(e)</div>
+            </div>
+            <div class="talent-action">
+              @if (row.status === 'available') {
+                <button type="button" (click)="learn(row)">Lernen</button>
+              } @else if (row.status === 'learned') {
+                <span class="talent-status learned">✓ gelernt</span>
+              } @else if (row.status === 'needs_points') {
+                <span class="talent-status needs_points">Punkte fehlen</span>
+              } @else {
+                <span class="talent-status locked">Voraussetzungen fehlen</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

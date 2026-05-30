@@ -1,0 +1,56 @@
+/* Skills-Panel. Übernommen aus `frontend/legacy/style.css` Z. 82-106. */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.skills-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.skills-box {
+  width: 90%; max-width: 480px;
+  background: rgba(20,18,14,0.97); border: 1px solid #c8b88a;
+  color: #c8b88a; font-size: 13px;
+  display: flex; flex-direction: column;
+}
+
+.skills-header {
+  padding: 10px 14px; background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid #555;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #e8d870; font-weight: bold;
+}
+
+.skills-close {
+  background: none; border: 1px solid #555;
+  color: #c8b88a; padding: 3px 10px;
+  cursor: pointer; font-family: monospace;
+}
+
+.skills-list { padding: 10px 14px; }
+.skills-empty { color: #888; font-style: italic; padding: 14px; text-align: center; }
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px 1fr;
+  gap: 8px; align-items: center;
+  padding: 6px 0;
+}
+.skill-icon { font-size: 18px; text-align: center; }
+.skill-name { color: #e8d870; font-weight: bold; }
+.skill-level { color: #fff; font-weight: bold; text-align: center; }
+.skill-progress {
+  height: 12px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #555;
+  position: relative;
+}
+.skill-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #4a5a8a, #6a8acf);
+  transition: width 0.3s;
+}

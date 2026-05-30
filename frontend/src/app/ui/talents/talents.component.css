@@ -1,0 +1,72 @@
+/* Talents-Panel. Übernommen aus `frontend/legacy/style.css` Z. 147-195. */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.talents-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.talents-box {
+  width: 92%; max-width: 720px;
+  background: rgba(20,18,14,0.97);
+  border: 1px solid #b89858;
+  color: #c8b88a; font-size: 12px;
+  max-height: 88vh;
+  display: flex; flex-direction: column;
+}
+
+.talents-header {
+  padding: 10px 14px; background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid #555;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #ffd060; font-weight: bold;
+}
+
+.talents-points { color: #ffd060; font-size: 14px; }
+
+.talents-close {
+  background: none; border: 1px solid #555;
+  color: #c8b88a; padding: 3px 10px;
+  cursor: pointer; font-family: monospace;
+}
+
+.talents-list { padding: 8px 14px; overflow-y: auto; flex: 1; }
+.talents-empty { color: #888; font-style: italic; padding: 14px; text-align: center; }
+
+.talent-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 140px;
+  gap: 8px; padding: 8px 0; align-items: center;
+  border-bottom: 1px dashed #443a20;
+}
+.talent-row.locked { opacity: 0.45; }
+.talent-row.learned { background: rgba(40,60,30,0.3); }
+.talent-row.available { background: rgba(60,50,20,0.3); }
+
+.talent-icon { font-size: 22px; text-align: center; }
+.talent-name { color: #e8c870; font-weight: bold; }
+.talent-desc { font-size: 10px; color: #a09080; }
+.talent-meta { font-size: 9px; color: #807060; }
+
+.talent-action button {
+  background: #604020; border: 1px solid #a08040;
+  color: #fff; cursor: pointer;
+  padding: 4px 8px; font-size: 11px;
+  border-radius: 3px; width: 100%;
+  font-family: monospace;
+}
+.talent-action button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.talent-status {
+  font-size: 10px; padding: 2px 6px;
+  border-radius: 3px; text-align: center;
+  display: block;
+}
+.talent-status.learned      { background: #305030; color: #80f080; }
+.talent-status.needs_points { background: #503020; color: #ff8060; }
+.talent-status.locked       { background: #303030; color: #808080; }

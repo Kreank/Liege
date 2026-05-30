@@ -1,0 +1,92 @@
+/* Character/Attribute-Panel. Übernommen aus
+   `frontend/legacy/style.css` Z. 198-224 + Stat-Section-Title aus
+   Z. 929-938 (für Werte unter Attributen). */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.char-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.char-box {
+  width: 90%; max-width: 540px;
+  background: rgba(20,18,14,0.97);
+  border: 1px solid #c8a888;
+  color: #c8b88a; font-size: 12px;
+  max-height: 84vh;
+  display: flex; flex-direction: column;
+}
+
+.char-header {
+  padding: 10px 14px; background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid #555;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #e8c870; font-weight: bold;
+}
+
+.char-close {
+  background: none; border: 1px solid #555;
+  color: #c8b88a; padding: 3px 10px;
+  cursor: pointer; font-family: monospace;
+}
+
+.char-list { padding: 10px 14px; overflow-y: auto; }
+
+.char-unspent {
+  background: rgba(120,90,30,0.4);
+  border: 1px solid #c8a868;
+  color: #f0d870;
+  padding: 6px 8px; font-size: 11px; font-weight: bold;
+  text-align: center; margin-bottom: 8px;
+}
+
+.attr-row {
+  display: grid;
+  grid-template-columns: 1fr 60px 88px;
+  gap: 8px; padding: 5px 0; align-items: center;
+  border-bottom: 1px dashed #443a20;
+}
+.attr-label { color: #e8c870; font-weight: bold; }
+.attr-desc  { font-size: 10px; color: #a09060; }
+.attr-value {
+  font-size: 14px; font-weight: bold; color: #fff;
+  text-align: right;
+}
+
+.attr-actions { display: flex; gap: 3px; justify-content: flex-end; }
+.alloc-btn {
+  background: rgba(60,90,40,0.5);
+  border: 1px solid #80c060;
+  color: #d0e8a0;
+  font-size: 12px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: monospace;
+  min-width: 28px;
+}
+.alloc-btn:hover { background: rgba(80,120,50,0.7); }
+.alloc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.alloc-btn.minus {
+  background: rgba(100,40,40,0.4);
+  border-color: #c08080;
+  color: #f0a0a0;
+}
+
+.stat-section-title {
+  color: #aaaa88; font-size: 11px;
+  margin-top: 12px; margin-bottom: 4px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 1px dotted #443524;
+  padding-bottom: 2px;
+}
+
+.stat-row {
+  display: flex; justify-content: space-between;
+  padding: 3px 0;
+}
+.stat-row .stat-val { color: #e8d870; font-weight: bold; }

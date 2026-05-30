@@ -449,3 +449,74 @@ Subscription gepatcht — läuft in der Zone, in der `connect()` aufgerufen
 wurde (= außerhalb, weil wir das im Phaser-Component machen). Sobald F5+ eine
 UI-Komponente bindet, muss die Component das `signal()`-Read explizit in
 die Zone holen (z. B. via `effect()` mit Default-Schedule).
+
+## 23. F5-F10 — UI-Panels (erste Welle)
+
+### F5 HUD
+HP/Mana/Hunger/Durst/Ausdauer-Bars + Koords + Connection-Status, alles
+read-only an Signals gebunden. Bewusst weggelassen (kommt mit späteren
+Phasen): `#status-effects-row` (eigener Service später), `#wallet-hud`
+(im Inventar-Panel), `#body-parts` (eigene Komponente F-final), `#tile-name`.
+
+### F6 Hotbar
+9 Slots, Tastatur 1-9, localStorage-Key `liege_hotbar` (Format kompatibel
+zur Legacy: Array von 9 kind-Strings oder null). Item-Counts kommen
+live aus `state.inventory()`. **Welle 25 Spell-Slots** (Spellbook → Hotbar)
+sind NICHT migriert — Spellbook kommt in F13. Drag-Drop zwischen Slots
+(Swap) und Inventar → Hotbar bleibt F-final, weil dafür die Inv-Component
+einen gemeinsamen DragDrop-Service bräuchte (würde Scope sprengen).
+Cooldowns/Mana-Greying ebenfalls F13.
+
+### F7 Inventar
+Grid-Layout (Beutel) + Equip-Slots links, Wallet im Stat-Bereich.
+Drag-Drop nutzt natives `dataTransfer` (kein zusätzliches DnD-Lib),
+Mime `application/json`. Inv → Equip löst `equip_item`, Equip → Bag löst
+`unequip_item`. Reorder im Beutel ist nicht implementiert — Legacy hat
+das auch nicht persistiert. Klick = equip/use, Rechtsklick = drop,
+Doppelklick = split-stack (Hälfte abspalten). Stat-Sheet ist auf die
+Wallet-Zeile reduziert — volle `_buildStatSheetSection` aus Legacy
+(Resistenzen, Bonus-Aufschlüsselung, Allocation-Buttons) lebt in
+CharacterComponent (F8), nicht doppelt im Inventar.
+
+### F8 Skills/Talente/Charakter
+Drei Komponenten in einem Commit, weil Plan sie bündelt.
+- **Skills:** Read-only-Liste über `player().skills` (Map kind→{level,xp,xp_next}).
+  Icons als statische Map (gleich wie Legacy).
+- **Talente:** Liest `state.talents()` (TalentTree). Wenn `tree`-Feld
+  fehlt (Backend liefert nur learned/points), bleibt die Liste leer und
+  zeigt einen Hinweis. Legacy hatte die Tab-Struktur (Klassen/Schulen)
+  client-seitig fest verdrahtet — wir warten auf einen vom Backend
+  gelieferten Tree-Snapshot, der in F-final eingeführt wird.
+- **Charakter:** Attribute mit +/-1-Allocation, sendet `allocate_attr`.
+  Stat-Sheet darunter ist read-only. Body-Part-Block bleibt F-final.
+
+Tasten: `K` Skills, `T` Talente, `C` Charakter, `I` Inventar — alle
+`Esc`-bar. Tastatur-Listener sind pro Component (HostListener), greifen
+nicht in `<input>`/`<textarea>` oder mit Modifier-Keys.
+
+### F9 Quests
+Quest-Liste sortiert nach State (active zuerst), Objektive mit
+Progress/Required, Rewards. Accept-Button auf available-Quests sendet
+`accept_quest_template`. Quest-Detail wird inline gezeigt (kein
+separates Modal — Legacy hatte das auch im selben Overlay).
+Turn-In-Buttons sind im NPC-Dialog, nicht in der Quest-Liste — bleibt
+in F-Dialog.
+
+### F10 Faktionen
+Reine Liste aus `state.factions()`. Standing-Label (Verbündet/Neutral/
+Feind) wird client-seitig aus Goodwill abgeleitet, identisch zur Legacy-
+Heuristik (>=2000 verbündet, <=-500 feindlich, sonst neutral).
+
+### Architektur-Hinweise zu allen Panels
+- **OnPush + Signals**: jedes Overlay nutzt `computed()` aus
+  `GameStateService`-Signals; keine `@Input()`, keine `ngOnChanges`.
+- **Standalone** mit eigenen CSS-Files, kein `ViewEncapsulation.None`.
+- **Tastatur via `@HostListener('document:keydown', …)`**: jede Component
+  hängt sich selbst ans Doc, weil ein zentraler `KeybindService` Scope
+  sprengen würde — kommt evtl. in F-final.
+- **Zone-Hygiene**: Komponenten leben in der Angular-Zone (sie reagieren
+  auf Klicks), Phaser bleibt out-of-zone. Keine Cross-Pollution durch
+  die Signals — Signal-Reads sind Zone-rein.
+- **Stub-Marker**: `frontend/src/app/legacy-stubs.ts` ist nach F10
+  um sieben Einträge schlanker (`hud, hotbar, inventory, skills,
+  talents, character, quests, factions`).

@@ -12,9 +12,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { PhaserGameComponent } from './game/phaser-game.component';
+import { CharacterComponent } from './ui/character/character.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
 import { InventoryComponent } from './ui/inventory/inventory.component';
+import { SkillsComponent } from './ui/skills/skills.component';
+import { TalentsComponent } from './ui/talents/talents.component';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +27,9 @@ import { InventoryComponent } from './ui/inventory/inventory.component';
     HudComponent,
     HotbarComponent,
     InventoryComponent,
+    SkillsComponent,
+    TalentsComponent,
+    CharacterComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

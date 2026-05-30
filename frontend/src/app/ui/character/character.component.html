@@ -1,0 +1,49 @@
+@if (visible()) {
+  <div class="char-overlay" (click)="close()">
+    <div class="char-box" (click)="$event.stopPropagation()">
+      <div class="char-header">
+        <span>📋 Charakter — Attribute</span>
+        <button type="button" class="char-close" (click)="close()">C / Esc</button>
+      </div>
+      <div class="char-list">
+        @if (unspent() > 0) {
+          <div class="char-unspent">{{ unspent() }} freie Punkt(e) zu verteilen</div>
+        }
+        @for (row of attrs(); track row.key) {
+          <div class="attr-row">
+            <div>
+              <div class="attr-label">{{ row.label }}</div>
+              <div class="attr-desc">{{ row.desc }}</div>
+            </div>
+            <div class="attr-value">{{ row.value }}</div>
+            <div class="attr-actions">
+              <button
+                type="button"
+                class="alloc-btn minus"
+                [disabled]="row.value <= 0"
+                (click)="allocate(row, -1)"
+              >−</button>
+              <button
+                type="button"
+                class="alloc-btn"
+                [disabled]="unspent() <= 0"
+                (click)="allocate(row, 1)"
+              >+</button>
+            </div>
+          </div>
+        }
+        @if (stats().length > 0) {
+          <div class="stat-section-title">Werte</div>
+          @for (s of stats(); track s.key) {
+            @if (s.value !== undefined) {
+              <div class="stat-row">
+                <span>{{ s.label }}</span>
+                <span class="stat-val">{{ s.value }}</span>
+              </div>
+            }
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
