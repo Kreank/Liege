@@ -30,3 +30,9 @@ logs/
 postgres-data/
 docker-volumes/
 docker-compose.override.yml
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.nx/

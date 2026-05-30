@@ -173,3 +173,46 @@ das alle ~15s Wetterzustände wechselt und bei Gewitter Blitze platziert.
 
 **Fix:** beide in `ASYNC_BROADCAST_TYPES` aufgenommen. Keine Backend-
 Änderung — wie schon bei `npc_goal` reines Test-Tooling.
+
+---
+
+## 10. F1 — Docker-Build erwartet vorher gebautes Angular-`dist/`
+
+**Ort:** `backend/Dockerfile` (`COPY frontend/ ../frontend/`),
+`backend/main.py` (`app.mount("/", StaticFiles(directory="../frontend/dist/
+frontend/browser", html=True))`).
+
+**Symptom:** Wenn jemand `docker compose build backend` ausführt, ohne vorher
+`cd frontend && npm run build` zu laufen zu haben, ist `frontend/dist/` leer
+oder fehlt → FastAPI-Startup wirft `RuntimeError: Directory
+'../frontend/dist/frontend/browser' does not exist` und der Container bleibt
+in Restart-Loop. F1 baut Angular im Host und schiebt das ganze `frontend/`-
+Verzeichnis (inkl. `dist/`) per `COPY` in den Container.
+
+**Auswirkung:** Solange wir nur lokal arbeiten und nach Codeänderung in
+`frontend/src/` per Hand `npm run build && docker compose build backend`
+laufen, ist alles gut. Sobald CI/CD oder ein "fresh clone"-Path dazukommt,
+muss der Build-Step in den Container (Multi-Stage: `node:24-alpine` baut
+`dist/`, `python:3.12-slim` kopiert nur das raus).
+
+**Wer den Fix übernimmt:** Phase F-final oder F-PWA — sobald Angular die
+Hauptseite tatsächlich liefert (jetzt noch leeres Standard-Template),
+lohnt sich Multi-Stage. Bis dahin: README-Hinweis genügt.
+
+---
+
+## 11. F1 — Angular schluckt Phaser-CDN-Stand, keine Type-Defs verifiziert
+
+**Ort:** `frontend/package.json` → `phaser@3.60.0`.
+
+**Symptom:** Wir haben Phaser als `npm i phaser@3.60.0` reingezogen, um den
+Stand des Legacy-CDN-Tags zu spiegeln. Phaser bringt eigene Type-Defs mit
+(`phaser/types/phaser.d.ts`); ob die mit dem strict-mode-TS in Angular 21
+sauber durchgehen, ist erst in Phase F4 (Phaser-Renderer integrieren)
+sichtbar.
+
+**Auswirkung:** F1-Build ist grün (Phaser wird nirgends importiert).
+F4 könnte Type-Friction zeigen → ggf. `skipLibCheck: true` in `tsconfig.app.
+json` setzen oder Phaser über `@ts-expect-error`-Wrapper isolieren.
+
+**Wer den Fix übernimmt:** Phase F4 (Phaser als Renderer), nicht jetzt.

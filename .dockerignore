@@ -16,3 +16,9 @@ env/
 .DS_Store
 docu/
 README.md
+
+# Angular build artefakte (dev), aber dist/ MUSS rein
+frontend/node_modules/
+frontend/.angular/
+frontend/.nx/
+frontend/.vscode/

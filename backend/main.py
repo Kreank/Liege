@@ -267,29 +267,26 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 app.add_api_websocket_route("/ws/dev-chat", dev_chat_handler)
 
-app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+# Legacy-Vanilla-JS bleibt unter /static/* erreichbar (login.html etc.).
+# Nach Phase F-final wird das Mount entfernt.
+app.mount("/static", StaticFiles(directory="../frontend/legacy"), name="static")
 app.mount("/assets", StaticFiles(directory="../assets"), name="assets")
-
-
-@app.get("/")
-async def root():
-    return FileResponse("../frontend/index.html")
 
 
 @app.get("/login")
 async def login_page():
-    return FileResponse("../frontend/login.html")
+    return FileResponse("../frontend/legacy/login.html")
 
 
 @app.get("/admin")
 async def admin_page():
-    return FileResponse("../frontend/admin.html")
+    return FileResponse("../frontend/legacy/admin.html")
 
 
 @app.get("/manifest.webmanifest")
 async def pwa_manifest():
     return FileResponse(
-        "../frontend/manifest.webmanifest",
+        "../frontend/legacy/manifest.webmanifest",
         media_type="application/manifest+json",
     )
 
@@ -298,7 +295,7 @@ async def pwa_manifest():
 async def pwa_sw():
     # Muss von root serviert werden, damit der Scope `/` ist.
     return FileResponse(
-        "../frontend/sw.js",
+        "../frontend/legacy/sw.js",
         media_type="application/javascript",
         headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
     )
@@ -465,6 +462,22 @@ async def websocket_endpoint(websocket: WebSocket):
             "type": "player_left",
             "player_id": player_id,
         })
+
+
+# Angular-Build als Root mounten. MUSS am Ende stehen, damit alle
+# explizit registrierten Routen (/ws, /auth/*, /login, /admin,
+# /manifest.webmanifest, /sw.js, /assets/*, /static/*) Vorrang haben.
+# FastAPI prüft Routes in Registrierungsreihenfolge, Mounts greifen
+# als Fallback. html=True liefert index.html für unbekannte Paths
+# (SPA-Routing).
+app.mount(
+    "/",
+    StaticFiles(
+        directory="../frontend/dist/frontend/browser",
+        html=True,
+    ),
+    name="ng_root",
+)
 
 
 if __name__ == "__main__":
