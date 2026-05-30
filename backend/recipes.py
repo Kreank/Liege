@@ -206,8 +206,145 @@ RECIPES = {
          "material": "steel", "inputs": [("steel_ingot", 3), ("wood", 1)], "requires": "smithing_advanced"},
         {"id": "steel_halberd","name": "Stahl-Hellebarde","output": "halberd","category": "weapon",
          "material": "steel", "inputs": [("steel_ingot", 2), ("wood", 3)], "requires": "smithing_advanced"},
+
+        # ── Welle 35: Monster-Drop-Crafting (Knochen-/Drachen-/Konstrukt-Waffen) ──
+        # Knochen-Waffen (frühes Necromancy-Flair, billiger als Stahl)
+        {"id": "craft_bone_dagger",    "name": "Knochendolch",        "output": "bone_dagger",    "category": "weapon",
+         "inputs": [("bone", 5), ("wood", 2)]},
+        {"id": "craft_bone_spear",     "name": "Knochenspeer",        "output": "bone_spear",     "category": "weapon",
+         "inputs": [("bone", 8), ("wood", 3)]},
+        {"id": "craft_bone_staff",     "name": "Knochenstab",         "output": "bone_staff",     "category": "weapon",
+         "inputs": [("bone", 6), ("wood", 1)]},
+        {"id": "craft_bone_warhammer", "name": "Knochen-Streithammer","output": "bone_warhammer", "category": "weapon",
+         "inputs": [("bone", 10), ("stone", 4)]},
+        # Drachen-Schmiede (Premium-Equipment, requires smithing_advanced)
+        {"id": "drake_chestplate",     "name": "Drachenschuppen-Panzer", "output": "chestplate",   "category": "armor",
+         "material": "steel", "inputs": [("drake_scale", 5), ("crude_steel_ingot", 2)],
+         "requires": "smithing_advanced"},
+        {"id": "drake_shield",         "name": "Drachenschuppen-Schild", "output": "shield",       "category": "armor",
+         "material": "steel", "inputs": [("drake_scale", 3), ("wood", 2)],
+         "requires": "smithing_advanced"},
+        {"id": "dragontooth_spear",    "name": "Drachenzahn-Speer",   "output": "spear",          "category": "weapon",
+         "material": "iron", "inputs": [("dragon_tooth", 3), ("wood", 1)],
+         "requires": "smithing_advanced"},
+        {"id": "dragontooth_dagger",   "name": "Drachenzahn-Dolch",   "output": "dagger",         "category": "weapon",
+         "material": "iron", "inputs": [("dragon_tooth", 2), ("wood", 1)],
+         "requires": "smithing_advanced"},
+        {"id": "dragonhorn_hammer",    "name": "Drachenhorn-Hammer",  "output": "bone_warhammer", "category": "weapon",
+         "inputs": [("dragon_horn", 2), ("bone", 3)],
+         "requires": "smithing_advanced"},
+        # Konstrukt-Crafting (Granit-Stein-Rüstung)
+        {"id": "granite_chestplate",   "name": "Granit-Panzer",       "output": "chestplate",     "category": "armor",
+         "material": "stone", "inputs": [("granite_core", 2), ("stone", 10)],
+         "requires": "smithing_basics"},
     ],
 }
+
+# Welle 35: Monster-Drop-Recipes nach Station angehängt (statt das große
+# Dict-Literal oben weiter aufzublähen, hier append-style — gleicher Effekt).
+
+# ── HAND ──────────────────────────────────────────────────────────────
+RECIPES["hand"] += [
+    # Pelz/Leder-Verarbeitung (auch ohne Webstuhl möglich)
+    {"id": "tan_wolf_pelt",      "name": "Wolfsfell gerben",     "output": "crude_leather", "category": "material",
+     "inputs": [("wolf_pelt", 2)]},
+    {"id": "tan_shadow_pelt",    "name": "Schattenfell gerben",  "output": "leather",       "category": "material",
+     "inputs": [("shadow_pelt", 1)]},
+    # Fletching: Federn → Pfeile
+    {"id": "fletch_arrows",      "name": "Pfeile fletchen",      "output": "arrow",         "category": "material",
+     "inputs": [("dune_feather", 5), ("wood", 2)]},
+    # Roh-Schamanen-Stock aus Schädel + Stoff
+    {"id": "craft_shaman_stick", "name": "Schamanen-Stock",      "output": "shaman_stick",  "category": "weapon",
+     "inputs": [("skull", 1), ("cloth", 2), ("wood", 1)]},
+]
+
+# ── WORKBENCH (Loom-Ersatz) ───────────────────────────────────────────
+RECIPES["workbench"] += [
+    # Otter-Felle → Stoffrolle
+    {"id": "weave_otter_cloth",  "name": "Otterstoff weben",     "output": "cloth",         "category": "material",
+     "inputs": [("otter_pelt", 3)]},
+    # Arktis-Pelz + Stoff → warme Brustrüstung (fur-flavored)
+    {"id": "fur_chest_arctic",   "name": "Pelz-Brustpanzer",     "output": "chestplate",    "category": "armor",
+     "material": "fur", "inputs": [("arctic_pelt", 1), ("cloth", 2)]},
+]
+
+# ── FURNACE (Kitchen + Alchemy + Smelting) ────────────────────────────
+RECIPES["furnace"] += [
+    # — Kitchen: Mob-Fleisch garen —
+    {"id": "cook_dark_meat",     "name": "Dunkles Fleisch garen","output": "cooked_meat",   "category": "food",
+     "inputs": [("dark_meat", 2), ("wood", 1)], "requires": "agriculture"},
+    {"id": "cook_tentacle",      "name": "Tentakel garen",       "output": "cooked_meat",   "category": "food",
+     "inputs": [("tentacle_meat", 1), ("wood", 1)], "requires": "agriculture"},
+    {"id": "cook_strider",       "name": "Strider-Filet garen",  "output": "cooked_meat",   "category": "food",
+     "inputs": [("strider_meat", 1), ("wood", 1)], "requires": "agriculture"},
+    {"id": "salt_pork",          "name": "Schweinerücken salzen","output": "cooked_meat",   "category": "food",
+     "inputs": [("pork_loin", 1), ("salt_lump", 1), ("wood", 1)], "requires": "agriculture"},
+
+    # — Alchemy: Element-Glands → Resist-Tränke —
+    {"id": "brew_fire_resist_gland",  "name": "Feuerwiderstand (Drüse)", "output": "fire_resist_potion",  "category": "consumable",
+     "inputs": [("fire_gland", 1), ("herb", 2)], "requires": "alchemy_basics"},
+    {"id": "brew_frost_resist_gland", "name": "Frostwiderstand (Drüse)", "output": "frost_resist_potion", "category": "consumable",
+     "inputs": [("frost_gland", 1), ("herb", 2)], "requires": "alchemy_basics"},
+    {"id": "brew_antidote_gland",     "name": "Gegengift (Drüse)",       "output": "antidote_potion",     "category": "consumable",
+     "inputs": [("poison_gland", 1), ("herb", 2)], "requires": "alchemy_basics"},
+
+    # — Alchemy: Essenzen → Tränke/Scrolls —
+    {"id": "brew_fire_resist_essence",  "name": "Feuerwiderstand (Essenz)", "output": "fire_resist_potion",  "category": "consumable",
+     "inputs": [("essence_fire", 1), ("mana_potion", 1)], "requires": "alchemy_basics"},
+    {"id": "brew_frost_resist_essence", "name": "Frostwiderstand (Essenz)", "output": "frost_resist_potion", "category": "consumable",
+     "inputs": [("essence_frost", 1), ("mana_potion", 1)], "requires": "alchemy_basics"},
+    {"id": "brew_water_health",         "name": "Heiltrank (Wasser-Essenz)","output": "health_potion",       "category": "consumable",
+     "inputs": [("essence_water", 1), ("herb", 2)], "requires": "alchemy_basics"},
+    {"id": "brew_lightning_speed",      "name": "Geschwindigkeitstrank",    "output": "speed_potion",        "category": "consumable",
+     "inputs": [("essence_lightning", 1), ("mana_potion", 1)], "requires": "alchemy_basics"},
+    {"id": "brew_arcane_mana",          "name": "Manatrank (Arkane Essenz)","output": "mana_potion",         "category": "consumable",
+     "inputs": [("essence_arcane", 2)], "requires": "alchemy_basics"},
+    {"id": "brew_dryad_health",         "name": "Heiltrank (Dryaden-Saft)", "output": "health_potion",       "category": "consumable",
+     "inputs": [("dryad_sap", 1), ("herb", 2)], "requires": "alchemy_basics"},
+    {"id": "brew_frostdust_resist",     "name": "Frostwiderstand (Staub)",  "output": "frost_resist_potion", "category": "consumable",
+     "inputs": [("frost_dust", 1), ("mana_potion", 1)], "requires": "alchemy_basics"},
+    {"id": "brew_astral_mana",          "name": "Manatrank (Astralstaub)",  "output": "mana_potion",         "category": "consumable",
+     "inputs": [("astral_dust", 3)], "requires": "alchemy_basics"},
+
+    # — Magie-Output aus Essenzen —
+    {"id": "scribe_void_scroll", "name": "Leere-Schriftrolle",   "output": "scroll",        "category": "magic",
+     "inputs": [("void_essence", 1), ("bone", 3)], "requires": "alchemy_basics"},
+    {"id": "craft_soul_amulet",  "name": "Seelen-Amulett",       "output": "amulet",        "category": "jewelry",
+     "inputs": [("soul_essence", 1), ("bone", 5)], "requires": "alchemy_basics"},
+    {"id": "craft_wisp_torch",   "name": "Irrlicht-Fackel",      "output": "torch",         "category": "consumable",
+     "inputs": [("wisp_essence", 1), ("cloth", 2)], "requires": "alchemy_basics"},
+
+    # — Dragon-Heart Transmutation (super-rare) —
+    {"id": "transmute_mythril",  "name": "Mythril-Transmutation","output": "mythril_ingot", "category": "material",
+     "inputs": [("dragon_heart", 1), ("fire_gland", 1), ("frost_gland", 1), ("storm_gland", 1)],
+     "requires": "mastersmithing"},
+]
+
+# ── ANVIL (zusätzliche Drachen-/Konstrukt-Recipes oben schon angehängt) ──
+RECIPES["anvil"] += [
+    # Mechanik-Pickaxe aus Uhrwerk-Zahnrädern
+    {"id": "clockwork_pickaxe",  "name": "Uhrwerk-Spitzhacke",   "output": "pickaxe",       "category": "tool",
+     "inputs": [("clockwork_gear", 5), ("wood", 1)], "requires": "smithing_advanced"},
+    # Phylakterie-Splitter → Necro-Amulett
+    {"id": "phylactery_amulet",  "name": "Phylakterie-Amulett",  "output": "amulet",        "category": "jewelry",
+     "inputs": [("phylactery_shard", 1), ("crystal", 1)], "requires": "smithing_advanced"},
+
+    # Gems & Pearls → Schmuck
+    {"id": "pearl_amulet",       "name": "Perlen-Amulett",       "output": "amulet",        "category": "jewelry",
+     "inputs": [("pearl_great", 3)]},
+    {"id": "mire_pearl_ring",    "name": "Morast-Perlenring",    "output": "ring",          "category": "jewelry",
+     "inputs": [("mire_pearl", 2)]},
+    {"id": "river_pearl_ring",   "name": "Fluss-Perlenring",     "output": "ring",          "category": "jewelry",
+     "inputs": [("river_pearl", 2)]},
+    {"id": "brine_pearl_ring",   "name": "Sole-Perlenring",      "output": "ring",          "category": "jewelry",
+     "inputs": [("brine_pearl", 2)]},
+    {"id": "fuse_crystal_shards","name": "Kristall fügen",       "output": "crystal",       "category": "material",
+     "inputs": [("crystal_shard", 5)]},
+    {"id": "refine_sand_crystal","name": "Sandkristall raffinieren","output": "crystal",    "category": "material",
+     "inputs": [("sand_crystal", 1), ("crystal", 1)]},
+]
+
+# Marker-Sentinel entfernt das leere Append-Hilfs-Dict-Konstrukt.
 
 
 # Kategorien-Reihenfolge fürs Frontend (gleiche Sortierung wie hier).
