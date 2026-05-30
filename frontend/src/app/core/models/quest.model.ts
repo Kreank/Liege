@@ -17,6 +17,9 @@ export interface Quest {
   readonly description?: string;
   readonly state: QuestState;
   readonly giver_npc_id?: number;
+  /** Optionaler Ziel-NPC (für Deliver/Turn-in). Backend setzt das beim
+   *  `quest_turn_in`-Hook auf den Receiver-NPC (`quests.py::ensure_…`). */
+  readonly target_npc_id?: number;
   readonly objectives: readonly QuestObjective[];
   readonly rewards?: Readonly<Record<string, number | string>>;
   readonly is_main?: boolean;

@@ -40,6 +40,9 @@ import { GameStateService } from '../../core/services/game-state.service';
 const VIEW_W = 64;
 const VIEW_H = 44;
 
+/** Pulse-Periode für Quest-Marker (ms). 2026-05-31 — H1.7. */
+const PULSE_PERIOD_MS = 1200;
+
 @Component({
   selector: 'app-minimap',
   standalone: true,
@@ -58,6 +61,9 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
   /** Chunks-Identity-Ref — pflegen das Lookup nur, wenn sich die Liste ändert. */
   private lastChunksRef: readonly Chunk[] | null = null;
   private destroyed = false;
+  /** RAF-Handle für den Pulse-Loop — null wenn keine aktiven Quest-Marker da
+   *  sind (spart CPU, wenn niemand eine Quest hat). */
+  private pulseRaf: number | null = null;
 
   constructor() {
     // Bei Signal-Updates neu zeichnen. Phaser-FPS-Schutz: wir hängen NICHT
@@ -71,17 +77,85 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
       this.state.npcsVisible();
       this.state.players();
       this.state.player();
+      this.state.quests();
       this._scheduleDraw();
+      this._ensurePulseLoop();
     });
   }
 
   ngAfterViewInit(): void {
     this.ctx = this.canvasRef.nativeElement.getContext('2d');
     this._draw();
+    this._ensurePulseLoop();
   }
 
   ngOnDestroy(): void {
     this.destroyed = true;
+    if (this.pulseRaf !== null) {
+      cancelAnimationFrame(this.pulseRaf);
+      this.pulseRaf = null;
+    }
+  }
+
+  /** Startet den Pulse-Loop nur wenn aktive Quest-Marker vorhanden sind.
+   *  Reduziert CPU-Last bei leerer Quest-Liste auf signal-driven Draws. */
+  private _ensurePulseLoop(): void {
+    if (this.destroyed) return;
+    const hasMarkers = this._questMarkers().length > 0;
+    if (hasMarkers && this.pulseRaf === null) {
+      const tick = (): void => {
+        if (this.destroyed) return;
+        this._draw();
+        if (this._questMarkers().length > 0) {
+          this.pulseRaf = requestAnimationFrame(tick);
+        } else {
+          this.pulseRaf = null;
+        }
+      };
+      this.pulseRaf = requestAnimationFrame(tick);
+    }
+  }
+
+  /** Ermittelt aktive Quest-Marker:
+   *   • Turn-In-Marker (gelber Stern) für Completed-Quests mit giver_npc_id
+   *     oder target_npc_id, deren NPC sichtbar ist.
+   *   • Kill-Highlight-Set (Set von creature_kinds) für aktive Kill-Quests
+   *     mit unerfüllter Objective. */
+  private _questMarkers(): readonly { x: number; y: number; kind: 'turnin' }[] {
+    const quests = this.state.quests();
+    if (quests.length === 0) return [];
+    const npcs = this.state.npcsVisible();
+    const out: { x: number; y: number; kind: 'turnin' }[] = [];
+    for (const q of quests) {
+      if (q.state !== 'completed' && q.state !== 'active') continue;
+      // Turn-In oder Deliver: NPC-Ziel auf Karte hervorheben.
+      const targetId = q.state === 'completed'
+        ? (q.giver_npc_id ?? q.target_npc_id)
+        : (q.target_npc_id);
+      if (targetId == null) continue;
+      const npc = npcs.find((n) => n.id === targetId);
+      if (!npc) continue;
+      out.push({ x: npc.x, y: npc.y, kind: 'turnin' });
+    }
+    return out;
+  }
+
+  /** Set von creature_kinds, die für aktive Kill-Quests highlighted werden. */
+  private _killTargetKinds(): ReadonlySet<string> {
+    const quests = this.state.quests();
+    const set = new Set<string>();
+    for (const q of quests) {
+      if (q.state !== 'active') continue;
+      for (const o of q.objectives) {
+        if (o.done) continue;
+        // Backend-Objective-Slug: für Kill-Quests heißt das Target-Feld
+        // `creature_kind`, das landet im frontend Quest-Objective als `target`.
+        // (siehe quests.py::create_from_template: objective.creature_kind,
+        //  und ws/quests.py serialisiert es als objectives[{kind, target}]).
+        if (o.target) set.add(o.target);
+      }
+    }
+    return set;
   }
 
   private _scheduleDraw(): void {
@@ -162,13 +236,21 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
 
     // NPCs — Creature = rot, sonst gelb (Legacy-Heuristik vereinfacht ohne
     // CREATURE_KINDS-Set: wir nutzen `hostile`-Flag, das die NPC-Modelle
-    // bereits führen).
+    // bereits führen). H1.7: Kill-Quest-Targets bekommen eine helle Aura.
+    const killKinds = this._killTargetKinds();
     for (const n of this.state.npcsVisible() as readonly NPC[]) {
       const px = (n.x - ox) * scaleX;
       const py = (n.y - oy) * scaleY;
       if (px < 0 || py < 0 || px >= canvas.width || py >= canvas.height) continue;
-      ctx.fillStyle = n.hostile ? '#e84040' : '#ffe070';
-      ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, dotSize, dotSize);
+      if (killKinds.has(n.kind)) {
+        // Quest-Target-Highlight: cyan-grünlicher Punkt (deutlich von hostile/
+        // friendly unterscheidbar). Größer als normal.
+        ctx.fillStyle = '#80ffe0';
+        ctx.fillRect(Math.floor(px) - 2, Math.floor(py) - 2, dotSize + 2, dotSize + 2);
+      } else {
+        ctx.fillStyle = n.hostile ? '#e84040' : '#ffe070';
+        ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, dotSize, dotSize);
+      }
     }
 
     // Andere Spieler
@@ -193,10 +275,56 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
       ctx.fillRect(Math.floor(px) - 2, Math.floor(py) - 2, dotSize + 1, dotSize + 1);
     }
 
+    // Quest-Marker (H1.7) — gelber Stern mit Sinus-Pulse über Turn-In-NPCs.
+    // Render NACH allen NPCs, damit der Marker oben liegt.
+    const markers = this._questMarkers();
+    if (markers.length > 0) {
+      const now = performance.now();
+      const phase = (now % PULSE_PERIOD_MS) / PULSE_PERIOD_MS;
+      const pulse = 1 + 0.2 * Math.sin(phase * Math.PI * 2);
+      ctx.save();
+      for (const m of markers) {
+        const mx = (m.x - ox) * scaleX;
+        const my = (m.y - oy) * scaleY;
+        if (mx < 0 || my < 0 || mx >= canvas.width || my >= canvas.height) continue;
+        const size = Math.max(3, dotSize + 2) * pulse;
+        // Outer-Glow
+        ctx.fillStyle = 'rgba(255, 220, 80, 0.35)';
+        ctx.beginPath();
+        ctx.arc(mx, my, size * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        // Stern-Body
+        ctx.fillStyle = '#ffe060';
+        this._drawStar(ctx, mx, my, size, 5);
+      }
+      ctx.restore();
+    }
+
     // Eigener Spieler — heller Punkt in der Mitte
     const px = (me.x - ox) * scaleX;
     const py = (me.y - oy) * scaleY;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(Math.floor(px) - 2, Math.floor(py) - 2, dotSize + 2, dotSize + 2);
+  }
+
+  /** Zeichnet einen 5-zackigen Stern als gefüllten Path. */
+  private _drawStar(
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    radius: number,
+    points: number,
+  ): void {
+    const inner = radius * 0.45;
+    ctx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const r = i % 2 === 0 ? radius : inner;
+      const a = (Math.PI * 2 * i) / (points * 2) - Math.PI / 2;
+      const x = cx + Math.cos(a) * r;
+      const y = cy + Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
   }
 }
