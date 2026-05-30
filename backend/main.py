@@ -74,6 +74,7 @@ import ws.trade  # noqa: F401 — registriert open_trade/buy_item/sell_item
 import ws.loot  # noqa: F401 — registriert loot_vote/set_loot_rule
 import ws.raid  # noqa: F401 — registriert raid_trigger_manual/dev_*/force_respawn
 import ws.crafting  # noqa: F401 — registriert open_hand_crafting/craft
+import ws.character  # noqa: F401 — registriert wake/allocate_attr/learn_*/cast_learned/list_*/character_*
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
@@ -748,11 +749,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 await _push_group_state_to_all_members(g["id"])
                 continue
 
-            if mtype == "wake":
-                # Spieler wacht aktiv aus dem Bett-Schlaf auf.
-                needs.set_resting(player_id, False)
-
-            elif mtype == "dungeon_chest":
+            if mtype == "dungeon_chest":
                 # Dungeon-Schatzkiste öffnen (Auto-Loot direkt ins Inventar).
                 cw = await dungeon_instance.get_player_world(player_id)
                 parsed = dungeon_instance.parse_world_id(cw)
@@ -1025,20 +1022,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 if item is not None:
                     await websocket.send_json({"type": "inventory_update", "item": item})
                     await _send_attrs_update(websocket, player_id)
-
-            elif mtype == "allocate_attr":
-                attr = (data.get("attr") or "").strip()
-                n = int(data.get("n", 1) or 1)
-                if attr and -50 <= n <= 50:
-                    import player_stats as _ps
-                    result = await _ps.allocate_point(player_id, attr, n)
-                    if result and "ok" in result:
-                        await _send_attrs_update(websocket, player_id)
-                    elif result and "error" in result:
-                        await websocket.send_json({
-                            "type": "toast",
-                            "text": f"Allokation: {result['error']}",
-                        })
 
             elif mtype == "use_item":
                 item_id = int(data.get("item_id", 0))
@@ -2452,251 +2435,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json({
                         "type": "inventory_add", "item": transferred,
                     })
-
-            elif mtype == "learn_talent":
-                talent_id = data.get("talent_id", "")
-                found = talents.find_talent(talent_id)
-                if found is None:
-                    await websocket.send_json({"type": "toast", "text": "Unbekanntes Talent"})
-                    continue
-                skill_name, _ = found
-                lvl = await skills.get_skill_level(player_id, skill_name)
-                result = await talents.learn_talent(player_id, talent_id, lvl)
-                if result["ok"]:
-                    # Aktualisiertes Tree senden
-                    sk = await skills.get_skills(player_id)
-                    learned = await talents.list_learned(player_id)
-                    pts = await talents.get_talent_points(player_id)
-                    await websocket.send_json({
-                        "type": "talent_learned",
-                        "talent_id": talent_id,
-                        "points":    pts,
-                        "learned":   learned,
-                        "tree":      talents.tree_for_ui(sk, set(l["talent_id"] for l in learned), pts),
-                    })
-                    await websocket.send_json({"type": "toast", "text": f"🌟 {found[1]['name']} gelernt!"})
-                else:
-                    reason_msgs = {
-                        "skill_too_low":  f"Skill zu niedrig (brauche Level {result.get('needed')})",
-                        "prereq_missing": f"Vorgänger-Talent fehlt: {result.get('prereq')}",
-                        "already_learned":"Bereits gelernt",
-                        "no_points":      "Keine Talent-Punkte verfügbar",
-                    }
-                    await websocket.send_json({
-                        "type": "toast",
-                        "text": reason_msgs.get(result["reason"], f"Fehler: {result['reason']}"),
-                    })
-
-            elif mtype == "learn_spell":
-                # Spieler lernt aus einem Spell-Item (verbraucht 1 Stück)
-                item_id = int(data.get("item_id", 0))
-                row = await db.pool().fetchrow(
-                    "SELECT kind, category FROM items WHERE id = $1 AND owner = $2",
-                    item_id, player_id,
-                )
-                if not row or row["category"] != "magic":
-                    await websocket.send_json({"type": "toast", "text": "Das ist kein Zauber-Item"})
-                    continue
-                spell_kind = row["kind"]
-                # Schon gelernt?
-                exists = await db.pool().fetchrow(
-                    "SELECT 1 FROM learned_spells WHERE player_name = $1 AND spell_kind = $2",
-                    player_id, spell_kind,
-                )
-                if exists:
-                    await websocket.send_json({"type": "toast",
-                        "text": "Diesen Zauber kennst du bereits."})
-                    continue
-                # Item verbrauchen + Spell speichern
-                await items.consume_one(player_id, spell_kind)
-                await db.pool().execute(
-                    "INSERT INTO learned_spells (player_name, spell_kind) "
-                    "VALUES ($1, $2) ON CONFLICT DO NOTHING",
-                    player_id, spell_kind,
-                )
-                spell_cfg = combat.SPELLS.get(spell_kind, {})
-                await websocket.send_json({
-                    "type": "spell_learned",
-                    "spell_kind": spell_kind,
-                    "learned": await _list_learned_spells(player_id),
-                })
-                await websocket.send_json({
-                    "type": "toast",
-                    "text": f"📖 Zauber gelernt: {spell_cfg.get('name', spell_kind)}",
-                })
-                # XP für Magie
-                xp = await skills.gain_xp(player_id, "magic", 25)
-                if xp:
-                    await websocket.send_json({"type": "skill_xp", **xp})
-                inv = await items.get_inventory(player_id)
-                await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
-
-            elif mtype == "cast_learned":
-                # Cast eines bereits gelernten Zaubers (ohne Item-Verbrauch)
-                spell_kind = data.get("spell_kind", "")
-                spell = combat.SPELLS.get(spell_kind)
-                if not spell:
-                    continue
-                # Prüfen ob gelernt
-                exists = await db.pool().fetchrow(
-                    "SELECT 1 FROM learned_spells WHERE player_name = $1 AND spell_kind = $2",
-                    player_id, spell_kind,
-                )
-                if not exists:
-                    await websocket.send_json({"type": "toast",
-                        "text": "Diesen Zauber hast du nicht gelernt."})
-                    continue
-                # Mana-Check
-                pstate = await db.pool().fetchrow(
-                    "SELECT mana, max_mana FROM players WHERE name = $1", player_id,
-                )
-                if not pstate or pstate["mana"] < spell["mana"]:
-                    await websocket.send_json({"type": "toast", "text": "Zu wenig Mana"})
-                    continue
-                # Mana abziehen
-                new_mana = pstate["mana"] - spell["mana"]
-                await db.pool().execute(
-                    "UPDATE players SET mana = $1 WHERE name = $2", new_mana, player_id,
-                )
-                await websocket.send_json({
-                    "type": "player_mana", "mana": new_mana, "max_mana": pstate["max_mana"],
-                })
-                # Self-Effekt + Heal anwenden
-                if spell.get("heal_self", 0) > 0:
-                    await heal_player(player_id, spell["heal_self"])
-                self_eff = spell.get("self_effect")
-                if self_eff:
-                    try:
-                        await status_effects.apply("player", player_id,
-                            self_eff["effect"], self_eff["magnitude"], self_eff["duration"])
-                        effs = await status_effects.list_for_target("player", player_id)
-                        await websocket.send_json({"type": "status_effects", "effects": effs})
-                    except Exception:
-                        pass
-                await websocket.send_json({"type": "toast",
-                    "text": f"✨ {spell.get('name', spell_kind)} gewirkt"})
-                xp = await skills.gain_xp(player_id, "magic", 5 + spell["mana"] // 3)
-                if xp:
-                    await websocket.send_json({"type": "skill_xp", **xp})
-
-            elif mtype == "list_attributes":
-                attrs = await _compute_attributes(player_id)
-                await websocket.send_json({"type": "attributes_update", **attrs})
-
-            elif mtype == "character_check_name":
-                # Welle 23: Live-Check ob ein gewünschter display_name frei ist.
-                want = str(data.get("display_name", "")).strip()[:24]
-                if not want or len(want) < 3:
-                    await websocket.send_json({"type": "character_name_check",
-                        "name": want, "available": False, "reason": "zu kurz (min 3 Zeichen)"})
-                    continue
-                if not all(c.isalnum() or c in "-_ " for c in want):
-                    await websocket.send_json({"type": "character_name_check",
-                        "name": want, "available": False, "reason": "nur Buchstaben/Zahlen/-_ Leerzeichen"})
-                    continue
-                taken = await db.pool().fetchval(
-                    "SELECT 1 FROM players WHERE LOWER(display_name) = LOWER($1) "
-                    "AND name <> $2", want, player_id,
-                )
-                await websocket.send_json({
-                    "type": "character_name_check",
-                    "name": want,
-                    "available": not taken,
-                    "reason": "schon vergeben" if taken else "frei",
-                })
-
-            elif mtype == "character_create":
-                # Welle 23: Spieler wählt Preset + display_name + verteilt 20
-                # Startpunkte. Wird nur akzeptiert wenn character_created
-                # noch FALSE ist (kein erneutes Char-Creation für gleichen Account).
-                preset = str(data.get("preset", "")).strip()[:32]
-                allocated_in = data.get("allocated") or {}
-                display_name = str(data.get("display_name", "")).strip()[:24]
-                # display_name-Validation
-                if not display_name or len(display_name) < 3:
-                    await websocket.send_json({"type": "toast",
-                        "text": "Spielername muss mindestens 3 Zeichen lang sein."})
-                    continue
-                if not all(c.isalnum() or c in "-_ " for c in display_name):
-                    await websocket.send_json({"type": "toast",
-                        "text": "Spielername: nur Buchstaben/Zahlen/-_ Leerzeichen erlaubt."})
-                    continue
-                taken = await db.pool().fetchval(
-                    "SELECT 1 FROM players WHERE LOWER(display_name) = LOWER($1) "
-                    "AND name <> $2", display_name, player_id,
-                )
-                if taken:
-                    await websocket.send_json({"type": "toast",
-                        "text": f"Spielername '{display_name}' ist bereits vergeben."})
-                    continue
-                # Validate preset
-                VALID_PRESETS = {"ember_mage", "iron_delver", "knife_runner",
-                                  "shieldbearer", "wanderer_cloak", "wild_ranger"}
-                if preset not in VALID_PRESETS:
-                    await websocket.send_json({"type": "toast",
-                        "text": "Ungültige Charakter-Auswahl"})
-                    continue
-                # Validate allocated: 12 valid attrs, sum <= 20, each <= 5
-                VALID_ATTRS = {"stärke", "ausdauer", "energie", "intelligenz",
-                                "weisheit", "ausweichen", "geschick", "verteidigung",
-                                "charisma", "krit_rate", "krit_schaden", "schleichen"}
-                MAX_PER_ATTR = 10   # Welle 23: erhöht von 5 für mehr Specialization
-                MAX_TOTAL = 20
-                cleaned: dict[str, int] = {}
-                total = 0
-                for k, v in allocated_in.items():
-                    if k not in VALID_ATTRS:
-                        continue
-                    iv = max(0, min(MAX_PER_ATTR, int(v)))
-                    if iv > 0:
-                        cleaned[k] = iv
-                        total += iv
-                if total > MAX_TOTAL:
-                    await websocket.send_json({"type": "toast",
-                        "text": f"Zu viele Punkte vergeben ({total}/{MAX_TOTAL})"})
-                    continue
-                # Already created? — block re-creation
-                row = await db.pool().fetchrow(
-                    "SELECT character_created FROM players WHERE name = $1",
-                    player_id,
-                )
-                if row and row["character_created"]:
-                    await websocket.send_json({"type": "toast",
-                        "text": "Charakter ist bereits erstellt"})
-                    continue
-                # Persist preset + allocated_attrs + display_name + flag set
-                import json as _json
-                remaining_points = MAX_TOTAL - total
-                await db.pool().execute(
-                    "UPDATE players SET preset = $2, "
-                    "  allocated_attrs = $3::jsonb, "
-                    "  unspent_attr_points = $4, "
-                    "  display_name = $5, "
-                    "  character_created = TRUE "
-                    "WHERE name = $1",
-                    player_id, preset, _json.dumps(cleaned),
-                    remaining_points, display_name,
-                )
-                logging.info("Character created: %s preset=%s name=%s alloc=%s",
-                              player_id, preset, display_name, cleaned)
-                await websocket.send_json({
-                    "type": "character_created",
-                    "preset": preset,
-                    "display_name": display_name,
-                    "allocated": cleaned,
-                    "unspent": remaining_points,
-                })
-
-            elif mtype == "list_talents":
-                sk = await skills.get_skills(player_id)
-                learned = await talents.list_learned(player_id)
-                pts = await talents.get_talent_points(player_id)
-                await websocket.send_json({
-                    "type":    "talents_update",
-                    "learned": learned,
-                    "points":  pts,
-                    "tree":    talents.tree_for_ui(sk, set(l["talent_id"] for l in learned), pts),
-                })
 
             elif mtype == "list_quests":
                 qs = await quests.list_for_player(player_id)
