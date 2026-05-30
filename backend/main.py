@@ -71,6 +71,7 @@ import ws.bills  # noqa: F401 — registriert add_bill/remove_bill/list_bills
 import ws.research  # noqa: F401 — registriert invest_research
 import ws.dialog  # noqa: F401 — registriert talk_to_npc
 import ws.trade  # noqa: F401 — registriert open_trade/buy_item/sell_item
+import ws.loot  # noqa: F401 — registriert loot_vote/set_loot_rule
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
@@ -776,33 +777,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     logging.exception("dev_trigger_event fehlgeschlagen")
                     await websocket.send_json({"type": "toast",
                                                 "text": f"Fehler: {_e}"})
-                continue
-
-            if mtype == "loot_vote":
-                roll_id = int(data.get("roll_id", 0))
-                vote_kind = (data.get("vote") or "").strip().lower()
-                res = await loot_rolls.vote(roll_id, player_id, vote_kind)
-                if not res.get("ok"):
-                    await websocket.send_json({"type": "loot_vote_error",
-                                                "reason": res["reason"]})
-                continue
-
-            if mtype == "set_loot_rule":
-                rule = (data.get("rule") or "").strip().lower()
-                g = await groups.get_group_for(player_id)
-                if not g:
-                    await websocket.send_json({"type": "group_error",
-                                                "reason": "not_in_group"})
-                    continue
-                res = await groups.set_loot_rule(g["id"], player_id, rule)
-                if not res.get("ok"):
-                    await websocket.send_json({"type": "group_error",
-                                                "reason": res["reason"]})
-                    continue
-                await _broadcast_to_group(g["id"], {
-                    "type": "loot_rule_changed",
-                    "rule": res["rule"],
-                })
                 continue
 
             if mtype == "raid_trigger_manual":
