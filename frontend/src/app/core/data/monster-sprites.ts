@@ -209,6 +209,100 @@ export const MONSTER_SPRITES: Readonly<Record<string, string>> = {
   wolf_alpha:     '/assets/monsters/world_sprites/legacy_33/sprites_96/wolf_alpha_world_96.png',
   wolverine:      '/assets/monsters/world_sprites/legacy_33/sprites_96/wolverine_world_96.png',
   zombie:         '/assets/monsters/world_sprites/legacy_33/sprites_96/zombie_world_96.png',
+
+  // -- Welle render-fix (2026-05-31): Gap-Filler fuer NPC_SPRITE-Kinds ohne Mapping --
+  // Strategie: AssetLoader registriert MONSTER_SPRITES mit kind===textureKey, also
+  // wird `textureKeyFor(n.kind)` einen valide geladenen Phaser-Texture-Key liefern
+  // statt null (was zum Magenta-Fallback fuehrte).
+  //
+  // Friendly NPCs ohne Walk-Cycle (cat/dog/villager_male) -> Static aus characters/npcs/.
+  cat:                '/assets/characters/npcs/cat.png',
+  dog:                '/assets/characters/npcs/dog.png',
+  // Wald-Tiere mit Animation-Folder -> erstes idle-Frame.
+  fox:                '/assets/animations/animals/fox/south/idle_01.png',
+  rabbit:             '/assets/animations/animals/rabbit/south/idle_01.png',
+  // Schwaerme: Tiles/Effects als Fallback (keine echten Mob-Sprites).
+  frog_swarm:         '/assets/tiles/overlays/disasters/frog_plague/frog_swarm_dense_tile_01.png',
+  locust_swarm:       '/assets/animations/disasters/locust_swarm/locust_swarm_density_high_anim_01.png',
+
+  // Nutztiere — die `animations/animals/<base>/south/idle_01.png`-Files dienen als
+  // Static-Sprite. Subvarianten (Bulle/Kalb/Ferkel) teilen sich das Base-Sprite.
+  cow:                '/assets/animations/animals/cow/south/idle_01.png',
+  bull:               '/assets/animations/animals/cow/south/idle_01.png',
+  calf:               '/assets/animations/animals/cow/south/idle_01.png',
+  ox:                 '/assets/animations/animals/cow/south/idle_01.png',
+  sheep:              '/assets/animations/animals/sheep/south/idle_01.png',
+  ram:                '/assets/animations/animals/sheep/south/idle_01.png',
+  lamb:               '/assets/animations/animals/sheep/south/idle_01.png',
+  sheared_sheep:      '/assets/animations/animals/sheep/south/idle_01.png',
+  pig:                '/assets/animations/animals/pig/south/idle_01.png',
+  piglet:             '/assets/animations/animals/pig/south/idle_01.png',
+  boar_domestic:      '/assets/animations/animals/pig/south/idle_01.png',
+  goat:               '/assets/animations/animals/goat/south/idle_01.png',
+  buck_goat:          '/assets/animations/animals/goat/south/idle_01.png',
+  kid_goat:           '/assets/animations/animals/goat/south/idle_01.png',
+  horse:              '/assets/animations/animals/horse/south/idle_01.png',
+  draft_horse:        '/assets/animations/animals/horse/south/idle_01.png',
+  foal:               '/assets/animations/animals/horse/south/idle_01.png',
+  donkey:             '/assets/animations/animals/horse/south/idle_01.png',
+  mule:               '/assets/animations/animals/horse/south/idle_01.png',
+  // Gefluegel
+  chicken_hen:        '/assets/animations/animals/chicken_hen/south/idle_01.png',
+  rooster:            '/assets/animations/animals/rooster/south/idle_01.png',
+  chick:              '/assets/animations/animals/chicken_hen/south/idle_01.png',
+  duck:               '/assets/animations/animals/duck/south/idle_01.png',
+  drake:              '/assets/animations/animals/duck/south/idle_01.png',
+  duckling:           '/assets/animations/animals/duck/south/idle_01.png',
+  goose:              '/assets/animations/animals/goose/south/idle_01.png',
+  gander:             '/assets/animations/animals/goose/south/idle_01.png',
+  gosling:            '/assets/animations/animals/goose/south/idle_01.png',
+
+  // Karawanen-Wagen (NPC-Kinds) — Static aus props/transport/.
+  farm_cart_hay:        '/assets/props/transport/farm_cart_hay.png',
+  handcart_empty:       '/assets/props/transport/handcart_empty.png',
+  horse_cart_single:    '/assets/props/transport/horse_cart_single.png',
+  market_wagon_covered: '/assets/props/transport/market_wagon_covered.png',
+
+  // Welle-13-Monster ohne eigenes Sprite -> semantisch naechster creature_*-Match
+  // bzw. legacy-Bear/Wolf-Fallback fuer Big-Game ohne Asset.
+  giant_spider:   '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chittering_spider_nest_world_128.png',
+  bone_crawler:   '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_bone_skirmisher_world_128.png',
+  necromancer:    '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_lich_archivist_world_128.png',
+  ogre:           '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_orgrim_basher_world_128.png',
+  minotaur:       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_iron_horn_aurochs_world_128.png',
+  manticore:      '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_red_world_128.png',
+  griffin:        '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_shrike_falcon_world_128.png',
+  harpy:          '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_shrike_falcon_world_128.png',
+  hydra:          '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_marsh_naga_world_128.png',
+  chimera:        '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_red_world_128.png',
+  basilisk:       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_wyrmling_basilisk_world_128.png',
+  gargoyle:       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_iron_sentinel_world_128.png',
+  stone_golem:    '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_stone_elemental_lumbering_world_128.png',
+  crystal_golem:  '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_grindstone_golem_world_128.png',
+  dragon_whelp:   '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_dragon_whelp_world_128.png',
+  thornling:      '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_briar_imp_world_128.png',
+  treant:         '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_treant_warden_world_128.png',
+
+  // Welle-14-Slugs (CREATURE_KINDS) — Assets nach Cleanup nicht mehr da, daher
+  // generischer Bear/Wolf-Fallback aus legacy_33. Pragmatisch: kein Magenta mehr,
+  // alle sehen halt aus wie generische Pelztiere. Bei Asset-Re-Drop tauschen.
+  razorback_vermin:        '/assets/monsters/world_sprites/legacy_33/sprites_96/boar_world_96.png',
+  spined_abyss_larva:      '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_burrow_grub_world_128.png',
+  reed_walker:             '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_mire_drowner_world_128.png',
+  redland_scavenger:       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_normal_hyena_world_128.png',
+  mossback_warden:         '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_treant_warden_world_128.png',
+  grave_wraith:            '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_wailing_specter_world_128.png',
+  serpent_oracle:          '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_marsh_naga_world_128.png',
+  urtikus_eye_fiend:       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_thing_in_the_well_world_128.png',
+  mantis_chimera:          '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_giant_centipede_world_128.png',
+  iron_spider:             '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chittering_spider_nest_world_128.png',
+  dendroid_guardian:       '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_treant_warden_world_128.png',
+  blood_antler_drake:      '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_chromatic_drake_red_world_128.png',
+  kaiju_thornback:         '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_thornmaw_world_128.png',
+  void_eye_brute:          '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_choir_of_mouths_world_128.png',
+  frost_rune_boar_prime:   '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_silverback_boar_world_128.png',
+  magma_shell_devourer:    '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_fire_elemental_lord_world_128.png',
+  rockshell_colossus:      '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_stone_elemental_lumbering_world_128.png',
 };
 
 /** Monster-Kind -> West-gespiegeltes 128px-Sprite (nur creature_ und overworld_ Praefixe). */
