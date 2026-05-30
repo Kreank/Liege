@@ -13,10 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Quests-Panel (aktive Quests, Lore-Quests, Accept/Turn-in).
-  //          Legacy `toggleQuests`, `renderQuests`.
-  'quests',
-
   // TODO F5+: Faktionen-Panel (Rep-Bars, Standing-Labels).
   //          Legacy `toggleFactions`, `renderFactions`.
   'factions',

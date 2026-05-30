@@ -1,0 +1,72 @@
+/* Quests-Panel. Übernommen aus `frontend/legacy/style.css` Z. 543-573. */
+
+:host {
+  display: contents;
+  font-family: monospace;
+}
+
+.quests-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.quests-box {
+  width: 90%; max-width: 540px;
+  background: rgba(20,18,14,0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a; font-size: 12px;
+  max-height: 84vh;
+  display: flex; flex-direction: column;
+}
+
+.quests-header {
+  padding: 10px 14px; background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid #555;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #e8d870; font-weight: bold;
+}
+
+.quests-close {
+  background: none; border: 1px solid #555;
+  color: #c8b88a; padding: 3px 10px;
+  cursor: pointer; font-family: monospace;
+}
+
+.quests-list { padding: 8px 14px; overflow-y: auto; }
+.quests-empty { color: #888; font-style: italic; padding: 14px; text-align: center; }
+
+.quest-row {
+  padding: 8px 6px;
+  border-bottom: 1px dashed #443a20;
+  cursor: pointer;
+}
+.quest-row:hover { background: rgba(60,50,30,0.25); }
+.quest-row.completed { background: rgba(30,60,30,0.25); }
+.quest-row.failed { background: rgba(80,30,30,0.25); }
+.quest-row.available { background: rgba(60,50,20,0.25); }
+
+.quest-title { color: #e8d870; font-weight: bold; }
+.quest-main-tag {
+  color: #ffd060; font-size: 10px;
+  border: 1px solid #c8a868;
+  padding: 0 4px; margin-right: 4px;
+  border-radius: 2px;
+}
+.quest-state { color: #888; font-size: 10px; margin-left: 6px; }
+.quest-desc { font-size: 11px; color: #b09870; margin: 4px 0; }
+.quest-objective { font-size: 11px; color: #b8b890; margin: 2px 0; }
+.quest-objective.done { color: #80c080; text-decoration: line-through; }
+.quest-reward { font-size: 11px; color: #80c0a0; margin: 4px 0; }
+
+.quest-actions { display: flex; gap: 6px; margin-top: 4px; }
+.quest-btn {
+  border: 1px solid #50a050; color: #fff;
+  cursor: pointer; padding: 4px 10px;
+  border-radius: 3px; font-size: 11px;
+  font-family: monospace;
+}
+.quest-accept  { background: #305030; }
+.quest-claim   { background: #205020; }
+.quest-turnin  { background: #503020; border-color: #c08040; }
+.quest-btn:hover { filter: brightness(1.2); }

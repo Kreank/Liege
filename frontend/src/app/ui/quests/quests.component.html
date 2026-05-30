@@ -1,0 +1,66 @@
+@if (visible()) {
+  <div class="quests-overlay" (click)="close()">
+    <div class="quests-box" (click)="$event.stopPropagation()">
+      <div class="quests-header">
+        <span>📜 Quests</span>
+        <button type="button" class="quests-close" (click)="close()">Q / Esc</button>
+      </div>
+      <div class="quests-list">
+        @if (quests().length === 0) {
+          <div class="quests-empty">Keine Quests aktiv.</div>
+        }
+        @for (q of quests(); track q.quest_id) {
+          <div
+            class="quest-row"
+            [class.completed]="q.state === 'completed'"
+            [class.failed]="q.state === 'failed'"
+            [class.available]="q.state === 'available'"
+            (click)="toggle(q)"
+          >
+            <div class="quest-title">
+              @if (q.is_main) { <span class="quest-main-tag">[Haupt]</span> }
+              {{ q.title }}
+              <span class="quest-state">[{{ q.state }}]</span>
+            </div>
+            @if (expandedId() === q.quest_id) {
+              @if (q.description) {
+                <div class="quest-desc">{{ q.description }}</div>
+              }
+              @for (o of q.objectives; track $index) {
+                <div class="quest-objective" [class.done]="o.done">
+                  • {{ o.kind }}{{ o.target ? ' — ' + o.target : '' }}: {{ o.progress }}/{{ o.required }}
+                </div>
+              }
+              @if (q.rewards) {
+                <div class="quest-reward">
+                  Belohnung:
+                  @for (r of rewardEntries(q); track r.key) {
+                    <span>{{ r.key }}: {{ r.value }}{{ $last ? '' : ', ' }}</span>
+                  }
+                </div>
+              }
+              <div class="quest-actions">
+                @if (q.state === 'available' && (q.template_id || q.giver_npc_id !== undefined)) {
+                  <button type="button" class="quest-btn quest-accept" (click)="accept(q, $event)">
+                    Annehmen
+                  </button>
+                }
+                @if (q.state === 'completed') {
+                  @if (q.giver_npc_id !== undefined) {
+                    <button type="button" class="quest-btn quest-turnin" (click)="turnIn(q, $event)">
+                      Beim NPC abgeben
+                    </button>
+                  } @else {
+                    <button type="button" class="quest-btn quest-claim" (click)="claim(q, $event)">
+                      Belohnung abholen
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
