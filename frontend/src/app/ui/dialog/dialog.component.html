@@ -5,16 +5,66 @@
         <span><span class="dialog-npc-name">{{ d.npc_name }}</span><span class="dialog-npc-kind"> — {{ d.npc_kind }}</span></span>
         <button type="button" class="dialog-close" (click)="close()">Esc</button>
       </div>
-      <div class="dialog-npc-bg">{{ d.backstory }}</div>
+      @if (d.backstory) {
+        <div class="dialog-npc-bg">{{ d.backstory }}</div>
+      }
       <div class="dialog-history">
+        @if (d.history.length === 0) {
+          <div class="dialog-empty">
+            Schreibe unten etwas, um den NPC anzusprechen.
+            Oder frage nach Aufträgen (📜).
+          </div>
+        }
         @for (b of d.history; track $index) {
           <div class="bubble" [class.user]="b.side === 'user'" [class.npc]="b.side === 'npc'" [class.typing]="b.typing">
             {{ b.text }}
           </div>
         }
       </div>
+      @if (questStatus(); as qs) {
+        @if (qs.offers.length > 0 || qs.turnins.length > 0) {
+          <div class="dialog-quests">
+            @if (qs.offers.length > 0) {
+              <div class="dialog-quests-section">
+                <div class="dialog-quests-title">📜 Verfügbare Aufträge</div>
+                @for (o of qs.offers; track o.template_id) {
+                  <div class="dialog-quest-row">
+                    <div class="dialog-quest-info">
+                      <div class="dialog-quest-name">
+                        @if (o.tier) { <span class="dialog-quest-tier">T{{ o.tier }}</span> }
+                        {{ o.title }}
+                      </div>
+                      @if (o.description) {
+                        <div class="dialog-quest-desc">{{ o.description }}</div>
+                      }
+                    </div>
+                    <button type="button" class="dialog-quest-btn-mini" (click)="acceptOffer(o.template_id)">
+                      Annehmen
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            @if (qs.turnins.length > 0) {
+              <div class="dialog-quests-section">
+                <div class="dialog-quests-title">✓ Abgabebereit</div>
+                @for (t of qs.turnins; track t.quest_id) {
+                  <div class="dialog-quest-row">
+                    <div class="dialog-quest-info">
+                      <div class="dialog-quest-name">{{ t.title }}</div>
+                    </div>
+                    <button type="button" class="dialog-quest-btn-mini turnin" (click)="turnIn(t.quest_id)">
+                      Abgeben
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
       <div class="dialog-actions-row">
-        <button type="button" class="dialog-quest-btn" (click)="askQuest()">📜 Auftrag (zufällig)</button>
+        <button type="button" class="dialog-quest-btn" (click)="askQuest()">📜 Nach Aufträgen fragen</button>
       </div>
       <div class="dialog-input-row">
         <input class="dialog-input" type="text" maxlength="500"

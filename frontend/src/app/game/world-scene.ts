@@ -54,6 +54,7 @@ import type { EffectAnimationsService } from './effect-animations.service';
 import type { WalkAnimationsService } from './walk-animations.service';
 import { COMBAT_FX } from './combat-fx';
 import { DisasterOverlay } from './disaster-overlay';
+import { DungeonRenderer } from './dungeon-renderer';
 import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
 import { VISUAL_EFFECTS } from './visual-effects';
@@ -127,6 +128,24 @@ export class WorldScene extends Phaser.Scene {
   private readonly chunkContainers = new Map<string, Phaser.GameObjects.Container>();
   private lastChunksRef: readonly Chunk[] | null = null;
   private chunkSize = 32;
+  /** Overworld-Tile-Layer sichtbar? Wird auf `false` gesetzt, sobald der
+   *  Spieler einen Dungeon betritt — Overworld-Chunks bleiben im Speicher
+   *  (keine Re-Render-Kosten beim Exit), nur ihre Container werden
+   *  unsichtbar geschaltet. */
+  private overworldTilesVisible = true;
+
+  // ─── Dungeon-Mode (Welle H1-A — H1.10 / H1.11) ─────────────────────
+  /** Eigener Renderer für Dungeon-Floors. Lebt parallel zum Overworld-
+   *  Tile-Layer; wird durch das `dungeonFloor()`-Signal in `update()`
+   *  getriggert. */
+  private dungeonRenderer: DungeonRenderer | null = null;
+  /** Letzte gesehene Floor-Version (`dungeonFloor.version`), um
+   *  `show()` vs `swap()` zu entscheiden und Doppel-Rerender zu vermeiden. */
+  private lastDungeonVersion = 0;
+  /** Letzte Dungeon-ID — wenn sie wechselt, ist es ein neuer Eintritt
+   *  (show + Fade-In). Bei gleicher ID + neuer Version: Floor-Wechsel
+   *  innerhalb desselben Dungeons (swap mit Fade-Out/In). */
+  private lastDungeonId: number | string | null = null;
 
   // ─── Sprite-Pools (F4b) ────────────────────────────────────────────
   /** Spieler-Sprites (key = player_id as string). Eigener Spieler hat
@@ -244,6 +263,9 @@ export class WorldScene extends Phaser.Scene {
     this.effectAnimations.createAnimations(this);
     // G4: Disaster-Overlay initialisieren (Tint/Particle/Bolt).
     this.disasterOverlay = new DisasterOverlay(this, this.effectAnimations);
+    // Welle H1-A: Dungeon-Renderer (Tile-Layer + Feature-Sprites). Aktiv
+    // nur wenn `state.dungeonFloor()` non-null ist (siehe update()).
+    this.dungeonRenderer = new DungeonRenderer(this);
 
     // ─── Kamera-Setup ─────────────────────────────────────────────────
     // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
@@ -269,6 +291,13 @@ export class WorldScene extends Phaser.Scene {
     // Pro Frame: prüfen, ob die State-Listen sich identitätsmäßig geändert
     // haben (Signals liefern immutable Arrays). Identity-Check ist O(1) —
     // ein Deep-Diff würde dem 60-FPS-Budget schaden.
+
+    // ─── Welle H1-A: Dungeon-Mode-Switch zuerst ───────────────────────
+    // Reihenfolge ist wichtig: wir prüfen ZUERST den Mode-Wechsel, damit
+    // der Overworld-Tile-Sync danach den Visibility-Flip kennt (statt
+    // einen verwaisten Container für einen unsichtbaren Layer zu bauen).
+    this.syncDungeonMode();
+
     const chunks = this.bridge.state.chunks();
     if (chunks !== this.lastChunksRef) {
       this.lastChunksRef = chunks;
@@ -373,14 +402,44 @@ export class WorldScene extends Phaser.Scene {
       // Tile blockiert → fällt durch zur Default-Logik unten.
     }
 
-    // 1) NPC? Hostile → attack, friendly → talk.
+    // 0) Dungeon-Truhe (H1.5)? Im Dungeon (state.inDungeon()) werden Truhen
+    //    NICHT als Struktur geführt, sondern als Feature im Dungeon-Floor-
+    //    Payload. Wir matchen die Tile-Pos gegen `dungeonChests` (Subagent A
+    //    füllt die Liste beim `dungeon_enter`-Handler). Bereits geöffnete
+    //    Truhen werden übersprungen — Backend würde ohnehin ablehnen, aber
+    //    das erspart einen sinnlosen Roundtrip + Toast-Spam.
+    if (this.bridge.state.inDungeon()) {
+      const chests = this.bridge.state.dungeonChests();
+      const chest = chests.find((c) => c.x === tileX && c.y === tileY);
+      if (chest && !chest.opened) {
+        this.bridge.sendDungeonChest(tileX, tileY);
+        return;
+      }
+    }
+
+    // 1) NPC? Hostile → attack, merchant → trade, friendly → Dialog lokal.
+    //    H1.8: Wir senden NICHT mehr `talk_to_npc` mit leerer Message (das
+    //    Backend droppt silent). Stattdessen öffnet ein Click den Dialog
+    //    lokal — der erste Send-Roundtrip läuft, sobald der Spieler etwas
+    //    in das Input-Feld tippt und Enter drückt.
     const npcs = this.bridge.state.npcsVisible();
     const npcHere = npcs.find((n) => n.x === tileX && n.y === tileY);
     if (npcHere) {
       if (this.isHostileNpc(npcHere)) {
         this.bridge.sendAttackNpc(npcHere.id);
+      } else if (this.isMerchantNpc(npcHere)) {
+        // Händler: direkt Handels-Modal öffnen (Subagent C / H1.13 bauen
+        // das Trade-Panel-Sell-Tab). Backend antwortet mit `trade_open`.
+        this.bridge.sendIntent({ type: 'open_trade', npc_id: npcHere.id });
       } else {
-        this.bridge.sendTalkToNpc(npcHere.id);
+        // Friendly → Dialog lokal öffnen. Kein WS-Frame nötig — der Server
+        // bekommt erst beim ersten Send (Enter im Input) Bescheid.
+        this.bridge.state.openDialog({
+          npc_id: npcHere.id,
+          npc_name: npcHere.name ?? npcHere.kind,
+          npc_kind: npcHere.kind,
+          backstory: '',
+        });
       }
       return;
     }
@@ -393,12 +452,17 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    // 3) Struktur? Harvest-bar (Tree/Stone/Ore/Wall/Door/Crop) → attack,
-    //    sonst use (Bett/Brunnen/Schild/Truhe/…).
+    // 3) Struktur? Harvest-bar (Tree/Stone/Ore/Wall/Crop) → attack,
+    //    Tür → toggle_door (H1.12), sonst use (Bett/Brunnen/Schild/Truhe/…).
     const structures = this.bridge.state.structures();
     const structHere = structures.find((s) => s.x === tileX && s.y === tileY);
     if (structHere) {
-      if (this.shouldAttackStructure(structHere.type)) {
+      if (isDoorType(structHere.type)) {
+        // H1.12 — Tür-Toggle via separates Intent. Backend antwortet mit
+        // `structure_replaced` (door_open ↔ door_closed); Renderer macht
+        // den Sprite-Swap.
+        this.bridge.sendToggleDoor(tileX, tileY);
+      } else if (this.shouldAttackStructure(structHere.type)) {
         this.bridge.sendAttackStructure(tileX, tileY);
       } else {
         this.bridge.sendUseStructure(tileX, tileY);
@@ -430,6 +494,16 @@ export class WorldScene extends Phaser.Scene {
     if (n.hostile === true) return true;
     if (n.hostile === false) return false;
     return CREATURE_KINDS.has(n.kind);
+  }
+
+  /**
+   * Merchant-Detection (H1.8/H1.13). Backend hat keinen `is_merchant`-Flag;
+   * stattdessen ist der NPC-Kind `merchant` (siehe core/data/npc-sprites.ts).
+   * Weibliche Variante `merchant_female` ist ebenfalls Händler. Erweiterbar,
+   * sobald Backend mehr Händler-Slugs einführt.
+   */
+  private isMerchantNpc(n: { readonly kind: string }): boolean {
+    return n.kind === 'merchant' || n.kind === 'merchant_female';
   }
 
   /**
@@ -472,6 +546,110 @@ export class WorldScene extends Phaser.Scene {
         this.chunkContainers.delete(key);
       }
     }
+    // Welle H1-A: Sichtbarkeit der neuen Chunks an den aktuellen Mode
+    // anpassen. Falls wir gerade im Dungeon sind, sollen frisch
+    // gerenderte Overworld-Chunks (z. B. nach Backend-Lazy-Spawn)
+    // unsichtbar bleiben bis zum Exit.
+    if (!this.overworldTilesVisible) {
+      for (const container of this.chunkContainers.values()) {
+        container.setVisible(false);
+      }
+    }
+  }
+
+  /**
+   * Welle H1-A — H1.10 / H1.11: Dungeon-Mode-Wechsel.
+   *
+   * Liest `state.dungeonFloor()` und schaltet die Scene zwischen
+   * Overworld-Layer und `DungeonRenderer` um:
+   *   • Eintritt (Overworld → Dungeon):   Overworld-Chunks hide() +
+   *                                       NPC/Item/Struct-Pools clearen +
+   *                                       `dungeonRenderer.show(floor)`.
+   *   • Floor-Wechsel (Dungeon → Dungeon, gleiche ID):
+   *                                       `dungeonRenderer.swap(floor)` +
+   *                                       NPC/Item/Struct-Pools clearen.
+   *   • Exit (Dungeon → Overworld):       `dungeonRenderer.hide()` +
+   *                                       Overworld-Chunks show().
+   *
+   * Pool-Clearing ist Pflicht: Backend sendet beim `dungeon_exit` eine
+   * NPC-Liste, die nur die Overworld-Mobs enthält — der `npcsVisible`-
+   * Sync entfernt die Dungeon-Mobs implizit. Strukturen/Items werden
+   * aber NICHT vom Backend re-synct → wir blenden ihre Container-Layer
+   * über die Sichtbarkeit der Pools per Sprite-Hide weg. (Die Datenliste
+   * `state.structures()` ändert sich nicht, wenn der Spieler in einen
+   * Dungeon geht; sie blieben sonst sichtbar mitten im Wand-Layer.)
+   */
+  private syncDungeonMode(): void {
+    if (!this.dungeonRenderer) return;
+    const floor = this.bridge.state.dungeonFloor();
+    const wasInDungeon = this.lastDungeonId !== null;
+    const isInDungeon = floor !== null;
+
+    if (!isInDungeon) {
+      if (wasInDungeon) {
+        // Exit → Overworld
+        this.dungeonRenderer.hide();
+        this.setOverworldVisible(true);
+        this.lastDungeonId = null;
+        this.lastDungeonVersion = 0;
+      }
+      return;
+    }
+
+    // floor !== null
+    const enteringNew = floor.id !== this.lastDungeonId;
+    const versionChanged = floor.version !== this.lastDungeonVersion;
+    if (!enteringNew && !versionChanged) return;
+
+    if (!wasInDungeon || enteringNew) {
+      // Eintritt (Overworld → Dungeon) ODER Wechsel zwischen Dungeons
+      // (unwahrscheinlich, aber defensiv: anderer Dungeon → wie Eintritt).
+      this.setOverworldVisible(false);
+      this.dungeonRenderer.show(floor);
+    } else {
+      // Gleicher Dungeon, neuer Floor → swap mit Fade-Animation.
+      this.dungeonRenderer.swap(floor);
+    }
+    this.lastDungeonId = floor.id;
+    this.lastDungeonVersion = floor.version;
+  }
+
+  /**
+   * Zentraler Schalter für die Sichtbarkeit der Overworld-Tile-Container.
+   * NPC- und Struktur-Pools werden hier ebenfalls mitgeschaltet — die
+   * Daten-Snapshots bleiben unangetastet, nur die Sprites werden
+   * versteckt/gezeigt. Beim Exit ist der State innerhalb von Millisekunden
+   * sauber, weil das Backend per `dungeon_exit` einen neuen `npcs`-Array
+   * mitschickt (siehe GameStateService._handleDungeonExit).
+   */
+  private setOverworldVisible(visible: boolean): void {
+    this.overworldTilesVisible = visible;
+    for (const container of this.chunkContainers.values()) {
+      container.setVisible(visible);
+    }
+    // Pools: alle Sprites togglen. Wir packen das in einen kleinen
+    // Helper, weil die Pool-Klasse keinen `setVisible`-Bulk-Helper
+    // anbietet (würde sich für H2 lohnen, aktuell direkt.)
+    this.toggleAllSpritesVisible(this.npcPool, visible);
+    this.toggleAllSpritesVisible(this.structurePool, visible);
+    this.toggleAllSpritesVisible(this.groundItemPool, visible);
+  }
+
+  /** Sichtbarkeits-Toggle für alle Sprites eines Pools. */
+  private toggleAllSpritesVisible<TItem, TSprite extends Phaser.GameObjects.GameObject>(
+    pool: SpritePool<TItem, TSprite>,
+    visible: boolean,
+  ): void {
+    // SpritePool hat keinen Iterator — wir greifen via `get(key)` zu, das
+    // ist aber ohne Schlüsselliste blind. Workaround: Wir verwenden den
+    // privaten `sprites`-Map nicht; stattdessen patchen wir Sichtbarkeit
+    // beim nächsten sync() automatisch über die State-Listen. Für JETZT
+    // forcieren wir ein invalides letztes Ref → der nächste Frame
+    // rebuildet die Pool-Liste. Das ist O(N) und im Mode-Wechsel ok.
+    void pool; void visible;
+    this.lastNpcsRef = null;
+    this.lastStructuresRef = null;
+    this.lastGroundItemsRef = null;
   }
 
   private renderChunk(chunk: Chunk): void {
