@@ -13,10 +13,6 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Downed-Overlay (Respawn-Button, Countdown).
-  //          Legacy `_showDownedOverlay`, `forceRespawn`.
-  'downed-overlay',
-
   // TODO F5+: Dialog-Panel (NPC-Talk Input + Antworten + Quest-Button).
   //          Legacy `openDialog`, `sendDialog`, `closeDialog`.
   'dialog',

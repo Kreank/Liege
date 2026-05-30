@@ -1,0 +1,12 @@
+@if (visible()) {
+  <div class="downed-overlay">
+    <div class="downed-box">
+      <div class="downed-title">💀 Du bist gefallen</div>
+      <div class="downed-sub">Ein Heiler kann dich wiederbeleben — oder du respawnst sofort.</div>
+      <div class="downed-timer">{{ remainingLabel() }}</div>
+      <button type="button" class="downed-respawn-btn" (click)="forceRespawn()">
+        ⮕ Sofort respawnen
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,67 @@
+/* Übernommen aus legacy/style.css Z. 267-293 (Welle 25 Down-Overlay). */
+
+:host { display: contents; }
+
+.downed-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  background: radial-gradient(
+    circle,
+    rgba(40, 0, 0, 0.55) 30%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  align-items: center;
+  justify-content: center;
+}
+
+.downed-box {
+  width: min(380px, 90vw);
+  padding: 24px 28px;
+  background: rgba(15, 5, 8, 0.95);
+  border: 2px solid #a04040;
+  border-radius: 8px;
+  text-align: center;
+  color: #ffd0c0;
+  font-family: monospace;
+  box-shadow: 0 0 32px rgba(160, 40, 40, 0.6);
+}
+
+.downed-title {
+  font-size: 22px;
+  color: #ff8080;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.downed-sub {
+  font-size: 12px;
+  color: #c0a0a0;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.downed-timer {
+  font-size: 36px;
+  font-weight: bold;
+  color: #ffc0a0;
+  margin: 8px 0 16px;
+  font-family: monospace;
+}
+
+.downed-respawn-btn {
+  background: #803020;
+  color: #fff;
+  border: 1px solid #c04040;
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: monospace;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.downed-respawn-btn:hover {
+  background: #a04030;
+  box-shadow: 0 0 12px rgba(255, 80, 80, 0.5);
+}

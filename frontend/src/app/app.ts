@@ -15,6 +15,7 @@ import { PhaserGameComponent } from './game/phaser-game.component';
 import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
 import { ChatComponent } from './ui/chat/chat.component';
+import { DownedOverlayComponent } from './ui/downed-overlay/downed-overlay.component';
 import { GroupInviteComponent } from './ui/group-invite/group-invite.component';
 import { HotbarComponent } from './ui/hotbar/hotbar.component';
 import { HudComponent } from './ui/hud/hud.component';
@@ -48,6 +49,7 @@ import { TalentsComponent } from './ui/talents/talents.component';
     SpellbookComponent,
     CastBarComponent,
     ChatComponent,
+    DownedOverlayComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

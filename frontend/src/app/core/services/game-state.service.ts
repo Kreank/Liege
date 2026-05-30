@@ -114,6 +114,12 @@ export class GameStateService {
   readonly events = signal<readonly WorldEvent[]>([]);
   readonly players = signal<Readonly<Record<string, OnlinePlayer>>>({});
 
+  // ─── Downed-State (F15) ──────────────────────────────────────────────
+  /** Wenn der Spieler im Down-State ist, der absolute ms-Zeitstempel, ab dem
+   *  er sich auto-respawnen kann. Wird auf `player_downed` gesetzt, auf
+   *  `player_respawned` geleert. */
+  readonly downedExpiresAt = signal<number | null>(null);
+
   // ─── Chat (F14) ──────────────────────────────────────────────────────
   readonly chatLog = signal<readonly {
     readonly id: number;
@@ -158,7 +164,7 @@ export class GameStateService {
       case 'player_healed':        this._patchPlayer({ hp: msg['hp'] as number, max_hp: msg['max_hp'] as number }); break;
       case 'player_mana':          this._patchPlayer({ mana: msg['mana'] as number, max_mana: msg['max_mana'] as number }); break;
       case 'player_needs':         this._handlePlayerNeeds(msg); break;
-      case 'player_downed':        this._patchPlayer({ is_downed: true }); break;
+      case 'player_downed':        this._handlePlayerDowned(msg); break;
       case 'player_respawned':     this._handlePlayerRespawned(msg); break;
       case 'player_died':          /* nur Toast — kein Self-State */ break;
       case 'player_downed_visible':
@@ -416,6 +422,13 @@ export class GameStateService {
       y: msg['y'] as number,
       is_downed: false,
     });
+    this.downedExpiresAt.set(null);
+  }
+
+  private _handlePlayerDowned(msg: GenericMsg): void {
+    this._patchPlayer({ is_downed: true });
+    const dur = (msg['duration_s'] as number | undefined) ?? 30;
+    this.downedExpiresAt.set(Date.now() + dur * 1000);
   }
 
   private _handleBodyPartDamaged(msg: GenericMsg): void {
