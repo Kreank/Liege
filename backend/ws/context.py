@@ -33,3 +33,4 @@ class WsContext:
     npcs: NPCManager
     items: ItemManager
     events: EventManager
+    user: dict | None = None  # auth-User-Dict (role etc.) — Dev/Admin-Gates

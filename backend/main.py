@@ -72,6 +72,7 @@ import ws.research  # noqa: F401 — registriert invest_research
 import ws.dialog  # noqa: F401 — registriert talk_to_npc
 import ws.trade  # noqa: F401 — registriert open_trade/buy_item/sell_item
 import ws.loot  # noqa: F401 — registriert loot_vote/set_loot_rule
+import ws.raid  # noqa: F401 — registriert raid_trigger_manual/dev_*/force_respawn
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
 
@@ -515,6 +516,7 @@ async def websocket_endpoint(websocket: WebSocket):
         npcs=npcs,
         items=items,
         events=events,
+        user=user,
     )
 
     try:
@@ -743,75 +745,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     "to_kind": res["to_kind"],
                 })
                 await _push_group_state_to_all_members(g["id"])
-                continue
-
-            if mtype == "dev_world_repopulate":
-                # Admin-only: setzt populated=false für leere Chunks, löscht
-                # System-Strukturen darin. Beim nächsten Betreten neu gespawnt.
-                if user.get("role") != "admin":
-                    await websocket.send_json({"type": "toast",
-                                                "text": "⛔ Admin only"})
-                    continue
-                import world_populator as _wp
-                count = await _wp.reset_chunks_without_player_structures(world)
-                await websocket.send_json({"type": "toast",
-                                            "text": f"♻️ {count} Chunks zurückgesetzt"})
-                continue
-
-            if mtype == "dev_trigger_event":
-                # Admin-only: feuert sofort einen Event-Effekt (zum Testen von
-                # Disastern etc.). data.effect = z.B. "thunderstorm", "toxic_fog".
-                if user.get("role") != "admin":
-                    await websocket.send_json({"type": "toast", "text": "⛔ Admin only"})
-                    continue
-                eff = (data.get("effect") or "").strip()
-                if not eff:
-                    await websocket.send_json({"type": "toast", "text": "effect fehlt"})
-                    continue
-                try:
-                    await event_worker._apply_event_effect(
-                        {"effect": eff}, {}, world, npcs, structures, manager)
-                    await websocket.send_json({"type": "toast",
-                                                "text": f"🧪 Event ausgelöst: {eff}"})
-                except Exception as _e:
-                    logging.exception("dev_trigger_event fehlgeschlagen")
-                    await websocket.send_json({"type": "toast",
-                                                "text": f"Fehler: {_e}"})
-                continue
-
-            if mtype == "raid_trigger_manual":
-                tier = int(data.get("tier", 1))
-                g = await groups.get_group_for(player_id)
-                if not g:
-                    await websocket.send_json({"type": "group_error",
-                                                "reason": "not_in_group"})
-                    continue
-                # Nur Leader darf manuelle Raids triggern
-                if g["leader"] != player_id:
-                    await websocket.send_json({"type": "group_error",
-                                                "reason": "leader_only"})
-                    continue
-                res = await raid_director.trigger_manual_raid(
-                    player_id, tier, world, npcs, manager, events,
-                )
-                if not res.get("ok"):
-                    await websocket.send_json({"type": "raid_error",
-                                                "reason": res["reason"],
-                                                "remaining_s": res.get("remaining_s", 0)})
-                    continue
-                await _broadcast_to_group(g["id"], {
-                    "type": "raid_started",
-                    "tier": res["tier"],
-                    "label": res["label"],
-                    "spawned": res["spawned"],
-                    "by": player_id,
-                })
-                continue
-
-            # Welle 25: force_respawn — Sofort-Respawn aus dem Down-State
-            if mtype == "force_respawn":
-                if is_downed(player_id):
-                    await _do_respawn(player_id, in_place=False)
                 continue
 
             if mtype == "wake":
