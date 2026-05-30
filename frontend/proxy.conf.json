@@ -1,0 +1,38 @@
+{
+  "/ws": {
+    "target": "http://localhost:8000",
+    "ws": true,
+    "secure": false,
+    "logLevel": "warn"
+  },
+  "/auth": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "logLevel": "warn"
+  },
+  "/admin": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "logLevel": "warn"
+  },
+  "/login": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "logLevel": "warn"
+  },
+  "/assets": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "logLevel": "warn"
+  },
+  "/manifest.webmanifest": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "logLevel": "warn"
+  },
+  "/ngsw-worker.js": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "logLevel": "warn"
+  }
+}
