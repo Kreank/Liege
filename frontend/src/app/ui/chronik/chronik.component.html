@@ -1,0 +1,34 @@
+@if (visible()) {
+  <div class="chronik-overlay" (click)="close()">
+    <div class="chronik-box" (click)="$event.stopPropagation()">
+      <div class="chronik-header">
+        <span>📖 Welt-Chronik</span>
+        <button type="button" class="chronik-close" (click)="close()">J / Esc</button>
+      </div>
+      <div class="chronik-list">
+        @if (rows().length === 0) {
+          <div class="chronik-empty">
+            Noch keine Welt-Ereignisse aufgezeichnet.<br>
+            Hier erscheinen Storyteller-Lore, Raid-Wellen und Katastrophen,
+            sobald sie passieren.
+          </div>
+        }
+        @for (row of rows(); track row.id) {
+          <div class="chronik-row" [class.minor]="row.severityClass === 'minor'"
+                                  [class.major]="row.severityClass === 'major'">
+            <div class="chronik-icon">{{ row.icon }}</div>
+            <div class="chronik-body">
+              <div class="chronik-title">{{ row.title }}</div>
+              @if (row.description) {
+                <div class="chronik-desc">{{ row.description }}</div>
+              }
+              @if (row.ts) {
+                <div class="chronik-ts">{{ row.ts }}</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
