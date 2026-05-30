@@ -43,6 +43,13 @@ import {
 import type { WalkAnimationsService } from './walk-animations.service';
 import { setupInput } from './input';
 import { SpritePool } from './sprite-pools';
+import {
+  buildStructureLookup,
+  familyOf,
+  wallMaskFor,
+  wallSpriteKeyFor,
+  type WallFamily,
+} from './wall-tiler';
 
 /** Init-Daten, die `PhaserGameComponent` per `scene.start('WorldScene',{...})` durchreicht. */
 export interface WorldSceneInitData {
@@ -125,6 +132,9 @@ export class WorldScene extends Phaser.Scene {
   private readonly npcTracks = new Map<string | number, MoveTrack>();
   /** Pro Player-Key: letzte Position + Direction + Frame-Stamp. */
   private readonly playerTracks = new Map<string | number, MoveTrack>();
+  /** Strukturen-Lookup (x,y) -> Structure, fuer Wall-Auto-Tiling. Wird jeden
+   *  Sync neu gebaut — das ist O(N), unkritisch bei <500 sichtbaren Strukturen. */
+  private structureLookup: (x: number, y: number) => Structure | null = () => null;
 
   // ─── Kamera-Follow + Local Sprint-State (F4c) ────────────────────────
   /** Letzte Spieler-Tile-Position für Move-Intent-Deduplication. */
@@ -187,7 +197,7 @@ export class WorldScene extends Phaser.Scene {
     this.structurePool = new SpritePool<Structure, Phaser.GameObjects.GameObject>({
       keyOf: (s) => s.id,
       create: (s) => this.createStructureSprite(s),
-      update: (g, s) => this.updateMovableSprite(g, s.x, s.y),
+      update: (g, s) => this.updateStructureSprite(g, s),
     });
     this.groundItemPool = new SpritePool<GroundItem, Phaser.GameObjects.GameObject>({
       keyOf: (g) => g.id,
@@ -238,6 +248,9 @@ export class WorldScene extends Phaser.Scene {
     const structures = this.bridge.state.structures();
     if (structures !== this.lastStructuresRef) {
       this.lastStructuresRef = structures;
+      // Lookup-Map fuer Wall-Auto-Tiling neu bauen, BEVOR der Pool synct,
+      // damit `updateStructureSprite` einen aktuellen Nachbar-Snapshot sieht.
+      this.structureLookup = buildStructureLookup(structures);
       this.structurePool.sync(structures);
     }
     const groundItems = this.bridge.state.itemsGround();
@@ -501,12 +514,49 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createStructureSprite(s: Structure): Phaser.GameObjects.GameObject {
-    // F-render-foundation: AssetLoader kennt den Type-Key bereits aus
-    // STRUCTURE_SPRITES (Subagent B liefert die Map). Falls leer → Fallback.
-    const tex = this.assetLoader.textureKeyFor(s.type) ?? `struct_${s.type}`;
+    const key = this.structureSpriteKeyFor(s);
+    const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.structure, TILE_SIZE);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.STRUCTURES;
     return obj;
+  }
+
+  /**
+   * Strukturen werden bei jedem Sync neu aktualisiert. Fuer Wall/Fence
+   * berechnen wir die Bitmask gegen die aktuellen Nachbarn und tauschen
+   * ggf. die Texture — dadurch passen sich Wand-Segmente korrekt an, wenn
+   * der User in derselben Linie ein weiteres Tile platziert.
+   */
+  private updateStructureSprite(obj: Phaser.GameObjects.GameObject, s: Structure): void {
+    this.updateMovableSprite(obj, s.x, s.y);
+    const family = familyOf(s.type, s.material ?? null);
+    if (!family) return; // nur Wall/Fence brauchen Re-Tiling
+    const key = this.structureSpriteKeyFor(s);
+    const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
+    // Nur echte Image-Sprites haben `setTexture`. Rectangle-Fallbacks
+    // ignorieren wir — das Magenta-Rect bleibt bis das Asset da ist.
+    const maybeImage = obj as Phaser.GameObjects.GameObject & {
+      setTexture?: (key: string) => void;
+      texture?: Phaser.Textures.Texture;
+    };
+    if (typeof maybeImage.setTexture === 'function' && this.textures.exists(tex)) {
+      if (maybeImage.texture?.key !== tex) {
+        maybeImage.setTexture(tex);
+      }
+    }
+  }
+
+  /**
+   * Ermittelt den STRUCTURE_SPRITES-Schluessel fuer eine Strukur. Fuer
+   * Wall/Fence wird die 4-Nachbarn-Bitmask berechnet und ueber
+   * WALL_MASK_TO_VARIANT auf eine Variante gemappt (z. B.
+   * `wall_stone_corner_ne`). Fuer alle anderen Typen: einfach `s.type`.
+   */
+  private structureSpriteKeyFor(s: Structure): string {
+    const family: WallFamily | null = familyOf(s.type, s.material ?? null);
+    if (!family) return s.type;
+    const mask = wallMaskFor(s.x, s.y, this.structureLookup, family);
+    return wallSpriteKeyFor(family, mask);
   }
 
   private createGroundItemSprite(g: GroundItem): Phaser.GameObjects.GameObject {
