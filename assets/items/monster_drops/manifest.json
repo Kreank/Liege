@@ -1,0 +1,1334 @@
+{
+  "generated": "2026-05-30",
+  "asset_type": "monster_drop_items",
+  "source_request": "146 Slugs aus backend/monster_drop_items.py (Welle 35)",
+  "count": 147,
+  "derived_from_existing": 147,
+  "placeholders": 0,
+  "contact": "assets/items/monster_drops/contacts/drop_items_contact.jpg",
+  "items": [
+    {
+      "id": "wolf_pelt",
+      "name": "Wolfsfell",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#8a7a5a",
+      "note": "leather_roll mit warmem braun-Tint = Wolfsfell-Rolle",
+      "generated_path": "assets/items/monster_drops/wolf_pelt.png"
+    },
+    {
+      "id": "arctic_pelt",
+      "name": "Arktis-Fell",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#d8e8ee",
+      "note": "leather_roll mit kühlem weiß-blau-Tint",
+      "generated_path": "assets/items/monster_drops/arctic_pelt.png"
+    },
+    {
+      "id": "shadow_pelt",
+      "name": "Schatten-Fell",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#3a3a4a",
+      "note": "leather_roll mit dunklem schiefer-Tint",
+      "generated_path": "assets/items/monster_drops/shadow_pelt.png"
+    },
+    {
+      "id": "otter_pelt",
+      "name": "Otter-Fell",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#6a5a3a",
+      "note": "leather_roll mit warmem dunkel-ocker",
+      "generated_path": "assets/items/monster_drops/otter_pelt.png"
+    },
+    {
+      "id": "crude_leather",
+      "name": "Rohes Leder",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "copy",
+      "note": "direkter Match: leather_roll = rohes Leder",
+      "generated_path": "assets/items/monster_drops/crude_leather.png"
+    },
+    {
+      "id": "skull",
+      "name": "Schädel",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "copy",
+      "note": "bone_fragments als Schädel-Sammlung",
+      "generated_path": "assets/items/monster_drops/skull.png"
+    },
+    {
+      "id": "sinew",
+      "name": "Sehne",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#c8a878",
+      "note": "Knochen-Sehne, leicht hautfarben getintet",
+      "generated_path": "assets/items/monster_drops/sinew.png"
+    },
+    {
+      "id": "swift_sinew",
+      "name": "Flinke Sehne",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#aac890",
+      "note": "Sehne mit grünlichem Schimmer (magisch)",
+      "generated_path": "assets/items/monster_drops/swift_sinew.png"
+    },
+    {
+      "id": "fang",
+      "name": "Fangzahn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#f0e8d0",
+      "note": "Knochen-Bruchstücke hell als Zähne",
+      "generated_path": "assets/items/monster_drops/fang.png"
+    },
+    {
+      "id": "horn",
+      "name": "Horn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#a87a4a",
+      "note": "Knochen warm-braun = Horn",
+      "generated_path": "assets/items/monster_drops/horn.png"
+    },
+    {
+      "id": "thorn_fang",
+      "name": "Dornen-Fang",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#705a3a",
+      "note": "dunkler braun-grünlich für Dornen-Wesen",
+      "generated_path": "assets/items/monster_drops/thorn_fang.png"
+    },
+    {
+      "id": "frost_fang",
+      "name": "Frost-Fang",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#a8d8e8",
+      "note": "Knochen mit Frost-Cyan",
+      "generated_path": "assets/items/monster_drops/frost_fang.png"
+    },
+    {
+      "id": "panther_claw",
+      "name": "Panther-Klaue",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#2a2a2a",
+      "note": "dunkle Klauen",
+      "generated_path": "assets/items/monster_drops/panther_claw.png"
+    },
+    {
+      "id": "claw_fragment",
+      "name": "Klauen-Splitter",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#6a5a4a",
+      "note": "bruchstücke generisch",
+      "generated_path": "assets/items/monster_drops/claw_fragment.png"
+    },
+    {
+      "id": "boar_tusk",
+      "name": "Eber-Stoßzahn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#e8d8b0",
+      "note": "Elfenbein-Töne",
+      "generated_path": "assets/items/monster_drops/boar_tusk.png"
+    },
+    {
+      "id": "silver_bristle",
+      "name": "Silber-Borste",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#c8d0d8",
+      "note": "Silber-helle Borsten",
+      "generated_path": "assets/items/monster_drops/silver_bristle.png"
+    },
+    {
+      "id": "iron_horn",
+      "name": "Eisen-Horn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#5a5a6a",
+      "note": "Eisen-grau Horn",
+      "generated_path": "assets/items/monster_drops/iron_horn.png"
+    },
+    {
+      "id": "corrupted_antler",
+      "name": "Verderbtes Geweih",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#5a3a6a",
+      "note": "verderbtes lila-grau",
+      "generated_path": "assets/items/monster_drops/corrupted_antler.png"
+    },
+    {
+      "id": "titan_antler",
+      "name": "Titan-Geweih",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#b0a060",
+      "note": "Titan-Geweih golden-bronze",
+      "generated_path": "assets/items/monster_drops/titan_antler.png"
+    },
+    {
+      "id": "titan_femur",
+      "name": "Titan-Oberschenkel",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#d0c890",
+      "note": "Riesenknochen, helles Elfenbein",
+      "generated_path": "assets/items/monster_drops/titan_femur.png"
+    },
+    {
+      "id": "giant_femur",
+      "name": "Riesen-Oberschenkel",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#b0a890",
+      "note": "Riesen-Knochen alt-elfenbein",
+      "generated_path": "assets/items/monster_drops/giant_femur.png"
+    },
+    {
+      "id": "spider_eye",
+      "name": "Spinnen-Auge",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/giant_spider.png",
+      "transform": "copy",
+      "note": "giant_spider Source nutzt das Spider-Asset",
+      "generated_path": "assets/items/monster_drops/spider_eye.png"
+    },
+    {
+      "id": "vampire_fang",
+      "name": "Vampir-Reißzahn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#f0e0d0",
+      "note": "Reißzähne hell",
+      "generated_path": "assets/items/monster_drops/vampire_fang.png"
+    },
+    {
+      "id": "dune_feather",
+      "name": "Dünen-Feder",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#d8b878",
+      "note": "warmes sandgelb für Wüstenfeder",
+      "generated_path": "assets/items/monster_drops/dune_feather.png"
+    },
+    {
+      "id": "roc_feather",
+      "name": "Roc-Feder",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#a89070",
+      "note": "Roc gross-feder dunkelocker",
+      "generated_path": "assets/items/monster_drops/roc_feather.png"
+    },
+    {
+      "id": "roc_talon",
+      "name": "Roc-Kralle",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#3a2a1a",
+      "note": "Roc-Kralle dunkelbraun",
+      "generated_path": "assets/items/monster_drops/roc_talon.png"
+    },
+    {
+      "id": "wing_membrane",
+      "name": "Flügelhaut",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#5a4a6a",
+      "note": "Flügelhaut leder-lila",
+      "generated_path": "assets/items/monster_drops/wing_membrane.png"
+    },
+    {
+      "id": "tattered_cloth",
+      "name": "Zerrissener Stoff",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+      "transform": "tint:#8a7a6a",
+      "note": "cloth_bolt mit grau-braun-Tint = zerrissen",
+      "generated_path": "assets/items/monster_drops/tattered_cloth.png"
+    },
+    {
+      "id": "damp_cloth",
+      "name": "Klamme Stoffbahn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+      "transform": "tint:#6a7a7a",
+      "note": "cloth_bolt mit feucht-grünlich",
+      "generated_path": "assets/items/monster_drops/damp_cloth.png"
+    },
+    {
+      "id": "ancient_silk",
+      "name": "Antike Seide",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+      "transform": "tint:#c8a868",
+      "note": "cloth_bolt mit antikem gold-beige",
+      "generated_path": "assets/items/monster_drops/ancient_silk.png"
+    },
+    {
+      "id": "ancient_bandage",
+      "name": "Antike Bandage",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+      "transform": "tint:#a89870",
+      "note": "Mumien-Bandage gelblich-vergilbt",
+      "generated_path": "assets/items/monster_drops/ancient_bandage.png"
+    },
+    {
+      "id": "dream_silk",
+      "name": "Traumseide",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+      "transform": "tint:#a878d8",
+      "note": "Traumseide schimmerndes lila",
+      "generated_path": "assets/items/monster_drops/dream_silk.png"
+    },
+    {
+      "id": "crude_steel_ingot",
+      "name": "Roher Stahlbarren",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/iron_ore.png",
+      "transform": "copy",
+      "note": "iron_ore = roher Stahl-Klumpen",
+      "generated_path": "assets/items/monster_drops/crude_steel_ingot.png"
+    },
+    {
+      "id": "mythril_ingot",
+      "name": "Mythril-Barren",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/iron_ore.png",
+      "transform": "tint:#a8c8e0",
+      "note": "iron_ore mit silber-blau für Mythril",
+      "generated_path": "assets/items/monster_drops/mythril_ingot.png"
+    },
+    {
+      "id": "starfall_ingot",
+      "name": "Sternenfall-Barren",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/iron_ore.png",
+      "transform": "tint:#9a8ad8",
+      "note": "iron_ore mit kosmischem lila-blau",
+      "generated_path": "assets/items/monster_drops/starfall_ingot.png"
+    },
+    {
+      "id": "polished_stone",
+      "name": "Polierter Stein",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/rough_stone.png",
+      "transform": "copy",
+      "note": "rough_stone als polished_stone",
+      "generated_path": "assets/items/monster_drops/polished_stone.png"
+    },
+    {
+      "id": "salt_lump",
+      "name": "Salzklumpen",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/rough_stone.png",
+      "transform": "tint:#f0f0e8",
+      "note": "rough_stone mit weiß-creme-Tint = Salz",
+      "generated_path": "assets/items/monster_drops/salt_lump.png"
+    },
+    {
+      "id": "naga_scale",
+      "name": "Naga-Schuppe",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#5aa890",
+      "note": "blue_crystal als grünliche Schuppe",
+      "generated_path": "assets/items/monster_drops/naga_scale.png"
+    },
+    {
+      "id": "wyrm_scale",
+      "name": "Wyrm-Schuppe",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#9a6a3a",
+      "note": "blue_crystal mit Wyrm-bronze",
+      "generated_path": "assets/items/monster_drops/wyrm_scale.png"
+    },
+    {
+      "id": "worm_chitin",
+      "name": "Wurm-Chitin",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#8a6a3a",
+      "note": "Knochen-bruch als Chitin-Bruch ocker",
+      "generated_path": "assets/items/monster_drops/worm_chitin.png"
+    },
+    {
+      "id": "kelpie_mane",
+      "name": "Kelpie-Mähne",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#3a6a7a",
+      "note": "Leder-bahn als nasse blau-grüne Mähne",
+      "generated_path": "assets/items/monster_drops/kelpie_mane.png"
+    },
+    {
+      "id": "kraken_ink",
+      "name": "Kraken-Tinte",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#2a2a3a",
+      "note": "mana_potion mit fast-schwarz für Tinte",
+      "generated_path": "assets/items/monster_drops/kraken_ink.png"
+    },
+    {
+      "id": "plant_fiber",
+      "name": "Pflanzenfaser",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/tall_grass_tuft.png",
+      "transform": "copy",
+      "note": "tall_grass_tuft = Pflanzenfaser direkt",
+      "generated_path": "assets/items/monster_drops/plant_fiber.png"
+    },
+    {
+      "id": "briar_thorn",
+      "name": "Dorn aus dem Gestrüpp",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/tall_grass_tuft.png",
+      "transform": "tint:#4a3a2a",
+      "note": "tall_grass mit dunklem braun = Dornen-Strauch",
+      "generated_path": "assets/items/monster_drops/briar_thorn.png"
+    },
+    {
+      "id": "thornmaw_seed",
+      "name": "Thornmaw-Samen",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mushroom_cluster.png",
+      "transform": "tint:#6a3a4a",
+      "note": "mushroom als düsterer dornen-samen",
+      "generated_path": "assets/items/monster_drops/thornmaw_seed.png"
+    },
+    {
+      "id": "clockwork_gear",
+      "name": "Uhrwerk-Zahnrad",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/rune_altar.png",
+      "transform": "tint:#a89060",
+      "note": "rune_altar mit bronze für Zahnrad",
+      "generated_path": "assets/items/monster_drops/clockwork_gear.png"
+    },
+    {
+      "id": "rotten_flesh",
+      "name": "Faules Fleisch",
+      "category": "food",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+      "transform": "tint:#6a5a3a",
+      "note": "cooked_meat mit fauler grün-brauner Tönung",
+      "generated_path": "assets/items/monster_drops/rotten_flesh.png"
+    },
+    {
+      "id": "dark_meat",
+      "name": "Dunkles Fleisch",
+      "category": "food",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+      "transform": "tint:#5a2a1a",
+      "note": "cooked_meat mit dunkel-rotem Tint",
+      "generated_path": "assets/items/monster_drops/dark_meat.png"
+    },
+    {
+      "id": "pork_loin",
+      "name": "Schweinerücken",
+      "category": "food",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+      "transform": "copy",
+      "note": "cooked_meat direkt als Schweine-Stück",
+      "generated_path": "assets/items/monster_drops/pork_loin.png"
+    },
+    {
+      "id": "strider_meat",
+      "name": "Strider-Filet",
+      "category": "food",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+      "transform": "tint:#d8a878",
+      "note": "cooked_meat heller, hell-rosa für mageres Filet",
+      "generated_path": "assets/items/monster_drops/strider_meat.png"
+    },
+    {
+      "id": "tentacle_meat",
+      "name": "Tentakel-Fleisch",
+      "category": "food",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+      "transform": "tint:#9a5a8a",
+      "note": "cooked_meat mit krak-lila",
+      "generated_path": "assets/items/monster_drops/tentacle_meat.png"
+    },
+    {
+      "id": "herb_bundle",
+      "name": "Kräuterbündel",
+      "category": "food",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/herb_bundle.png",
+      "transform": "copy",
+      "note": "direkter Match: herb_bundle",
+      "generated_path": "assets/items/monster_drops/herb_bundle.png"
+    },
+    {
+      "id": "drake_scale",
+      "name": "Drachen-Schuppe",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#8a3a3a",
+      "note": "blue_crystal als rot-bronze Drachenschuppe",
+      "generated_path": "assets/items/monster_drops/drake_scale.png"
+    },
+    {
+      "id": "drake_horn",
+      "name": "Drachen-Horn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#3a2a2a",
+      "note": "bone_fragments als dunkles Drachen-Horn",
+      "generated_path": "assets/items/monster_drops/drake_horn.png"
+    },
+    {
+      "id": "dragon_tooth",
+      "name": "Drachenzahn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#f8e8c8",
+      "note": "bone_fragments als großer heller Drachenzahn",
+      "generated_path": "assets/items/monster_drops/dragon_tooth.png"
+    },
+    {
+      "id": "dragon_horn",
+      "name": "Großes Drachen-Horn",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#7a5a3a",
+      "note": "bone als großes goldenes Drachenhorn",
+      "generated_path": "assets/items/monster_drops/dragon_horn.png"
+    },
+    {
+      "id": "dragon_heart",
+      "name": "Drachenherz",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/health_potion.png",
+      "transform": "tint:#aa1a1a",
+      "note": "health_potion intensives rot pulsierend",
+      "generated_path": "assets/items/monster_drops/dragon_heart.png"
+    },
+    {
+      "id": "fire_gland",
+      "name": "Feuer-Drüse",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/fire_resist_potion.png",
+      "transform": "copy",
+      "note": "fire_resist_potion = Feuer-Essenz-Drüse",
+      "generated_path": "assets/items/monster_drops/fire_gland.png"
+    },
+    {
+      "id": "frost_gland",
+      "name": "Frost-Drüse",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#7ad0e8",
+      "note": "mana_potion eis-cyan getintet",
+      "generated_path": "assets/items/monster_drops/frost_gland.png"
+    },
+    {
+      "id": "acid_gland",
+      "name": "Säure-Drüse",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#9ad84a",
+      "note": "mana_potion ätzend-grün",
+      "generated_path": "assets/items/monster_drops/acid_gland.png"
+    },
+    {
+      "id": "poison_gland",
+      "name": "Gift-Drüse",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/antidote_potion.png",
+      "transform": "tint:#6aaa3a",
+      "note": "antidote_potion als gift-grüne Drüse",
+      "generated_path": "assets/items/monster_drops/poison_gland.png"
+    },
+    {
+      "id": "storm_gland",
+      "name": "Sturm-Drüse",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#a8a8e8",
+      "note": "mana_potion mit blitz-lavendel",
+      "generated_path": "assets/items/monster_drops/storm_gland.png"
+    },
+    {
+      "id": "emerald_egg",
+      "name": "Smaragd-Ei",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#3aa86a",
+      "note": "blue_crystal als smaragdgrünes Ei",
+      "generated_path": "assets/items/monster_drops/emerald_egg.png"
+    },
+    {
+      "id": "essence_arcane",
+      "name": "Arkane Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#a868e8",
+      "note": "mana_potion als arkane Essenz lila",
+      "generated_path": "assets/items/monster_drops/essence_arcane.png"
+    },
+    {
+      "id": "essence_fire",
+      "name": "Feuer-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/fire_resist_potion.png",
+      "transform": "tint:#e85a2a",
+      "note": "fire_resist mit intensiverer feuer-orange",
+      "generated_path": "assets/items/monster_drops/essence_fire.png"
+    },
+    {
+      "id": "essence_frost",
+      "name": "Frost-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#7ad8f0",
+      "note": "mana_potion mit eis-cyan",
+      "generated_path": "assets/items/monster_drops/essence_frost.png"
+    },
+    {
+      "id": "essence_water",
+      "name": "Wasser-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/water_flask.png",
+      "transform": "copy",
+      "note": "water_flask direkt als Wasser-Essenz",
+      "generated_path": "assets/items/monster_drops/essence_water.png"
+    },
+    {
+      "id": "essence_lightning",
+      "name": "Blitz-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#f0e858",
+      "note": "mana_potion mit blitz-gelb",
+      "generated_path": "assets/items/monster_drops/essence_lightning.png"
+    },
+    {
+      "id": "essence_storm",
+      "name": "Sturm-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#7a8aa8",
+      "note": "mana_potion mit sturm-grau-blau",
+      "generated_path": "assets/items/monster_drops/essence_storm.png"
+    },
+    {
+      "id": "soul_essence",
+      "name": "Seelen-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#cae8d0",
+      "note": "mana_potion mit geister-weiß-grün",
+      "generated_path": "assets/items/monster_drops/soul_essence.png"
+    },
+    {
+      "id": "void_essence",
+      "name": "Leere-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#2a1a3a",
+      "note": "mana_potion mit fast-schwarz lila",
+      "generated_path": "assets/items/monster_drops/void_essence.png"
+    },
+    {
+      "id": "sleep_essence",
+      "name": "Schlaf-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#8a8ac8",
+      "note": "mana_potion mit traum-lavendel",
+      "generated_path": "assets/items/monster_drops/sleep_essence.png"
+    },
+    {
+      "id": "wisp_essence",
+      "name": "Irrlicht-Essenz",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#9af0a8",
+      "note": "mana_potion mit irrlicht-mintgrün",
+      "generated_path": "assets/items/monster_drops/wisp_essence.png"
+    },
+    {
+      "id": "frost_dust",
+      "name": "Frost-Staub",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#cae8f8",
+      "note": "blue_crystal als feinpulvriger Frost",
+      "generated_path": "assets/items/monster_drops/frost_dust.png"
+    },
+    {
+      "id": "astral_dust",
+      "name": "Astral-Staub",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#c8a8f8",
+      "note": "blue_crystal als kosmischer Staub",
+      "generated_path": "assets/items/monster_drops/astral_dust.png"
+    },
+    {
+      "id": "dryad_sap",
+      "name": "Dryaden-Saft",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#7ac850",
+      "note": "mana_potion mit pflanzen-grün",
+      "generated_path": "assets/items/monster_drops/dryad_sap.png"
+    },
+    {
+      "id": "ghoul_tongue",
+      "name": "Ghul-Zunge",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cooked_meat.png",
+      "transform": "tint:#7a3a4a",
+      "note": "cooked_meat mit untot-violett",
+      "generated_path": "assets/items/monster_drops/ghoul_tongue.png"
+    },
+    {
+      "id": "imp_eye",
+      "name": "Kobold-Auge",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#e83a3a",
+      "note": "blue_crystal als rotes Imp-Auge",
+      "generated_path": "assets/items/monster_drops/imp_eye.png"
+    },
+    {
+      "id": "aberrant_eye",
+      "name": "Aberrantes Auge",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#aa68ca",
+      "note": "blue_crystal als verstörtes Auge",
+      "generated_path": "assets/items/monster_drops/aberrant_eye.png"
+    },
+    {
+      "id": "forehead_eye",
+      "name": "Stirn-Auge",
+      "category": "lore",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#daca7a",
+      "note": "blue_crystal als goldenes seherauge",
+      "generated_path": "assets/items/monster_drops/forehead_eye.png"
+    },
+    {
+      "id": "fire_core",
+      "name": "Feuer-Kern",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#e87a2a",
+      "note": "blue_crystal als feurig-orange Kern",
+      "generated_path": "assets/items/monster_drops/fire_core.png"
+    },
+    {
+      "id": "granite_core",
+      "name": "Granit-Kern",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/rough_stone.png",
+      "transform": "tint:#5a5a6a",
+      "note": "rough_stone als grauer Kern",
+      "generated_path": "assets/items/monster_drops/granite_core.png"
+    },
+    {
+      "id": "glowing_core",
+      "name": "Glühender Kern",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#f8d878",
+      "note": "blue_crystal als hellgelb-glühend",
+      "generated_path": "assets/items/monster_drops/glowing_core.png"
+    },
+    {
+      "id": "magma_heart",
+      "name": "Magma-Herz",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/health_potion.png",
+      "transform": "tint:#e83a1a",
+      "note": "health_potion intensives feuerrot",
+      "generated_path": "assets/items/monster_drops/magma_heart.png"
+    },
+    {
+      "id": "avalanche_core",
+      "name": "Lawinen-Kern",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#d0e8f0",
+      "note": "blue_crystal als eis-weiß Kern",
+      "generated_path": "assets/items/monster_drops/avalanche_core.png"
+    },
+    {
+      "id": "ossuary_core",
+      "name": "Ossuar-Kern",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/bone_fragments.png",
+      "transform": "tint:#e8d8b0",
+      "note": "bone_fragments als ossuar-elfenbein",
+      "generated_path": "assets/items/monster_drops/ossuary_core.png"
+    },
+    {
+      "id": "phylactery_shard",
+      "name": "Phylakterie-Splitter",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#2a4a6a",
+      "note": "blue_crystal als dunkler lich-splitter",
+      "generated_path": "assets/items/monster_drops/phylactery_shard.png"
+    },
+    {
+      "id": "old_god_shard",
+      "name": "Alter-Gott-Splitter",
+      "category": "lore",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#5a3a7a",
+      "note": "blue_crystal als alter-gott-lila",
+      "generated_path": "assets/items/monster_drops/old_god_shard.png"
+    },
+    {
+      "id": "sanity_shard",
+      "name": "Verstand-Splitter",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#a8a8d8",
+      "note": "blue_crystal als bleiche verstand-scherbe",
+      "generated_path": "assets/items/monster_drops/sanity_shard.png"
+    },
+    {
+      "id": "impossible_angle",
+      "name": "Unmöglicher Winkel",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#3a2a4a",
+      "note": "blue_crystal als nicht-euklidisches lila-schwarz",
+      "generated_path": "assets/items/monster_drops/impossible_angle.png"
+    },
+    {
+      "id": "storm_glass",
+      "name": "Sturm-Glas",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#9aa8c8",
+      "note": "blue_crystal als sturm-glas grau-violett",
+      "generated_path": "assets/items/monster_drops/storm_glass.png"
+    },
+    {
+      "id": "soul_lantern_shard",
+      "name": "Seelenlaternen-Scherbe",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#daca6a",
+      "note": "blue_crystal als laternen-gelb",
+      "generated_path": "assets/items/monster_drops/soul_lantern_shard.png"
+    },
+    {
+      "id": "night_shard",
+      "name": "Nacht-Splitter",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#1a1a3a",
+      "note": "blue_crystal als nacht-schwarz-blau",
+      "generated_path": "assets/items/monster_drops/night_shard.png"
+    },
+    {
+      "id": "glacier_eye",
+      "name": "Gletscher-Auge",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#a8e0f0",
+      "note": "blue_crystal als hell-eisblau",
+      "generated_path": "assets/items/monster_drops/glacier_eye.png"
+    },
+    {
+      "id": "pearl_great",
+      "name": "Große Perle",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#f0e8d8",
+      "note": "blue_crystal als großes perlweiß",
+      "generated_path": "assets/items/monster_drops/pearl_great.png"
+    },
+    {
+      "id": "mire_pearl",
+      "name": "Morast-Perle",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#6a7a5a",
+      "note": "blue_crystal als trüb-grüne Sumpf-Perle",
+      "generated_path": "assets/items/monster_drops/mire_pearl.png"
+    },
+    {
+      "id": "river_pearl",
+      "name": "Fluss-Perle",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#a8d0e0",
+      "note": "blue_crystal als hellblaue Fluss-Perle",
+      "generated_path": "assets/items/monster_drops/river_pearl.png"
+    },
+    {
+      "id": "brine_pearl",
+      "name": "Sole-Perle",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#c8d8d0",
+      "note": "blue_crystal als grünlich-graue Salz-Perle",
+      "generated_path": "assets/items/monster_drops/brine_pearl.png"
+    },
+    {
+      "id": "crystal_shard",
+      "name": "Kristall-Splitter",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "copy",
+      "note": "blue_crystal direkt als Kristall-Splitter",
+      "generated_path": "assets/items/monster_drops/crystal_shard.png"
+    },
+    {
+      "id": "sand_crystal",
+      "name": "Sand-Kristall",
+      "category": "material",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/blue_crystal.png",
+      "transform": "tint:#daba6a",
+      "note": "blue_crystal als sandiger goldkristall",
+      "generated_path": "assets/items/monster_drops/sand_crystal.png"
+    },
+    {
+      "id": "rusty_sword",
+      "name": "Verrostetes Schwert",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_aruming_sword.png",
+      "transform": "tint:#8a5a3a",
+      "note": "plain_aruming_sword mit rost-tint",
+      "generated_path": "assets/items/monster_drops/rusty_sword.png"
+    },
+    {
+      "id": "iron_sword",
+      "name": "Eisenschwert",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_aruming_sword.png",
+      "transform": "copy",
+      "note": "plain_aruming_sword direkt = iron sword",
+      "generated_path": "assets/items/monster_drops/iron_sword.png"
+    },
+    {
+      "id": "iron_spear",
+      "name": "Eisenspeer",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png",
+      "transform": "copy",
+      "note": "plain_war_spear direkt",
+      "generated_path": "assets/items/monster_drops/iron_spear.png"
+    },
+    {
+      "id": "bone_dagger",
+      "name": "Knochendolch",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/hooked_ritual_dagger.png",
+      "transform": "tint:#e8d8b0",
+      "note": "hooked_ritual_dagger mit elfenbein für Knochen",
+      "generated_path": "assets/items/monster_drops/bone_dagger.png"
+    },
+    {
+      "id": "bone_spear",
+      "name": "Knochenspeer",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png",
+      "transform": "tint:#e8d8b0",
+      "note": "war_spear mit elfenbein für Knochenspeer",
+      "generated_path": "assets/items/monster_drops/bone_spear.png"
+    },
+    {
+      "id": "bone_staff",
+      "name": "Knochenstab",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/red_oak_staff.png",
+      "transform": "tint:#e8d8b0",
+      "note": "staff mit elfenbein-tint",
+      "generated_path": "assets/items/monster_drops/bone_staff.png"
+    },
+    {
+      "id": "bone_warhammer",
+      "name": "Knochen-Streithammer",
+      "category": "weapon",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/iron_mace.png",
+      "transform": "tint:#e8d8b0",
+      "note": "iron_mace mit elfenbein für Knochenhammer",
+      "generated_path": "assets/items/monster_drops/bone_warhammer.png"
+    },
+    {
+      "id": "shaman_stick",
+      "name": "Schamanen-Stock",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/red_oak_staff.png",
+      "transform": "tint:#7a5a3a",
+      "note": "red_oak_staff dunkler braun für primitiv",
+      "generated_path": "assets/items/monster_drops/shaman_stick.png"
+    },
+    {
+      "id": "worn_bow",
+      "name": "Abgenutzter Bogen",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/ashwood_recurve_bow.png",
+      "transform": "tint:#7a6a5a",
+      "note": "ashwood mit abgenutzt-grau",
+      "generated_path": "assets/items/monster_drops/worn_bow.png"
+    },
+    {
+      "id": "living_wood_bow",
+      "name": "Lebendholz-Bogen",
+      "category": "weapon",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/goldleaf_bow.png",
+      "transform": "tint:#5aa850",
+      "note": "goldleaf_bow mit lebend-grün",
+      "generated_path": "assets/items/monster_drops/living_wood_bow.png"
+    },
+    {
+      "id": "demon_forge_hammer",
+      "name": "Dämonen-Schmiedehammer",
+      "category": "weapon",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/iron_mace.png",
+      "transform": "tint:#aa3a1a",
+      "note": "iron_mace mit dämonen-rot-glühend",
+      "generated_path": "assets/items/monster_drops/demon_forge_hammer.png"
+    },
+    {
+      "id": "iron_helm",
+      "name": "Eisenhelm",
+      "category": "armor",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/crested_hoplite_helm.png",
+      "transform": "copy",
+      "note": "crested_hoplite_helm direkt",
+      "generated_path": "assets/items/monster_drops/iron_helm.png"
+    },
+    {
+      "id": "leather_armor_piece",
+      "name": "Lederrüstungs-Teil",
+      "category": "armor",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_vest.png",
+      "transform": "copy",
+      "note": "leather_vest direkt",
+      "generated_path": "assets/items/monster_drops/leather_armor_piece.png"
+    },
+    {
+      "id": "noble_cloak",
+      "name": "Adels-Umhang",
+      "category": "armor",
+      "source": "assets/equipment/armor/professional/reference_based/icons_128/green_hooded_mantle.png",
+      "transform": "tint:#7a3a3a",
+      "note": "green_hooded_mantle als adels-roter Umhang",
+      "generated_path": "assets/items/monster_drops/noble_cloak.png"
+    },
+    {
+      "id": "pilgrim_robe",
+      "name": "Pilger-Robe",
+      "category": "armor",
+      "source": "assets/equipment/armor/professional/reference_based/icons_128/green_hooded_mantle.png",
+      "transform": "tint:#a8a090",
+      "note": "green_hooded_mantle als pilger-graubeige",
+      "generated_path": "assets/items/monster_drops/pilgrim_robe.png"
+    },
+    {
+      "id": "pharaoh_mask",
+      "name": "Pharaonen-Maske",
+      "category": "armor",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/crested_hoplite_helm.png",
+      "transform": "tint:#d8b048",
+      "note": "helm mit pharaonen-gold",
+      "generated_path": "assets/items/monster_drops/pharaoh_mask.png"
+    },
+    {
+      "id": "undying_crown",
+      "name": "Untote Krone",
+      "category": "armor",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/crested_hoplite_helm.png",
+      "transform": "tint:#3a3a4a",
+      "note": "helm mit untot-grau",
+      "generated_path": "assets/items/monster_drops/undying_crown.png"
+    },
+    {
+      "id": "witchking_crown",
+      "name": "Hexenkönig-Krone",
+      "category": "armor",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/crested_hoplite_helm.png",
+      "transform": "tint:#3a2a5a",
+      "note": "helm mit hexenkönig-lila",
+      "generated_path": "assets/items/monster_drops/witchking_crown.png"
+    },
+    {
+      "id": "warchief_crown",
+      "name": "Kriegshäuptlings-Krone",
+      "category": "armor",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/crested_hoplite_helm.png",
+      "transform": "tint:#7a3a2a",
+      "note": "helm mit warchief-bronze-rot",
+      "generated_path": "assets/items/monster_drops/warchief_crown.png"
+    },
+    {
+      "id": "consecrated_amulet",
+      "name": "Geweihtes Amulett",
+      "category": "jewelry",
+      "source": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/amulets_magic_fantasy_stylized_textures_game.png",
+      "transform": "tint:#f0e0a0",
+      "note": "amulet asset mit goldenem geweiht-tint",
+      "generated_path": "assets/items/monster_drops/consecrated_amulet.png"
+    },
+    {
+      "id": "scarab_amulet",
+      "name": "Skarabäus-Amulett",
+      "category": "jewelry",
+      "source": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/amulets_magic_fantasy_stylized_textures_game_02.png",
+      "transform": "tint:#5aa848",
+      "note": "amulet mit skarabäus-grün",
+      "generated_path": "assets/items/monster_drops/scarab_amulet.png"
+    },
+    {
+      "id": "blood_chalice",
+      "name": "Blut-Kelch",
+      "category": "jewelry",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#aa1a1a",
+      "note": "mana_potion als blut-roter Kelch",
+      "generated_path": "assets/items/monster_drops/blood_chalice.png"
+    },
+    {
+      "id": "inquisitor_signet",
+      "name": "Inquisitor-Siegel",
+      "category": "jewelry",
+      "source": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+      "transform": "tint:#d0c060",
+      "note": "ring mit inquisitor-gold",
+      "generated_path": "assets/items/monster_drops/inquisitor_signet.png"
+    },
+    {
+      "id": "crypt_signet",
+      "name": "Krypta-Siegel",
+      "category": "jewelry",
+      "source": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+      "transform": "tint:#4a4a5a",
+      "note": "ring mit krypta-grau",
+      "generated_path": "assets/items/monster_drops/crypt_signet.png"
+    },
+    {
+      "id": "traitor_signet",
+      "name": "Verräter-Siegel",
+      "category": "jewelry",
+      "source": "assets/equipment/jewelry/professional/from_neu_pro/icons_128/dark_fantasy_ring_relic_epic_rpg_artifact_co.png",
+      "transform": "tint:#7a2a2a",
+      "note": "ring mit verräter-dunkelrot",
+      "generated_path": "assets/items/monster_drops/traitor_signet.png"
+    },
+    {
+      "id": "arrow",
+      "name": "Pfeil",
+      "category": "ammo",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png",
+      "transform": "tint:#8a6a3a",
+      "note": "war_spear mini als Pfeil-Bündel",
+      "generated_path": "assets/items/monster_drops/arrow.png"
+    },
+    {
+      "id": "evergreen_arrow",
+      "name": "Immergrün-Pfeil",
+      "category": "ammo",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png",
+      "transform": "tint:#3a8a3a",
+      "note": "war_spear mit evergreen-grün",
+      "generated_path": "assets/items/monster_drops/evergreen_arrow.png"
+    },
+    {
+      "id": "silver_bolt",
+      "name": "Silber-Bolzen",
+      "category": "ammo",
+      "source": "assets/equipment/weapons/professional/reference_based/icons_128/plain_war_spear.png",
+      "transform": "tint:#c8c8d0",
+      "note": "war_spear mit silber-tint",
+      "generated_path": "assets/items/monster_drops/silver_bolt.png"
+    },
+    {
+      "id": "goblin_ear",
+      "name": "Goblin-Ohr",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/goblin_raider_bust.png",
+      "transform": "copy",
+      "note": "goblin_raider_bust als Goblin-Trophäe",
+      "generated_path": "assets/items/monster_drops/goblin_ear.png"
+    },
+    {
+      "id": "orgrim_skull",
+      "name": "Orgrim-Schädel",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/skeletal_warrior_bust.png",
+      "transform": "tint:#8a7a6a",
+      "note": "skeletal_warrior_bust als Orgrim-Schädel-Trophäe",
+      "generated_path": "assets/items/monster_drops/orgrim_skull.png"
+    },
+    {
+      "id": "captain_banner",
+      "name": "Hauptmann-Banner",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/cloth_bolt.png",
+      "transform": "tint:#aa3a3a",
+      "note": "cloth_bolt als blut-rotes Banner",
+      "generated_path": "assets/items/monster_drops/captain_banner.png"
+    },
+    {
+      "id": "boss_trophy",
+      "name": "Boss-Trophäe",
+      "category": "trophy",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/necromancer_bust.png",
+      "transform": "copy",
+      "note": "necromancer_bust als generische Boss-Trophäe",
+      "generated_path": "assets/items/monster_drops/boss_trophy.png"
+    },
+    {
+      "id": "crude_map_fragment",
+      "name": "Karten-Fragment",
+      "category": "quest",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/dungeon_map.png",
+      "transform": "copy",
+      "note": "dungeon_map direkt = Karten-Fragment",
+      "generated_path": "assets/items/monster_drops/crude_map_fragment.png"
+    },
+    {
+      "id": "drowner_lock_of_hair",
+      "name": "Ziehenden-Haarlocke",
+      "category": "quest",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/leather_roll.png",
+      "transform": "tint:#3a4a3a",
+      "note": "leather_roll als nasses dunkelgrünes Haar",
+      "generated_path": "assets/items/monster_drops/drowner_lock_of_hair.png"
+    },
+    {
+      "id": "living_toad",
+      "name": "Lebende Kröte",
+      "category": "quest",
+      "source": "assets/monsters/world_sprites/generated_longlist/icons_64/creature_bog_toad_icon_64.png",
+      "transform": "copy",
+      "note": "bog_toad icon als lebende Kröte",
+      "generated_path": "assets/items/monster_drops/living_toad.png"
+    },
+    {
+      "id": "messenger_capsule",
+      "name": "Boten-Kapsel",
+      "category": "quest",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/kings_seal.png",
+      "transform": "copy",
+      "note": "kings_seal als versiegelte Boten-Kapsel",
+      "generated_path": "assets/items/monster_drops/messenger_capsule.png"
+    },
+    {
+      "id": "stolen_pouch",
+      "name": "Gestohlener Beutel",
+      "category": "quest",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/coin_stack.png",
+      "transform": "tint:#8a6a3a",
+      "note": "coin_stack mit beutel-braun",
+      "generated_path": "assets/items/monster_drops/stolen_pouch.png"
+    },
+    {
+      "id": "well_idol",
+      "name": "Brunnen-Idol",
+      "category": "quest",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/rune_altar.png",
+      "transform": "tint:#5a6a7a",
+      "note": "rune_altar als wasser-stein-idol",
+      "generated_path": "assets/items/monster_drops/well_idol.png"
+    },
+    {
+      "id": "plague_phial",
+      "name": "Pest-Phiole",
+      "category": "quest",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/antidote_potion.png",
+      "transform": "tint:#aaaa3a",
+      "note": "antidote_potion als pest-gelb-grün",
+      "generated_path": "assets/items/monster_drops/plague_phial.png"
+    },
+    {
+      "id": "witch_brew",
+      "name": "Hexenbräu",
+      "category": "consumable",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/mana_potion.png",
+      "transform": "tint:#5a3a6a",
+      "note": "mana_potion als hexenbräu-dunkellila",
+      "generated_path": "assets/items/monster_drops/witch_brew.png"
+    },
+    {
+      "id": "lore_fragment",
+      "name": "Lore-Fragment",
+      "category": "lore",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_scroll.png",
+      "transform": "copy",
+      "note": "research_scroll direkt",
+      "generated_path": "assets/items/monster_drops/lore_fragment.png"
+    },
+    {
+      "id": "unique_lore_item",
+      "name": "Einzigartiges Lore-Stück",
+      "category": "lore",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_tome.png",
+      "transform": "copy",
+      "note": "research_tome als einzigartiges lore-buch",
+      "generated_path": "assets/items/monster_drops/unique_lore_item.png"
+    },
+    {
+      "id": "white_pilgrim_token",
+      "name": "Weißer Pilger-Stein",
+      "category": "lore",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/kings_seal.png",
+      "transform": "tint:#f0f0e8",
+      "note": "kings_seal mit weiß-tint",
+      "generated_path": "assets/items/monster_drops/white_pilgrim_token.png"
+    },
+    {
+      "id": "tech_print",
+      "name": "Tech-Druck",
+      "category": "lore",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_scroll.png",
+      "transform": "tint:#a8c8d8",
+      "note": "research_scroll mit tech-blau-grau",
+      "generated_path": "assets/items/monster_drops/tech_print.png"
+    },
+    {
+      "id": "dark_grimoire",
+      "name": "Dunkles Grimoire",
+      "category": "lore",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/research_tome.png",
+      "transform": "tint:#3a2a4a",
+      "note": "research_tome mit dunkellila",
+      "generated_path": "assets/items/monster_drops/dark_grimoire.png"
+    },
+    {
+      "id": "ancient_treasure",
+      "name": "Antiker Schatz",
+      "category": "lore",
+      "source": "assets/professional/original_pack_2026_05_27/icons_128/coin_stack.png",
+      "transform": "tint:#d8c060",
+      "note": "coin_stack mit antik-gold tint",
+      "generated_path": "assets/items/monster_drops/ancient_treasure.png"
+    },
+    {
+      "id": "star_mote_shard",
+      "name": "Stern-Splitter",
+      "category": "lore",
+      "source": "assets/professional/additional_assets_2026_05_29_v2/lore_items/icons_128/rift_lore.png",
+      "transform": "copy",
+      "note": "rift_lore direkt als Stern-Splitter",
+      "generated_path": "assets/items/monster_drops/star_mote_shard.png"
+    }
+  ]
+}
