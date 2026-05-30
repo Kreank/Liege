@@ -585,9 +585,10 @@ export class WorldScene extends Phaser.Scene {
     const variantTex = n.sprite_variant ? `npc_${n.sprite_variant}` : null;
     const baseTex = this.assetLoader.textureKeyFor(n.kind) ?? `npc_${n.kind}`;
     const tex = variantTex && this.textures.exists(variantTex) ? variantTex : baseTex;
-    // Animated path nur wenn das Kind in ANIMATED_NPC_KINDS ist (Walk-Cycle
-    // wurde registriert). Animal-/Cart-Kinds sind static.
-    const animKind = ANIMATED_NPC_SET.has(n.kind) ? n.kind : null;
+    // Animated path: bevorzuge die Variant (bandit_axe) wenn sie eine
+    // registrierte Walk-Anim hat — sonst der Basis-Kind (bandit). So
+    // bekommen Equip-Varianten ihren eigenen Walk-Cycle statt der Generic.
+    const animKind = this.npcAnimKind(n);
     const obj = animKind
       ? this.animatedSpriteOrFallback(tex, animKind, FALLBACK_COLORS.npc, TILE_SIZE)
       : this.spriteOrFallback(tex, FALLBACK_COLORS.npc, TILE_SIZE);
@@ -597,9 +598,21 @@ export class WorldScene extends Phaser.Scene {
 
   private updateNpcSprite(obj: Phaser.GameObjects.GameObject, n: NPC): void {
     this.updateMovableSprite(obj, n.x, n.y);
-    if (ANIMATED_NPC_SET.has(n.kind)) {
-      this.handleWalkAnim(obj, this.npcTracks, n.id, n.kind, n.x, n.y);
+    const animKind = this.npcAnimKind(n);
+    if (animKind) {
+      this.handleWalkAnim(obj, this.npcTracks, n.id, animKind, n.x, n.y);
     }
+  }
+
+  /** Resolve Walk-Anim-Kind: bevorzuge `sprite_variant` falls registriert. */
+  private npcAnimKind(n: NPC): string | null {
+    if (n.sprite_variant && ANIMATED_NPC_SET.has(n.sprite_variant)) {
+      return n.sprite_variant;
+    }
+    if (ANIMATED_NPC_SET.has(n.kind)) {
+      return n.kind;
+    }
+    return null;
   }
 
   private createStructureSprite(s: Structure): Phaser.GameObjects.GameObject {
@@ -732,12 +745,14 @@ export class WorldScene extends Phaser.Scene {
     sprite.anims.play(idleKey, true);
   }
 
-  /** Liefert den NPC-Kind aus dem aktuellen npcsVisible()-Snapshot. */
+  /** Liefert den Walk-Anim-Kind eines NPC (Variant bevorzugt) aus dem
+   *  aktuellen npcsVisible()-Snapshot. Nötig für die Idle-Detection. */
   private npcKindFor(id: string | number): string | null {
     const npcs = this.bridge.state.npcsVisible();
     const idNum = typeof id === 'string' ? Number(id) : id;
     const npc = npcs.find((n) => n.id === idNum);
-    return npc ? npc.kind : null;
+    if (!npc) return null;
+    return this.npcAnimKind(npc);
   }
 
   /** Liefert das Player-Preset aus dem aktuellen players()-Snapshot. */
