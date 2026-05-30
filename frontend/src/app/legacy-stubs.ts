@@ -13,19 +13,7 @@
 // dürfen (siehe Plan). Sucht der Plan nach offenen UI-Punkten → grep hier.
 
 export const F4_PENDING_UI_PANELS = [
-  // TODO F5+: Minimap (DOM-Canvas, kein Phaser — wird per `drawMinimap`
-  //          gemalt). Eventuell als Angular-Component mit `<canvas>`.
-  'minimap',
-
-  // TODO F5+: Top-Right-Links (Admin/Logout) — werden Legacy via
-  //          `document.body.appendChild` rangehängt; gehört in den App-Shell.
-  'top-right-links',
-
-  // TODO F5+: Settings-Overlay (Audio-Sliders Master/SFX/Music + Mute).
-  //          Legacy `setupSoundSettings`. Liegt komplett im IIFE oben.
-  'settings',
-
-  // TODO F5+: Mobile-Touch-Joystick + Action-Buttons.
+  // TODO F-final: Mobile-Touch-Joystick + Action-Buttons.
   //          Legacy `window.MobileUI`, `window.touchInput`.
   'mobile-controls',
 ] as const;

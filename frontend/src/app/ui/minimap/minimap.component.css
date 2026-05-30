@@ -1,0 +1,22 @@
+/* Minimap-Canvas — positioniert oben rechts (Legacy: frontend/legacy/
+   style.css ~Z. 10647). */
+
+:host { display: contents; }
+
+.minimap {
+  position: fixed;
+  top: 50px;
+  right: 12px;
+  z-index: 50;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #6e5e3a;
+  border-radius: 2px;
+  image-rendering: pixelated;
+}
+
+@media (max-width: 720px) {
+  .minimap {
+    width: 180px;
+    height: 124px;
+  }
+}

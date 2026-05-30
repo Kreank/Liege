@@ -28,14 +28,17 @@ import { FactionsComponent } from './ui/factions/factions.component';
 import { InventoryComponent } from './ui/inventory/inventory.component';
 import { ItemTooltipComponent } from './ui/item-tooltip/item-tooltip.component';
 import { LootRollComponent } from './ui/loot-roll/loot-roll.component';
+import { MinimapComponent } from './ui/minimap/minimap.component';
 import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
 import { ResearchComponent } from './ui/research/research.component';
+import { SettingsComponent } from './ui/settings/settings.component';
 import { SignInspectComponent } from './ui/sign-inspect/sign-inspect.component';
 import { SkillsComponent } from './ui/skills/skills.component';
 import { SpellbookComponent } from './ui/spellbook/spellbook.component';
 import { TalentsComponent } from './ui/talents/talents.component';
+import { TopRightLinksComponent } from './ui/top-right-links/top-right-links.component';
 import { TradeComponent } from './ui/trade/trade.component';
 
 @Component({
@@ -68,6 +71,9 @@ import { TradeComponent } from './ui/trade/trade.component';
     BestiaryComponent,
     SignInspectComponent,
     ItemTooltipComponent,
+    MinimapComponent,
+    SettingsComponent,
+    TopRightLinksComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

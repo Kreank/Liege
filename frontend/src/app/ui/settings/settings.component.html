@@ -1,0 +1,50 @@
+<button type="button"
+        class="settings-btn"
+        title="Einstellungen"
+        (click)="toggle()">⚙️</button>
+
+@if (visible()) {
+  <div class="settings-overlay" (click)="close()">
+    <div class="settings-box" (click)="$event.stopPropagation()">
+      <div class="settings-header">
+        <span>⚙️ Einstellungen — Sound</span>
+        <button type="button" class="settings-close" (click)="close()">×</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-row">
+          <label>
+            🔊 Gesamtlautstärke
+            <span class="val">{{ pct(master()) }}%</span>
+          </label>
+          <input type="range" min="0" max="100"
+                 [value]="pct(master())"
+                 (input)="onSliderInput('master', $event)">
+        </div>
+        <div class="settings-row">
+          <label>
+            ⚔️ Effekte (SFX)
+            <span class="val">{{ pct(sfx()) }}%</span>
+          </label>
+          <input type="range" min="0" max="100"
+                 [value]="pct(sfx())"
+                 (input)="onSliderInput('sfx', $event)">
+        </div>
+        <div class="settings-row">
+          <label>
+            🎵 Musik
+            <span class="val">{{ pct(music()) }}%</span>
+          </label>
+          <input type="range" min="0" max="100"
+                 [value]="pct(music())"
+                 (input)="onSliderInput('music', $event)">
+        </div>
+        <div class="settings-row mute-row">
+          <input type="checkbox" id="mute-toggle"
+                 [checked]="muted()"
+                 (change)="onMuteChange($event)">
+          <label for="mute-toggle">🔇 Alles stummschalten</label>
+        </div>
+      </div>
+    </div>
+  </div>
+}

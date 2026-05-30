@@ -1,0 +1,23 @@
+/* Top-Right-Links — übernommen aus frontend/legacy/style.css Z. 1283-1294. */
+
+:host { display: contents; font-family: monospace; }
+
+.top-right-link {
+  position: fixed; top: 10px; z-index: 100;
+  color: #c8b88a;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #6e5e3a;
+  padding: 4px 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: monospace;
+  text-shadow: 1px 1px 2px #000;
+  border-radius: 3px;
+}
+.top-right-link:hover {
+  border-color: #c8b88a;
+  background: rgba(40,30,15,0.75);
+}
+
+#top-link-logout { right: 12px; }
+#top-link-admin  { right: 108px; }

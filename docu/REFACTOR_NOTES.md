@@ -573,3 +573,28 @@ Heuristik (>=2000 verbündet, <=-500 feindlich, sonst neutral).
   schließen.
 - **Stub-Marker:** legacy-stubs verliert `build-bar`, `bestiary`,
   `item-tooltip`, `sign-inspect` (jetzt 4 offen).
+
+### F-extras-4 Minimap / Settings / Top-Right-Links
+- **Minimap (`ui/minimap/`):** HTML-Canvas mit `@ViewChild`, kein Phaser.
+  Ein `effect()` reagiert auf `chunks`, `structures`, `dungeons`,
+  `npcsVisible`, `players`, `player`-Signals und plant einen Draw per
+  `requestAnimationFrame` (so kollabieren mehrere Signal-Updates in einem
+  Tick auf einen einzigen Draw). Tile-Layer + NPC- / Player- / Struktur- /
+  Dungeon-Punkte mit Cheby-bezogenem Sichtfenster 64×44 (Legacy-Default).
+  Quest-Marker, Event-Pulse und Sense-Radius sind absichtlich nicht
+  mitgenommen — die Backend-State dafür ist im Legacy aus mehreren Quellen
+  rekonstruiert und gehört in einen F-final-Polish-Pass.
+- **Settings (`ui/settings/`):** Standalone ⚙️-Button + Modal mit
+  Master/SFX/Music-Sliders + Mute-Toggle. Werte werden in
+  `localStorage['liege_sound_settings']` persistiert (gleiche Key wie
+  Legacy) und an `window.SoundManager.setVolume/setMute` weitergereicht,
+  falls vorhanden. Kein Sound-Manager-Port — der lebt vorerst in
+  `frontend/legacy/app.js` und wird in F-final entweder portiert oder
+  durch einen Angular-AudioService abgelöst.
+- **Top-Right-Links (`ui/top-right-links/`):** Macht beim Init einen
+  `GET /auth/me`-Fetch. 401 → Redirect auf `/login` (Legacy-Verhalten).
+  Admin-Link wird nur bei `role === 'admin'` gerendert; Logout-Click
+  `POST /auth/logout` → Redirect.
+- **Stub-Marker:** legacy-stubs verliert `minimap`, `settings`,
+  `top-right-links`. Übrig bleibt nur noch `mobile-controls` (Touch-
+  Joystick — F-final).
