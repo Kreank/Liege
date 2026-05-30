@@ -1,0 +1,49 @@
+@if (board(); as b) {
+  <div class="qb-overlay" (click)="close()">
+    <div class="qb-box" (click)="$event.stopPropagation()">
+      <div class="qb-header">
+        <span>📋 Auftragstafel</span>
+        <button type="button" class="qb-close" (click)="close()">Esc</button>
+      </div>
+      <div class="qb-list">
+        @if (b.offers.length === 0) {
+          <div class="qb-empty">
+            Aktuell keine Aufträge verfügbar.<br>
+            Komm später wieder oder steige im Kampf-Level auf.
+          </div>
+        }
+        @for (o of b.offers; track o.template_id) {
+          <div class="qb-row">
+            <div class="qb-row-head">
+              @if (o.tier) {
+                <span class="qb-tier">T{{ o.tier }}</span>
+              }
+              <span class="qb-title">{{ o.title }}</span>
+            </div>
+            @if (o.description) {
+              <div class="qb-desc">{{ o.description }}</div>
+            }
+            @if (objectiveLabel(o.quest_type, o.objective); as obj) {
+              @if (obj) {
+                <div class="qb-objective">🎯 {{ obj }}</div>
+              }
+            }
+            @if (rewardRows(o.reward).length > 0) {
+              <div class="qb-reward">
+                Belohnung:
+                @for (r of rewardRows(o.reward); track r.key) {
+                  <span>{{ r.key }}: {{ r.value }}{{ $last ? '' : ', ' }}</span>
+                }
+              </div>
+            }
+            <div class="qb-actions">
+              <button type="button" class="qb-accept" (click)="accept(o.template_id)">
+                Annehmen
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

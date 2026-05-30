@@ -42,6 +42,7 @@ import type {
   UnknownServerMessage,
 } from '../models/ws-message.model';
 import { isInitMessage } from '../models/ws-message.model';
+import { ToastService } from './toast.service';
 import { WebSocketService } from './websocket.service';
 
 /**
@@ -71,6 +72,7 @@ function _stripPreviousSlot(
 @Injectable({ providedIn: 'root' })
 export class GameStateService {
   private readonly ws = inject(WebSocketService);
+  private readonly toast = inject(ToastService);
 
   // ─── Spieler-State ────────────────────────────────────────────────────
   readonly player = signal<PlayerSnapshot | null>(null);
@@ -119,6 +121,29 @@ export class GameStateService {
   readonly itemsGround = signal<readonly GroundItem[]>([]);
   readonly events = signal<readonly WorldEvent[]>([]);
   readonly players = signal<Readonly<Record<string, OnlinePlayer>>>({});
+  /** Aktuell laufende Disaster (H1.17). Backend tracked das in `disaster_state`;
+   *  Frontend hält nur die `kind`-Strings für UI-Indikatoren. Patches durch
+   *  `disaster_started` / `disaster_ended`; Init-Snapshot über
+   *  `init.active_disasters`. */
+  readonly activeDisasters = signal<ReadonlySet<string>>(new Set());
+
+  // ─── Dungeon-Kontext (H1-C / H1.5, H1.12) ────────────────────────────
+  /** True wenn der Spieler in einer Dungeon-Instanz ist (Gegenstück zur
+   *  Overworld). Subagent A (H1.10/H1.11) toggled das beim `dungeon_enter`/
+   *  `dungeon_exit`-Handler. Click-Routing in `world-scene.ts::handleTileClick`
+   *  nutzt das, um Dungeon-spezifische Intents (z. B. `dungeon_chest`) zu
+   *  senden statt der Overworld-Defaults. */
+  readonly inDungeon = signal<boolean>(false);
+  /** Feature-Tiles im aktuellen Dungeon-Floor, die als Truhe klickbar sind.
+   *  Befüllt von Subagent A aus `dungeon_enter`/`dungeon_floor_change`.
+   *  Click-Routing matched Tile-Pos gegen diese Liste → `dungeon_chest`-
+   *  Intent. `opened`-Flag verhindert Re-Trigger auf bereits geleerte
+   *  Truhen (Backend lehnt das ohnehin ab, aber Toast-Spam vermeiden). */
+  readonly dungeonChests = signal<readonly {
+    readonly x: number;
+    readonly y: number;
+    readonly opened: boolean;
+  }[]>([]);
 
   // ─── Interaktions-Modals (F-extras-1) ────────────────────────────────
   /** Aktive NPC-Konversation (Dialog-Panel). */
@@ -147,6 +172,33 @@ export class GameStateService {
       readonly requires?: string | null;
       readonly inputs: readonly { readonly kind: string; readonly quantity: number }[];
     }[];
+  } | null>(null);
+
+  /** Aktives Quest-Board-Angebot (quest_board_open). H1.6. */
+  readonly activeQuestBoard = signal<{
+    readonly board_id: number;
+    readonly offers: readonly {
+      readonly template_id: string;
+      readonly title: string;
+      readonly description?: string;
+      readonly quest_type?: string;
+      readonly objective?: Readonly<Record<string, unknown>>;
+      readonly reward?: Readonly<Record<string, number | string>>;
+      readonly tier?: number;
+    }[];
+  } | null>(null);
+
+  /** Letzter NPC-Quest-Status (`npc_quest_status` aus `query_npc_quests`).
+   *  Dialog-Panel rendert das als „Verfügbare Quests"-Sektion (H1.8). */
+  readonly activeNpcQuestStatus = signal<{
+    readonly npc_id: number;
+    readonly offers: readonly {
+      readonly template_id: string;
+      readonly title: string;
+      readonly description?: string;
+      readonly tier?: number;
+    }[];
+    readonly turnins: readonly { readonly quest_id: number; readonly title: string }[];
   } | null>(null);
 
   /** Händler-Tab (trade_open). */
@@ -195,6 +247,56 @@ export class GameStateService {
     readonly slug: string;
     readonly label: string;
   } | null>(null);
+
+  // ─── Dungeon-Floor-State (Welle H1-A — H1.10 / H1.11) ────────────────
+  /** Aktiver Dungeon-Floor (rich state für den `DungeonRenderer` in der
+   *  Phaser-Scene). Null wenn der Spieler in der Overworld ist. Wird von
+   *  `dungeon_enter` / `dungeon_floor_change` gesetzt, von `dungeon_exit`
+   *  / `dungeon_collapsed` geleert. Parallel pflegen wir `inDungeon` und
+   *  `dungeonChests` (oben), die das Click-Routing in der WorldScene
+   *  nutzt. */
+  readonly dungeonFloor = signal<{
+    readonly id: number | string;
+    readonly name?: string;
+    readonly floorIdx: number;
+    readonly floorCount: number;
+    readonly size: number;
+    readonly tiles: readonly (readonly number[])[];
+    readonly spawn: { readonly x: number; readonly y: number };
+    /** Theme-Daten (Tints, Label, Ambient) aus `dungeon_floor_payload`. */
+    readonly theme?: string;
+    readonly themeData?: {
+      readonly label?: string;
+      readonly wall_tint?: string | number | null;
+      readonly floor_tint?: string | number | null;
+      readonly ambient_color?: string | number | null;
+      readonly ambient?: string | null;
+    };
+    /** Sichtbare Features (Truhen, getriggerte Fallen, Decor). */
+    readonly features?: {
+      readonly chests?: readonly { readonly x: number; readonly y: number; readonly opened?: boolean }[];
+      readonly traps?: readonly { readonly x: number; readonly y: number; readonly kind?: string }[];
+      readonly decor?: readonly { readonly x: number; readonly y: number; readonly kind: string }[];
+    };
+    /** Versions-Token (monotonic): inkrementiert pro `dungeon_enter` /
+     *  `dungeon_floor_change`. Der Phaser-Renderer beobachtet den Wert
+     *  und triggert dann den Floor-Re-Render (statt nur Signal-Identity,
+     *  das stabil bliebe, wenn Backend zweimal denselben Floor schickt). */
+    readonly version: number;
+  } | null>(null);
+
+  /** Dungeon-Sense-Pulse (kurzlebig): wenn der Spieler ein Sense-Item
+   *  benutzt, sendet das Backend Dungeon-Positionen im Radius. Wird von
+   *  der Minimap-Komponente konsumiert (Pulse-Animation für 5s, H3.10
+   *  Polish-Task). Wir füttern das Signal hier bereits, damit alle sechs
+   *  dungeon_*-Frames atomar in einem Commit landen. */
+  readonly dungeonSensePulse = signal<{
+    readonly at_ms: number;
+    readonly dungeons: readonly { readonly x: number; readonly y: number; readonly radius?: number }[];
+  } | null>(null);
+
+  /** Monotonic version-token für `dungeonFloor.version`. */
+  private _dungeonVersion = 0;
 
   // ─── Meta ────────────────────────────────────────────────────────────
   readonly worldSeed = signal<number | string | null>(null);
@@ -265,9 +367,9 @@ export class GameStateService {
       case 'npc_goal':
       case 'npc_speech':
       case 'npc_mood':
-      case 'npc_quest_status':
         // UI-Side-Effects (Sprechblase, Mood-Icon) — kein State-Update.
         break;
+      case 'npc_quest_status':     this._handleNpcQuestStatus(msg); break;
 
       case 'item_spawned':         this._handleItemSpawned(msg); break;
       case 'item_picked_up':       this._handleItemPickedUp(msg); break;
@@ -283,10 +385,17 @@ export class GameStateService {
       // ─── Chunks + Welt ─────────────────────────────────────────────
       case 'chunks':               this._handleChunks(msg); break;
       case 'event':                this._handleEvent(msg); break;
+      case 'world_event':          this._handleWorldEvent(msg); break;
       case 'weather':              this._handleWeather(msg); break;
 
-      // ─── Zeit ───────────────────────────────────────────────────────
-      case 'time_update':          this._handleTimeUpdate(msg); break;
+      // ─── Zeit (H1.18) ──────────────────────────────────────────────
+      // Backend sendet aktuell `time_update` (siehe backend/time_system.py).
+      // Anhang B des Frontend-Implementation-Plans warnt vor einem
+      // `time_tick`-Mismatch — wir handlen defensiv beide Strings auf den
+      // selben Branch, damit ein etwaiges Backend-Rename oder ein paralleles
+      // Frame-Format nicht stillschweigend versickert.
+      case 'time_update':
+      case 'time_tick':            this._handleTimeUpdate(msg); break;
 
       // ─── Party / Loot ───────────────────────────────────────────────
       case 'group_state':          this.party.set((msg['group'] as Group | null) ?? null); break;
@@ -301,8 +410,8 @@ export class GameStateService {
         break;
       case 'group_converted':      this._handleGroupConverted(msg); break;
       case 'group_chat':           this._handleGroupChat(msg); break;
-      case 'group_error':
-      case 'raid_error':           /* Toast — kein State */ break;
+      case 'group_error':          this._toastError(msg, 'Gruppen-Aktion fehlgeschlagen'); break;
+      case 'raid_error':           this._toastError(msg, 'Raid-Aktion fehlgeschlagen'); break;
       case 'raid_started':         /* Visual-Event */ break;
       case 'loot_roll_started':    this._handleLootRollStarted(msg); break;
       case 'loot_roll_resolved':   this.activeLootRoll.set(null); break;
@@ -311,19 +420,20 @@ export class GameStateService {
         // loot_voted: nur Live-Vote-Count, der Overlay zeigt das nicht; das
         // Lootrule-Update wird vom späteren Party-Settings-Panel konsumiert.
         break;
+      case 'loot_vote_error':      this._toastError(msg, 'Loot-Vote ungültig'); break;
 
       // ─── Quests + Factions ──────────────────────────────────────────
       case 'quests_update':        this._handleQuestsUpdate(msg); break;
-      case 'quest_new':            this._handleQuestNew(msg); break;
+      case 'quest_new':            this._handleQuestNew(msg); this._toastQuestNew(msg); break;
       case 'quest_progress':       this._handleQuestProgress(msg); break;
-      case 'quest_closed':         this._handleQuestClosed(msg); break;
+      case 'quest_closed':         this._handleQuestClosed(msg); this._toastQuestClosed(msg); break;
       case 'factions_update':      this._handleFactionsUpdate(msg); break;
-      case 'quest_board_open':     /* UI-Trigger */ break;
+      case 'quest_board_open':     this._handleQuestBoardOpen(msg); break;
 
       // ─── Talents + Spells ───────────────────────────────────────────
       case 'talents_update':       this._handleTalentsUpdate(msg); break;
-      case 'talent_learned':       this._handleTalentLearned(msg); break;
-      case 'spell_learned':        this._handleSpellLearned(msg); break;
+      case 'talent_learned':       this._handleTalentLearned(msg); this._toastTalentLearned(msg); break;
+      case 'spell_learned':        this._handleSpellLearned(msg); this._toastSpellLearned(msg); break;
       case 'cast_started':         this._handleCastStarted(msg); break;
       case 'cast_interrupted':
       case 'cast_finished':        this.activeCast.set(null); break;
@@ -343,25 +453,38 @@ export class GameStateService {
       case 'research_pool_update': this._handleResearchPoolUpdate(msg); break;
       case 'skill_xp':             /* Floating-Text, kein persistent state hier */ break;
 
-      // ─── Dungeons / Disasters / Misc ────────────────────────────────
-      case 'dungeon_enter':
-      case 'dungeon_exit':
-      case 'dungeon_floor_change':
-      case 'dungeon_collapsed':
-      case 'dungeon_sense':
-      case 'dungeon_chest_opened':
+      // ─── Disaster (H1.17 — Start/End-Toast + activeDisasters-Set) ───
+      case 'disaster_started':     this._handleDisasterStarted(msg); break;
+      case 'disaster_ended':       this._handleDisasterEnded(msg); break;
+
+      // ─── Dungeons (Welle H1-A — H1.10 / H1.11) ─────────────────────
+      case 'dungeon_enter':         this._handleDungeonEnter(msg); break;
+      case 'dungeon_floor_change':  this._handleDungeonFloorChange(msg); break;
+      case 'dungeon_exit':          this._handleDungeonExit(msg); break;
+      case 'dungeon_collapsed':     this._handleDungeonCollapsed(msg); break;
+      case 'dungeon_sense':         this._handleDungeonSense(msg); break;
+      case 'dungeon_chest_opened':  this._handleDungeonChestOpened(msg); break;
+
+      // ─── Misc-FX (UI-Side-Effects, kein State) ─────────────────────
       case 'trap_triggered':
-      case 'disaster_started':
-      case 'disaster_ended':
       case 'lightning_strike':
       case 'earthquake_shake':
       case 'visual_effect':
-      case 'chat':                 this._handleChat(msg); break;
-      case 'character_created':
       case 'character_name_check':
-      case 'toast':
         // Reine UI-/Audio-Effekte oder Modals — keine Signals zu updaten.
         break;
+
+      case 'chat':                 this._handleChat(msg); break;
+
+      // ─── Spieler-Lifecycle-Toasts (H1.23) ──────────────────────────
+      // `player_respawned` ist oben schon gehandelt (Down-State-Clear); der
+      // Toast lebt direkt im Handler, damit kein Duplicate-Case entsteht.
+      // `character_created` triggert hier nur den Erfolgs-Toast; der State
+      // wird via folgendem `init`-Frame ohnehin neu aufgebaut.
+      case 'character_created':    this.toast.show('Charakter erstellt.', 'success'); break;
+
+      // ─── Backend-Toast (H1.22 — vorher No-op, jetzt aktiv) ────────
+      case 'toast':                this._handleBackendToast(msg); break;
 
       default:
         this._warnUnknown(msg.type);
@@ -428,6 +551,11 @@ export class GameStateService {
 
     this.party.set(msg.group ?? null);
     this.partyInvites.set(msg.group_invites ?? []);
+
+    // H1.16 — Init-Snapshot der aktiven Welt-Disaster (Bloodmoon, Pestilence,
+    // …). Inkrementelle Patches kommen über `disaster_started`/`disaster_ended`.
+    const initDisasters = msg.active_disasters ?? [];
+    this.activeDisasters.set(new Set(initDisasters.map((d) => d.kind)));
 
     // Welle 22+30: research kommt als {nodes,pool,branches,ages} oder als
     // platter nodes-dict (Legacy-Format, frontend/legacy/app.js Z. 5080-5089).
@@ -509,6 +637,10 @@ export class GameStateService {
       is_downed: false,
     });
     this.downedExpiresAt.set(null);
+    // H1.23 — Lifecycle-Feedback. Wir packen den Toast direkt hier, damit
+    // der Dispatch keinen Duplicate-Case mit dem oben definierten
+    // `case 'player_respawned'` braucht.
+    this.toast.show('Du wurdest wiederbelebt.', 'info');
   }
 
   private _handlePlayerDowned(msg: GenericMsg): void {
@@ -725,8 +857,58 @@ export class GameStateService {
     const ev = msg['event'] as WorldEvent | undefined;
     if (!ev) return;
     // Frontend hält letzte ~50 Events — der Renderer/Chronik-Panel limitiert
-    // sich selbst.
-    this.events.set([...this.events(), ev]);
+    // sich selbst. Wir schneiden hart ab, damit der Signal-Array nicht in
+    // Long-Sessions ins Megabyte-Volume rutscht.
+    const nextEvents = [...this.events(), ev];
+    if (nextEvents.length > 50) nextEvents.splice(0, nextEvents.length - 50);
+    this.events.set(nextEvents);
+  }
+
+  /**
+   * H1.14 — `world_event`-Handler. Backend (event_worker, dungeon_director,
+   * inventory.py) sendet das Frame mit `{kind, text, x?, y?}` (siehe z. B.
+   * backend/ws/inventory.py:337 für `dungeon_spawned`). Wir spiegeln das in
+   * den `events`-Signal-Stream (für Chronik-Panel, Subagent C H1.15) und
+   * triggern bei hoher Severity zusätzlich einen Toast.
+   *
+   * Severity-Ableitung: Backend hat aktuell KEIN `severity`-Feld auf
+   * `world_event` — wir leiten heuristisch ab, ob es ein Disaster-/Raid-
+   * Event ist (Toast = warn) oder ein neutrales Highlight (kein Toast,
+   * Chronik-Eintrag genügt). Sobald das Backend `severity` explizit mit-
+   * schickt, greift der Cast oben.
+   */
+  private _handleWorldEvent(msg: GenericMsg): void {
+    const kind = (msg['kind'] as string | undefined) ?? 'world_event';
+    const text = msg['text'] as string | undefined;
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    const severity = msg['severity'] as string | undefined;
+    // Synthetisches WorldEvent-Objekt bauen — Backend liefert die Felder
+    // flach, wir bauen sie in die kanonische `WorldEvent`-Form, damit
+    // Chronik + Init-Snapshot dasselbe Format konsumieren.
+    const ev: WorldEvent = {
+      id: `we_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      kind,
+      title: text,
+      description: text,
+      ts: new Date().toISOString(),
+      x,
+      y,
+    };
+    const nextEvents = [...this.events(), ev];
+    if (nextEvents.length > 50) nextEvents.splice(0, nextEvents.length - 50);
+    this.events.set(nextEvents);
+
+    // Toast-Trigger: explizite Severity (`high`/`major`/`critical`) ODER
+    // Disaster-/Raid-Heuristik wenn kein Severity-Feld da ist.
+    if (!text) return;
+    const isHighSeverity =
+      severity === 'high' || severity === 'major' || severity === 'critical';
+    const isImportantKind =
+      /disaster|raid|invasion|bloodmoon|wildfire|earthquake|collapse|dungeon_spawned/i.test(kind);
+    if (isHighSeverity || isImportantKind) {
+      this.toast.show(text, 'warn', 6000);
+    }
   }
 
   private _handleWeather(msg: GenericMsg): void {
@@ -737,8 +919,29 @@ export class GameStateService {
   }
 
   private _handleTimeUpdate(msg: GenericMsg): void {
-    const t = msg['time'] as TimeSnapshot | undefined;
-    if (t) this.time.set(t);
+    // H1.18 — Backend sendet sowohl `{type:'time_update', **snap}` (flach,
+    // Felder direkt auf msg, siehe backend/time_system.py) als auch — laut
+    // WS_PROTOCOL.md Anhang B — alternativ `{type:'time_tick', time:{...}}`.
+    // Wir akzeptieren beide Formen, damit ein etwaiges Frame-Format-Drift
+    // nicht den Tag/Nacht-Cycle abreißen lässt.
+    const nested = msg['time'] as TimeSnapshot | undefined;
+    if (nested && typeof nested === 'object') {
+      this.time.set(nested);
+      return;
+    }
+    const hour = msg['hour'];
+    const day = msg['day'];
+    if (typeof hour === 'number' || typeof day === 'number') {
+      const cur = this.time();
+      const snap: TimeSnapshot = {
+        day: (day as number | undefined) ?? cur?.day ?? 0,
+        hour: (hour as number | undefined) ?? cur?.hour ?? 0,
+        minute: (msg['minute'] as number | undefined) ?? cur?.minute ?? 0,
+        phase: (msg['phase'] as TimeSnapshot['phase'] | undefined) ?? cur?.phase,
+        is_blood_moon: (msg['is_blood_moon'] as boolean | undefined) ?? cur?.is_blood_moon,
+      };
+      this.time.set(snap);
+    }
   }
 
   // ── Party ──
@@ -904,6 +1107,12 @@ export class GameStateService {
     readonly npc_kind: string;
     readonly backstory: string;
   }): void {
+    // Stale Quest-Status vom vorherigen NPC verwerfen — sonst zeigt das
+    // Dialog-Panel beim Sprecher-Wechsel kurz die alten Offers (H1.8).
+    const prev = this.activeDialog();
+    if (!prev || prev.npc_id !== args.npc_id) {
+      this.activeNpcQuestStatus.set(null);
+    }
     this.activeDialog.set({
       npc_id: args.npc_id,
       npc_name: args.npc_name,
@@ -914,7 +1123,10 @@ export class GameStateService {
     });
   }
 
-  closeDialog(): void { this.activeDialog.set(null); }
+  closeDialog(): void {
+    this.activeDialog.set(null);
+    this.activeNpcQuestStatus.set(null);
+  }
 
   /** Erweitert den Dialog-Verlauf um eine Bubble. */
   appendDialogBubble(side: 'user' | 'npc', text: string, opts?: { readonly typing?: boolean }): void {
@@ -955,6 +1167,43 @@ export class GameStateService {
   closeChest(): void { this.activeChest.set(null); }
   closeCrafting(): void { this.activeCrafting.set(null); }
   closeTrade(): void { this.activeTrade.set(null); }
+  closeQuestBoard(): void { this.activeQuestBoard.set(null); }
+
+  private _handleQuestBoardOpen(msg: GenericMsg): void {
+    const boardId = msg['board_id'] as number | undefined;
+    if (boardId == null) return;
+    const offers = (msg['offers'] as readonly {
+      readonly template_id: string;
+      readonly title: string;
+      readonly description?: string;
+      readonly quest_type?: string;
+      readonly objective?: Readonly<Record<string, unknown>>;
+      readonly reward?: Readonly<Record<string, number | string>>;
+      readonly tier?: number;
+    }[] | undefined) ?? [];
+    this.activeQuestBoard.set({ board_id: boardId, offers });
+  }
+
+  private _handleNpcQuestStatus(msg: GenericMsg): void {
+    const npcId = msg['npc_id'] as number | undefined;
+    if (npcId == null) return;
+    const offers = (msg['offers'] as readonly {
+      readonly template_id: string;
+      readonly title: string;
+      readonly description?: string;
+      readonly tier?: number;
+    }[] | undefined) ?? [];
+    const turnins = (msg['turnins'] as readonly {
+      readonly quest_id: number;
+      readonly title: string;
+    }[] | undefined) ?? [];
+    this.activeNpcQuestStatus.set({ npc_id: npcId, offers, turnins });
+  }
+
+  /** Wird vom Dialog-Panel beim Öffnen/Schließen aufgerufen, damit stale
+   *  `npc_quest_status`-Daten nicht zwischen NPC-Wechseln durchblutet
+   *  werden (H1.8). */
+  clearNpcQuestStatus(): void { this.activeNpcQuestStatus.set(null); }
 
   private _handleChestOpen(msg: GenericMsg): void {
     const id = msg['chest_id'] as number | undefined;
@@ -1158,6 +1407,265 @@ export class GameStateService {
 
   closeSignInspect(): void { this.activeSignInspect.set(null); }
 
+  // ── Dungeons (Welle H1-A — H1.10 / H1.11) ──
+  //
+  // 6 Frames vom Backend:
+  //   • dungeon_enter         — Floor-0-Betreten (mit tiles, spawn, features)
+  //   • dungeon_floor_change  — Treppe rauf/runter (gleicher Floor-State,
+  //                              neue tiles + neuer spawn)
+  //   • dungeon_exit          — Treppe Floor-0 hoch → zurück zur Overworld
+  //   • dungeon_collapsed     — Dungeon ist abgelaufen / eingestürzt;
+  //                              Spieler wird vom Backend zur Overworld
+  //                              gebeamt (Toast als visuelles Feedback)
+  //   • dungeon_sense         — Spüre-Item: kurzlebige Position-Liste
+  //                              (Minimap-Pulse, H3.10)
+  //   • dungeon_chest_opened  — Truhe geöffnet (Sprite-Swap im Floor)
+  //
+  // Architektur: Wir aktualisieren mehrere parallele Signals (statt eines
+  // großen Bündels), damit unterschiedliche Konsumenten unabhängig auf das
+  // reagieren können was sie interessiert:
+  //   • dungeonFloor      → Phaser-Renderer (tile-map + features layer)
+  //   • inDungeon         → Click-Routing in WorldScene (Subagent C)
+  //   • dungeonChests     → dito (für `dungeon_chest`-Intent-Auswahl)
+  //   • dungeonSensePulse → Minimap-Component (Polish, H3.10)
+  //
+  // Außerdem: bei `dungeon_enter` / `floor_change` / `exit` setzen wir
+  // die Spieler-Position direkt, damit der Phaser-Player-Sprite + Kamera
+  // ohne Verzögerung am Spawn stehen.
+
+  private _handleDungeonEnter(msg: GenericMsg): void {
+    const floor = this._buildDungeonFloorFromMsg(msg);
+    if (!floor) return;
+    this.dungeonFloor.set(floor);
+    this.inDungeon.set(true);
+    this._syncDungeonChestsFromFloor(floor);
+    this._patchPlayer({ x: floor.spawn.x, y: floor.spawn.y });
+  }
+
+  private _handleDungeonFloorChange(msg: GenericMsg): void {
+    const floor = this._buildDungeonFloorFromMsg(msg);
+    if (!floor) return;
+    this.dungeonFloor.set(floor);
+    this.inDungeon.set(true);
+    this._syncDungeonChestsFromFloor(floor);
+    this._patchPlayer({ x: floor.spawn.x, y: floor.spawn.y });
+  }
+
+  private _handleDungeonExit(msg: GenericMsg): void {
+    this.dungeonFloor.set(null);
+    this.inDungeon.set(false);
+    this.dungeonChests.set([]);
+    const spawn = msg['spawn'] as { readonly x?: number; readonly y?: number } | undefined;
+    if (spawn?.x != null && spawn?.y != null) {
+      this._patchPlayer({ x: spawn.x, y: spawn.y });
+    }
+    // Backend sendet `chunks` als Feld direkt im dungeon_exit-Frame —
+    // den selben Merge nutzen wie der normale `chunks`-Handler.
+    const chunks = msg['chunks'] as readonly Chunk[] | undefined;
+    if (chunks && chunks.length > 0) {
+      const map = new Map<string, Chunk>();
+      for (const c of this.chunks()) map.set(`${c.cx},${c.cy}`, c);
+      for (const c of chunks) map.set(`${c.cx},${c.cy}`, c);
+      this.chunks.set(Array.from(map.values()));
+    }
+    // Backend liefert auch `npcs` (Overworld-NPCs in der Nähe des Exit-
+    // Punkts) — voll ersetzen, weil die NPCs des Dungeon-Floors weg sind.
+    const npcs = msg['npcs'] as readonly NPC[] | undefined;
+    if (npcs) this.npcsVisible.set(npcs);
+  }
+
+  private _handleDungeonCollapsed(msg: GenericMsg): void {
+    // Backend hat den Spieler bereits zur Overworld zurückgebeamt; wir
+    // räumen lokal den Dungeon-State auf. Toast-Service informiert.
+    this.dungeonFloor.set(null);
+    this.inDungeon.set(false);
+    this.dungeonChests.set([]);
+    const name = (msg['name'] as string | undefined) ?? 'Dungeon';
+    this.toast.show(`💥 ${name} eingestürzt — du wurdest hinausgeworfen`, 'warn');
+  }
+
+  private _handleDungeonSense(msg: GenericMsg): void {
+    const dungeons = msg['dungeons'] as readonly {
+      readonly x: number; readonly y: number; readonly radius?: number;
+    }[] | undefined;
+    if (!dungeons) return;
+    this.dungeonSensePulse.set({
+      at_ms: Date.now(),
+      dungeons,
+    });
+  }
+
+  private _handleDungeonChestOpened(msg: GenericMsg): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null) return;
+    // Click-Routing-Signal aktualisieren — die Truhe ist nicht mehr
+    // klickbar (oder soll als „leer" angezeigt werden).
+    this.dungeonChests.set(
+      this.dungeonChests().map((c) =>
+        c.x === x && c.y === y ? { ...c, opened: true } : c,
+      ),
+    );
+    // Den rich-floor-state ebenfalls patchen, damit der Phaser-Renderer
+    // beim nächsten Snapshot den Sprite-Swap macht (auch falls er gerade
+    // einen vollen Re-Render auslöst).
+    const cur = this.dungeonFloor();
+    if (!cur || !cur.features?.chests) return;
+    const nextChests = cur.features.chests.map((c) =>
+      c.x === x && c.y === y ? { ...c, opened: true } : c,
+    );
+    this.dungeonFloor.set({
+      ...cur,
+      features: { ...cur.features, chests: nextChests },
+    });
+  }
+
+  /** Baut den rich `dungeonFloor`-State aus einem `dungeon_enter` /
+   *  `dungeon_floor_change`-Frame. Validiert die Pflichtfelder; bei
+   *  fehlenden Feldern → null (Frame wird ignoriert, defensiv). */
+  private _buildDungeonFloorFromMsg(
+    msg: GenericMsg,
+  ): ReturnType<typeof this.dungeonFloor> | null {
+    const id = msg['dungeon_id'] as number | string | undefined;
+    const tiles = msg['tiles'] as readonly (readonly number[])[] | undefined;
+    const spawn = msg['spawn'] as { readonly x?: number; readonly y?: number } | undefined;
+    const size = msg['size'] as number | undefined;
+    const floorIdx = msg['floor_idx'] as number | undefined;
+    const floorCount = msg['floor_count'] as number | undefined;
+    if (id == null || !tiles || !spawn || spawn.x == null || spawn.y == null
+        || size == null || floorIdx == null) {
+      return null;
+    }
+    this._dungeonVersion += 1;
+    return {
+      id,
+      name: msg['name'] as string | undefined,
+      floorIdx,
+      floorCount: floorCount ?? 1,
+      size,
+      tiles,
+      spawn: { x: spawn.x, y: spawn.y },
+      theme: msg['theme'] as string | undefined,
+      themeData: msg['theme_data'] as {
+        readonly label?: string;
+        readonly wall_tint?: string | number | null;
+        readonly floor_tint?: string | number | null;
+        readonly ambient_color?: string | number | null;
+        readonly ambient?: string | null;
+      } | undefined,
+      features: msg['features'] as {
+        readonly chests?: readonly { readonly x: number; readonly y: number; readonly opened?: boolean }[];
+        readonly traps?: readonly { readonly x: number; readonly y: number; readonly kind?: string }[];
+        readonly decor?: readonly { readonly x: number; readonly y: number; readonly kind: string }[];
+      } | undefined,
+      version: this._dungeonVersion,
+    };
+  }
+
+  /** Synct das schmale `dungeonChests`-Signal (Click-Routing) aus dem
+   *  rich `dungeonFloor`-State. */
+  private _syncDungeonChestsFromFloor(
+    floor: NonNullable<ReturnType<typeof this.dungeonFloor>>,
+  ): void {
+    const chests = floor.features?.chests ?? [];
+    this.dungeonChests.set(
+      chests.map((c) => ({ x: c.x, y: c.y, opened: c.opened === true })),
+    );
+  }
+
+  // ── Disaster (H1.16, H1.17) ──
+
+  private _handleDisasterStarted(msg: GenericMsg): void {
+    const kind = msg['kind'] as string | undefined;
+    if (!kind) return;
+    const next = new Set(this.activeDisasters());
+    next.add(kind);
+    this.activeDisasters.set(next);
+    // H1.17 — Start-Toast. Idempotent — falls Backend zusätzlich einen `toast`
+    // sendet, kriegt der Spieler zwei Hinweise, das ist sichtbar harmlos.
+    this.toast.show(`⚠️ ${_disasterLabel(kind)} beginnt`, 'warn', 6000);
+  }
+
+  private _handleDisasterEnded(msg: GenericMsg): void {
+    const kind = msg['kind'] as string | undefined;
+    if (!kind) return;
+    const next = new Set(this.activeDisasters());
+    next.delete(kind);
+    this.activeDisasters.set(next);
+    this.toast.show(`✓ ${_disasterLabel(kind)} vorbei`, 'success', 4000);
+  }
+
+  // ── Toast-Triggers (H1.22 + H1.23) ──
+
+  /**
+   * H1.22 — Backend-`toast`-Frame durchreichen. Backend sendet `{type:'toast',
+   * text:'...', kind?:'info'|'warn'|'error'|'success'}`. Vorher war der Case
+   * ein expliziter No-op, dadurch versickerten >150 Toast-Strings pro Session.
+   */
+  private _handleBackendToast(msg: GenericMsg): void {
+    const text = msg['text'] as string | undefined;
+    if (!text) return;
+    const rawKind = msg['kind'] as string | undefined;
+    // Backend nutzt freie Strings; wir mappen alles außerhalb unseres
+    // Type-Sets defensiv auf `info`, damit der Toast trotzdem rauskommt.
+    const kind: 'info' | 'success' | 'warn' | 'error' =
+      rawKind === 'success' || rawKind === 'warn' || rawKind === 'error'
+        ? rawKind
+        : 'info';
+    this.toast.show(text, kind);
+  }
+
+  /**
+   * Generischer Error-Toast-Builder für group/raid/loot-Fehler (H1.23).
+   * Backend sendet typischerweise `{reason, ...}`; wir bauen einen lesbaren
+   * Text aus `text`/`reason`/`detail` + Fallback-Label.
+   */
+  private _toastError(msg: GenericMsg, fallback: string): void {
+    const text =
+      (msg['text'] as string | undefined) ??
+      (msg['reason'] as string | undefined) ??
+      (msg['detail'] as string | undefined);
+    this.toast.show(text ? `${fallback}: ${text}` : fallback, 'error');
+  }
+
+  /** Quest-New-Toast — wertet `quest.title` aus dem Backend-Frame aus. */
+  private _toastQuestNew(msg: GenericMsg): void {
+    const q = msg['quest'] as { readonly title?: string } | undefined;
+    const title = q?.title ?? (msg['title'] as string | undefined);
+    this.toast.show(title ? `Neue Quest: ${title}` : 'Neue Quest erhalten.', 'success');
+  }
+
+  /** Quest-Closed-Toast. */
+  private _toastQuestClosed(msg: GenericMsg): void {
+    const q = msg['quest'] as { readonly title?: string } | undefined;
+    const title = q?.title ?? (msg['title'] as string | undefined);
+    this.toast.show(
+      title ? `Quest abgeschlossen: ${title}` : 'Quest abgeschlossen!',
+      'success',
+    );
+  }
+
+  /** Spell-Learned-Toast. Backend liefert je nach Pfad `spell_id` oder
+   *  `spell_name`; wir fallen auf den `id`-String zurück. */
+  private _toastSpellLearned(msg: GenericMsg): void {
+    const name =
+      (msg['spell_name'] as string | undefined) ??
+      (msg['name'] as string | undefined) ??
+      (msg['spell_id'] as string | undefined);
+    if (!name) return;
+    this.toast.show(`Du hast ${name} gelernt.`, 'success');
+  }
+
+  /** Talent-Learned-Toast. */
+  private _toastTalentLearned(msg: GenericMsg): void {
+    const name =
+      (msg['talent_name'] as string | undefined) ??
+      (msg['name'] as string | undefined) ??
+      (msg['talent_id'] as string | undefined);
+    if (!name) return;
+    this.toast.show(`Talent gelernt: ${name}`, 'success');
+  }
+
   // ── Misc ──
 
   private _warnUnknown(type: string): void {
@@ -1166,4 +1674,22 @@ export class GameStateService {
     // eslint-disable-next-line no-console
     console.warn('Unknown WS type:', type);
   }
+}
+
+// ─── Helpers (Modul-lokal) ─────────────────────────────────────────────
+
+/** Disaster-Kind → Deutsche UI-Bezeichnung für Toasts und Tooltips. */
+function _disasterLabel(kind: string): string {
+  const map: Readonly<Record<string, string>> = {
+    bloodmoon: 'Blutmond',
+    dying_sun: 'Sterbende Sonne',
+    thunderstorm: 'Gewittersturm',
+    scorching_heat: 'Sengende Hitze',
+    ash_rain: 'Aschenregen',
+    wildfire: 'Waldbrand',
+    pestilence: 'Pestilenz',
+    locust_swarm: 'Heuschreckenschwarm',
+    toxic_fog: 'Giftnebel',
+  };
+  return map[kind] ?? kind;
 }
