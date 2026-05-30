@@ -1,0 +1,69 @@
+// GameBridgeService — die einzige Naht zwischen Phaser und Angular.
+//
+// Phaser-Scenes leben außerhalb der Angular-Zone (siehe `PhaserGameComponent`
+// `ngZone.runOutsideAngular`). Daher dürfen sie KEINE Angular-Services direkt
+// injizieren — jeder Signal-`set()` würde Change Detection triggern und die
+// Render-Loop könnte stottern.
+//
+// Stattdessen wird **diese Bridge** in die Scene per `Scene.init(data)`
+// durchgereicht. Sie bietet Phaser-seitig:
+//   • READ-only Zugriff auf alle Game-State-Signals (über `state` → das
+//     GameStateService selbst, das nur read-Methoden anbietet).
+//   • `sendIntent()` — delegiert an `WebSocketService.send()`. Strikt typed
+//     mit `ClientIntent`.
+//
+// Bridge wird in `PhaserGameComponent` injiziert (Angular-side) und einmal
+// pro `Phaser.Game` an die Scene weitergegeben.
+
+import { Injectable, inject } from '@angular/core';
+
+import type { ClientIntent } from '../models/ws-message.model';
+import { GameStateService } from './game-state.service';
+import { WebSocketService } from './websocket.service';
+
+@Injectable({ providedIn: 'root' })
+export class GameBridgeService {
+  /** READ-only Game-State (Phaser liest pro Frame Signals via `state.<sig>()`). */
+  readonly state = inject(GameStateService);
+  private readonly ws = inject(WebSocketService);
+
+  /**
+   * Phaser → Server. Frame muss einen `type`-String haben; alles weitere ist
+   * intent-spezifisch. Spiegelt das Legacy-`ws.send(JSON.stringify({...}))`.
+   *
+   * No-op wenn die WS nicht offen ist — gleiches Verhalten wie Legacy.
+   */
+  sendIntent(intent: ClientIntent): void {
+    this.ws.send(intent);
+  }
+
+  // ─── Convenience-Helpers für die häufigsten Intents ──────────────────
+  //
+  // Die Scene könnte alles direkt über `sendIntent({type:'move',...})`
+  // schicken. Wir bieten kleine Wrapper, um Tippfehler im `type`-String zu
+  // vermeiden und damit `git grep sendMove` die Aufrufer findet.
+
+  sendMove(x: number, y: number): void {
+    this.sendIntent({ type: 'move', x, y });
+  }
+
+  sendSprint(on: boolean): void {
+    this.sendIntent({ type: 'sprint', on });
+  }
+
+  sendAttackNpc(npcId: number): void {
+    this.sendIntent({ type: 'attack_npc', npc_id: npcId });
+  }
+
+  sendUseStructure(x: number, y: number): void {
+    this.sendIntent({ type: 'use_structure', x, y });
+  }
+
+  sendPickItem(itemId: number): void {
+    this.sendIntent({ type: 'pick_item', item_id: itemId });
+  }
+
+  sendTalkToNpc(npcId: number): void {
+    this.sendIntent({ type: 'talk_to_npc', npc_id: npcId });
+  }
+}
