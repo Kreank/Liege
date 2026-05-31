@@ -6,22 +6,25 @@
         <span>Münzen: {{ t.coins }}</span>
         <button type="button" class="trade-close" (click)="close()">Esc</button>
       </div>
-      <div class="trade-cols">
-        <div>
-          <div class="col-title">Mein Beutel (Verkaufen)</div>
-          <div class="trade-list">
-            @if (sellable().length === 0) {
-              <div class="inv-empty">(nichts zu verkaufen)</div>
-            }
-            @for (it of sellable(); track it.id) {
-              <div class="trade-row">
-                <span class="name">{{ it.name }}@if (it.quantity > 1) { <span class="qty">× {{ it.quantity }}</span> }</span>
-                <button type="button" (click)="sell(it.id)">→ Verkaufen</button>
-              </div>
-            }
-          </div>
-        </div>
-        <div>
+
+      <!-- H2.21 — Tab-Switcher Kaufen / Verkaufen. -->
+      <div class="trade-tabs">
+        <button type="button"
+                class="trade-tab"
+                [class.active]="tab() === 'buy'"
+                (click)="switchTab('buy')">
+          ← Kaufen
+        </button>
+        <button type="button"
+                class="trade-tab"
+                [class.active]="tab() === 'sell'"
+                (click)="switchTab('sell')">
+          → Verkaufen
+        </button>
+      </div>
+
+      @if (tab() === 'buy') {
+        <div class="trade-panel">
           <div class="col-title">Angebot des Händlers</div>
           <div class="trade-list">
             @if (t.offerings.length === 0) {
@@ -36,7 +39,40 @@
             }
           </div>
         </div>
-      </div>
+      } @else {
+        <div class="trade-panel">
+          <div class="col-title">Mein Beutel (Verkaufen)</div>
+          <div class="trade-list">
+            @if (sellable().length === 0) {
+              <div class="inv-empty">(nichts zu verkaufen)</div>
+            }
+            @for (it of sellable(); track it.id) {
+              <div class="trade-row" [class.needs-confirm]="it.needsConfirm">
+                <span class="name">
+                  {{ it.name }}@if (it.quantity > 1) { <span class="qty">× {{ it.quantity }}</span> }
+                </span>
+                <button type="button" (click)="sell(it)">→ Verkaufen</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- H2.21 — Confirm-Dialog für teure/Equipment-Sells. -->
+      @if (sellConfirm(); as sc) {
+        <div class="sell-confirm-backdrop">
+          <div class="sell-confirm-box">
+            <div class="sell-confirm-title">⚠ Wirklich verkaufen?</div>
+            <div class="sell-confirm-item">
+              {{ sc.item.name }}@if (sc.item.quantity > 1) { <span class="qty">× {{ sc.item.quantity }}</span> }
+            </div>
+            <div class="sell-confirm-actions">
+              <button type="button" class="confirm-yes" (click)="confirmSell()">Verkaufen</button>
+              <button type="button" class="confirm-no" (click)="cancelSell()">Abbrechen</button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 }

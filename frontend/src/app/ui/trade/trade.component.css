@@ -13,6 +13,7 @@
 }
 
 .trade-box {
+  position: relative;
   width: 90%;
   max-width: 720px;
   background: rgba(20, 18, 14, 0.97);
@@ -59,6 +60,100 @@
   text-transform: uppercase;
   margin-bottom: 6px;
 }
+
+/* H2.21 — Tab-Switcher Kaufen / Verkaufen. */
+.trade-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #4a3a20;
+  background: rgba(0, 0, 0, 0.25);
+}
+.trade-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #4a3a20;
+  color: #aaaa88;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background 0.1s;
+}
+.trade-tab:last-child { border-right: none; }
+.trade-tab:hover { background: rgba(80, 60, 30, 0.4); color: #c8b88a; }
+.trade-tab.active {
+  background: rgba(80, 60, 30, 0.6);
+  color: #e8d870;
+  border-bottom: 2px solid #e8d870;
+}
+
+.trade-panel {
+  padding: 10px 14px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trade-panel .col-title {
+  color: #aaaa88;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.trade-row.needs-confirm {
+  border-left: 2px solid #c08040;
+}
+
+/* H2.21 — Sell-Confirm-Dialog (für Equipment/Quality/teure Stacks). */
+.sell-confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+.sell-confirm-box {
+  background: rgba(30, 24, 16, 0.98);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 14px 18px;
+  min-width: 260px;
+  font-family: monospace;
+  font-size: 13px;
+}
+.sell-confirm-title {
+  color: #e8d870;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.sell-confirm-item {
+  padding: 6px 0;
+  border-bottom: 1px dashed #555;
+  margin-bottom: 10px;
+}
+.sell-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.sell-confirm-actions button {
+  background: rgba(80, 80, 40, 0.5);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 12px;
+}
+.sell-confirm-actions .confirm-yes { border-color: #c08040; color: #e8c060; }
+.sell-confirm-actions .confirm-no:hover { background: rgba(60, 30, 30, 0.6); }
+.sell-confirm-actions button:hover { background: rgba(120, 90, 40, 0.7); }
 
 .trade-list {
   display: flex;

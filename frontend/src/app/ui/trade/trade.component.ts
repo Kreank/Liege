@@ -15,17 +15,35 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
+  signal,
 } from '@angular/core';
 
+import { ITEM } from '../../core/data/items';
 import type { InventoryItem } from '../../core/models/item.model';
 import { GameStateService } from '../../core/services/game-state.service';
 import { WebSocketService } from '../../core/services/websocket.service';
+
+/** Tab-Modus im Trade-Modal (H2.21). */
+type TradeTab = 'buy' | 'sell';
+
+/** Schwellwert für Sell-Confirmation: Equipment/Quality oder hoher Stack. */
+const SELL_CONFIRM_QUANTITY = 5;
+const SELL_CONFIRM_CATEGORIES: ReadonlySet<string> = new Set([
+  'weapon', 'armor', 'jewelry', 'equipment',
+]);
 
 interface SellableRow {
   readonly id: number;
   readonly name: string;
   readonly quantity: number;
+  readonly category: string;
+  readonly needsConfirm: boolean;
+}
+
+interface SellConfirmState {
+  readonly item: SellableRow;
 }
 
 @Component({
@@ -42,21 +60,77 @@ export class TradeComponent {
   readonly trade = computed(() => this.state.activeTrade());
   readonly visible = computed<boolean>(() => this.trade() !== null);
 
+  /** Aktiver Tab im Trade-Modal — H2.21. */
+  readonly tab = signal<TradeTab>('buy');
+
+  /** Optionaler Confirm-Dialog für teure/equipment-Sells. */
+  readonly sellConfirm = signal<SellConfirmState | null>(null);
+
+  constructor() {
+    // Beim Öffnen eines neuen Trades immer zum „Kaufen"-Tab springen
+    // (Standard-Flow ist „Spieler will Händler-Angebote sehen"). Wenn der
+    // Spieler explizit auf „Verkaufen" geklickt hat, bleibt das Tab dort
+    // BIS das Modal schließt — der Re-Reset triggert via `trade()`-Change.
+    let lastNpcId: number | null = null;
+    effect(() => {
+      const t = this.trade();
+      const npcId = t?.npc_id ?? null;
+      if (npcId !== lastNpcId) {
+        this.tab.set('buy');
+        this.sellConfirm.set(null);
+        lastNpcId = npcId;
+      }
+    });
+  }
+
   readonly sellable = computed<readonly SellableRow[]>(() =>
     this.state.inventory()
       .filter((it: InventoryItem) => !it.equipped_slot)
-      .map((it: InventoryItem) => ({
-        id: it.id,
-        name: it.unique_name ?? it.name,
-        quantity: it.quantity ?? 1,
-      })),
+      .map((it: InventoryItem) => {
+        const def = ITEM[it.kind];
+        const category = it.category ?? def?.category ?? '';
+        const qty = it.quantity ?? 1;
+        return {
+          id: it.id,
+          name: it.unique_name ?? it.name,
+          quantity: qty,
+          category,
+          needsConfirm: qty >= SELL_CONFIRM_QUANTITY || SELL_CONFIRM_CATEGORIES.has(category),
+        };
+      }),
   );
 
   @HostListener('document:keydown.escape')
-  onEscape(): void { if (this.visible()) this.close(); }
+  onEscape(): void {
+    if (this.sellConfirm()) { this.sellConfirm.set(null); return; }
+    if (this.visible()) this.close();
+  }
 
   close(): void { this.state.closeTrade(); }
 
+  switchTab(t: TradeTab): void { this.tab.set(t); }
+
   buy(kind: string): void { this.ws.send({ type: 'buy_item', kind }); }
-  sell(itemId: number): void { this.ws.send({ type: 'sell_item', item_id: itemId }); }
+
+  /** Sell-Klick: bei „teuren" Items zuerst Confirm-Dialog, sonst direkt. */
+  sell(item: SellableRow): void {
+    if (item.needsConfirm) {
+      this.sellConfirm.set({ item });
+      return;
+    }
+    this._sendSell(item.id);
+  }
+
+  confirmSell(): void {
+    const st = this.sellConfirm();
+    if (!st) return;
+    this._sendSell(st.item.id);
+    this.sellConfirm.set(null);
+  }
+
+  cancelSell(): void { this.sellConfirm.set(null); }
+
+  private _sendSell(itemId: number): void {
+    this.ws.send({ type: 'sell_item', item_id: itemId });
+  }
 }
