@@ -3,7 +3,7 @@
 
 === CONNECT ===
 RECEIVED (1):
-  {"body_parts": {"arms": 100, "legs": 100, "torso": 100}, "chunk_size": 32, "inventory": [], "max_hp": 100, "max_hunger": 100, "max_mana": 50, "max_stamina": 100, "max_thirst": 100, "needs_character_creation": true, "player_id": "smoketest", "power_tier": 1, "preset": null, "spawn": {"x": 32, "y": 68}, "type": "init", "wallet_copper": 0, "world_seed": 20260530}
+  {"body_parts": {"arms": 100, "legs": 100, "torso": 100}, "chunk_size": 32, "inventory": [], "max_hp": 100, "max_hunger": 100, "max_mana": 50, "max_stamina": 100, "max_thirst": 100, "needs_character_creation": true, "player_id": "smoketest", "power_tier": 1, "preset": null, "spawn": {"x": 14, "y": 75}, "type": "init", "wallet_copper": 126, "world_seed": 20260530}
 
 === list_attributes ===
 SENT: {"type": "list_attributes"}
@@ -41,12 +41,12 @@ RECEIVED (1):
 === group_create_party ===
 SENT: {"type": "group_create_party"}
 RECEIVED (1):
-  {"group": {"kind": "party", "leader": "smoketest", "loot_rule": "ffa", "members": [{"name": "smoketest", "online": true, "role": "leader", "sub_party": 1, "x": 32, "y": 68}], "name": null, "your_role": "leader"}, "type": "group_state"}
+  {"group": {"kind": "party", "leader": "smoketest", "loot_rule": "ffa", "members": [{"name": "smoketest", "online": true, "role": "leader", "sub_party": 1, "x": 14, "y": 75}], "name": null, "your_role": "leader"}, "type": "group_state"}
 
 === group_refresh ===
 SENT: {"type": "group_refresh"}
 RECEIVED (1):
-  {"group": {"kind": "party", "leader": "smoketest", "loot_rule": "ffa", "members": [{"name": "smoketest", "online": true, "role": "leader", "sub_party": 1, "x": 32, "y": 68}], "name": null, "your_role": "leader"}, "type": "group_state"}
+  {"group": {"kind": "party", "leader": "smoketest", "loot_rule": "ffa", "members": [{"name": "smoketest", "online": true, "role": "leader", "sub_party": 1, "x": 14, "y": 75}], "name": null, "your_role": "leader"}, "type": "group_state"}
 
 === group_disband ===
 SENT: {"type": "group_disband"}
