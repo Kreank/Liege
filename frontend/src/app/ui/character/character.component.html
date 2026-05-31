@@ -32,6 +32,18 @@
             </div>
           </div>
         }
+        @if (bodyParts().length > 0) {
+          <div class="stat-section-title">Körperteile</div>
+          @for (bp of bodyParts(); track bp.name) {
+            <div class="bp-row" [class.bp-damaged]="bp.damaged" [class.bp-crippled]="bp.barClass === 'crippled'">
+              <div class="bp-label">{{ bp.label }}</div>
+              <div class="bp-bar">
+                <div class="bp-bar-fill" [class]="'bp-bar-' + bp.barClass" [style.width.%]="bp.pct"></div>
+                <div class="bp-bar-text">{{ bp.hp }} / {{ bp.maxHp }}</div>
+              </div>
+            </div>
+          }
+        }
         @if (stats().length > 0) {
           <div class="stat-section-title">Werte</div>
           @for (s of stats(); track s.key) {

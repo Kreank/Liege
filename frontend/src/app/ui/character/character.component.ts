@@ -26,7 +26,7 @@ import {
   signal,
 } from '@angular/core';
 
-import type { PlayerAttributes, PlayerStats } from '../../core/models/player.model';
+import type { BodyPart, PlayerAttributes, PlayerStats } from '../../core/models/player.model';
 import { GameBridgeService } from '../../core/services/game-bridge.service';
 import { GameStateService } from '../../core/services/game-state.service';
 
@@ -42,6 +42,29 @@ interface StatRow {
   readonly label: string;
   readonly value: number | undefined;
 }
+
+/** Body-Part-Row für H3.2 — pre-derived Display-Werte für die HP-Bar.
+ *  `pct` ist 0..100 (clamped), `barClass` steuert die Farbe:
+ *  grün ≥66 %, gelb 33..65 %, rot <33 %, „crippled" bei hp == 0. */
+interface BodyPartRow {
+  readonly name: string;
+  readonly label: string;
+  readonly hp: number;
+  readonly maxHp: number;
+  readonly pct: number;
+  readonly damaged: boolean;
+  readonly barClass: 'ok' | 'wound' | 'crit' | 'crippled';
+}
+
+/** Mapping Backend-Slug → deutsche UI-Bezeichnung. Backend liefert die
+ *  3 Standard-Slugs `legs`/`arms`/`torso` (Welle 28 Body-Damage-System);
+ *  Fallback ist die Capitalize-Form, damit unbekannte Parts korrekt rendern. */
+const BODY_PART_LABEL: Readonly<Record<string, string>> = {
+  legs: '🦵 Beine',
+  arms: '💪 Arme',
+  torso: '🫁 Torso',
+  head: '🧠 Kopf',
+};
 
 const ATTR_META: ReadonlyArray<Omit<AttrRow, 'value'>> = [
   { key: 'strength',     label: '💪 Stärke',       desc: 'Schaden + Tragelast' },
@@ -92,6 +115,33 @@ export class CharacterComponent {
     const s = this.state.stats() ?? this.state.player()?.stats ?? null;
     if (!s) return [];
     return STAT_META.map((m) => ({ ...m, value: s[m.key] as number | undefined }));
+  });
+
+  /** H3.2 — Body-Parts-Section. Liest aus `state.player().body_parts`
+   *  (Welle 28-Body-Damage-System). Bei fehlendem Snapshot leerer Array,
+   *  damit die Section im Template via @if einfach ausgeblendet wird. */
+  readonly bodyParts = computed<readonly BodyPartRow[]>(() => {
+    const parts: readonly BodyPart[] | undefined = this.state.player()?.body_parts;
+    if (!parts || parts.length === 0) return [];
+    return parts.map((bp) => {
+      const maxHp = Math.max(0, bp.max_hp);
+      const hp = Math.max(0, bp.hp);
+      const pct = maxHp > 0 ? Math.min(100, Math.round((hp / maxHp) * 100)) : 0;
+      let barClass: BodyPartRow['barClass'];
+      if (hp <= 0) barClass = 'crippled';
+      else if (pct < 33) barClass = 'crit';
+      else if (pct < 66) barClass = 'wound';
+      else barClass = 'ok';
+      return {
+        name: bp.name,
+        label: BODY_PART_LABEL[bp.name] ?? bp.name.charAt(0).toUpperCase() + bp.name.slice(1),
+        hp,
+        maxHp,
+        pct,
+        damaged: !!bp.damaged || hp < maxHp,
+        barClass,
+      };
+    });
   });
 
   @HostListener('document:keydown', ['$event'])

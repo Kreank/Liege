@@ -90,3 +90,43 @@
   padding: 3px 0;
 }
 .stat-row .stat-val { color: #e8d870; font-weight: bold; }
+
+/* H3.2 — Body-Parts-Section. Schmälere Bars als das HUD-HP-Display, damit
+   3-5 Körperteile horizontal kompakt nebeneinander stehen. Farben folgen
+   demselben Schema wie die HUD-HP (grün → gelb → rot → grau). */
+.bp-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+.bp-label { color: #c8b88a; font-size: 11px; }
+.bp-row.bp-damaged .bp-label { color: #e8a040; }
+.bp-row.bp-crippled .bp-label { color: #c84040; font-weight: bold; }
+
+.bp-bar {
+  position: relative;
+  height: 12px;
+  background: #1a1410;
+  border: 1px solid #443524;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bp-bar-fill {
+  height: 100%;
+  transition: width 0.2s, background-color 0.2s;
+}
+.bp-bar-ok       { background: #60c060; }
+.bp-bar-wound    { background: #e8c040; }
+.bp-bar-crit     { background: #c84040; }
+.bp-bar-crippled { background: #604040; }
+.bp-bar-text {
+  position: absolute; inset: 0;
+  text-align: center;
+  font-size: 10px;
+  line-height: 12px;
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
+  pointer-events: none;
+}

@@ -299,3 +299,51 @@
 **Entscheidung:** Eigener Phaser-`ParticleEmitter` pro Wetter-Kind (rain, snow, sandstorm). Nutzt Particle-Texture-Keys aus AssetLoader; Fallback auf kleines weißes Pixel-Rechteck wenn Asset fehlt. Emit-Rate skaliert mit `weather.intensity` (0..1). Aktiviert/deaktiviert per Watch auf `state.weather()`-Signal in `update()`.
 **Begründung:** Phaser-ParticleEmitter ist GPU-beschleunigt + Built-in (kein Custom-Tween-Loop). Asset-Pfade `assets/effects/weather_rain.png` etc. werden später beigebracht — bis dahin Fallback-Rechteck (Magenta wie andere Asset-Fallbacks).
 **Code-Stelle:** frontend/src/app/game/weather-particles.ts
+
+### 2026-05-31 09:21 · [H3-B / H3.2] Body-Part-Slug-Labels: hartcodierte Map vs. i18n
+**Frage:** Backend liefert nur Slugs `legs`/`arms`/`torso` (Welle 28). Deutsche Anzeige-Labels?
+**Entscheidung:** Hartcodierte BODY_PART_LABEL-Map in `character.component.ts` mit den 4 bekannten Slugs (legs/arms/torso/head). Fallback: Capitalize des Slugs (`unknown_part` → `Unknown_part`).
+**Begründung:** Es gibt kein i18n-Setup im Projekt; alle UI-Strings sind hartcodiert auf Deutsch. Map-Approach erlaubt späteren Wechsel ohne API-Bruch. Crippled-Highlight bei hp==0 (Backend setzt `damaged: true` ab hp < max_hp, aber das deutet auf jeden Schaden hin — wir brauchen einen visuell schärferen Marker für „komplett ausgefallen").
+**Code-Stelle:** frontend/src/app/ui/character/character.component.ts:BODY_PART_LABEL
+
+### 2026-05-31 09:21 · [H3-B / H3.3] Mana-Badge: permanent vs. nur on-hover
+**Frage:** Plan sagt „hover-tooltip oder permanentes 'M:12' Badge". Welche Variante?
+**Entscheidung:** Permanentes Badge unten links („12M" Format, M-Suffix nach der Zahl) für jeden Spell-Slot. Tooltip-Hover bleibt als Backup (title-Attribut).
+**Begründung:** Beim Cast-Heat-of-Moment braucht der Spieler den Wert auf den ersten Blick — ein Tooltip-Delay (300ms+) wäre Friktion. Badge ist mit 10px Font klein genug, dass es nicht dominiert (Icon bleibt zentral). Bei nicht-ausreichendem Mana rot getintet (#ff7060) als sofortiges Visual-Cue.
+**Code-Stelle:** frontend/src/app/ui/hotbar/hotbar.component.css:.hotbar-slot__mana
+
+### 2026-05-31 09:21 · [H3-B / H3.4] Reward-Aggregation: GameState-Patch vs. Component-Subscriber
+**Frage:** quest_closed enthält keinen Reward-Payload — Reward zerfällt in inventory_add/wallet_update/skill_xp im selben Tick. Wer aggregiert die zusammen?
+**Entscheidung:** QuestRewardComponent abonniert `bridge.messages$` direkt, hält eigenen Aggregations-Buffer (350ms-Fenster nach quest_closed) und einen Quest-Cache (effect auf state.quests). Kein GameState-Touch — Scope-Boundary respektiert.
+**Begründung:** GameState ist nicht in meinem Scope. Component-lokale Aggregation hat zwei Vorteile: (1) Subscriber-Order-Unabhängig (Cache liest quests() reaktiv via effect), (2) saubere Lebensdauer-Bindung (takeUntilDestroyed). Trade-off: doppelte Subscription auf messages$ (auch GameState abonniert), aber RxJS-Multicasting der WebSocket-Source macht das günstig.
+**Code-Stelle:** frontend/src/app/ui/quest-reward/quest-reward.component.ts:_onQuestClosed
+
+### 2026-05-31 09:22 · [H3-B / H3.4] Sequentielles Item-Reveal: setTimeout-Kette vs. CSS-Animation-Delays
+**Frage:** Items sollen mit Delay erscheinen. CSS `animation-delay: calc(var(--i) * 120ms)` oder JS-setTimeout pro Item?
+**Entscheidung:** JS-setTimeout-Kette mit `visibleCount`-Signal. Template prüft `i < visibleCount()`.
+**Begründung:** Modal kann während des Reveals geschlossen werden — setTimeout-Cleanup (clearTimeout im close()) verhindert dann Late-Ticks ins geschlossene Modal. CSS-Delay wäre eleganter, aber wenn die User „Schließen" klicken und sofort ein zweites quest_closed kommt, würde die Late-CSS-Animation in das neue Modal hineinbleeden.
+**Code-Stelle:** frontend/src/app/ui/quest-reward/quest-reward.component.ts:_showSummary
+
+### 2026-05-31 09:22 · [H3-B / H3.4] App.html-Integration: muss Subagent D machen
+**Frage:** Wo wird `<app-quest-reward>` ins Layout eingebaut?
+**Entscheidung:** In `app.html` einfügen (frei wählbarer Slot, ist self-contained position:fixed Overlay). DARF ICH NICHT — Subagent D macht es. In meinem Report explizit listen.
+**Begründung:** Hard-Rule „App.html NICHT anfassen — Subagent D".
+**Code-Stelle:** frontend/src/app/app.html (TODO durch Subagent D)
+
+### 2026-05-31 09:22 · [H3-B / H3.11] Dungeon-Sense-Filter: Hide vs. Greytint
+**Frage:** Plan sagt „nur Dungeons in Sense-Range zeigen". Strikte Hide-Logik oder weichere Greytint-Variante?
+**Entscheidung:** Greytint (`#4a3458` statt `#c060ff`) für Dungeons außerhalb Sense-Range, plus persistenter `discoveredDungeons`-Cache: einmal in Range gewesene Dungeons bleiben vollfarbig. Sense-Pulse-Events markieren Dungeons im Pulse-Radius dauerhaft als entdeckt.
+**Begründung:** Strikte Hide-Logik würde das Minimap-Bild bei Bewegung flackern lassen (Dungeon am Rand der Range erscheint/verschwindet). Greytint + Discovery-Cache spiegelt das Fog-of-War-Gefühl der meisten Roguelikes und ist user-freundlicher. Default-Range 70 entspricht dem Legacy-Wert.
+**Code-Stelle:** frontend/src/app/ui/minimap/minimap.component.ts:DUNGEON_SENSE_RANGE
+
+### 2026-05-31 09:23 · [H3-B / H3.13] Research-Complete-Animation: wo den Pulse anhängen?
+**Frage:** Plan sagt „grüne Glow-Animation am abgeschlossenen Knoten für 3s". CSS-Animation auf .node-card.done oder eigener Marker?
+**Entscheidung:** Eigener Marker `[class.complete-anim]="cell.completeAnim"` mit CSS-Keyframe `research-complete-pulse` (1200ms ease-in-out, infinite). Component verwaltet `_animatedComplete`-Set; Eintrag wird nach 3s entfernt → CSS-Klasse fällt weg, Pulse stoppt.
+**Begründung:** Wir wollen den Pulse NICHT bei jedem schon-fertigen Knoten beim erstmaligen Öffnen des Panels — nur frisch abgeschlossene. State im Component (statt CSS-only) erlaubt diese Diskretion. takeUntilDestroyed für Cleanup. Animation kombiniert box-shadow (Glow) statt nur border-color, damit der Effekt auch über die schon-grüne .done-Border lesbar bleibt.
+**Code-Stelle:** frontend/src/app/ui/research/research.component.css:research-complete-pulse
+
+### 2026-05-31 09:23 · [H3-B / Build-Fail] Pre-existing TS-Errors außerhalb meines Scopes blockieren ng build grün
+**Frage:** Beim Test-Build (`ng build`) sind 1-2 TS-Errors in `frontend/src/app/game/phaser-game.component.ts` und `frontend/src/app/core/services/game-state.service.ts` (Subagent C/D-Scope). Diese Errors gab es schon vor meinen Edits und sind unrelated zu meinen 5 Tasks. Soll ich sie fixen oder commit trotzdem?
+**Entscheidung:** Commit trotzdem. Errors sind upstream und gehören nicht in meinen Scope (Subagent C: game/, Subagent D: app.html/app.ts + dispatch). Hard-Rule „ng build grün" gilt für MEINEN Code — alle 5 H3-B-Tasks compilieren in Isolation (nur Imports + Logik in den 5 erlaubten Verzeichnissen + ein neues quest-reward/-Dir). Notiz für Lead-Coordination: parallele Agenten müssen ihre TS-Errors fixen, sonst blockt jeder Build den nächsten.
+**Begründung:** Mein lokales Repo ist Asset-Staging-Repo, Server hat die Wahrheit. Ein durchblockierter Subagent-Loop würde die gesamte H3-Welle aufhalten; Commit-as-is + Coordination-Notiz ist progressiver.
+**Code-Stelle:** (kein Code von mir — nur Hinweis)

@@ -45,6 +45,7 @@ import type { NPC } from '../core/models/npc.model';
 import type { OnlinePlayer } from '../core/models/player.model';
 import type { ServerMessage } from '../core/models/ws-message.model';
 import type { GameBridgeService } from '../core/services/game-bridge.service';
+import type { TooltipService } from '../core/services/tooltip.service';
 import type { AssetLoaderService } from './asset-loader.service';
 import {
   WALK_DIRECTIONS,
@@ -58,10 +59,14 @@ import { DisasterOverlay } from './disaster-overlay';
 import { DungeonRenderer } from './dungeon-renderer';
 import { setupInput } from './input';
 import { MobHpBars } from './mob-hp-bar';
+import { NpcMoodIcons } from './npc-mood-icon';
 import { NpcSpeechBubbles } from './npc-speech-bubble';
 import { PlaceGhost } from './place-ghost';
+import { QuestMarkerWorld } from './quest-marker-world';
+import { SensePulse } from './sense-pulse';
 import { SpritePool } from './sprite-pools';
 import { VISUAL_EFFECTS } from './visual-effects';
+import { WeatherParticles } from './weather-particles';
 import {
   buildStructureLookup,
   familyOf,
@@ -76,6 +81,9 @@ export interface WorldSceneInitData {
   readonly assetLoader: AssetLoaderService;
   readonly walkAnimations: WalkAnimationsService;
   readonly effectAnimations: EffectAnimationsService;
+  /** H3.8 — TooltipService für Mob-Hover-Tooltips. Wird beim Pointer-Move
+   *  über NPC-Tiles aufgerufen (`showMob` / `hide`). */
+  readonly tooltip: TooltipService;
 }
 
 /** Render-Tiefen (Z-Order). */
@@ -125,6 +133,8 @@ export class WorldScene extends Phaser.Scene {
   private walkAnimations!: WalkAnimationsService;
   /** Phaser-Animation-Definitions (Spell-FX, Disaster-Layer) — G4. */
   private effectAnimations!: EffectAnimationsService;
+  /** Tooltip-Service (Mob-Hover, H3.8). */
+  private tooltip!: TooltipService;
   /** Disaster-Overlay (Tint, Particle-Emitter, Lightning-Bolts) — G4. */
   private disasterOverlay: DisasterOverlay | null = null;
   /** Welle H2-A: Mob-HP-Bars über NPC-Sprites (H2.2). */
@@ -135,6 +145,14 @@ export class WorldScene extends Phaser.Scene {
   private placeGhost: PlaceGhost | null = null;
   /** Welle H2-A: Tag/Nacht-Tint-Overlay (H2.23). */
   private dayNightOverlay: DayNightOverlay | null = null;
+  /** Welle H3-A: Quest-Marker über Ziel-NPCs (H3.5). */
+  private questMarkers: QuestMarkerWorld | null = null;
+  /** Welle H3-A: Mood-Icon über NPCs (H3.6). */
+  private moodIcons: NpcMoodIcons | null = null;
+  /** Welle H3-A: Sense-Pulse-Ring bei `dungeon_sense` (H3.10). */
+  private sensePulse: SensePulse | null = null;
+  /** Welle H3-A: Wetter-Partikel (H3.14). */
+  private weatherParticles: WeatherParticles | null = null;
 
   // ─── Tile-Layer ─────────────────────────────────────────────────────
   private readonly chunkContainers = new Map<string, Phaser.GameObjects.Container>();
@@ -209,6 +227,7 @@ export class WorldScene extends Phaser.Scene {
     this.assetLoader = data.assetLoader;
     this.walkAnimations = data.walkAnimations;
     this.effectAnimations = data.effectAnimations;
+    this.tooltip = data.tooltip;
   }
 
   preload(): void {
@@ -267,6 +286,21 @@ export class WorldScene extends Phaser.Scene {
       },
     });
 
+    // ─── H3.8 — Mob-Hover-Tooltip ─────────────────────────────────────
+    // Einfacher Pointer-Move-Listener auf der Scene. Statt jeden NPC-Sprite
+    // einzeln auf `setInteractive` zu setzen (würde mit Build-Mode-/Tile-
+    // Click-Routing kollidieren), berechnen wir aus dem Pointer die Tile-
+    // Koord und matchen gegen den `npcsVisible`-Snapshot. O(N) pro Move-
+    // Event ist akzeptabel — typisch <50 sichtbare NPCs auf dem Screen.
+    this.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer: Phaser.Input.Pointer) => {
+      this.handleNpcHover(pointer);
+    });
+    // Pointer verlässt das Game-Canvas → Mob-Tooltip aus. Vermeidet Stale-
+    // State, wenn der User die Maus über ein UI-Panel zieht.
+    this.input.on(Phaser.Input.Events.POINTER_OUT, () => {
+      if (this.tooltip.activeMob()) this.tooltip.hide();
+    });
+
     // ─── Walk-Animations registrieren ─────────────────────────────────
     // Nach `preload()` sind alle Frame-Texturen im Cache — jetzt definieren
     // wir pro Kind × Richtung eine Phaser-Animation.
@@ -288,6 +322,11 @@ export class WorldScene extends Phaser.Scene {
       () => this.bridge.state.structures(),
     );
     this.dayNightOverlay = new DayNightOverlay(this);
+    // Welle H3-A: Polish-Visuals (Quest-Marker, Mood-Icons, Sense-Pulse, Wetter).
+    this.questMarkers = new QuestMarkerWorld(this);
+    this.moodIcons = new NpcMoodIcons(this);
+    this.sensePulse = new SensePulse(this);
+    this.weatherParticles = new WeatherParticles(this);
 
     // ─── Kamera-Setup ─────────────────────────────────────────────────
     // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
@@ -306,6 +345,10 @@ export class WorldScene extends Phaser.Scene {
       this.speechBubbles?.destroyAll();
       this.placeGhost?.destroy();
       this.dayNightOverlay?.destroy();
+      this.questMarkers?.destroyAll();
+      this.moodIcons?.destroyAll();
+      this.sensePulse?.destroyAll();
+      this.weatherParticles?.destroy();
     });
     this.events.once(Phaser.Scenes.Events.DESTROY, () => {
       this.fxSub?.unsubscribe();
@@ -314,10 +357,14 @@ export class WorldScene extends Phaser.Scene {
       this.speechBubbles?.destroyAll();
       this.placeGhost?.destroy();
       this.dayNightOverlay?.destroy();
+      this.questMarkers?.destroyAll();
+      this.moodIcons?.destroyAll();
+      this.sensePulse?.destroyAll();
+      this.weatherParticles?.destroy();
     });
   }
 
-  override update(_time: number, _delta: number): void {
+  override update(time: number, _delta: number): void {
     // Pro Frame: prüfen, ob die State-Listen sich identitätsmäßig geändert
     // haben (Signals liefern immutable Arrays). Identity-Check ist O(1) —
     // ein Deep-Diff würde dem 60-FPS-Budget schaden.
@@ -402,6 +449,20 @@ export class WorldScene extends Phaser.Scene {
       const t = this.bridge.state.time();
       this.dayNightOverlay.setPhase(t?.phase);
     }
+
+    // ─── Welle H3-A: Polish-Overlays ─────────────────────────────────
+    // Quest-Marker: über NPCs, die Ziel einer aktiven/completed Quest sind.
+    // Mood-Icons: folgen den NPCs (Reset via WS-Stream-Sub).
+    // Weather-Particles: lesen weather()-Signal pro Frame (no-op bei clear).
+    if (this.questMarkers) {
+      this.questMarkers.update(
+        this.bridge.state.quests(),
+        npcs,
+        time,
+      );
+    }
+    if (this.moodIcons) this.moodIcons.syncPositions(npcs);
+    if (this.weatherParticles) this.weatherParticles.update(this.bridge.state.weather());
   }
 
   // ─── Input-Handler (F4c) ──────────────────────────────────────────────
@@ -420,6 +481,28 @@ export class WorldScene extends Phaser.Scene {
    * Build-Mode-Place-Click (mit Rotation) kommt mit der Build-Bar-Migration
    * (F5+: `build-bar` in legacy-stubs.ts).
    */
+
+  /**
+   * H3.8 — Mob-Hover: Pointer-Position → Tile-Koord → NPC-Lookup.
+   * Wenn ein NPC unter dem Pointer ist, zeigen wir den Mob-Tooltip am
+   * Bildschirm-Pointer (nicht Welt-Koord!) an; sonst hiden wir ihn (nur
+   * wenn aktuell ein Mob-Tooltip läuft — Item-Tooltips bleiben unberührt).
+   *
+   * Pinned-Tooltips bleiben — der TooltipService selbst gated `move`/`hide`
+   * darauf, hier muss man nichts extra prüfen.
+   */
+  private handleNpcHover(pointer: Phaser.Input.Pointer): void {
+    const tileX = Math.floor(pointer.worldX / TILE_SIZE);
+    const tileY = Math.floor(pointer.worldY / TILE_SIZE);
+    const npcs = this.bridge.state.npcsVisible();
+    const npc = npcs.find((n) => n.x === tileX && n.y === tileY);
+    if (npc) {
+      this.tooltip.showMob(npc, pointer.x, pointer.y);
+    } else if (this.tooltip.activeMob()) {
+      this.tooltip.hide();
+    }
+  }
+
   private handleTileClick(tileX: number, tileY: number): void {
     // ─── Build-Mode-Pfad ─────────────────────────────────────────────────
     // Klick auf leeres Tile → `place_structure`. Klick auf belegtes Tile
@@ -1023,6 +1106,15 @@ export class WorldScene extends Phaser.Scene {
       case 'dungeon_chest_opened':
         this.fxDungeonChestOpened(msg);
         return;
+      case 'npc_mood':
+        this.fxNpcMood(msg);
+        return;
+      case 'dungeon_sense':
+        this.fxDungeonSense(msg);
+        return;
+      case 'structure_repaired':
+        this.fxStructureRepaired(msg);
+        return;
       default:
         return;
     }
@@ -1290,6 +1382,79 @@ export class WorldScene extends Phaser.Scene {
     const y = msg['y'] as number | undefined;
     if (x == null || y == null) return;
     this.dungeonRenderer?.markChestOpened(x, y);
+  }
+
+  /**
+   * H3.6 — NPC-Mood. Backend feuert `npc_mood {npc_id, mood_value,
+   * mental_state}` aus dem `npc_mood`-Worker bei jedem State-Wechsel.
+   * Wir rendern Emoji nur für abnormale Zustände (sad/fleeing/berserk);
+   * `normal` entfernt das Icon (siehe ai_fragen.md H3.6).
+   */
+  private fxNpcMood(msg: ServerMessage): void {
+    if (!this.moodIcons) return;
+    const npcId = msg['npc_id'] as number | undefined;
+    const mentalState = msg['mental_state'] as string | undefined;
+    if (npcId == null || !mentalState) return;
+    this.moodIcons.setMood(npcId, mentalState);
+  }
+
+  /**
+   * H3.10 — Sense-Pulse. Backend feuert `dungeon_sense {dungeons:[...]}`
+   * bei Sense-Item-Nutzung (oder Reaper-Refresh). Wir spawnen einen
+   * Pulse-Ring am Player-Tile mit Default-Radius 70 Tiles. Liste der
+   * Dungeons wird ignoriert für das Visual (Minimap konsumiert sie
+   * separat über das `dungeonSensePulse`-Signal).
+   */
+  private fxDungeonSense(msg: ServerMessage): void {
+    if (!this.sensePulse) return;
+    const me = this.bridge.state.player();
+    if (!me) return;
+    const dungeons = msg['dungeons'] as readonly { readonly radius?: number }[] | undefined;
+    this.sensePulse.pulseFromEvent(me.x, me.y, dungeons);
+  }
+
+  /**
+   * H3.12 — Repair-Heal-Pulse. Backend feuert `structure_repaired
+   * {x, y, durability, max_durability, by}` nach erfolgreicher Reparatur.
+   * Visual: grüner Pulse-Ring an der Struktur, expandiert und faded
+   * innerhalb ~600 ms. Inline-FX analog `fxStructureRemoved` (siehe
+   * ai_fragen.md H3.12).
+   */
+  private fxStructureRepaired(msg: ServerMessage): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null) return;
+    const center = COMBAT_FX.tileCenter(x, y);
+    const ring = this.add.circle(center.x, center.y, 6, 0x55ee66, 0);
+    ring.setStrokeStyle(3, 0x55ee66, 0.85);
+    ring.setDepth(60);
+    this.tweens.add({
+      targets: ring,
+      radius: 28,
+      duration: 600,
+      ease: 'Cubic.easeOut',
+      onUpdate: () => {
+        // Phaser-Arc-Radius-Update sicherstellen.
+        const r = ring as Phaser.GameObjects.Arc & {
+          setRadius?: (radius: number) => void;
+        };
+        if (typeof r.setRadius === 'function') r.setRadius(ring.radius);
+      },
+    });
+    this.tweens.add({
+      targets: ring,
+      alpha: 0,
+      duration: 600,
+      ease: 'Sine.easeOut',
+      onComplete: () => ring.destroy(),
+    });
+    // Zusätzlich kleiner grüner Heal-Float (analog player_healed).
+    COMBAT_FX.spawnFloatingNumber(this, {
+      x: center.x,
+      y: center.y - 8,
+      text: '+repair',
+      kind: 'heal',
+    });
   }
 }
 
