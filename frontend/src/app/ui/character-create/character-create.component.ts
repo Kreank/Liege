@@ -36,7 +36,8 @@ import {
   signal,
 } from '@angular/core';
 
-import type { PlayerAttributes } from '../../core/models/player.model';
+import type { AttributeKey, PlayerAttributes } from '../../core/models/player.model';
+import { ATTRIBUTE_KEYS } from '../../core/models/player.model';
 import { GameStateService } from '../../core/services/game-state.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 
@@ -47,7 +48,7 @@ interface PresetOption {
 }
 
 interface AttrMeta {
-  readonly key: keyof Omit<PlayerAttributes, 'unspent'>;
+  readonly key: AttributeKey;
   readonly label: string;
   readonly desc: string;
 }
@@ -61,37 +62,41 @@ const PRESETS: ReadonlyArray<PresetOption> = [
   { key: 'wild_ranger',    label: 'Wildhüter',    preview: '/assets/animations/player_presets/wild_ranger/idle_1.png' },
 ];
 
+// 12 deutsche Backend-Slugs (ws/character.py VALID_ATTRS). Reihenfolge =
+// UI-Layout der Liste.
 const ATTR_META: ReadonlyArray<AttrMeta> = [
-  { key: 'strength',     label: '💪 Stärke',       desc: 'Schaden + Tragelast' },
-  { key: 'dexterity',    label: '🎯 Geschick',     desc: 'Crit + Angriffstempo' },
-  { key: 'intelligence', label: '🧠 Intelligenz',  desc: 'Manapool + Zauber' },
-  { key: 'constitution', label: '❤️ Konstitution', desc: 'HP + Ausdauer' },
-  { key: 'wisdom',       label: '🕯️ Weisheit',     desc: 'Mana-Regen + Resistenzen' },
-  { key: 'charisma',     label: '🎭 Charisma',     desc: 'Preise + Quests' },
+  { key: 'stärke',       label: '💪 Stärke',         desc: 'Physischer Schaden + Roh-Yield' },
+  { key: 'geschick',     label: '🎯 Geschick',       desc: 'Genauigkeit + Crafting-Präzision' },
+  { key: 'ausdauer',     label: '🫁 Ausdauer',       desc: 'Höhere HP-Cap + weniger Erschöpfung' },
+  { key: 'energie',      label: '⚡ Energie',         desc: 'Größerer Mana-Pool + Spell-Regen' },
+  { key: 'intelligenz',  label: '🧠 Intelligenz',    desc: 'Stärkere Spells + Forschungs-Gates' },
+  { key: 'weisheit',     label: '📖 Weisheit',       desc: 'Heilkunst + Status-Resistenz' },
+  { key: 'verteidigung', label: '🛡️ Verteidigung',   desc: 'Schadensreduktion' },
+  { key: 'ausweichen',   label: '💨 Ausweichen',     desc: 'Chance Angriffe zu negieren' },
+  { key: 'krit_rate',    label: '💥 Krit-Rate',      desc: 'Chance auf kritischen Treffer' },
+  { key: 'krit_schaden', label: '✨ Krit-Schaden',    desc: 'Multiplier bei kritischen Treffern' },
+  { key: 'charisma',     label: '💬 Charisma',       desc: 'Handelspreise + NPC-Mood' },
+  { key: 'schleichen',   label: '👤 Schleichen',     desc: 'Reduzierte Aggro-Reichweite' },
 ];
 
 type NameStatus = 'idle' | 'checking' | 'ok' | 'taken' | 'invalid';
 
 const MIN_NAME_LEN = 3;
 const MAX_NAME_LEN = 24;
-/** Default-Pool, falls Backend-Init `attributes.unspent` nicht liefert.
- *  Hartcodiert auf 5 weil das der Backend-Default in services/player_state.py
- *  ist (siehe `INITIAL_UNSPENT_POINTS`). */
-const DEFAULT_POOL = 5;
+/** Default-Pool für Char-Creation. Backend `ws/character.py` validiert
+ *  MAX_TOTAL=20, max 10 pro Attribut. */
+const DEFAULT_POOL = 20;
+const MAX_PER_ATTR = 10;
 /** Client-seitige Vor-Validierung (Backend macht autoritativ noch eine eigene). */
 const NAME_RE = /^[A-Za-zÄÖÜäöüß0-9_\- ]+$/;
 
-type AttrKey = AttrMeta['key'];
+type AttrKey = AttributeKey;
 type AllocationMap = Readonly<Record<AttrKey, number>>;
 
-const EMPTY_ALLOC: AllocationMap = {
-  strength: 0,
-  dexterity: 0,
-  intelligence: 0,
-  constitution: 0,
-  wisdom: 0,
-  charisma: 0,
-};
+const EMPTY_ALLOC: AllocationMap = ATTRIBUTE_KEYS.reduce(
+  (acc, k) => ({ ...acc, [k]: 0 }),
+  {} as AllocationMap,
+);
 
 @Component({
   selector: 'app-character-create',
@@ -224,6 +229,7 @@ export class CharacterCreateComponent {
     const cur = this.allocated();
     const next = (cur[key] ?? 0) + delta;
     if (next < 0) return;
+    if (next > MAX_PER_ATTR) return;
     if (delta > 0 && this.remaining() <= 0) return;
     this.allocated.set({ ...cur, [key]: next });
   }

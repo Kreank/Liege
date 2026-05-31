@@ -8,17 +8,33 @@ export interface BodyPart {
   readonly damaged?: boolean;
 }
 
-/** Attribut-Snapshot (Stärke, Geschick, …). */
+/** Attribut-Snapshot — 12 deutsche Slugs (Backend ws/character.py
+ *  VALID_ATTRS). Alle optional weil Backend nur die allokierten Slugs
+ *  sendet (z.B. {stärke: 3, weisheit: 2}, alle anderen 0). */
 export interface PlayerAttributes {
-  readonly strength: number;
-  readonly dexterity: number;
-  readonly intelligence: number;
-  readonly constitution: number;
-  readonly wisdom: number;
-  readonly charisma: number;
+  readonly stärke?: number;
+  readonly ausdauer?: number;
+  readonly energie?: number;
+  readonly intelligenz?: number;
+  readonly weisheit?: number;
+  readonly ausweichen?: number;
+  readonly geschick?: number;
+  readonly verteidigung?: number;
+  readonly charisma?: number;
+  readonly krit_rate?: number;
+  readonly krit_schaden?: number;
+  readonly schleichen?: number;
   /** Punkte, die noch zu verteilen sind. */
   readonly unspent?: number;
 }
+
+/** Alle 12 Attribut-Slugs als Konstante (Reihenfolge = UI-Reihenfolge). */
+export const ATTRIBUTE_KEYS = [
+  'stärke', 'geschick', 'ausdauer', 'energie',
+  'intelligenz', 'weisheit', 'verteidigung', 'ausweichen',
+  'krit_rate', 'krit_schaden', 'charisma', 'schleichen',
+] as const;
+export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number];
 
 /** Stat-Sheet (abgeleitete Werte aus Attributen + Equipment). */
 export interface PlayerStats {

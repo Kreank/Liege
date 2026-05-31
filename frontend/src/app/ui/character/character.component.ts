@@ -66,13 +66,20 @@ const BODY_PART_LABEL: Readonly<Record<string, string>> = {
   head: '🧠 Kopf',
 };
 
+// 12 deutsche Backend-Slugs (sync mit character-create.component.ts).
 const ATTR_META: ReadonlyArray<Omit<AttrRow, 'value'>> = [
-  { key: 'strength',     label: '💪 Stärke',       desc: 'Schaden + Tragelast' },
-  { key: 'dexterity',    label: '🎯 Geschick',     desc: 'Crit + Angriffstempo' },
-  { key: 'intelligence', label: '🧠 Intelligenz',  desc: 'Manapool + Zauber' },
-  { key: 'constitution', label: '❤️ Konstitution', desc: 'HP + Ausdauer' },
-  { key: 'wisdom',       label: '🕯️ Weisheit',     desc: 'Mana-Regen + Resistenzen' },
-  { key: 'charisma',     label: '🎭 Charisma',     desc: 'Preise + Quests' },
+  { key: 'stärke',       label: '💪 Stärke',         desc: 'Physischer Schaden + Roh-Yield' },
+  { key: 'geschick',     label: '🎯 Geschick',       desc: 'Genauigkeit + Crafting-Präzision' },
+  { key: 'ausdauer',     label: '🫁 Ausdauer',       desc: 'Höhere HP-Cap + weniger Erschöpfung' },
+  { key: 'energie',      label: '⚡ Energie',         desc: 'Größerer Mana-Pool + Spell-Regen' },
+  { key: 'intelligenz',  label: '🧠 Intelligenz',    desc: 'Stärkere Spells + Forschungs-Gates' },
+  { key: 'weisheit',     label: '📖 Weisheit',       desc: 'Heilkunst + Status-Resistenz' },
+  { key: 'verteidigung', label: '🛡️ Verteidigung',   desc: 'Schadensreduktion' },
+  { key: 'ausweichen',   label: '💨 Ausweichen',     desc: 'Chance Angriffe zu negieren' },
+  { key: 'krit_rate',    label: '💥 Krit-Rate',      desc: 'Chance auf kritischen Treffer' },
+  { key: 'krit_schaden', label: '✨ Krit-Schaden',    desc: 'Multiplier bei Krits' },
+  { key: 'charisma',     label: '💬 Charisma',       desc: 'Handelspreise + NPC-Mood' },
+  { key: 'schleichen',   label: '👤 Schleichen',     desc: 'Reduzierte Aggro-Reichweite' },
 ];
 
 const STAT_META: ReadonlyArray<Omit<StatRow, 'value'>> = [
