@@ -556,7 +556,17 @@ export class GameStateService {
       // Toast lebt direkt im Handler, damit kein Duplicate-Case entsteht.
       // `character_created` triggert hier nur den Erfolgs-Toast; der State
       // wird via folgendem `init`-Frame ohnehin neu aufgebaut.
-      case 'character_created':    this.toast.show('Charakter erstellt.', 'success'); break;
+      case 'character_created':
+        // Backend persistiert + setzt character_created=TRUE, sendet aber
+        // KEINEN neuen `init`-Frame. Wir müssen needsCharacterCreation
+        // selbst auf false setzen + preset patchen — sonst bleibt das Modal
+        // offen (Bug 31.05 Issue #1).
+        this.needsCharacterCreation.set(false);
+        this._patchPlayer({
+          preset: (msg['preset'] as string | undefined) ?? null,
+        });
+        this.toast.show('Charakter erstellt.', 'success');
+        break;
 
       // ─── Backend-Toast (H1.22 — vorher No-op, jetzt aktiv) ────────
       case 'toast':                this._handleBackendToast(msg); break;

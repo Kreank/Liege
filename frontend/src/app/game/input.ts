@@ -31,6 +31,8 @@ export interface InputCallbacks {
   readonly onSprintChange: (on: boolean) => void;
   /** Build-Mode-Toggle (B). Nur signalisieren; die Visualisierung kommt mit F5+. */
   readonly onToggleBuildMode: () => void;
+  /** WASD/Arrow-Tasten: Bewegung um delta-tiles. Bug 31.05 Issue #3. */
+  readonly onMoveStep: (dx: number, dy: number) => void;
 }
 
 /**
@@ -68,6 +70,36 @@ export function setupInput(
 
   // ─── Keyboard: B = Build-Mode Toggle ─────────────────────────────────
   kb.on('keydown-B', () => callbacks.onToggleBuildMode());
+
+  // ─── Keyboard: WASD + Arrow-Tasten → Bewegung um 1 Tile ──────────────
+  // Repeat aktiv (emitOnRepeat=true), damit Halten kontinuierlich läuft.
+  const KC = Phaser.Input.Keyboard.KeyCodes;
+  const up    = kb.addKey(KC.W,    /*emitOnRepeat*/ true);
+  const down  = kb.addKey(KC.S,    true);
+  const left  = kb.addKey(KC.A,    true);
+  const right = kb.addKey(KC.D,    true);
+  const arrUp    = kb.addKey(KC.UP,    true);
+  const arrDown  = kb.addKey(KC.DOWN,  true);
+  const arrLeft  = kb.addKey(KC.LEFT,  true);
+  const arrRight = kb.addKey(KC.RIGHT, true);
+  // Throttle: Bewegungs-Intent max alle 120ms (sonst flutet WS bei
+  // gehaltener Taste). Sprint senkt das auf 80ms.
+  let lastMoveAt = 0;
+  const moveCheck = (dx: number, dy: number) => {
+    const now = performance.now();
+    const interval = sprintKey.isDown ? 80 : 120;
+    if (now - lastMoveAt < interval) return;
+    lastMoveAt = now;
+    callbacks.onMoveStep(dx, dy);
+  };
+  up.on('down',    () => moveCheck(0, -1));
+  down.on('down',  () => moveCheck(0,  1));
+  left.on('down',  () => moveCheck(-1, 0));
+  right.on('down', () => moveCheck(1,  0));
+  arrUp.on('down',    () => moveCheck(0, -1));
+  arrDown.on('down',  () => moveCheck(0,  1));
+  arrLeft.on('down',  () => moveCheck(-1, 0));
+  arrRight.on('down', () => moveCheck(1,  0));
 
   return { isSprintHeld: () => sprintKey.isDown };
 }

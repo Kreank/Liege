@@ -235,6 +235,10 @@ export class CharacterCreateComponent {
   createCharacter(): void {
     if (!this.canSubmit()) return;
     this.creating.set(true);
+    // Safety-Reset: falls Backend kein character_created-Frame schickt
+    // (z.B. weil Char schon erstellt war → nur ein toast-Frame zurück),
+    // soll der Button nach 5s wieder klickbar werden.
+    setTimeout(() => this.creating.set(false), 5000);
     // Allokation nur senden, wenn der Spieler mind. 1 Punkt verteilt hat.
     // Backend akzeptiert das Feld auch leer/missing — kein Pflichtfeld.
     const alloc = this.allocated();

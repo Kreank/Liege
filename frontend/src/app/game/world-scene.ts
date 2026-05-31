@@ -59,6 +59,7 @@ import { DisasterOverlay } from './disaster-overlay';
 import { DungeonRenderer } from './dungeon-renderer';
 import { setupInput } from './input';
 import { MobHpBars } from './mob-hp-bar';
+import { NameLabels } from './name-labels';
 import { NpcMoodIcons } from './npc-mood-icon';
 import { NpcSpeechBubbles } from './npc-speech-bubble';
 import { PlaceGhost } from './place-ghost';
@@ -142,6 +143,7 @@ export class WorldScene extends Phaser.Scene {
   private disasterOverlay: DisasterOverlay | null = null;
   /** Welle H2-A: Mob-HP-Bars über NPC-Sprites (H2.2). */
   private mobHpBars: MobHpBars | null = null;
+  private nameLabels: NameLabels | null = null;
   /** Welle H2-A: NPC-Sprechblasen (H2.11). */
   private speechBubbles: NpcSpeechBubbles | null = null;
   /** Welle H2-A: Place-Ghost-Preview im Build-Mode (H2.16). */
@@ -287,6 +289,13 @@ export class WorldScene extends Phaser.Scene {
       onToggleBuildMode: () => {
         this.bridge.toggleBuildMode();
       },
+      // Bug 31.05 Issue #3 — WASD/Arrow-Bewegung um delta-Tiles relativ
+      // zur aktuellen Spieler-Position. Backend kennt nur absolute (x,y).
+      onMoveStep: (dx, dy) => {
+        const p = this.bridge.state.player();
+        if (!p) return;
+        this.bridge.sendMove(p.x + dx, p.y + dy);
+      },
     });
 
     // ─── H3.8 — Mob-Hover-Tooltip ─────────────────────────────────────
@@ -317,6 +326,7 @@ export class WorldScene extends Phaser.Scene {
     this.dungeonRenderer = new DungeonRenderer(this);
     // Welle H2-A: Mob-HP-Bars + NPC-Sprechblasen + Place-Ghost + Tag/Nacht.
     this.mobHpBars = new MobHpBars(this);
+    this.nameLabels = new NameLabels(this);
     this.speechBubbles = new NpcSpeechBubbles(this);
     this.placeGhost = new PlaceGhost(
       this,
@@ -440,6 +450,12 @@ export class WorldScene extends Phaser.Scene {
     // (Bewegung folgt dem Sprite).
     if (this.mobHpBars) this.mobHpBars.syncPositions(npcs);
     if (this.speechBubbles) this.speechBubbles.syncPositions(npcs);
+    // Issue 31.05 #5: Name-Labels über Spieler + Friendly-NPCs
+    if (this.nameLabels) {
+      const players = Object.values(this.bridge.state.players());
+      const selfId = this.bridge.state.player()?.player_id;
+      this.nameLabels.sync(players, npcs, selfId !== undefined ? String(selfId) : undefined);
+    }
     // Place-Ghost: Cursor-Tracking + Build-Mode-Sichtbarkeit.
     if (this.placeGhost) {
       this.placeGhost.update(
@@ -628,6 +644,11 @@ export class WorldScene extends Phaser.Scene {
   private isHostileNpc(n: { readonly kind: string; readonly hostile?: boolean }): boolean {
     if (n.hostile === true) return true;
     if (n.hostile === false) return false;
+    // Welle H bug 31.05 #4: creature_*-Pool (128 Slugs aus monster_longlist)
+    // ist nicht im statischen CREATURE_KINDS-Set. Prefix-Check fängt das ab.
+    // overworld_*-Pool ist explizit drin, aber Doppel-Check schadet nicht.
+    if (n.kind.startsWith('creature_')) return true;
+    if (n.kind.startsWith('overworld_')) return true;
     return CREATURE_KINDS.has(n.kind);
   }
 
