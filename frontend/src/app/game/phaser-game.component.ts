@@ -106,11 +106,15 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
       // WorldScene-interne Hover-Detection von einer parallelen Subagent-
       // Edit überschrieben wird, übernimmt dieser Controller das Wiring.
       // Doppel-Hover ist no-op (beide schreiben dasselbe TooltipService-
-      // Signal). Wir warten auf den Scene-CREATE-Event, weil `scene.input`
-      // erst nach `create()` voll verfügbar ist.
-      const scene = this.game.scene.getScene('WorldScene');
-      scene.events.once(Phaser.Scenes.Events.CREATE, () => {
-        new MobHoverController(scene, this.bridge, this.tooltip).attach();
+      // Signal). Wir warten auf Phaser-READY (Scene-Manager hat dann den
+      // WorldScene-Eintrag instanziiert) und danach auf das Scene-CREATE.
+      const game = this.game;
+      game.events.once(Phaser.Core.Events.READY, () => {
+        const scene = game.scene.getScene('WorldScene');
+        if (!scene) return;  // defensiv: Scene konnte nicht geladen werden
+        scene.events.once(Phaser.Scenes.Events.CREATE, () => {
+          new MobHoverController(scene, this.bridge, this.tooltip).attach();
+        });
       });
     });
 
