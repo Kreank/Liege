@@ -19,6 +19,9 @@ import { CharacterComponent } from './ui/character/character.component';
 import { CharacterCreateComponent } from './ui/character-create/character-create.component';
 import { ChatComponent } from './ui/chat/chat.component';
 import { ChestComponent } from './ui/chest/chest.component';
+import { ChronikComponent } from './ui/chronik/chronik.component';
+import { QuestBoardComponent } from './ui/quest-board/quest-board.component';
+import { ToastContainerComponent } from './ui/toast/toast-container.component';
 import { CraftingComponent } from './ui/crafting/crafting.component';
 import { DialogComponent } from './ui/dialog/dialog.component';
 import { DownedOverlayComponent } from './ui/downed-overlay/downed-overlay.component';
@@ -78,6 +81,9 @@ import { TradeComponent } from './ui/trade/trade.component';
     SettingsComponent,
     TopRightLinksComponent,
     MobileControlsComponent,
+    QuestBoardComponent,
+    ChronikComponent,
+    ToastContainerComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
