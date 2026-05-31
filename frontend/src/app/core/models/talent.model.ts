@@ -18,6 +18,27 @@ export interface TalentTree {
 /** Schule des Zaubers — Spellbook-Tabs filtern darauf. */
 export type SpellSchool = 'healer' | 'mage';
 
+/** Mögliche Werte von `target_kind` (Backend-Vertrag, siehe
+ *  `backend/spells.py::SPELLS`). H2.3 routet darauf:
+ *    • `self`         → kein Pick, direkt casten.
+ *    • `group`        → kein Pick (alle nahen Gruppen-Member werden
+ *                       serverseitig betroffen). Direkt casten.
+ *    • `single`       → NPC-Pick (Enemy/Friendly).
+ *    • `aoe`          → Tile-Pick (Ground-Center für Radius-Effekt).
+ *    • `ground`       → Tile-Pick.
+ *    • `downed`       → Pick auf einen downed Mitspieler (Single-Pick).
+ *  Legacy-Werte `enemy`/`tile` werden vom Frontend defensiv akzeptiert,
+ *  auch wenn das Backend sie aktuell nicht emittiert. */
+export type SpellTargetKind =
+  | 'self'
+  | 'group'
+  | 'single'
+  | 'aoe'
+  | 'ground'
+  | 'downed'
+  | 'enemy'
+  | 'tile';
+
 /** Spell-Definitions-Eintrag aus dem Backend-Catalog (siehe
  *  `backend/spells.py::SPELLS`). */
 export interface SpellEntry {
@@ -30,7 +51,11 @@ export interface SpellEntry {
   readonly skill_req?: number;
   readonly icon_path?: string;
   readonly school?: SpellSchool;
-  readonly target_kind?: 'self' | 'group' | 'enemy' | 'tile' | 'downed';
+  readonly target_kind?: SpellTargetKind;
+  /** Maximale Cast-Entfernung in Tiles (Backend `range`). H2.3 Range-Circle. */
+  readonly range?: number;
+  /** Wirkradius für AoE-Spells in Tiles (Backend `radius`). */
+  readonly radius?: number;
   readonly tier?: number;
 }
 

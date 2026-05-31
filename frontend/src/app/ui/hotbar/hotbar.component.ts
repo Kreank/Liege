@@ -44,8 +44,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -110,24 +112,73 @@ export class HotbarComponent {
   private readonly state = inject(GameStateService);
   private readonly bridge = inject(GameBridgeService);
   private readonly tooltip = inject(TooltipService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // H2.4 — RAF-Tick starten/stoppen je nach Spell-Cooldown-Aktivität.
+    // Wir wollen nicht permanent ticken (CPU sparen), nur solange mindestens
+    // ein laufender Cooldown im State steht.
+    effect(() => {
+      const cds = this.state.spellCooldowns();
+      const now = Date.now();
+      const hasActive = Array.from(cds.values()).some((endMs) => endMs > now);
+      if (hasActive) this._startCdTicker();
+      else this._stopCdTicker();
+    });
+    this.destroyRef.onDestroy(() => this._stopCdTicker());
+  }
+
+  private _startCdTicker(): void {
+    if (this._cdRafId !== null) return;
+    const loop = (): void => {
+      this._cdTick.set(Date.now());
+      // Eigene Live-Check, ob noch Cooldown läuft, sonst Loop beenden.
+      const cds = this.state.spellCooldowns();
+      const now = Date.now();
+      const stillActive = Array.from(cds.values()).some((endMs) => endMs > now);
+      if (stillActive) {
+        this._cdRafId = requestAnimationFrame(loop);
+      } else {
+        this._cdRafId = null;
+      }
+    };
+    this._cdRafId = requestAnimationFrame(loop);
+  }
+
+  private _stopCdTicker(): void {
+    if (this._cdRafId !== null) {
+      cancelAnimationFrame(this._cdRafId);
+      this._cdRafId = null;
+    }
+  }
 
   /** Slot-Belegung (null = leer, sonst kind-String). */
   private readonly _slots = signal<readonly (string | null)[]>(this._loadFromStorage());
   /** Aktiver Slot (Highlight). */
   private readonly _activeIndex = signal<number>(0);
 
-  /** Cooldown-Restzeiten pro kind (Sekunden). Hook für Welle G4 —
-   *  aktuell wird die Map nie befüllt, das Template rendert nur Overlay,
-   *  wenn ein Eintrag existiert. Sobald Backend `cooldown_update`-
-   *  Messages liefert, kann eine WS-Handler-Subscription diese Map
-   *  pflegen. */
+  /** Lokale Cooldown-Restzeiten pro kind (Sekunden) — bleibt als Hook
+   *  bestehen, falls in Zukunft Item-Cooldowns (Healtränke etc.) kommen.
+   *  Spell-Cooldowns leben separat im `GameStateService.spellCooldowns`
+   *  als End-Timestamp-Map und werden weiter unten in `slots` gemischt. */
   readonly cooldownsRemaining = signal<ReadonlyMap<string, number>>(new Map());
+
+  /** RAF-Tick für Live-Update der Spell-Cooldown-Anzeige. Wir tickern nur,
+   *  solange mindestens ein Cooldown läuft (siehe Effect im Konstruktor),
+   *  um CPU bei leerem State zu sparen. */
+  private readonly _cdTick = signal<number>(Date.now());
+  private _cdRafId: number | null = null;
 
   readonly slots = computed<readonly HotbarSlotView[]>(() => {
     const slots = this._slots();
     const inv = this.state.inventory();
     const active = this._activeIndex();
     const cooldowns = this.cooldownsRemaining();
+    // Spell-Cooldowns aus GameState — Map<spell_id, endMs>. Hotbar-Slot mit
+    // `kind === spell_id` rendert den Rest als Sekunden.
+    const spellCds = this.state.spellCooldowns();
+    void this._cdTick(); // Reactivity-Anker: ticker triggert Re-Compute.
+    const now = Date.now();
 
     // Counts pro kind, nur nicht-equipped zählen.
     const counts: Record<string, number> = {};
@@ -145,7 +196,12 @@ export class HotbarComponent {
       const empty = !kind;
       const missing = !!kind && cnt === 0 && !equipped;
       const tooltip = def ? `${def.name}${cnt > 0 ? ` (${cnt})` : ''}` : null;
-      const cd = kind ? cooldowns.get(kind) ?? 0 : 0;
+      // Item-Cooldown (lokal) ODER Spell-Cooldown (aus GameState-End-Timestamp).
+      let cd = kind ? cooldowns.get(kind) ?? 0 : 0;
+      if (kind && cd <= 0) {
+        const endMs = spellCds.get(kind);
+        if (endMs && endMs > now) cd = (endMs - now) / 1000;
+      }
       const cdLabel = cd > 0 ? (cd >= 10 ? Math.ceil(cd).toString() : cd.toFixed(1)) : '';
       views.push({
         index: i,

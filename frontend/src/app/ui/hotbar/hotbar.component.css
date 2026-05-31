@@ -62,15 +62,23 @@
 }
 .hotbar-slot__count--equipped { color: #80f080; }
 
-/* Cooldown-Overlay (Hook für Welle G4). Rendert nur, wenn
-   cooldownRemaining > 0. Aktuell rein optisch — die Kreis-Animation
-   kommt mit dem echten Backend-Hook. */
+/* Cooldown-Overlay (H2.4). Aktiv wenn cooldownRemaining > 0.
+   Layered:
+     • Dunkler Halbtransparenz-Layer (::before) gibt den „inaktiv"-
+       Cue über dem ganzen Slot.
+     • Sekunden-Label (__cooldown) zeigt den Countdown mittig.
+   Kreis-Animation könnte später per conic-gradient mit CSS-Var
+   nachgereicht werden (Player-Cooldown-Quote als `--cd-pct`); aktuell
+   bewusst zurückhaltend, damit das Sekunden-Label gut lesbar bleibt. */
 .hotbar-slot.on-cooldown::before {
   content: '';
   position: absolute; inset: 0;
   background: rgba(0,0,0,0.55);
   border-radius: 3px;
   pointer-events: none;
+}
+.hotbar-slot.on-cooldown .hotbar-slot__icon {
+  filter: grayscale(0.6) brightness(0.6);
 }
 .hotbar-slot__cooldown {
   position: absolute; top: 50%; left: 50%;
