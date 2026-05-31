@@ -42,6 +42,7 @@
                          [class.done]="cell.node.done"
                          [class.locked]="!cell.node.available"
                          [class.partial]="!cell.node.done && cell.node.points > 0"
+                         [class.complete-anim]="cell.completeAnim"
                          [style.border-color]="cell.branchColor">
                       <div class="node-head">
                         <span class="node-icon">{{ cell.node.icon || '🔬' }}</span>

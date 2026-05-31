@@ -95,6 +95,30 @@
 .node-card.locked { background: rgba(30,30,30,0.7); opacity: 0.55; }
 .node-card.partial { background: rgba(80,60,20,0.7); border-color: #e8a040 !important; }
 
+/* H3.13 — Research-Complete-Animation. Bei `research_update` mit done=true
+   bekommt der frisch abgeschlossene Knoten für ~3s eine grüne Glow-Border
+   mit Sinus-Pulse (CSS-Animation). Wir tweaken zusätzlich `box-shadow`
+   statt nur `border-color`, damit der Effekt auch bei `done`-Cards (die
+   schon eine grüne Border haben) deutlich sichtbar ist. */
+.node-card.complete-anim {
+  border-color: #80ff80 !important;
+  animation: research-complete-pulse 1200ms ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes research-complete-pulse {
+  0% {
+    box-shadow: 0 0 4px rgba(128, 255, 128, 0.35), 0 0 0 rgba(128, 255, 128, 0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(128, 255, 128, 0.95), 0 0 32px rgba(96, 224, 96, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(128, 255, 128, 0.35), 0 0 0 rgba(128, 255, 128, 0);
+  }
+}
+
 .node-head {
   display: flex; align-items: center; gap: 6px;
 }
