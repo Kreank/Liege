@@ -203,7 +203,8 @@ export class CharacterCreateComponent {
       return;
     }
     this.nameStatus.set('checking');
-    this.ws.send({ type: 'character_check_name', name: trimmed });
+    // Backend liest `display_name`; `name` als Alias mitsenden für robust.
+    this.ws.send({ type: 'character_check_name', display_name: trimmed, name: trimmed });
   }
 
   selectPreset(key: string): void {
@@ -240,6 +241,7 @@ export class CharacterCreateComponent {
     if (this.spent() > 0) {
       this.ws.send({
         type: 'character_create',
+        display_name: this.name(),
         name: this.name(),
         preset: this.selectedPreset(),
         allocated: { ...alloc },
@@ -247,6 +249,7 @@ export class CharacterCreateComponent {
     } else {
       this.ws.send({
         type: 'character_create',
+        display_name: this.name(),
         name: this.name(),
         preset: this.selectedPreset(),
       });
