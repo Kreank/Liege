@@ -81,9 +81,11 @@ export interface WorldSceneInitData {
   readonly assetLoader: AssetLoaderService;
   readonly walkAnimations: WalkAnimationsService;
   readonly effectAnimations: EffectAnimationsService;
-  /** H3.8 — TooltipService für Mob-Hover-Tooltips. Wird beim Pointer-Move
-   *  über NPC-Tiles aufgerufen (`showMob` / `hide`). */
-  readonly tooltip: TooltipService;
+  /** H3.8 — TooltipService für Mob-Hover-Tooltips (optional, weil der
+   *  externe MobHoverController in `phaser-game.component.ts` denselben
+   *  Job macht — defensiv falls die WorldScene-interne Hover-Detection
+   *  von einer parallelen Subagent-Edit überschrieben wird). */
+  readonly tooltip?: TooltipService;
 }
 
 /** Render-Tiefen (Z-Order). */
@@ -133,8 +135,9 @@ export class WorldScene extends Phaser.Scene {
   private walkAnimations!: WalkAnimationsService;
   /** Phaser-Animation-Definitions (Spell-FX, Disaster-Layer) — G4. */
   private effectAnimations!: EffectAnimationsService;
-  /** Tooltip-Service (Mob-Hover, H3.8). */
-  private tooltip!: TooltipService;
+  /** Tooltip-Service (Mob-Hover, H3.8). Optional — falls null, übernimmt
+   *  der externe MobHoverController in phaser-game.component.ts. */
+  private tooltip: TooltipService | null = null;
   /** Disaster-Overlay (Tint, Particle-Emitter, Lightning-Bolts) — G4. */
   private disasterOverlay: DisasterOverlay | null = null;
   /** Welle H2-A: Mob-HP-Bars über NPC-Sprites (H2.2). */
@@ -227,7 +230,7 @@ export class WorldScene extends Phaser.Scene {
     this.assetLoader = data.assetLoader;
     this.walkAnimations = data.walkAnimations;
     this.effectAnimations = data.effectAnimations;
-    this.tooltip = data.tooltip;
+    this.tooltip = data.tooltip ?? null;
   }
 
   preload(): void {
@@ -298,7 +301,7 @@ export class WorldScene extends Phaser.Scene {
     // Pointer verlässt das Game-Canvas → Mob-Tooltip aus. Vermeidet Stale-
     // State, wenn der User die Maus über ein UI-Panel zieht.
     this.input.on(Phaser.Input.Events.POINTER_OUT, () => {
-      if (this.tooltip.activeMob()) this.tooltip.hide();
+      if (this.tooltip?.activeMob()) this.tooltip.hide();
     });
 
     // ─── Walk-Animations registrieren ─────────────────────────────────
@@ -492,6 +495,7 @@ export class WorldScene extends Phaser.Scene {
    * darauf, hier muss man nichts extra prüfen.
    */
   private handleNpcHover(pointer: Phaser.Input.Pointer): void {
+    if (!this.tooltip) return; // externer MobHoverController übernimmt
     const tileX = Math.floor(pointer.worldX / TILE_SIZE);
     const tileY = Math.floor(pointer.worldY / TILE_SIZE);
     const npcs = this.bridge.state.npcsVisible();

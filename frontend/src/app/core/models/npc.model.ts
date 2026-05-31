@@ -29,4 +29,18 @@ export interface NPC {
   readonly name?: string;
   /** Optionaler Sprite-Variant-Override (z. B. bandit_axe). */
   readonly sprite_variant?: string;
+  /** Tier (1-5) — Schwierigkeits-/Größen-Indikator. Backend setzt das in
+   *  `npcs._row_to_dict` (Welle 25). */
+  readonly tier?: number;
+  /** Level (creature_stats) — falls Backend liefert. Future-proof Feld;
+   *  aktuell rein anzeigend im Mob-Tooltip (H3.8). */
+  readonly level?: number;
+  /** Power-Budget-Skalierung für Gruppen: wenn != null, ist der Mob für eine
+   *  Gruppe der angegebenen Größe „aufgepowert" (HP/Damage-Boost). Future-
+   *  proof — Backend liefert das aktuell noch nicht (siehe H3.8 Spec), der
+   *  Tooltip zeigt die Info aber sobald sie kommt. */
+  readonly scaled_for_party_size?: number;
+  /** Prozentualer HP-Bonus durch Gruppen-Skalierung (z. B. 25 → +25 % HP).
+   *  Future-proof analog zu `scaled_for_party_size`. */
+  readonly scaled_hp_pct?: number;
 }

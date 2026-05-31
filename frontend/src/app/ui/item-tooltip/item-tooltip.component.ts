@@ -52,7 +52,11 @@ const CATEGORY_DE: Readonly<Record<string, string>> = {
 export class ItemTooltipComponent {
   private readonly tooltip = inject(TooltipService);
 
-  readonly payload = computed(() => this.tooltip.active());
+  // H3.8: TooltipService kann jetzt sowohl Item- als auch Mob-Tooltips halten.
+  // Wir lesen NUR den Item-Mode (separate `<app-mob-tooltip>` rendert die
+  // Mob-Variante). `activeItem` ist null wenn entweder gar nichts aktiv oder
+  // gerade ein Mob-Tooltip läuft.
+  readonly payload = computed(() => this.tooltip.activeItem());
   readonly visible = computed<boolean>(() => this.payload() !== null);
   readonly pinned = computed<boolean>(() => this.payload()?.pinned ?? false);
 

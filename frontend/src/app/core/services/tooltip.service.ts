@@ -18,9 +18,10 @@
 // einzige Stelle, die den DOM-Knoten rendert; sie liest hier ihre State-
 // Signals.
 
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 
 import type { InventoryItem } from '../models/item.model';
+import type { NPC } from '../models/npc.model';
 
 /** Eine Item-Form, die der Tooltip versteht. Wir geben uns mit dem Schnitt
  *  zufrieden, damit auch synthetische „Items" (Ground-Drops mit Mini-
@@ -34,23 +35,56 @@ export type TooltipItem = Pick<
   readonly equipped_slot?: InventoryItem['equipped_slot'];
 };
 
-interface TooltipPayload {
+interface TooltipItemPayload {
+  readonly mode: 'item';
   readonly item: TooltipItem;
   readonly x: number;
   readonly y: number;
   readonly pinned: boolean;
 }
 
+/** H3.8 — Mob-Tooltip-Payload. NPC roh weitergeben; die MobTooltipComponent
+ *  rendert daraus name/kind/hp/max_hp/tier + ggf. Gruppen-Skalierungs-Info. */
+interface TooltipMobPayload {
+  readonly mode: 'mob';
+  readonly npc: NPC;
+  readonly x: number;
+  readonly y: number;
+  readonly pinned: boolean;
+}
+
+type TooltipPayload = TooltipItemPayload | TooltipMobPayload;
+
 @Injectable({ providedIn: 'root' })
 export class TooltipService {
   readonly active = signal<TooltipPayload | null>(null);
+
+  /** Convenience-Signal: nur Item-Tooltips (für ItemTooltipComponent). */
+  readonly activeItem = computed<TooltipItemPayload | null>(() => {
+    const cur = this.active();
+    return cur && cur.mode === 'item' ? cur : null;
+  });
+
+  /** Convenience-Signal: nur Mob-Tooltips (für MobTooltipComponent). */
+  readonly activeMob = computed<TooltipMobPayload | null>(() => {
+    const cur = this.active();
+    return cur && cur.mode === 'mob' ? cur : null;
+  });
 
   show(item: TooltipItem, x: number, y: number): void {
     // Pinned-Tooltip nicht durch Hover überschreiben (Legacy-Verhalten:
     // `if (tt.classList.contains('pinned')) return;`).
     const cur = this.active();
     if (cur?.pinned) return;
-    this.active.set({ item, x, y, pinned: false });
+    this.active.set({ mode: 'item', item, x, y, pinned: false });
+  }
+
+  /** H3.8 — Mob-Hover/Klick zeigt einen Mob-Tooltip am gegebenen Bildschirm-
+   *  Punkt. Verhält sich symmetrisch zu `show()`/`hide()`/`pin()`. */
+  showMob(npc: NPC, x: number, y: number): void {
+    const cur = this.active();
+    if (cur?.pinned) return;
+    this.active.set({ mode: 'mob', npc, x, y, pinned: false });
   }
 
   move(x: number, y: number): void {
@@ -68,7 +102,12 @@ export class TooltipService {
   /** Pinned-Variante (Right-Click) — bleibt sichtbar bis `unpin()`. F-final
    *  kann darauf aufbauen, um Aktions-Buttons anzubieten. */
   pin(item: TooltipItem, x: number, y: number): void {
-    this.active.set({ item, x, y, pinned: true });
+    this.active.set({ mode: 'item', item, x, y, pinned: true });
+  }
+
+  /** Pinned-Mob (z. B. Klick statt nur Hover): bleibt bis `unpin()`. */
+  pinMob(npc: NPC, x: number, y: number): void {
+    this.active.set({ mode: 'mob', npc, x, y, pinned: true });
   }
 
   unpin(): void {

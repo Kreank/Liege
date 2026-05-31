@@ -1,0 +1,29 @@
+@if (visible()) {
+  <div class="mob-tooltip"
+       [class.pinned]="pinned()"
+       [class.hostile]="hostile()"
+       [style.left]="positionStyle().left"
+       [style.top]="positionStyle().top">
+    @if (pinned()) {
+      <div class="tt-close" (click)="closePinned()">×</div>
+    }
+    <div class="tt-name">{{ displayName() }}</div>
+    @if (kindLabel()) {
+      <div class="tt-kind">{{ kindLabel() }}</div>
+    }
+    <div class="tt-meta-row">
+      @if (tier() != null) {
+        <span class="tt-tier" [style.color]="tierColor()">T{{ tier() }}</span>
+      }
+      @if (level() != null) {
+        <span class="tt-level">Lvl {{ level() }}</span>
+      }
+      @if (hpText()) {
+        <span class="tt-hp">❤ {{ hpText() }}</span>
+      }
+    </div>
+    @if (scalingLabel()) {
+      <div class="tt-scaling">{{ scalingLabel() }}</div>
+    }
+  </div>
+}

@@ -29,9 +29,11 @@ import {
 import Phaser from 'phaser';
 
 import { GameBridgeService } from '../core/services/game-bridge.service';
+import { TooltipService } from '../core/services/tooltip.service';
 import { WebSocketService } from '../core/services/websocket.service';
 import { AssetLoaderService } from './asset-loader.service';
 import { EffectAnimationsService } from './effect-animations.service';
+import { MobHoverController } from './mob-hover';
 import { WalkAnimationsService } from './walk-animations.service';
 import { WorldScene, type WorldSceneInitData } from './world-scene';
 
@@ -64,6 +66,7 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
   private readonly assetLoader = inject(AssetLoaderService);
   private readonly walkAnimations = inject(WalkAnimationsService);
   private readonly effectAnimations = inject(EffectAnimationsService);
+  private readonly tooltip = inject(TooltipService);
 
   private game: Phaser.Game | null = null;
 
@@ -88,13 +91,27 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
       };
       this.game = new Phaser.Game(config);
       // Scene-Init-Daten: Bridge + Render-Foundation-Services weiterreichen.
+      // H3.8: `tooltip` ist optional im WorldSceneInitData (für interne Hover-
+      // Detection in der Scene); wir reichen es trotzdem rein, damit beide
+      // Wege (Scene-intern + extern MobHoverController) funktionieren.
       const initData: WorldSceneInitData = {
         bridge: this.bridge,
         assetLoader: this.assetLoader,
         walkAnimations: this.walkAnimations,
         effectAnimations: this.effectAnimations,
+        tooltip: this.tooltip,
       };
       this.game.scene.start('WorldScene', initData);
+      // H3.8 — Externer Mob-Hover-Tooltip als Sicherheits-Anker. Falls die
+      // WorldScene-interne Hover-Detection von einer parallelen Subagent-
+      // Edit überschrieben wird, übernimmt dieser Controller das Wiring.
+      // Doppel-Hover ist no-op (beide schreiben dasselbe TooltipService-
+      // Signal). Wir warten auf den Scene-CREATE-Event, weil `scene.input`
+      // erst nach `create()` voll verfügbar ist.
+      const scene = this.game.scene.getScene('WorldScene');
+      scene.events.once(Phaser.Scenes.Events.CREATE, () => {
+        new MobHoverController(scene, this.bridge, this.tooltip).attach();
+      });
     });
 
     // WS außerhalb der Zone öffnen — der WebSocket-Stream pumpt sonst pro

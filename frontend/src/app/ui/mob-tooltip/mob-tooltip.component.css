@@ -1,0 +1,76 @@
+/* Mob-Tooltip — Schwester zum Item-Tooltip (H3.8).
+ * Style-Sprache: dunkler Hintergrund + gelber Akzentrand wie der Rest des
+ * UIs. Bei hostilen Mobs wechselt der Rand ins Rot, damit der Spieler
+ * direkt sieht „das schlägt zurück". */
+
+:host {
+  display: contents;
+}
+
+.mob-tooltip {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  background: rgba(15,12,8,0.97);
+  border: 1px solid #b89858;
+  padding: 8px 10px;
+  color: #c8b88a;
+  font-size: 11px;
+  font-family: monospace;
+  min-width: 180px;
+  max-width: 260px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.mob-tooltip.hostile {
+  border-color: #c45a3a;
+  box-shadow: 0 4px 12px rgba(180,40,40,0.4);
+}
+
+.mob-tooltip.pinned {
+  pointer-events: auto;
+  box-shadow: 0 0 12px rgba(255,208,96,0.4);
+}
+
+.tt-close {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  color: #806040;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tt-name {
+  font-weight: bold;
+  font-size: 13px;
+  color: #e8d870;
+  margin-bottom: 2px;
+}
+
+.tt-kind {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.tt-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.tt-tier { font-weight: bold; }
+.tt-level { color: #d8c890; }
+.tt-hp { color: #d96565; }
+
+.tt-scaling {
+  font-size: 10px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(184,152,88,0.3);
+  color: #c8a890;
+  font-style: italic;
+}
