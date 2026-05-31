@@ -11,16 +11,26 @@
           <div class="inv-empty">(keine Rezepte verfügbar)</div>
         }
         @for (r of c.recipes; track r.output) {
-          <div class="recipe-row">
-            <span class="recipe-out">{{ r.output }}</span>
+          @let lockText = lockTooltip(r.requires);
+          @let locked = lockText !== '';
+          <div class="recipe-row" [class.locked]="locked"
+               [attr.title]="locked ? lockText : null">
+            <span class="recipe-out">
+              @if (locked) { <span class="recipe-lock-icon">🔒</span> }
+              {{ r.output }}
+            </span>
             <span class="recipe-cost">
               @for (inp of r.inputs; track inp.kind; let last = $last) {
                 {{ inp.kind }} ×{{ inp.quantity }}@if (!last) {<span>,&nbsp;</span>}
               }
             </span>
-            <button type="button" (click)="craft(r.output)">Herstellen</button>
-            <button type="button" class="bill-btn" title="Auftrag für 5 Stück"
-                    (click)="addBill(r.output, 5)">×5</button>
+            @if (locked) {
+              <span class="recipe-lock-reason">{{ lockText }}</span>
+            } @else {
+              <button type="button" (click)="craft(r.output)">Herstellen</button>
+              <button type="button" class="bill-btn" title="Auftrag für 5 Stück"
+                      (click)="addBill(r.output, 5)">×5</button>
+            }
           </div>
         }
       </div>
