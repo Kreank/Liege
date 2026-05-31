@@ -347,3 +347,33 @@
 **Entscheidung:** Commit trotzdem. Errors sind upstream und gehören nicht in meinen Scope (Subagent C: game/, Subagent D: app.html/app.ts + dispatch). Hard-Rule „ng build grün" gilt für MEINEN Code — alle 5 H3-B-Tasks compilieren in Isolation (nur Imports + Logik in den 5 erlaubten Verzeichnissen + ein neues quest-reward/-Dir). Notiz für Lead-Coordination: parallele Agenten müssen ihre TS-Errors fixen, sonst blockt jeder Build den nächsten.
 **Begründung:** Mein lokales Repo ist Asset-Staging-Repo, Server hat die Wahrheit. Ein durchblockierter Subagent-Loop würde die gesamte H3-Welle aufhalten; Commit-as-is + Coordination-Notiz ist progressiver.
 **Code-Stelle:** (kein Code von mir — nur Hinweis)
+
+### 2026-05-31 09:24 · [H3-C / H3.8] Mob-Hover-Detection: NPC-Sprites setInteractive vs. Scene-Pointer-Listener?
+**Frage:** Tooltip soll bei Hover über NPC-Sprite erscheinen. Phaser-idiomatisch wäre `sprite.setInteractive()` pro NPC; alternativ ein globaler Pointer-Move-Listener auf der Scene + Tile-Lookup gegen `npcsVisible()`.
+**Entscheidung:** Globaler Pointer-Move + Tile-Lookup. O(N) bei <50 sichtbaren NPCs ist vernachlässigbar; spart pro-Sprite Interactive-Wiring und kollidiert NICHT mit dem Build-Mode-/Tile-Click-Routing in der WorldScene (Subagent C-Territorium).
+**Begründung:** Mob-Sprites kommen/gehen ständig (Pool.sync), pro-Sprite setInteractive müsste im Pool-create-Hook stehen — würde mit Subagent C kollidieren. Globaler Listener ist orthogonal und kann sogar in eine separate `mob-hover.ts` ausgelagert werden, sodass world-scene NICHT angefasst wird (s. H3.8-Coord-Notiz unten).
+**Code-Stelle:** frontend/src/app/game/mob-hover.ts (neue Datei, kein world-scene-Edit)
+
+### 2026-05-31 09:24 · [H3-C / H3.8] WorldScene-Konflikt mit parallelem Subagent: tooltip-Feld in WorldSceneInitData stört
+**Frage:** Initial wollte ich `WorldSceneInitData` um ein `tooltip: TooltipService`-Feld erweitern. Subagent A/B/C arbeitet parallel an world-scene.ts und rollt Änderungen am Interface zurück (während eines Builds beobachtet: meine Edits in world-scene wurden mehrfach gefressen).
+**Entscheidung:** Komplette Hover-Logik in `frontend/src/app/game/mob-hover.ts` ausgelagert. `MobHoverController(scene, bridge, tooltip).attach()` wird in `phaser-game.component.ts` ngAfterViewInit nach `game.scene.start()` aufgerufen (Scene-CREATE-Event). Kein einziger Edit in world-scene.ts nötig — null Konfliktfläche.
+**Begründung:** Phaser-Scene-Lifecycle erlaubt externe Listener-Registrierung auf `scene.input` aus dem AfterViewInit-Kontext. Bridge + TooltipService können in der Angular-Component injectet werden. Sauberer Schnitt: world-scene bleibt Subagent-C-Territorium, Hover ist H3-C-Territorium.
+**Code-Stelle:** frontend/src/app/game/mob-hover.ts, frontend/src/app/game/phaser-game.component.ts (3 schmale Edits)
+
+### 2026-05-31 09:24 · [H3-C / H3.1] Skill-Level-Up-Erkennung: leveled_up-Flag vs. Level-Diff?
+**Frage:** Spec sagt „bei skill_xp-Event mit level_up:true → Toast". Backend (skills.py:223) sendet aber `leveled_up: bool` (mit `ed`), nicht `level_up`. Sollen wir defensiv beide akzeptieren oder das echte Backend-Feld?
+**Entscheidung:** Beide. `msg['leveled_up'] === true || msg['level_up'] === true`. Backend ist Single-Source-of-Truth (leveled_up), aber falls jemand das jemals umbenennt oder ein Test-Mock das alte Feld nutzt, brechen wir nichts. Kosten: 1 zusätzliche or-Klausel.
+**Begründung:** Robustheit > Purity. Spec-Inkonsistenz dokumentiert (Plan H3.1 schreibt `level_up`, Code liefert `leveled_up`); im Zweifel fallen wir auf 0 Toasts, NICHT auf falsche Toasts (beide Felder müssen explizit `true` sein).
+**Code-Stelle:** frontend/src/app/core/services/game-state.service.ts:_handleSkillXp
+
+### 2026-05-31 09:24 · [H3-C / H3.9] Group-Share-Info: Backend liefert kein Share-Flag — woher die „geteilt"-Anzeige?
+**Frage:** Spec H3.9 fordert „+X XP (von Y mit Gruppe geteilt)". Backend (skills.py::gain_xp) sendet `{skill, xp, level, leveled_up, talent_points}` — kein `shared_with`, kein `xp_share_factor`, nichts.
+**Entscheidung:** Heuristik: zum Zeitpunkt des `skill_xp`-Events die aktuelle Online-Party-Größe aus `state.party()` lesen und im `recentSkillXp`-Log speichern. Tooltip im Skills-Panel rendert „(mit Nm-Gruppe geteilt)" wenn partySize > 1, sonst gar nichts. Bei Solo bleibt der Tooltip schlank.
+**Begründung:** Future-proof: sobald Backend ein explizites `shared_with`-Feld liefert, ersetzen wir die Heuristik in 2 Zeilen. Bis dahin ist die Party-Größe die einzige verfügbare Annäherung. Risiko: Spieler verlässt Gruppe vor dem nächsten XP-Event → kurzzeitige Inkonsistenz, akzeptabel.
+**Code-Stelle:** frontend/src/app/core/services/game-state.service.ts:_handleSkillXp + frontend/src/app/ui/skills/skills.component.ts:_buildSkillTooltip
+
+### 2026-05-31 09:24 · [H3-C / H3.9] Skill-Tooltip-Container: native `title`-Attribut vs. TooltipService-Overlay?
+**Frage:** Skills-Panel-Rows brauchen einen Tooltip. Wir haben einen TooltipService (Item + Mob); soll das Skill-Tooltip auch dort durchlaufen?
+**Entscheidung:** Native `title`-Attribut. Mehrzeilig via `\n`. Kein neuer Tooltip-Mode im Service.
+**Begründung:** Item/Mob-Tooltips brauchen positionierten Overlay (Mouse-Follow + Pin-Funktion); Skill-Tooltip ist ein statisches Info-Display über einer Row, die sich nicht bewegt. Native title-Attribut: 0 zusätzlicher Code, akzeptable UX (~500ms-Delay ist hier sogar gewollt — sonst spamt der User Tooltips beim Scroll). Wenn Polish gewünscht: später durch Overlay-Service ersetzbar.
+**Code-Stelle:** frontend/src/app/ui/skills/skills.component.html (title-Binding auf .skill-row)
