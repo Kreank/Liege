@@ -31,6 +31,10 @@ import { MONSTER_SPRITES } from '../core/data/monster-sprites';
 import { STRUCTURE_SPRITES } from '../core/data/structure-sprites';
 import { ITEM_SPRITES } from '../core/data/item-sprites';
 import {
+  DUNGEON_FEATURE_ASSETS,
+  DUNGEON_TILE_ASSETS,
+} from '../core/data/dungeon-tiles';
+import {
   DISASTER_LAYERS,
   EFFECT_ANIMATIONS,
   EFFECT_SPRITES,
@@ -206,6 +210,14 @@ export class AssetLoaderService {
     // Welle vom Effect-Renderer konsumiert).
     for (const [kind, path] of Object.entries(EFFECT_SPRITES)) {
       this.registerSingle(kind, `effect_${kind}`, path);
+    }
+    // Welle H1-A: Dungeon-Tiles + Feature-Sprites. Key === Asset-Manifest-Key
+    // (z. B. `dungeon_tile_wall`), Pfad direkt aus dem Manifest.
+    for (const [key, path] of Object.entries(DUNGEON_TILE_ASSETS)) {
+      this.registerSingle(key, key, path);
+    }
+    for (const [key, path] of Object.entries(DUNGEON_FEATURE_ASSETS)) {
+      this.registerSingle(key, key, path);
     }
   }
 

@@ -86,4 +86,18 @@ export class SpritePool<T, S extends Phaser.GameObjects.GameObject> {
     }
     this.sprites.clear();
   }
+
+  /**
+   * Sichtbarkeits-Toggle für alle Pool-Sprites (Welle H1-A: Mode-Wechsel
+   * Overworld ↔ Dungeon). Behält die Sprites in der Map — der nächste
+   * `sync()` muss sie nicht neu bauen.
+   */
+  setAllVisible(visible: boolean): void {
+    for (const sprite of this.sprites.values()) {
+      const withVis = sprite as Phaser.GameObjects.GameObject & {
+        setVisible?: (v: boolean) => void;
+      };
+      withVis.setVisible?.(visible);
+    }
+  }
 }

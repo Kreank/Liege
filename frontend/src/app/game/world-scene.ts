@@ -615,41 +615,20 @@ export class WorldScene extends Phaser.Scene {
   }
 
   /**
-   * Zentraler Schalter für die Sichtbarkeit der Overworld-Tile-Container.
-   * NPC- und Struktur-Pools werden hier ebenfalls mitgeschaltet — die
-   * Daten-Snapshots bleiben unangetastet, nur die Sprites werden
-   * versteckt/gezeigt. Beim Exit ist der State innerhalb von Millisekunden
-   * sauber, weil das Backend per `dungeon_exit` einen neuen `npcs`-Array
-   * mitschickt (siehe GameStateService._handleDungeonExit).
+   * Zentraler Schalter für die Sichtbarkeit der Overworld-Sprites.
+   * Struktur- und Ground-Item-Pools werden mit-gehided, damit Overworld-
+   * Objekte nicht durch die Dungeon-Wände scheinen. Die NPC-Pool bleibt
+   * ungetoggled — die Liste wird parallel vom GameStateService durch die
+   * Dungeon-Floor-Mobs ersetzt (`_handleDungeonEnter` setzt `npcsVisible`
+   * auf die Floor-NPCs aus der `dungeon_enter`-Payload).
    */
   private setOverworldVisible(visible: boolean): void {
     this.overworldTilesVisible = visible;
     for (const container of this.chunkContainers.values()) {
       container.setVisible(visible);
     }
-    // Pools: alle Sprites togglen. Wir packen das in einen kleinen
-    // Helper, weil die Pool-Klasse keinen `setVisible`-Bulk-Helper
-    // anbietet (würde sich für H2 lohnen, aktuell direkt.)
-    this.toggleAllSpritesVisible(this.npcPool, visible);
-    this.toggleAllSpritesVisible(this.structurePool, visible);
-    this.toggleAllSpritesVisible(this.groundItemPool, visible);
-  }
-
-  /** Sichtbarkeits-Toggle für alle Sprites eines Pools. */
-  private toggleAllSpritesVisible<TItem, TSprite extends Phaser.GameObjects.GameObject>(
-    pool: SpritePool<TItem, TSprite>,
-    visible: boolean,
-  ): void {
-    // SpritePool hat keinen Iterator — wir greifen via `get(key)` zu, das
-    // ist aber ohne Schlüsselliste blind. Workaround: Wir verwenden den
-    // privaten `sprites`-Map nicht; stattdessen patchen wir Sichtbarkeit
-    // beim nächsten sync() automatisch über die State-Listen. Für JETZT
-    // forcieren wir ein invalides letztes Ref → der nächste Frame
-    // rebuildet die Pool-Liste. Das ist O(N) und im Mode-Wechsel ok.
-    void pool; void visible;
-    this.lastNpcsRef = null;
-    this.lastStructuresRef = null;
-    this.lastGroundItemsRef = null;
+    this.structurePool.setAllVisible(visible);
+    this.groundItemPool.setAllVisible(visible);
   }
 
   private renderChunk(chunk: Chunk): void {
@@ -1145,3 +1124,20 @@ function directionFor(dx: number, dy: number, prev: WalkDirection): WalkDirectio
 // Silence "unused import" warning fuer WALK_DIRECTIONS — wir nutzen den Type
 // `WalkDirection` aktiv, aber das Symbol nur indirekt ueber Service-Calls.
 void WALK_DIRECTIONS;
+
+/**
+ * H1.12 — Tür-Erkennung für Click-Routing. Backend-Strukturtypen:
+ *   door_wood, door_iron, door_stone, door_reinforced,
+ *   door_wood_open, door_iron_open, door_stone_open,
+ *   garden_gate_ew_closed, garden_gate_ew_open,
+ *   garden_gate_ns_closed, garden_gate_ns_open,
+ *   fence_gate_farm
+ * Alles davon wird per `toggle_door {x, y}` umgeschaltet. Backend antwortet
+ * mit `structure_replaced` (Sprite-Swap).
+ */
+function isDoorType(type: string): boolean {
+  if (type.startsWith('door_')) return true;
+  if (type.startsWith('garden_gate_')) return true;
+  if (type === 'fence_gate_farm') return true;
+  return false;
+}

@@ -1440,6 +1440,11 @@ export class GameStateService {
     this.inDungeon.set(true);
     this._syncDungeonChestsFromFloor(floor);
     this._patchPlayer({ x: floor.spawn.x, y: floor.spawn.y });
+    // Backend liefert `npcs` (NUR die Floor-Mobs) als Feld im Frame
+    // (siehe `dungeon_floor_payload`). Overworld-NPCs müssen weg, damit
+    // sie nicht durch die Wände des Dungeons hindurchscheinen.
+    const npcs = msg['npcs'] as readonly NPC[] | undefined;
+    if (npcs) this.npcsVisible.set(npcs);
   }
 
   private _handleDungeonFloorChange(msg: GenericMsg): void {
@@ -1449,6 +1454,8 @@ export class GameStateService {
     this.inDungeon.set(true);
     this._syncDungeonChestsFromFloor(floor);
     this._patchPlayer({ x: floor.spawn.x, y: floor.spawn.y });
+    const npcs = msg['npcs'] as readonly NPC[] | undefined;
+    if (npcs) this.npcsVisible.set(npcs);
   }
 
   private _handleDungeonExit(msg: GenericMsg): void {
