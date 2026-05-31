@@ -1,0 +1,33 @@
+@if (target(); as t) {
+  <div class="ctx-menu" role="dialog" aria-label="Struktur-Aktionen">
+    <div class="ctx-header">
+      <span class="ctx-title">🔧 {{ displayName() }}</span>
+      <button type="button" class="ctx-close" (click)="close()" title="Schließen (Esc)">×</button>
+    </div>
+    @if (hpLabel()) {
+      <div class="ctx-meta">HP: <span class="hp">{{ hpLabel() }}</span></div>
+    }
+    <div class="ctx-actions">
+      <button type="button"
+              class="ctx-btn repair"
+              [disabled]="!damaged()"
+              title="Material aus dem Inventar wird verbraucht"
+              (click)="repair()">
+        🔨 Reparieren
+      </button>
+      <button type="button"
+              class="ctx-btn upgrade"
+              [disabled]="!upgradable()"
+              [title]="upgradable() ? ('Aufwerten zu ' + upgradeTargetLabel()) : 'Maximal-Stufe erreicht'"
+              (click)="upgrade()">
+        ⬆ Aufwerten
+      </button>
+      <button type="button"
+              class="ctx-btn demolish"
+              title="Struktur entfernen (Material wird teilweise zurückgegeben)"
+              (click)="demolish()">
+        🗑 Abreißen
+      </button>
+    </div>
+  </div>
+}

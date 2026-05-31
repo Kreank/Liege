@@ -58,6 +58,33 @@ export class GameBridgeService {
   readonly selectedMaterial = signal<'stone' | 'wood' | 'straw'>('stone');
   readonly placeRotation = signal<number>(0);
 
+  /**
+   * Aktive Struktur-Auswahl für das Repair/Upgrade-Kontextmenü (H2.17).
+   * World-Scene setzt das beim Rechts-Klick auf eine eigene zerstörbare
+   * Struktur (Wall/Door/…). BuildBarContextMenuComponent rendert daraus
+   * ein kleines Popup mit Repair/Upgrade-Buttons. Wird vom UI auf `null`
+   * gesetzt, sobald die Action gesendet oder der Spieler woanders klickt.
+   */
+  readonly structureTarget = signal<{
+    readonly x: number;
+    readonly y: number;
+    readonly type: string;
+    readonly material?: string;
+    readonly hp?: number;
+    readonly max_hp?: number;
+  } | null>(null);
+
+  setStructureTarget(t: {
+    readonly x: number;
+    readonly y: number;
+    readonly type: string;
+    readonly material?: string;
+    readonly hp?: number;
+    readonly max_hp?: number;
+  } | null): void {
+    this.structureTarget.set(t);
+  }
+
   toggleBuildMode(): void {
     this.buildMode.update((v) => !v);
   }
@@ -122,6 +149,33 @@ export class GameBridgeService {
 
   sendAttackStructure(x: number, y: number): void {
     this.sendIntent({ type: 'attack_structure', x, y });
+  }
+
+  /**
+   * Reparieren der Struktur an (x,y) — H2.17. Backend verbraucht Material
+   * aus dem Inventar und sendet `structure_repaired` mit aktualisierter HP.
+   * Backend-Handler: `backend/ws/structures.py::handle_repair_structure`.
+   */
+  sendRepairStructure(x: number, y: number): void {
+    this.sendIntent({ type: 'repair_structure', x, y });
+  }
+
+  /**
+   * Aufwerten der Struktur an (x,y) auf das nächst-bessere Material
+   * (stone → reinforced_stone, straw → wood, …) — H2.17. Backend verbraucht
+   * Upgrade-Material und sendet `structure_upgraded`.
+   * Backend-Handler: `backend/ws/structures.py::handle_upgrade_structure`.
+   */
+  sendUpgradeStructure(x: number, y: number): void {
+    this.sendIntent({ type: 'upgrade_structure', x, y });
+  }
+
+  /**
+   * Entfernen der Struktur an (x,y) — H2.17 „Demolish" im Kontextmenü.
+   * Backend-Handler: `backend/ws/structures.py::handle_remove_structure`.
+   */
+  sendRemoveStructure(x: number, y: number): void {
+    this.sendIntent({ type: 'remove_structure', x, y });
   }
 
   sendPlaceStructure(args: {

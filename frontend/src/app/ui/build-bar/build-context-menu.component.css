@@ -1,0 +1,76 @@
+/* H2.17 — Repair/Upgrade-Kontextmenü für eigene Strukturen.
+ * Position: fix oben Mitte, über der Build-Bar (die selbst unten liegt).
+ * z-index zwischen Build-Bar und HUD-Modals.
+ */
+
+:host { display: contents; }
+
+.ctx-menu {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  background: rgba(20, 18, 14, 0.97);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  font-size: 13px;
+  font-family: monospace;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.ctx-header {
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e8d870;
+  font-weight: bold;
+}
+
+.ctx-close {
+  background: none;
+  border: 1px solid #555;
+  color: #c8b88a;
+  padding: 0 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.ctx-close:hover { background: rgba(120, 90, 40, 0.5); }
+
+.ctx-meta {
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #aaaa88;
+  border-bottom: 1px dashed #333;
+}
+.ctx-meta .hp { color: #e8d870; }
+
+.ctx-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+}
+
+.ctx-btn {
+  background: rgba(80, 80, 40, 0.5);
+  border: 1px solid #c8b88a;
+  color: #c8b88a;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 12px;
+  text-align: left;
+}
+.ctx-btn:hover:not(:disabled) { background: rgba(120, 90, 40, 0.7); }
+.ctx-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ctx-btn.repair { border-color: #88c878; color: #c8e8b0; }
+.ctx-btn.upgrade { border-color: #88a8e8; color: #b0c8e8; }
+.ctx-btn.demolish { border-color: #c87878; color: #e8b0b0; }
