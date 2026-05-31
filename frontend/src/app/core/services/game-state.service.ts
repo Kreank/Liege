@@ -418,7 +418,7 @@ export class GameStateService {
       case 'npc_damaged':          this._handleNpcDamaged(msg); break;
       case 'npc_died':             this._handleNpcDied(msg); break;
       case 'npc_reply':            this._handleNpcReply(msg); break;
-      case 'npc_attacked':
+      case 'npc_attacked':         this._handleNpcAttacked(msg); break;
       case 'npc_goal':
       case 'npc_speech':
       case 'npc_mood':
@@ -831,6 +831,81 @@ export class GameStateService {
     const id = msg['npc_id'] as number | undefined;
     if (id == null) return;
     this.npcsVisible.set(this.npcsVisible().filter((n) => n.id !== id));
+  }
+
+  /**
+   * H3.7 — Companion-Attack-Toast. Backend feuert `npc_attacked
+   * {npc_id, attacker_id?}` für jeden Mob-Hit auf einen NPC (auch
+   * Pflug-Bauern werden also „angegriffen", wenn ein Wolf dazukommt).
+   * Wir wollen aber NUR einen Toast triggern, wenn der angegriffene NPC
+   * ein „Companion" des Spielers ist — also ein zugehöriges Tier oder
+   * Quest-Eskorte, deren Tod das Spielerlebnis ernsthaft beeinträchtigt.
+   *
+   * Companion-Detection — Status 2026-05-31:
+   *   Das Backend führt heute KEIN explizites Companion-Modell mit
+   *   `owner_id`/`companion`-Flag/`escort_quest_id` auf NPCs. Das `NPC`-
+   *   Snapshot-Interface (core/models/npc.model.ts) trägt nur
+   *   `id, kind, x, y, hp?, max_hp?, hostile?, name?, sprite_variant?`.
+   *   Ohne dieses Datum können wir „mein Pet" nicht von „beliebiger
+   *   Bauer im Dorf" unterscheiden — und das WICHTIGSTE: wir dürfen
+   *   KEIN Toast-Spam bei jedem Wolf-vs-Bauer-Hit auslösen, weil das
+   *   die ganze Toast-Lane mit irrelevantem Lärm überflutet.
+   *
+   *   Pragmatische Entscheidung: solange Backend keine Companion-
+   *   Markierung mitschickt, ist dies ein No-op. Sobald das Backend
+   *   einen `owner_id`/`companion`/`escort_quest_id` (in NPC-Snapshot
+   *   ODER im `npc_attacked`-Frame selbst) liefert, fällt der Toast
+   *   trivial rein — die Hook ist hier verankert und die Logik kann
+   *   geradlinig ergänzt werden.
+   *
+   * Optional erkannte Felder (Forward-Compat):
+   *   • `msg.owner_id`    — Backend könnte den Companion-Owner direkt
+   *                         im Frame mitschicken.
+   *   • `msg.companion`   — explizites Flag.
+   *   • `npc.owner_id` / `npc.companion` / `npc.escort_quest_id` —
+   *                         NPC-Snapshot-Erweiterung.
+   *
+   * Defensive Heuristik (wenn alle Companion-Felder fehlen): Kein
+   * Toast. Eine reine `friendly + attacker != self`-Regel würde bei
+   * jedem Stadt-Raid 30+ Toasts pro Sekunde feuern, das ist
+   * spielzerstörend.
+   */
+  private _handleNpcAttacked(msg: GenericMsg): void {
+    const npcId = msg['npc_id'] as number | undefined;
+    if (npcId == null) return;
+    const npc = this.npcsVisible().find((n) => n.id === npcId);
+
+    // Companion-Detection — alle Quellen prüfen.
+    const myPlayerId = this.player()?.player_id;
+    const frameOwnerId = msg['owner_id'] as number | string | undefined;
+    const frameCompanionFlag = msg['companion'] as boolean | undefined;
+    // NPC-Snapshot kann perspektivisch Companion-Felder tragen — wir
+    // lesen sie defensiv per dynamischem Cast, ohne das `NPC`-Interface
+    // jetzt schon zu erweitern (das wäre Backend-Vertrags-Vorgriff).
+    const npcAny = npc as (NPC & {
+      readonly owner_id?: number | string;
+      readonly companion?: boolean;
+      readonly escort_quest_id?: number | string;
+    }) | undefined;
+    const npcOwnerId = npcAny?.owner_id;
+    const npcCompanionFlag = npcAny?.companion === true;
+    const npcEscortQuestId = npcAny?.escort_quest_id;
+
+    const isOwnedByMe =
+      myPlayerId != null &&
+      ((frameOwnerId != null && String(frameOwnerId) === String(myPlayerId)) ||
+       (npcOwnerId != null && String(npcOwnerId) === String(myPlayerId)));
+    const isCompanion = frameCompanionFlag === true || npcCompanionFlag;
+    const isEscort = npcEscortQuestId != null;
+
+    if (!isOwnedByMe && !isCompanion && !isEscort) {
+      // TODO: companion-Detection wenn Backend-Feld klar — siehe
+      // ai_fragen.md (H3.7). Bis dahin: defensiv kein Toast.
+      return;
+    }
+
+    const name = npc?.name ?? npc?.kind ?? 'Begleiter';
+    this.toast.show(`⚠️ ${name} wird angegriffen!`, 'warn', 5000);
   }
 
   private _handleItemSpawned(msg: GenericMsg): void {

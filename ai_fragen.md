@@ -244,3 +244,45 @@
 **Entscheidung:** Zusätzlich beim ersten Öffnen eines neuen NPC-Dialogs automatisch `query_npc_quests` feuern. Tracking per `_autoQueriedNpcId`, einmal pro NPC pro Dialog-Session. Manueller Refresh-Button bleibt.
 **Begründung:** Backend antwortet schnell, kostet keine DB-Last (filter über bereits geladene Templates). UX-Win: Quests sind sofort sichtbar. Tracking verhindert Spam bei kurz-aufeinanderfolgenden Open/Close-Zyklen.
 **Code-Stelle:** frontend/src/app/ui/dialog/dialog.component.ts:constructor (effect)
+
+### 2026-05-31 09:10 · [H3-A / H3.5] Quest-Marker im Welt-Renderer ohne target_x/target_y im Quest-Model
+**Frage:** Aufgabe-Detail sagt „Quest-Objects mit `target_x/target_y` aus state.quests() filtern". Im Frontend-Quest-Model (`core/models/quest.model.ts`) gibt es aber nur `target_npc_id`, kein `target_x/target_y`. Wie Quest-Marker positionieren?
+**Entscheidung:** Marker werden ausschließlich über `target_npc_id` (Lookup gegen `state.npcsVisible()`) und über `giver_npc_id` als Fallback positioniert. Wenn Backend später `target_x/target_y` zum Quest-Frame hinzufügt, lesen wir die optional aus dem rohen Quest-Objekt via `(q as any).target_x` ohne `any` — über lokales Index-Signature-Pattern (`q['target_x']`). Range-Check: nur Marker für Quests rendern, deren Ziel-NPC im aktuellen `npcsVisible()`-Snapshot ist (= im Sicht-Range).
+**Begründung:** target_npc_id deckt Kill- und Deliver-Quests ab. Pure Collect-Quests (Ressourcen sammeln) bekommen vorerst keinen Marker — alternativ würden wir alle Mob-Cluster eines Kinds markieren, das ist visuell zu spammy. Folge-Iteration kann pro Objective-Type Marker-Strategie definieren.
+**Code-Stelle:** frontend/src/app/game/quest-marker-world.ts
+
+### 2026-05-31 09:10 · [H3-A / H3.6] NPC-Mood-Icon: nur abnormale Stimmungen anzeigen oder auch „normal"?
+**Frage:** Backend sendet `npc_mood {npc_id, mental_state}` mit `normal/sad/fleeing/berserk`. Soll jeder friendly NPC mit „normal" auch ein Emoji bekommen (😐)?
+**Entscheidung:** Nur die DREI abnormalen States rendern (sad=😢, fleeing=😨, berserk=😡). „normal" → kein Icon (= Icon ausblenden). Aufgaben-Hinweis sagt explizit „mood vorhanden", also nur wenn relevant.
+**Begründung:** Welt mit 100+ NPCs würde mit 100 neutralen Emojis verwüstet aussehen. „normal" ist Default, hat keinen Mehrwert. Außerdem reduziert das Sprite-Last in Phaser-Scene massiv.
+**Code-Stelle:** frontend/src/app/game/npc-mood-icon.ts
+
+### 2026-05-31 09:10 · [H3-A / H3.10] Sense-Radius-Visualisierung: feste Range vs. aus Event-Payload
+**Frage:** Backend-Event `dungeon_sense {dungeons:[{x,y,tier}]}` enthält KEIN explizites `range/radius`-Feld. Aufgabe sagt „mit Sense-Range-Radius".
+**Entscheidung:** Default-Radius 70 Tiles (Chebyshev) hart-kodiert. Begründung: Backend-Komment in `dungeon_director.py:128` sagt „Spür-Radius ~70 Tiles" — Konstante existiert nicht extern. Falls einzelne Dungeons im Event ein `radius`-Feld tragen, nutzen wir das Max davon; sonst fest 70. Pulse-Dauer 2 s, expandiert von 0 auf 70*TILE_SIZE px, alpha 0.6→0.
+**Begründung:** Hart-codierter Default ist OK weil der Pulse rein dekorativ ist (kein Gameplay-Effekt). Falls Backend später Sense-Items mit unterschiedlicher Range einführt, kann der Frontend-Default überschrieben werden.
+**Code-Stelle:** frontend/src/app/game/sense-pulse.ts
+
+### 2026-05-31 09:10 · [H3-A / H3.12] Repair-Heal-Pulse: neue Klasse oder inline in world-scene
+**Frage:** Pulse-Ring an Struktur-Tile bei `structure_repaired` — eigene Helper-Klasse oder inline FX in world-scene.ts?
+**Entscheidung:** Inline in world-scene.ts (`fxStructureRepaired`-Methode), analog `fxStructureRemoved`. Pulse ist ein simpler Tween (grüner Ring expandiert + faded), kein State, kein Cleanup-Multiplex.
+**Begründung:** ~30 Zeilen, kein gemeinsamer Use-Case mit anderen Komponenten. Auslagern wäre Over-Engineering. `fxStructureRemoved` (Particle-Burst) ist das gleiche Pattern.
+**Code-Stelle:** frontend/src/app/game/world-scene.ts:fxStructureRepaired
+
+### 2026-05-31 07:10 · [H3-D / H3.7] Companion-Detection ohne Backend-Vertrag — defensiv kein Toast
+**Frage:** `npc_attacked {npc_id, attacker_id?}` kommt für JEDEN Mob-Hit auf einen NPC (Bauer, Wache, Tier). Wir wollen Toast NUR für eigene Companions/Eskorten. Aber NPC-Snapshot (core/models/npc.model.ts) trägt heute KEINE Companion-Felder (`owner_id`/`companion`/`escort_quest_id`). Auch das `npc_attacked`-Frame selbst hat keinen klaren Companion-Hinweis (im WS_PROTOCOL.md nicht spezifiziert). Was tun?
+**Entscheidung:** Defensiv kein Toast als Default. Hook implementiert, prüft beim Frame UND beim NPC-Snapshot dynamisch fünf Felder (`msg.owner_id == player.id`, `msg.companion === true`, `npc.owner_id == player.id`, `npc.companion === true`, `npc.escort_quest_id != null`). Wenn alle fehlen → kein Toast (Hard-Rule: kein Toast-Spam bei jedem Wolf-vs-Bauer-Hit). Sobald Backend eines davon mitschickt, funktioniert der Toast SOFORT ohne weiteren Code-Change. Alternative `faction == friendly + attacker != self` wäre Toast-Spam bei jedem Stadt-Raid (30+ Toasts/Sekunde) — verworfen.
+**Begründung:** Hard-Rule: kein User-zerstörender Toast-Spam. Hook bleibt im Code für Forward-Compat — sobald Backend `owner_id`/`companion`/`escort_quest_id` ergänzt (kleine ws-Erweiterung im NPC-Snapshot-Builder, ohne neuen Frame-Type), wird der Toast aktiv. TODO-Kommentar markiert die Stelle.
+**Code-Stelle:** frontend/src/app/core/services/game-state.service.ts:_handleNpcAttacked
+
+### 2026-05-31 07:10 · [H3-D / Integration] Keine neuen H3-Components zum Wiren bei meinem Lauf — Integration aufgeschoben
+**Frage:** Plan sagt „Sammle alle Listen aus den Berichten und füge zentral ein. Pflege `app.ts` standalone-imports synchron." → erwartet `<app-quest-reward>` (H3.4) und ggf. `<app-mob-tooltip>` (H3.8) zu integrieren. Was wenn Subagents A/B/C bei meinem Lauf noch nichts committed haben?
+**Entscheidung:** App.html-Integration ist No-Op für diese H3-Welle. Stand bei meinem Lauf: HEAD ist `ba5b582` (H2-D-Integration), keine neueren Component-Files unter `frontend/src/app/ui/`. `find ui -newer HEAD` zeigt nur In-Place-Edits (character.component erweitert für H3.2 Body-Parts, hotbar.component erweitert für H3.3 Mana-Cost, npc.model erweitert für H3.8 Tooltip-Felder) — alle DIESE leben in BESTEHENDEN Components und brauchen keinen neuen Selector in app.html. H3-A-Subagent hat oben 5 Decisions notiert (quest-marker-world, npc-mood-icon, sense-pulse, weather-particles), aber alle in `frontend/src/app/game/` (Phaser-Layer, kein app.html-Wire nötig). `<app-quest-reward>` (H3.4) existiert noch nicht. Wenn sie später committed werden, läuft ein separater H3-Integration-Pass (analog `ba5b582` für H2). Bis dahin: app.html + app.ts bleiben unverändert.
+**Begründung:** Cross-Subagent-Wait wäre Auto-Mode-Blocker (User-Anweisung „Bias toward working without stopping"). H3.7 (Solo-Task) ist erledigt + committed; Integration-Pass wird trivial nachgeholt, sobald die fehlenden Components da sind (3-Zeilen-Diff pro Component: Selector in app.html, Import + standalone-Eintrag in app.ts).
+**Code-Stelle:** frontend/src/app/app.html, frontend/src/app/app.ts (beide unverändert)
+
+### 2026-05-31 09:10 · [H3-A / H3.14] Weather-Particles: Phaser ParticleEmitter vs. eigene Sprite-Pool
+**Frage:** Phaser 3.60 hat `add.particles()` — eigener Emitter pro Wetter-Kind oder manuelle Sprite-Bursts (wie DisasterOverlay)?
+**Entscheidung:** Eigener Phaser-`ParticleEmitter` pro Wetter-Kind (rain, snow, sandstorm). Nutzt Particle-Texture-Keys aus AssetLoader; Fallback auf kleines weißes Pixel-Rechteck wenn Asset fehlt. Emit-Rate skaliert mit `weather.intensity` (0..1). Aktiviert/deaktiviert per Watch auf `state.weather()`-Signal in `update()`.
+**Begründung:** Phaser-ParticleEmitter ist GPU-beschleunigt + Built-in (kein Custom-Tween-Loop). Asset-Pfade `assets/effects/weather_rain.png` etc. werden später beigebracht — bis dahin Fallback-Rechteck (Magenta wie andere Asset-Fallbacks).
+**Code-Stelle:** frontend/src/app/game/weather-particles.ts
