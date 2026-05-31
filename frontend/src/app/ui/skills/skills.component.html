@@ -10,11 +10,13 @@
           <div class="skills-empty">Noch keine Fähigkeiten.</div>
         }
         @for (row of rows(); track row.kind) {
-          <div class="skill-row">
+          <!-- H3.9: title-Attribut zeigt aktuellen Stand + letzten XP-Gewinn
+               inkl. Group-Share-Hinweis (mehrzeilig via \n). -->
+          <div class="skill-row" [attr.title]="row.tooltipText">
             <span class="skill-icon">{{ row.icon }}</span>
             <span class="skill-name">{{ row.label }}</span>
             <span class="skill-level">Stufe {{ row.level }}</span>
-            <div class="skill-progress" [attr.title]="row.xp + ' / ' + row.xpNext + ' XP'">
+            <div class="skill-progress">
               <div class="skill-progress-fill" [style.width.%]="row.pct"></div>
             </div>
           </div>
