@@ -100,6 +100,16 @@ export class GameBridgeService {
     this.sendIntent({ type: 'talk_to_npc', npc_id: npcId });
   }
 
+  /**
+   * Händler-Trade-Intent. Backend antwortet mit `trade_open {offerings,
+   * coins}`, das GameState in `activeTrade` setzt → `<app-trade>` rendert.
+   * Click-Routing erkennt Merchant-Kinds (`merchant`, `merchant_female`,
+   * siehe world-scene.ts::isMerchantNpc — H1.13).
+   */
+  sendOpenTrade(npcId: number): void {
+    this.sendIntent({ type: 'open_trade', npc_id: npcId });
+  }
+
   sendAttackStructure(x: number, y: number): void {
     this.sendIntent({ type: 'attack_structure', x, y });
   }
@@ -119,5 +129,25 @@ export class GameBridgeService {
       material: args.material,
       rotation: args.rotation,
     });
+  }
+
+  /**
+   * Tür-Toggle (H1.12). Backend mappt `toggle_door {x, y}` auf den
+   * Tür-State-Swap und antwortet mit `structure_replaced` (door_open ↔
+   * door_closed). Backend-Handler in `backend/ws/structures.py::handle_toggle_door`.
+   */
+  sendToggleDoor(x: number, y: number): void {
+    this.sendIntent({ type: 'toggle_door', x, y });
+  }
+
+  /**
+   * Dungeon-Truhe öffnen (H1.5). NICHT identisch mit Overworld-`chest_open` —
+   * Dungeon-Truhen sind Features im Dungeon-Floor-Payload, das Backend liefert
+   * Loot direkt per `inventory_add` + `wallet_update` und feuert
+   * `dungeon_chest_opened {x, y}` zur Marker-Aktualisierung (Subagent A).
+   * Backend-Handler: `backend/ws/structures.py::handle_dungeon_chest`.
+   */
+  sendDungeonChest(x: number, y: number): void {
+    this.sendIntent({ type: 'dungeon_chest', x, y });
   }
 }
