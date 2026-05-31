@@ -25,6 +25,7 @@ import type {
   PlayerAttributes,
   PlayerSnapshot,
   PlayerStats,
+  SkillEntry,
   StatusEffect,
 } from '../models/player.model';
 import type { Bill } from '../models/bill.model';
@@ -296,6 +297,28 @@ export class GameStateService {
   /** Aktive Workshop-Aufträge (alle Stationen). UI filtert pro Station. */
   readonly bills = signal<readonly Bill[]>([]);
 
+  // ─── Skill-XP-Log (H3.1, H3.9 — Welle H3-C) ─────────────────────────
+  /** Ring-Buffer der letzten Skill-XP-Gewinne pro Skill. SkillsComponent
+   *  liest das für den Tooltip „Letzte XP-Gewinne: +N" (H3.9 — Group-
+   *  Share-Hinweis). Wir tracken pro Skill den letzten Gain (Increment in
+   *  XP-Punkten, abgeleitet aus der Differenz zur vorherigen XP-Summe),
+   *  den absoluten ms-Zeitstempel UND die aktuelle Party-Größe — Letzteres
+   *  ist die Heuristik für „mit Gruppe geteilt" (Backend liefert kein
+   *  explizites Share-Flag, siehe ai_fragen-Eintrag H3.9).
+   *
+   *  Wir halten max die letzten 5 Skills im Map; bei jedem neuen Eintrag
+   *  überschreibt der Key — das genügt für den Tooltip-Zweck. */
+  readonly recentSkillXp = signal<ReadonlyMap<string, {
+    /** Increment (xp_new - xp_prev). 0 wenn keine Differenz ermittelbar. */
+    readonly amount: number;
+    /** Wall-Clock-ms beim Receive. */
+    readonly atMs: number;
+    /** Online-Party-Mitglieder zum Zeitpunkt des Events (1 = solo). */
+    readonly partySize: number;
+    /** Hat dieses Event ein Level-Up ausgelöst? (für visuelles Hervorheben) */
+    readonly leveledUp: boolean;
+  }>>(new Map());
+
   // ─── Sign-Inspect (F-extras-3) ───────────────────────────────────────
   /** Aktives Sign-Inspect-Modal (Welle 51 — Schild-Lese-Modal). */
   readonly activeSignInspect = signal<{
@@ -503,7 +526,7 @@ export class GameStateService {
       case 'bill_blocked':         this._handleBillBlocked(msg); break;
       case 'research_update':      this._handleResearchUpdate(msg); break;
       case 'research_pool_update': this._handleResearchPoolUpdate(msg); break;
-      case 'skill_xp':             /* Floating-Text, kein persistent state hier */ break;
+      case 'skill_xp':             this._handleSkillXp(msg); break;
 
       // ─── Disaster (H1.17 — Start/End-Toast + activeDisasters-Set) ───
       case 'disaster_started':     this._handleDisasterStarted(msg); break;
@@ -1628,6 +1651,87 @@ export class GameStateService {
     this.research.set({ ...this.research(), pool });
   }
 
+  // ── Skill-XP (H3.1 + H3.9 — Welle H3-C) ──
+  //
+  // Backend-Frame (siehe backend/skills.py::gain_xp -> grant_xp-Pfade):
+  //   {type:'skill_xp', skill, xp, level, leveled_up,
+  //    talent_points, power_tier?, unlocked_spells?}
+  //
+  // Wir machen drei Dinge:
+  //   1. Player-Skills-Map updaten (xp/level), damit Skills-Panel live mit-
+  //      zieht — vorher passierte das nur bei `init`-Frames.
+  //   2. Toast bei `leveled_up == true` (H3.1).
+  //   3. Recent-XP-Log pflegen (H3.9) — Tooltip im Skills-Panel zeigt
+  //      „+N XP (geteilt mit Y-Gruppe)" anhand der aktuellen Party-Größe.
+  //
+  // Das Backend liefert KEIN explizites XP-Increment im Frame (nur `xp`
+  // als kumulativer neuer Wert). Wir errechnen das Delta aus der vorigen
+  // `player.skills[skill].xp`-Summe; bei `init` oder unsauberen Drifts
+  // fallen wir auf 0 zurück.
+  private _handleSkillXp(msg: GenericMsg): void {
+    const skill = msg['skill'] as string | undefined;
+    if (!skill) return;
+    const newXp = msg['xp'] as number | undefined;
+    const newLevel = msg['level'] as number | undefined;
+    // Backend nennt das Feld `leveled_up` (siehe skills.py:223). Wir
+    // akzeptieren defensiv auch `level_up` falls ein anderer Pfad das
+    // anders benennt.
+    const leveledUp =
+      msg['leveled_up'] === true || msg['level_up'] === true;
+
+    // (1) Player-Skills-Map updaten.
+    const player = this.player();
+    let amount = 0;
+    if (player && newXp != null) {
+      const prevEntry = player.skills?.[skill];
+      const prevXp = prevEntry?.xp ?? 0;
+      const prevXpNext = prevEntry?.xp_next ?? 0;
+      // Increment defensiv: nicht-negativ, sonst Drift (z. B. wenn der
+      // Server xp resettet hat) auf 0 mappen.
+      amount = Math.max(0, newXp - prevXp);
+      const nextSkills: Record<string, SkillEntry> = {
+        ...(player.skills ?? {}),
+        [skill]: {
+          level: newLevel ?? prevEntry?.level ?? 0,
+          xp: newXp,
+          // Backend liefert kein `xp_next` im Frame — wir bewahren den
+          // vorherigen Wert (Skills-Panel zeigt eine Progress-Bar; die
+          // bleibt korrekt, bis der nächste init-Frame xp_next aktualisiert).
+          xp_next: prevXpNext,
+        },
+      };
+      this._patchPlayer({ skills: nextSkills });
+    }
+
+    // (2) Level-Up-Toast (H3.1).
+    if (leveledUp && newLevel != null) {
+      const label = _skillLabel(skill);
+      this.toast.show(`🎉 ${label} jetzt Stufe ${newLevel}!`, 'success', 5000);
+    }
+
+    // (3) Recent-XP-Log (H3.9). Wir tracken auch Events ohne ermittelbares
+    // Increment (amount=0), damit das Tooltip-Recency-Signal trotzdem etwas
+    // anzeigen kann („Level-Up gerade eben").
+    const partyMembers = this.party()?.members ?? [];
+    // Online-Member zählen — Solo = 1 (der Spieler selbst).
+    const partySize = Math.max(1, partyMembers.filter((m) => m.online).length);
+    const next = new Map(this.recentSkillXp());
+    next.set(skill, {
+      amount,
+      atMs: Date.now(),
+      partySize,
+      leveledUp,
+    });
+    // Ring-Größe: max 8 Skills tracken (eine pro Skill-Kind im Spiel
+    // genügt; bei Overflow ältesten Eintrag droppen — Map ist insertion-
+    // ordered, also entfernen wir den ersten Key).
+    if (next.size > 8) {
+      const oldestKey = next.keys().next().value;
+      if (oldestKey !== undefined) next.delete(oldestKey);
+    }
+    this.recentSkillXp.set(next);
+  }
+
   // ── Bills (F-extras-2) ──
 
   private _handleBillsUpdate(msg: GenericMsg): void {
@@ -2045,4 +2149,22 @@ function _disasterLabel(kind: string): string {
     toxic_fog: 'Giftnebel',
   };
   return map[kind] ?? kind;
+}
+
+/** H3.1 — Skill-Kind → Deutsche UI-Bezeichnung für den Level-Up-Toast. */
+function _skillLabel(kind: string): string {
+  const map: Readonly<Record<string, string>> = {
+    melee: 'Nahkampf',
+    ranged: 'Fernkampf',
+    magic: 'Magie',
+    defense: 'Verteidigung',
+    mining: 'Bergbau',
+    woodcutting: 'Holzfällen',
+    cooking: 'Kochen',
+    fishing: 'Angeln',
+    farming: 'Landwirtschaft',
+    crafting: 'Handwerk',
+    alchemy: 'Alchemie',
+  };
+  return map[kind] ?? kind.charAt(0).toUpperCase() + kind.slice(1);
 }
