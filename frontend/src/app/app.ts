@@ -14,13 +14,16 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { PhaserGameComponent } from './game/phaser-game.component';
 import { BestiaryComponent } from './ui/bestiary/bestiary.component';
 import { BuildBarComponent } from './ui/build-bar/build-bar.component';
+import { BuildContextMenuComponent } from './ui/build-bar/build-context-menu.component';
 import { CastBarComponent } from './ui/cast-bar/cast-bar.component';
 import { CharacterComponent } from './ui/character/character.component';
 import { CharacterCreateComponent } from './ui/character-create/character-create.component';
 import { ChatComponent } from './ui/chat/chat.component';
 import { ChestComponent } from './ui/chest/chest.component';
 import { ChronikComponent } from './ui/chronik/chronik.component';
+import { ContainerActionOverlayComponent } from './ui/container-action-overlay/container-action-overlay.component';
 import { QuestBoardComponent } from './ui/quest-board/quest-board.component';
+import { SpellTargetOverlayComponent } from './ui/spell-target-overlay/spell-target-overlay.component';
 import { ToastContainerComponent } from './ui/toast/toast-container.component';
 import { CraftingComponent } from './ui/crafting/crafting.component';
 import { DialogComponent } from './ui/dialog/dialog.component';
@@ -83,6 +86,9 @@ import { TradeComponent } from './ui/trade/trade.component';
     MobileControlsComponent,
     QuestBoardComponent,
     ChronikComponent,
+    SpellTargetOverlayComponent,
+    ContainerActionOverlayComponent,
+    BuildContextMenuComponent,
     ToastContainerComponent,
   ],
   templateUrl: './app.html',
