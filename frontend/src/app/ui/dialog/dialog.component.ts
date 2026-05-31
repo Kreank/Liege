@@ -18,6 +18,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -52,6 +53,28 @@ export class DialogComponent {
     if (!d || !qs || qs.npc_id !== d.npc_id) return null;
     return qs;
   });
+
+  /** Tracking, für welche NPCs wir bereits einen Auto-`query_npc_quests`
+   *  abgesetzt haben — vermeidet Spam bei jedem Dialog-Open in derselben
+   *  Session. Wird beim Schließen + NPC-Wechsel resettet. */
+  private _autoQueriedNpcId: number | null = null;
+
+  constructor() {
+    // H2.8 — Beim ersten Öffnen eines neuen NPC-Dialogs automatisch die
+    // Quest-Offers abrufen. Backend antwortet stets mit
+    // `npc_quest_status {offers:[], turnins:[]}`, auch bei Creature-NPCs
+    // ohne Quest-Catalog — die UI rendert die Sektion dann einfach nicht.
+    effect(() => {
+      const d = this.dialog();
+      if (!d) {
+        this._autoQueriedNpcId = null;
+        return;
+      }
+      if (this._autoQueriedNpcId === d.npc_id) return;
+      this._autoQueriedNpcId = d.npc_id;
+      this.ws.send({ type: 'query_npc_quests', npc_id: d.npc_id });
+    });
+  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
