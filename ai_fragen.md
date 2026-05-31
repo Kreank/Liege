@@ -154,3 +154,15 @@
 **Entscheidung:** Vorläufig Tint (0x665544 = dunkelbraun) + Alpha 0.55. Dediziertes „open"-Sprite wird in H2.14 ergänzt (DUNGEON_FEATURE_SPRITES.chest_opened ist bereits als separater Texture-Key vorgesehen, mappt aktuell aber auf das gleiche PNG).
 **Begründung:** Sofort spielbar ohne Asset-Pipeline-Block. Visuell deutlich unterscheidbar (geöffnete Truhe = matter/transparent). H2.14 ist als „klein" markiert — Asset-Swap ist 1 PNG-Drop.
 **Code-Stelle:** frontend/src/app/game/dungeon-renderer.ts:markChestOpened
+
+### 2026-05-31 02:15 · [H2-C / H2.12] Self-Identifikation in Party-Member-Liste
+**Frage:** Backend liefert Party-Members als `[{name, role, sub_party, online, x?, y?}]` ohne klare Self-Markierung. Bei Raids brauche ich aber „eigene Sub-Party" um Members in cyan vs. lila zu rendern. Wie identifiziere ich Self im Members-Array?
+**Entscheidung:** Wir nutzen `party.leader` als Self-Proxy für die Sub-Party-Auflösung. Wenn der Leader-Eintrag eine `sub_party` hat, wird die als „eigene Sub-Party" genommen. Falls kein Leader-Match: Fallback auf `members[0].sub_party`.
+**Begründung:** Das Backend liefert weder den eigenen Player-Namen noch eine `is_self`-Flag in `group_snapshot`. Eine korrekte Self-ID würde GameState-Erweiterung verlangen (Backend nicht anfassbar, Hard-Rule 7). Die Leader-Heuristik ist nicht perfekt — wenn Self NICHT Leader ist, könnte die Sub-Party-Zuordnung falsch sein. Aber: bei Parties (kind='party') sind alle Members sowieso cyan, daher reicht der einfache Fall. Nur bei Raids mit mehreren Sub-Parties greift die Heuristik, und dort kann der Spieler trotzdem deutlich Party- (cyan) vs. Raid- (lila) Member sehen — der schlimmste Fall ist dass eine FREMDE Sub-Party fälschlich als „eigene" cyan gefärbt wird, was den Nutzwert nicht killt.
+**Code-Stelle:** frontend/src/app/ui/minimap/minimap.component.ts:_partyMemberNames
+
+### 2026-05-31 02:15 · [H2-C / H2.24] Event-Pulse-Quelle: GameState-Signal vs. WS-Stream direkt
+**Frage:** `disaster_started`-Frame trägt `{kind, x?, y?, duration_s?, label?}`. GameState hält nur `activeDisasters: Set<kind>` ohne Position. Wie kommt die Minimap an x/y?
+**Entscheidung:** MinimapComponent subscribed direkt auf `bridge.messages$` und filtert `disaster_started`-Frames mit gültigen x/y. Die Pulse-Marker leben lokal im Component-State (Array `eventPulses`), 30 s Lebensdauer pro Marker.
+**Begründung:** Alternative wäre ein neues `disasterPositions`-Signal in GameStateService — größere Änderung außerhalb meines Scopes (Subagent A/B könnten parallel an GameState arbeiten). Direkte Stream-Subscription ist isolierter und passt zum bestehenden Pattern (game-bridge.service.ts dokumentiert `messages$` explizit für transiente FX, „Damage-Numbers, Hit-Sparks" — Event-Pulse fällt in dieselbe Kategorie).
+**Code-Stelle:** frontend/src/app/ui/minimap/minimap.component.ts:ngAfterViewInit
