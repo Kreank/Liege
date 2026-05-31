@@ -36,8 +36,10 @@ import { InventoryComponent } from './ui/inventory/inventory.component';
 import { ItemTooltipComponent } from './ui/item-tooltip/item-tooltip.component';
 import { LootRollComponent } from './ui/loot-roll/loot-roll.component';
 import { MinimapComponent } from './ui/minimap/minimap.component';
+import { MobTooltipComponent } from './ui/mob-tooltip/mob-tooltip.component';
 import { MobileControlsComponent } from './ui/mobile-controls/mobile-controls.component';
 import { PartyFrameComponent } from './ui/party-frame/party-frame.component';
+import { QuestRewardComponent } from './ui/quest-reward/quest-reward.component';
 import { QuestsComponent } from './ui/quests/quests.component';
 import { RaidSelectorComponent } from './ui/raid-selector/raid-selector.component';
 import { ResearchComponent } from './ui/research/research.component';
@@ -89,6 +91,8 @@ import { TradeComponent } from './ui/trade/trade.component';
     SpellTargetOverlayComponent,
     ContainerActionOverlayComponent,
     BuildContextMenuComponent,
+    MobTooltipComponent,
+    QuestRewardComponent,
     ToastContainerComponent,
   ],
   templateUrl: './app.html',
