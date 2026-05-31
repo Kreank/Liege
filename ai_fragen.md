@@ -202,3 +202,45 @@
 **Entscheidung:** Vollbild-Rectangle mit setScrollFactor(0), depth=45 (unter Disaster-Tint=70, über NPCs=20).
 **Begründung:** PostFX/Filter ist Phaser-WebGL-only (Canvas-Fallback würde brechen). Rectangle ist trivial portabel; Disaster-Tint addiert sich darüber → Bloodmoon zur Nacht = purpur-rot, gewollt. Phase-Wechsel-Tween (3 s) per Alpha; Farbe wird sofort gesnappt (Phaser-Tween-Plugin hat keinen RGB-Interp out of the box).
 **Code-Stelle:** frontend/src/app/game/day-night-overlay.ts (applyTint)
+
+### 2026-05-31 06:55 · [H2-B / H2.3] Spell-Target-Overlay: Cursor-Mode oder Fullscreen-Layer?
+**Frage:** Spell-Target-Selection — Cursor-Anpassung im Phaser-Canvas vs. eigenes Angular-Fullscreen-Overlay über dem Canvas?
+**Entscheidung:** Standalone `<app-spell-target-overlay>` als Fullscreen-Pointer-Layer (z-index 5000) über dem Phaser-Canvas. Intercepted Clicks bevor sie Phaser-Input erreichen.
+**Begründung:** Phaser-Click-Handler in `world-scene.ts::handleTileClick` lebt im Subagent-C-Scope, ich darf ihn nicht anfassen. Außerdem ist UI-Layer-State (castingSpell, ESC-Cancel, Range-Circle) sauberer in Angular. Click-Koord → Tile-Koord per Player-zentrierter Kamera-Annahme: Mitte des Viewports = Player-Tile.
+**Code-Stelle:** frontend/src/app/ui/spell-target-overlay/spell-target-overlay.component.ts:_screenToTile
+
+### 2026-05-31 06:55 · [H2-B / H2.3] target_kind-Werte: Doc sagt enemy/ally/tile, Backend nutzt single/aoe/ground/downed
+**Frage:** Plan sagt `target_type='enemy'/'ally'/'tile'`, Backend `spells.py` verwendet `target_kind='single'/'aoe'/'ground'/'downed'/'self'/'group'`. Welcher Vertrag?
+**Entscheidung:** Backend-Vertrag ist die Wahrheit. `SpellTargetKind` Union enthält ALLE Backend-Werte PLUS die Legacy-Aliases `enemy`/`tile` (defensiv). Spell-Target-Overlay routet: single/enemy → NPC-Pick, aoe/ground/tile → Tile-Pick, downed → NPC-Pick (Downed-Player-Pick kommt später wenn `players()` State `is_downed`-Flag pflegt).
+**Begründung:** Backend ist führend; Frontend-Plan ist als Roadmap-Skizze gemeint, nicht als Vertrag. Übergangsweise alle 8 Strings akzeptieren, damit Backend-Refactor (z.B. Umbenennung) nicht durchschlägt.
+**Code-Stelle:** frontend/src/app/core/models/talent.model.ts:SpellTargetKind, frontend/src/app/ui/spell-target-overlay/spell-target-overlay.component.ts:onOverlayClick
+
+### 2026-05-31 06:55 · [H2-B / H2.4] Cooldown-Overlay: conic-gradient vs. Sekunden-Label?
+**Frage:** Plan sagt „dunkler Overlay-Kreis der gegen Uhrzeigersinn von voll zu leer geht". CSS-conic-gradient ist die kanonische Lösung, aber CSS-Var-Animationen sind tricky.
+**Entscheidung:** Vorerst nur Dark-Rect-Overlay + grayscale-Icon + Sekunden-Label (existierendes Pattern, nur Daten anschließen). Kreis-Animation per conic-gradient wird in einer Polish-Welle nachgereicht — die UI-Information „N Sekunden Rest" ist klar lesbar, das visuelle Polish ist sekundär.
+**Begründung:** Nutzwert vs. Aufwand: das Sekunden-Label trägt 90% der Info. Conic-Animation braucht einen RAF-Loop pro Slot oder eine CSS-Animation mit dynamischer Dauer — beides Mehraufwand. Anschluss-Punkt im CSS bleibt offen (`--cd-pct` Custom-Property).
+**Code-Stelle:** frontend/src/app/ui/hotbar/hotbar.component.css (.hotbar-slot.on-cooldown)
+
+### 2026-05-31 06:55 · [H2-B / H2.6] drink_water_tile: vom Chest aus oder nur Welt-Click?
+**Frage:** Container-Aktionen sollen alle vier UI-Buttons bekommen. drink_water_tile braucht aber gar keinen Container — soll der Button trotzdem im Chest-Panel sein?
+**Entscheidung:** Nein. drink_water_tile gehört ins WorldScene-Click-Routing (Subagent C), wenn der Spieler auf ein Wasser-Tile klickt ohne Container im Hotbar. Aus dem Chest-Panel gibts nur drink_container/fill_container/water_plant. Notiz an Subagent C in der Antwort an Lead.
+**Begründung:** Chest-Panel zeigt Inventar-Container-Items — drink_water_tile braucht KEIN Item, nur Tile-Click. Wäre ein Fremd-Body im Chest-Modal. Konsequent: Tile-Aktionen ohne Item gehen via WorldScene.
+**Code-Stelle:** frontend/src/app/ui/chest/chest.component.ts (kein drink_water_tile-Handler)
+
+### 2026-05-31 06:55 · [H2-B / H2.6] Container-Action-Overlay: eigener Komponent vs. Spell-Target wiederverwenden?
+**Frage:** Spell-Target und Container-Action machen strukturell beide dasselbe (Tile-Pick auf der Karte).
+**Entscheidung:** Eigene Komponente `<app-container-action-overlay>` neben spell-target-overlay. Beide sind kurz (~150 Zeilen), unterschiedliche Farbgebung (blau-magisch vs. grün-natur) und verschiedene State-Quellen.
+**Begründung:** Refactor zu generischem `<app-tile-target-overlay>` ist Polish-Material, jetzt nicht im Scope. Duplikation ist ~80 Zeilen Boilerplate — überschaubar. Bei Bedarf kann später ein Mixin/Base-Class drüber gezogen werden.
+**Code-Stelle:** frontend/src/app/ui/container-action-overlay/
+
+### 2026-05-31 06:55 · [H2-B / H2.7] Vote-Counts: Backend liefert votes_cast als kumulativ, wir wollen pro Kategorie
+**Frage:** Backend sendet `loot_roll_voted {roll_id, voter, vote, votes_cast}`. `votes_cast` ist gesamte Vote-Zahl (alle Kategorien zusammen), nicht pro Need/Greed/Pass.
+**Entscheidung:** Inkrementell selbst zählen: bei jedem `loot_roll_voted` +1 auf die spezifische Kategorie. `total` aus dem `loot_roll_started`-Frame (Backend liefert `total`/`participants`; fallback Group-Member-Count).
+**Begründung:** Backend hat keine pro-Kategorie-Counts in seinem Frame. Selbst zählen ist trivial und robust gegen Race-Conditions (Spieler kann eh nur einmal voten — Backend lehnt Doppel-Vote per loot_vote_error ab).
+**Code-Stelle:** frontend/src/app/core/services/game-state.service.ts:_handleLootRollVoted
+
+### 2026-05-31 06:55 · [H2-B / H2.8] Auto-query_npc_quests beim Dialog-Open?
+**Frage:** Dialog-Panel hat manuellen „📜 Nach Aufträgen fragen"-Button. Spieler muss extra klicken, um Quest-Offers zu sehen.
+**Entscheidung:** Zusätzlich beim ersten Öffnen eines neuen NPC-Dialogs automatisch `query_npc_quests` feuern. Tracking per `_autoQueriedNpcId`, einmal pro NPC pro Dialog-Session. Manueller Refresh-Button bleibt.
+**Begründung:** Backend antwortet schnell, kostet keine DB-Last (filter über bereits geladene Templates). UX-Win: Quests sind sofort sichtbar. Tracking verhindert Spam bei kurz-aufeinanderfolgenden Open/Close-Zyklen.
+**Code-Stelle:** frontend/src/app/ui/dialog/dialog.component.ts:constructor (effect)
