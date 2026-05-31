@@ -23,7 +23,9 @@ import {
 } from '@angular/core';
 
 import type { SpellEntry, SpellSchool } from '../../core/models/talent.model';
+import { GameBridgeService } from '../../core/services/game-bridge.service';
 import { GameStateService } from '../../core/services/game-state.service';
+import { ToastService } from '../../core/services/toast.service';
 
 interface SpellTile {
   readonly id: string;
@@ -40,6 +42,9 @@ interface DetailRow {
   readonly title: string;
   readonly description: string;
   readonly meta: string;
+  /** Original-Tile, damit der „Wirken"-Button im Detail-Panel den Cast
+   *  ohne erneuten Grid-Lookup auslösen kann. */
+  readonly tile: SpellTile;
 }
 
 const SCHOOL_LABEL: Readonly<Record<SpellSchool, string>> = {
@@ -58,6 +63,8 @@ const SCHOOLS: readonly SpellSchool[] = ['healer', 'mage'];
 })
 export class SpellbookComponent {
   private readonly state = inject(GameStateService);
+  private readonly bridge = inject(GameBridgeService);
+  private readonly toast = inject(ToastService);
 
   readonly schools = SCHOOLS.map((s) => ({ id: s, label: SCHOOL_LABEL[s] }));
   readonly visible = signal<boolean>(false);
@@ -115,7 +122,37 @@ export class SpellbookComponent {
       title: e.name,
       description: e.description ?? '',
       meta: `Mana ${e.mana_cost ?? 0} · Cast ${cast}s · Abklingzeit ${cd}s · Magie-Level ${e.skill_req ?? 0}`,
+      tile,
     });
+  }
+
+  /** H2.3 — Cast aus dem Spellbook auslösen. Trennt nach `target_kind`:
+   *    • `self` / `group` → kein Pick nötig, direkt `cast_spell {spell_id}`.
+   *    • alles andere     → Target-Selection-Mode aktivieren. Das Spellbook
+   *      schließt sich, damit das `<app-spell-target-overlay>` die Welt
+   *      ungehindert sehen kann; der nächste Click setzt das Target.
+   *  Gelernten Spell prüfen wir nochmal defensiv (UI verhindert es bereits
+   *  über `locked`, aber Backend würde sonst Toast werfen).
+   */
+  castTile(tile: SpellTile): void {
+    if (tile.locked) {
+      this.toast.show(
+        tile.learned ? 'Magie-Level zu niedrig.' : 'Diesen Zauber noch nicht gelernt.',
+        'warn',
+      );
+      return;
+    }
+    const tk = tile.entry.target_kind;
+    if (tk === 'self' || tk === 'group' || tk === undefined) {
+      // Direkt-Cast — kein Pick nötig.
+      this.bridge.sendIntent({ type: 'cast_spell', spell_id: tile.entry.id });
+      this.visible.set(false);
+      return;
+    }
+    // Target-Pick-Mode aktivieren. Spellbook schließen, damit das Overlay
+    // die Welt sieht.
+    this.state.beginSpellTargeting(tile.entry);
+    this.visible.set(false);
   }
 
   private _magicLevel(): number {

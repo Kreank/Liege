@@ -1,0 +1,15 @@
+@if (spell(); as s) {
+  <div class="sto-layer" (click)="onOverlayClick($event)">
+    @if (rangeCircleStyle(); as rc) {
+      <div class="sto-range-circle"
+           [style.left]="rc.left"
+           [style.top]="rc.top"
+           [style.width]="rc.width"
+           [style.height]="rc.height"></div>
+    }
+    <div class="sto-hint">
+      <span class="sto-hint-text">{{ hintLabel() }}</span>
+      <span class="sto-hint-esc">ESC zum Abbrechen</span>
+    </div>
+  </div>
+}
