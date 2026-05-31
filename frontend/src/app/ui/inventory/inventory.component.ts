@@ -346,6 +346,76 @@ export class InventoryComponent {
     this.bridge.sendIntent({ type: 'unequip_item', item_id: item.id });
   }
 
+  // ─── Auto-Stapeln + Sortieren ────────────────────────────────────────
+  //
+  // Ein-Klick-Aufräumen: alle stackable Items per Backend-`merge_stacks`
+  // zusammenführen, danach die lokalen Slot-Positionen nach Kategorie →
+  // Name → Quality → ID sortiert setzen. Nach dem Merge schickt das
+  // Backend ein `inventory_full_refresh` — die Order bleibt gültig, weil
+  // die überlebenden Stack-IDs ihre Slot-Position behalten und neue
+  // (von Pickups) am Ende landen (Default `MAX_SAFE_INTEGER`).
+  autoStackAndSort(): void {
+    const inv = this.state.inventory();
+    const bag = inv.filter((it) => !it.equipped_slot);
+    if (bag.length === 0) return;
+
+    // 1) Merge: pro kind+quality, das mehr als ein Stack hat, einen
+    //    merge_stacks-Intent. Backend dedupes selbst, ein Aufruf reicht.
+    const seenGroups = new Set<string>();
+    const groupCounts = new Map<string, number>();
+    for (const it of bag) {
+      const def = ITEM[it.kind];
+      const category = it.category ?? def?.category ?? '';
+      if (!STACKABLE_CATEGORIES.has(category)) continue;
+      const key = `${it.kind}|${it.quality ?? 'normal'}`;
+      groupCounts.set(key, (groupCounts.get(key) ?? 0) + 1);
+    }
+    for (const [key, count] of groupCounts) {
+      if (count < 2) continue;
+      if (seenGroups.has(key)) continue;
+      seenGroups.add(key);
+      const [kind, quality] = key.split('|');
+      this.bridge.sendIntent({
+        type: 'merge_stacks',
+        kind,
+        quality: quality as ItemQuality,
+      });
+    }
+
+    // 2) Sortieren: Equipment voran, dann Verbrauch, dann Rohstoffe;
+    //    innerhalb der Kategorie alphabetisch nach Name. Die Reihenfolge
+    //    spiegelt, was der Spieler am häufigsten oben sehen will.
+    const CATEGORY_ORDER: Readonly<Record<string, number>> = {
+      weapon: 10, armor: 11, jewelry: 12, tool: 13,
+      consumable: 20, food: 21, magic: 22, ammo: 23,
+      resource: 30, material: 31, trophy: 32, lore: 33, quest: 34,
+    };
+    const QUALITY_ORDER: Readonly<Record<string, number>> = {
+      legendary: 0, masterwork: 1, fine: 2, normal: 3, rough: 4,
+    };
+    const sortKey = (it: InventoryItem): [number, string, number, number] => {
+      const def = ITEM[it.kind];
+      const cat = it.category ?? def?.category ?? 'zzz';
+      const catRank = CATEGORY_ORDER[cat] ?? 99;
+      const name = def?.name ?? it.name ?? it.kind;
+      const qRank = QUALITY_ORDER[it.quality ?? 'normal'] ?? 5;
+      return [catRank, name, qRank, it.id];
+    };
+    const sorted = bag.slice().sort((a, b) => {
+      const ka = sortKey(a);
+      const kb = sortKey(b);
+      if (ka[0] !== kb[0]) return ka[0] - kb[0];
+      const nameCmp = ka[1].localeCompare(kb[1], 'de');
+      if (nameCmp !== 0) return nameCmp;
+      if (ka[2] !== kb[2]) return ka[2] - kb[2];
+      return ka[3] - kb[3];
+    });
+    const order: Record<number, number> = {};
+    sorted.forEach((it, idx) => { order[it.id] = idx; });
+    this.slotOrder.set(order);
+    this._persistSlotOrder(order);
+  }
+
   // ─── Drag-Drop ───────────────────────────────────────────────────────
   onDragStart(ev: DragEvent, payload: DragPayload): void {
     if (!ev.dataTransfer) return;

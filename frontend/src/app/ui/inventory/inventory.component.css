@@ -36,6 +36,27 @@
   cursor: pointer; font-family: monospace;
 }
 
+.inv-header-actions {
+  display: flex; gap: 8px; align-items: center;
+}
+
+.inv-tidy {
+  background: rgba(80, 60, 30, 0.45);
+  border: 1px solid #7a6238;
+  color: #e8d870;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: monospace;
+  font-weight: normal;
+}
+.inv-tidy:hover {
+  background: rgba(120, 90, 45, 0.7);
+  border-color: #b89255;
+}
+.inv-tidy:active {
+  background: rgba(60, 45, 22, 0.7);
+}
+
 .inv-body {
   display: grid;
   grid-template-columns: 280px 1fr;

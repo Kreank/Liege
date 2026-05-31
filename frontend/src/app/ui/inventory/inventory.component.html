@@ -3,7 +3,15 @@
     <div class="inv-box" (click)="$event.stopPropagation()">
       <div class="inv-header">
         <span>🎒 Inventar</span>
-        <button type="button" class="inv-close" (click)="close()">I / Esc</button>
+        <div class="inv-header-actions">
+          <button
+            type="button"
+            class="inv-tidy"
+            (click)="autoStackAndSort()"
+            title="Alle stapelbaren Items zusammenführen + nach Kategorie/Name sortieren"
+          >📦 Aufräumen</button>
+          <button type="button" class="inv-close" (click)="close()">I / Esc</button>
+        </div>
       </div>
 
       <div class="inv-body">
