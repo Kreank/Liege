@@ -238,9 +238,29 @@ export class InventoryComponent {
       }
       return;
     }
+    // H2.18 — Spell-Item-Learning: Backend hat einen separaten `learn_spell`-
+    // Intent für magic-Kategorie-Items, deren `kind` ein Spell-Catalog-Eintrag
+    // ist (spell_book, ice_scroll, holy_shield_scroll, …). Wenn der Spieler
+    // den Spell NOCH NICHT gelernt hat, lernt er ihn durch Verbrauch des Items.
+    // Sonst (bereits gelernt) fällt das Item auf `use_item` zurück, was bei
+    // consume-bare Scrolls den Cast direkt auslöst.
+    if (def.category === 'magic' && this._isLearnableUnknownSpell(item.kind)) {
+      this.bridge.sendIntent({ type: 'learn_spell', item_id: item.id });
+      return;
+    }
     if (def.category === 'consumable' || def.category === 'food' || def.category === 'magic') {
       this.bridge.sendIntent({ type: 'use_item', item_id: item.id });
     }
+  }
+
+  /** True wenn das Item-Kind im Spell-Catalog steht und der Spieler ihn noch
+   *  nicht gelernt hat. Backend `handle_learn_spell` matcht über `combat.SPELLS`
+   *  + `learned_spells`; das Frontend spiegelt beide über `state.spells()`. */
+  private _isLearnableUnknownSpell(kind: string): boolean {
+    const spells = this.state.spells();
+    const inCatalog = spells.catalog.some((s) => s.id === kind);
+    if (!inCatalog) return false;
+    return !spells.learned.includes(kind);
   }
 
   /** Right-Click → Drop, ggf. mit Bestätigung. */

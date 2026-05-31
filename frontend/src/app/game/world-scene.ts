@@ -53,9 +53,13 @@ import {
 import type { EffectAnimationsService } from './effect-animations.service';
 import type { WalkAnimationsService } from './walk-animations.service';
 import { COMBAT_FX } from './combat-fx';
+import { DayNightOverlay } from './day-night-overlay';
 import { DisasterOverlay } from './disaster-overlay';
 import { DungeonRenderer } from './dungeon-renderer';
 import { setupInput } from './input';
+import { MobHpBars } from './mob-hp-bar';
+import { NpcSpeechBubbles } from './npc-speech-bubble';
+import { PlaceGhost } from './place-ghost';
 import { SpritePool } from './sprite-pools';
 import { VISUAL_EFFECTS } from './visual-effects';
 import {
@@ -123,6 +127,14 @@ export class WorldScene extends Phaser.Scene {
   private effectAnimations!: EffectAnimationsService;
   /** Disaster-Overlay (Tint, Particle-Emitter, Lightning-Bolts) — G4. */
   private disasterOverlay: DisasterOverlay | null = null;
+  /** Welle H2-A: Mob-HP-Bars über NPC-Sprites (H2.2). */
+  private mobHpBars: MobHpBars | null = null;
+  /** Welle H2-A: NPC-Sprechblasen (H2.11). */
+  private speechBubbles: NpcSpeechBubbles | null = null;
+  /** Welle H2-A: Place-Ghost-Preview im Build-Mode (H2.16). */
+  private placeGhost: PlaceGhost | null = null;
+  /** Welle H2-A: Tag/Nacht-Tint-Overlay (H2.23). */
+  private dayNightOverlay: DayNightOverlay | null = null;
 
   // ─── Tile-Layer ─────────────────────────────────────────────────────
   private readonly chunkContainers = new Map<string, Phaser.GameObjects.Container>();
@@ -266,6 +278,16 @@ export class WorldScene extends Phaser.Scene {
     // Welle H1-A: Dungeon-Renderer (Tile-Layer + Feature-Sprites). Aktiv
     // nur wenn `state.dungeonFloor()` non-null ist (siehe update()).
     this.dungeonRenderer = new DungeonRenderer(this);
+    // Welle H2-A: Mob-HP-Bars + NPC-Sprechblasen + Place-Ghost + Tag/Nacht.
+    this.mobHpBars = new MobHpBars(this);
+    this.speechBubbles = new NpcSpeechBubbles(this);
+    this.placeGhost = new PlaceGhost(
+      this,
+      this.assetLoader,
+      () => this.input.activePointer ?? null,
+      () => this.bridge.state.structures(),
+    );
+    this.dayNightOverlay = new DayNightOverlay(this);
 
     // ─── Kamera-Setup ─────────────────────────────────────────────────
     // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
@@ -280,10 +302,18 @@ export class WorldScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.fxSub?.unsubscribe();
       this.fxSub = null;
+      this.mobHpBars?.destroyAll();
+      this.speechBubbles?.destroyAll();
+      this.placeGhost?.destroy();
+      this.dayNightOverlay?.destroy();
     });
     this.events.once(Phaser.Scenes.Events.DESTROY, () => {
       this.fxSub?.unsubscribe();
       this.fxSub = null;
+      this.mobHpBars?.destroyAll();
+      this.speechBubbles?.destroyAll();
+      this.placeGhost?.destroy();
+      this.dayNightOverlay?.destroy();
     });
   }
 
@@ -353,6 +383,24 @@ export class WorldScene extends Phaser.Scene {
       const px = me.x * TILE_SIZE + TILE_SIZE / 2;
       const py = me.y * TILE_SIZE + TILE_SIZE / 2;
       this.cameras.main.centerOn(px, py);
+    }
+
+    // ─── Welle H2-A: Overlay-Updates pro Frame ─────────────────────────
+    // HP-Bars und Sprech-Bubbles ans aktuelle NPC-Snapshot anhängen
+    // (Bewegung folgt dem Sprite).
+    if (this.mobHpBars) this.mobHpBars.syncPositions(npcs);
+    if (this.speechBubbles) this.speechBubbles.syncPositions(npcs);
+    // Place-Ghost: Cursor-Tracking + Build-Mode-Sichtbarkeit.
+    if (this.placeGhost) {
+      this.placeGhost.update(
+        this.bridge.buildMode(),
+        this.bridge.selectedStructure(),
+      );
+    }
+    // Tag/Nacht-Tint: phase aus dem time-Signal lesen.
+    if (this.dayNightOverlay) {
+      const t = this.bridge.state.time();
+      this.dayNightOverlay.setPhase(t?.phase);
     }
   }
 
@@ -962,6 +1010,19 @@ export class WorldScene extends Phaser.Scene {
       case 'lightning_strike':
         this.fxLightningStrike(msg);
         return;
+      case 'trap_triggered':
+        this.fxTrapTriggered(msg);
+        return;
+      case 'npc_speech':
+        this.fxNpcSpeech(msg);
+        return;
+      case 'inventory_add':
+      case 'item_picked_up':
+        this.fxAutoPickup(msg);
+        return;
+      case 'dungeon_chest_opened':
+        this.fxDungeonChestOpened(msg);
+        return;
       default:
         return;
     }
@@ -1013,11 +1074,25 @@ export class WorldScene extends Phaser.Scene {
         kind: 'phys',
       });
     }
+    // H2.2 — HP-Bar: Backend-Frame trägt frische `hp`/`max_hp`-Werte.
+    // Wir bevorzugen die Frame-Werte (sie sind aktueller als der nächste
+    // npcsVisible-Snapshot, der erst im Folge-Tick kommt).
+    const frameHp = msg['hp'] as number | undefined;
+    const frameMaxHp = msg['max_hp'] as number | undefined;
+    const hp = frameHp ?? npc.hp;
+    const maxHp = frameMaxHp ?? npc.max_hp;
+    if (this.mobHpBars && typeof hp === 'number' && typeof maxHp === 'number') {
+      this.mobHpBars.noteDamage(npcId, hp, maxHp, npc.x, npc.y);
+    }
   }
 
   private fxNpcDied(msg: ServerMessage): void {
     const npcId = msg['npc_id'] as number | undefined;
     if (npcId == null) return;
+    // H2.2 — HP-Bar mit-aufräumen (Sprite-Pool gibt kein Death-Event raus).
+    this.mobHpBars?.removeFor(npcId);
+    // H2.11 — Sprechblase mit-aufräumen.
+    this.speechBubbles?.removeFor(npcId);
     // Sprite aus dem Pool detachen, damit der nächste sync() es nicht
     // zusätzlich destroyed (State entfernt den NPC ebenfalls in diesem Tick).
     const sprite = this.npcPool.detach(npcId);
@@ -1105,6 +1180,117 @@ export class WorldScene extends Phaser.Scene {
     if (!kind || x == null || y == null) return;
     VISUAL_EFFECTS.spawn(this, { kind, x, y });
   }
+
+  /**
+   * H2.1 — Trap-Triggered. Backend feuert `{type:'trap_triggered', x, y,
+   * kind, dmg, text}` an den Spieler selbst (Dungeon-Falle ausgelöst).
+   * Kind-spezifischer FX:
+   *   • spike_trap   → hit_spark (rote Spitze)
+   *   • poison_trap  → poison_cloud (grüne Wolke)
+   *   • fire_trap    → fireball_explosion (Multi-Frame-Anim falls registriert)
+   *   • frost_trap   → frost_impact / hit_spark-Fallback
+   *   • dart_trap    → hit_spark
+   *   • rockfall_trap→ hit_spark
+   * Außerdem: Toast mit Trap-Label + Damage (Backend liefert `text`).
+   */
+  private fxTrapTriggered(msg: ServerMessage): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    const kind = (msg['kind'] as string | undefined) ?? 'spike_trap';
+    const dmg = msg['dmg'] as number | undefined;
+    const text = msg['text'] as string | undefined;
+    if (x == null || y == null) return;
+    const fxKind = TRAP_FX_KIND[kind] ?? 'hit_spark';
+    VISUAL_EFFECTS.spawn(this, { kind: fxKind, x, y });
+    // Zusätzlich ein roter Damage-Float am Spieler-Tile-Center, damit der
+    // Spieler den HP-Verlust sofort sieht (analog `fxPlayerDamaged`).
+    if (dmg != null && dmg > 0) {
+      const center = COMBAT_FX.tileCenter(x, y);
+      COMBAT_FX.spawnFloatingNumber(this, {
+        x: center.x,
+        y: center.y,
+        text: `-${dmg}`,
+        kind: 'phys',
+      });
+    }
+    // Toast — bevorzugt den Backend-Text (enthält Emoji + Beschreibung),
+    // hängen den Schaden an, falls vorhanden.
+    const toastText = text
+      ? (dmg != null && dmg > 0 ? `${text} (-${dmg})` : text)
+      : `⚠ Falle ausgelöst${dmg != null && dmg > 0 ? ` (-${dmg})` : ''}`;
+    this.bridge.showToast(toastText, 'warn', 5000);
+  }
+
+  /**
+   * H2.11 — NPC-Sprechblase. Backend feuert `{type:'npc_speech', npc_id,
+   * text, delay_ms?}` aus dem npc_chatter-Worker. Bubble bleibt 8 s
+   * sichtbar, dann fade.
+   */
+  private fxNpcSpeech(msg: ServerMessage): void {
+    const npcId = msg['npc_id'] as number | undefined;
+    const text = msg['text'] as string | undefined;
+    if (npcId == null || !text) return;
+    const delayMs = (msg['delay_ms'] as number | undefined) ?? 0;
+    this.speechBubbles?.show(npcId, text, delayMs);
+  }
+
+  /**
+   * H2.5 — Auto-Pickup-Floating-Text. Bei `inventory_add` ODER
+   * `item_picked_up` (während Bewegung) zeigen wir einen kurzen `+N kind`-
+   * Float am Spieler. Wir hören auf BEIDE Frames, weil `item_picked_up`
+   * Broadcast ist (auch andere Spieler) — wir filtern auf den eigenen
+   * Player. `inventory_add` ist Self-only, also immer erlaubt.
+   */
+  private fxAutoPickup(msg: ServerMessage): void {
+    const me = this.bridge.state.player();
+    if (!me) return;
+    // item_picked_up ist Broadcast → nur reagieren wenn `by === own player`.
+    if (msg.type === 'item_picked_up') {
+      const by = msg['by'] as number | string | undefined;
+      if (by != null && String(by) !== String(me.player_id)) return;
+    }
+    // Text-Bestimmung: bevorzugt `item.name` / `item.kind` / `item.quantity`.
+    const item = msg['item'] as {
+      readonly kind?: string; readonly name?: string; readonly quantity?: number;
+    } | undefined;
+    let label = 'Item';
+    let qty = 1;
+    if (item) {
+      label = item.name ?? item.kind ?? 'Item';
+      qty = item.quantity ?? 1;
+    } else {
+      // `item_picked_up` ohne `item`-Feld? Backend sendet `kind` separat
+      // (Welle 25 Audit hat das beobachtet). Defensiv fallen wir auf
+      // generisches "+1" zurück.
+      const kind = msg['kind'] as string | undefined;
+      if (kind) label = kind;
+    }
+    const center = COMBAT_FX.tileCenter(me.x, me.y);
+    COMBAT_FX.spawnFloatingNumber(this, {
+      x: center.x,
+      // Etwas höher als Damage-Floats, damit beide nebeneinander lesbar bleiben.
+      y: center.y - 18,
+      text: `+${qty} ${label}`,
+      kind: 'heal',
+    });
+    // Sound-Hook (TODO H4): noch nicht implementiert, nur Log.
+    // eslint-disable-next-line no-console
+    console.log('[pickup-sfx]', label, qty);
+  }
+
+  /**
+   * H2.14 — Dungeon-Chest-Sprite-Swap. State-Service hat den `opened`-Flag
+   * bereits gepatcht (siehe `_handleDungeonChestOpened`), aber der
+   * DungeonRenderer rendert die Floor-Features nur bei `show()`/`swap()`
+   * neu — nicht bei jedem Tick. Wir triggern den Swap explizit über den
+   * `markChestOpened`-Hook am Renderer.
+   */
+  private fxDungeonChestOpened(msg: ServerMessage): void {
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+    if (x == null || y == null) return;
+    this.dungeonRenderer?.markChestOpened(x, y);
+  }
 }
 
 /**
@@ -1141,3 +1327,18 @@ function isDoorType(type: string): boolean {
   if (type === 'fence_gate_farm') return true;
   return false;
 }
+
+/**
+ * H2.1 — Trap-Kind → visual_effect-Kind. Wenn ein registriertes Multi-Frame-
+ * FX existiert (z. B. `fireball_explosion`), bevorzugen wir das. Sonst
+ * fällt der `VISUAL_EFFECTS.spawn`-Dispatcher auf den generischen
+ * Sprite-Fade zurück (siehe visual-effects.ts::spawnGeneric).
+ */
+const TRAP_FX_KIND: Readonly<Record<string, string>> = {
+  spike_trap: 'hit_spark',
+  dart_trap: 'hit_spark',
+  rockfall_trap: 'hit_spark',
+  poison_trap: 'poison_cloud',
+  fire_trap: 'fireball_explosion',
+  frost_trap: 'frost_impact',
+};

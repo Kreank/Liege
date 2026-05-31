@@ -20,6 +20,7 @@ import type { Observable } from 'rxjs';
 
 import type { ClientIntent, ServerMessage } from '../models/ws-message.model';
 import { GameStateService } from './game-state.service';
+import { ToastService, type ToastKind } from './toast.service';
 import { WebSocketService } from './websocket.service';
 
 @Injectable({ providedIn: 'root' })
@@ -27,6 +28,15 @@ export class GameBridgeService {
   /** READ-only Game-State (Phaser liest pro Frame Signals via `state.<sig>()`). */
   readonly state = inject(GameStateService);
   private readonly ws = inject(WebSocketService);
+  /** Phaser-FX-Code (H2-A) braucht eine schmale Toast-Schiene ohne den
+   *  vollen GameStateService anzufassen. */
+  private readonly toastSvc = inject(ToastService);
+
+  /** Convenience für die WorldScene: kurzer Toast über die globale Pipeline.
+   *  Phaser-Side ruft das aus FX-Handlern (z. B. Trap-Triggered, H2.1). */
+  showToast(text: string, kind: ToastKind = 'info', durationMs?: number): void {
+    this.toastSvc.show(text, kind, durationMs);
+  }
 
   /**
    * Roher Server-Message-Stream. Wird vom Phaser-Renderer für **transiente**
