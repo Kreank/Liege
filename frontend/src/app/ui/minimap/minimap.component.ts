@@ -51,6 +51,12 @@ const EVENT_PULSE_DURATION_MS = 30_000;
 /** Pulse-Periode für Event-Marker (Disaster). H2.24. */
 const EVENT_PULSE_PERIOD_MS = 900;
 
+/** H3.11 — Dungeon-Sense-Range in Tiles (Chebyshev). Legacy verbarg Marker
+ *  außerhalb dieser Distanz; wir „graustufen" sie stattdessen, damit der
+ *  Spieler die ungefähre Karte behält, aber sieht was er noch nicht
+ *  erkundet hat. Wert orientiert sich am Legacy-Default 70. */
+const DUNGEON_SENSE_RANGE = 70;
+
 /** Gruppen-Member-Farben (H2.12). */
 const COLOR_PARTY_MEMBER = '#80e0ff';     // cyan — Party
 const COLOR_RAID_MEMBER = '#c890ff';      // lila — Raid (anderer sub_party)
@@ -93,6 +99,14 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
   private eventPulses: EventPulseMarker[] = [];
   private wsSub: Subscription | null = null;
 
+  /** H3.11 — Persistenter „Discovered"-Cache für Dungeons. Sobald ein Dungeon
+   *  einmal innerhalb DUNGEON_SENSE_RANGE der eigenen Position war (oder per
+   *  `dungeon_sense`-Frame als gespürt gemeldet wurde), bleibt er hier
+   *  vermerkt und wird auf der Minimap dauerhaft farbig gezeichnet — auch
+   *  wenn der Spieler wegläuft. Vermeidet das ständige Flicker „purple →
+   *  grau → purple" beim Rand-Tile. Key-Format: `${x},${y}`. */
+  private discoveredDungeons = new Set<string>();
+
   constructor() {
     // Bei Signal-Updates neu zeichnen. Phaser-FPS-Schutz: wir hängen NICHT
     // im Phaser-Tick, sondern reagieren reaktiv. Die involvierten Signals
@@ -107,6 +121,9 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
       this.state.player();
       this.state.quests();
       this.state.party();
+      // H3.11 — bei jedem `dungeon_sense`-Frame neu zeichnen, damit die
+      // gerade gespürten Dungeons sofort von grau auf lila kippen.
+      this.state.dungeonSensePulse();
       this._scheduleDraw();
       this._ensurePulseLoop();
     });
@@ -372,14 +389,33 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
       }
     }
 
-    // Dungeons (Sense-Radius nicht modelliert — wir zeigen alle bekannten
-    // Marker direkt; Legacy verbarg sie außerhalb 70-Tile Cheby — minor
-    // polish, gehört nach F-final).
-    ctx.fillStyle = '#c060ff';
+    // Dungeons (H3.11 — Sense-Filter):
+    //   • Dungeons in Chebyshev-Reichweite DUNGEON_SENSE_RANGE (oder per
+    //     `dungeon_sense`-Frame als gespürt gemeldet, siehe
+    //     `dungeonSensePulse`-Verarbeitung weiter unten) → volle Lila-Farbe
+    //     + persistent vermerkt im `discoveredDungeons`-Cache.
+    //   • Bereits einmal entdeckte Dungeons bleiben farbig — auch wenn der
+    //     Spieler wegläuft (deckt sich mit dem Legacy-Verhalten in
+    //     `drawMinimap`).
+    //   • Noch nie gespürte Dungeons rendern in Grau-Lila als Hinweis, dass
+    //     dort etwas ist, ohne die exakte Position als „bekannt" zu
+    //     markieren. Falls in Zukunft eine reine Hide-Logik gewünscht ist,
+    //     einfach den Else-Branch entfernen.
+    const sensePulse = this.state.dungeonSensePulse();
+    if (sensePulse) {
+      for (const sd of sensePulse.dungeons) {
+        this.discoveredDungeons.add(`${sd.x},${sd.y}`);
+      }
+    }
     for (const d of this.state.dungeons() as readonly DungeonMarker[]) {
       const px = (d.x - ox) * scaleX;
       const py = (d.y - oy) * scaleY;
       if (px < 0 || py < 0 || px >= canvas.width || py >= canvas.height) continue;
+      const dist = Math.max(Math.abs(d.x - me.x), Math.abs(d.y - me.y));
+      const key = `${d.x},${d.y}`;
+      if (dist <= DUNGEON_SENSE_RANGE) this.discoveredDungeons.add(key);
+      const inSense = this.discoveredDungeons.has(key);
+      ctx.fillStyle = inSense ? '#c060ff' : '#4a3458';
       ctx.fillRect(Math.floor(px) - 2, Math.floor(py) - 2, dotSize + 1, dotSize + 1);
     }
 
