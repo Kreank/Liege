@@ -1,0 +1,57 @@
+@if (current(); as r) {
+  <div class="qr-overlay" (click)="close()">
+    <div class="qr-box" (click)="$event.stopPropagation()">
+      <div class="qr-header">
+        <span class="qr-title">🏆 Belohnung erhalten</span>
+        <button type="button" class="qr-close" (click)="close()">×</button>
+      </div>
+      <div class="qr-quest-title">{{ r.questTitle }}</div>
+
+      @if (r.items.length > 0) {
+        <div class="qr-section-title">Du erhältst:</div>
+        <ul class="qr-items">
+          @for (it of r.items; track it.kind; let i = $index) {
+            <li class="qr-item" [class.qr-item--revealed]="i < visibleCount()">
+              @if (it.spritePath) {
+                <img class="qr-item-icon" [src]="it.spritePath" alt="" />
+              } @else {
+                <span class="qr-item-icon qr-item-icon--placeholder">?</span>
+              }
+              <span class="qr-item-name">{{ it.name }}</span>
+              @if (it.count > 1) {
+                <span class="qr-item-count">×{{ it.count }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      <div class="qr-summary" [class.qr-summary--revealed]="summaryRevealed()">
+        @if (r.coinDelta > 0) {
+          <div class="qr-row qr-coin">
+            <span class="qr-row-label">Münzen:</span>
+            <span class="qr-coin-parts">
+              @for (p of coinParts(r.coinDelta); track p.symbol) {
+                <span class="qr-coin-part qr-coin-{{ p.symbol }}">{{ p.value }}{{ p.symbol }}</span>
+              }
+            </span>
+          </div>
+        }
+        @if (r.xp.length > 0) {
+          <div class="qr-row qr-xp">
+            <span class="qr-row-label">Erfahrung:</span>
+            <span class="qr-xp-list">
+              @for (x of r.xp; track x.skill) {
+                <span class="qr-xp-entry">+{{ x.amount }} {{ skillLabel(x.skill) }}</span>
+              }
+            </span>
+          </div>
+        }
+      </div>
+
+      <div class="qr-actions">
+        <button type="button" class="qr-btn" (click)="close()">Schließen</button>
+      </div>
+    </div>
+  </div>
+}
