@@ -6,6 +6,49 @@
     <span>⚡ {{ connStatus().label }}</span>
   </div>
 
+  <!-- H1.19 — Uhr (oben rechts unter Connection-Status) -->
+  @if (clock(); as c) {
+    <div class="hud-clock" [class.hud-clock--bloodmoon]="c.bloodMoon"
+         [attr.title]="c.bloodMoon ? 'Blutmond — Tag ' + c.day + ', ' + c.hhmm : 'Tag ' + c.day + ', ' + c.hhmm">
+      <span class="hud-clock__phase">{{ c.bloodMoon ? '🩸🌙' : c.phaseIcon }}</span>
+      <span class="hud-clock__day">Tag {{ c.day }}</span>
+      <span class="hud-clock__sep">·</span>
+      <span class="hud-clock__time">{{ c.hhmm }}</span>
+    </div>
+  }
+
+  <!-- H1.16 — Disaster-Icon-Reihe (oben Mitte über dem Viewport) -->
+  @if (disasters().length > 0) {
+    <div class="hud-disasters" role="list" aria-label="Aktive Welt-Disaster">
+      @for (d of disasters(); track trackDisaster($index, d)) {
+        <div class="hud-disaster" role="listitem" [attr.title]="d.label">
+          @if (d.iconUrl) {
+            <img [src]="d.iconUrl" [alt]="d.label" />
+          } @else {
+            <span class="hud-disaster__fallback">⚠</span>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- H1.4 — Wallet (rechts unter der Uhr) -->
+  <div class="hud-wallet" [attr.title]="wallet().totalCopper + ' Kupfer gesamt'">
+    @if (wallet().gold > 0) {
+      <span class="hud-wallet__pair hud-wallet__pair--gold">
+        <span class="hud-wallet__amt">{{ wallet().gold }}</span><span class="hud-wallet__cur">g</span>
+      </span>
+    }
+    @if (wallet().gold > 0 || wallet().silver > 0) {
+      <span class="hud-wallet__pair hud-wallet__pair--silver">
+        <span class="hud-wallet__amt">{{ wallet().silver }}</span><span class="hud-wallet__cur">s</span>
+      </span>
+    }
+    <span class="hud-wallet__pair hud-wallet__pair--copper">
+      <span class="hud-wallet__amt">{{ wallet().copper }}</span><span class="hud-wallet__cur">c</span>
+    </span>
+  </div>
+
   <div class="hud-bar hud-bar--hp">
     <div class="hud-bar__fill" [style.width.%]="hp().pct"></div>
     <div class="hud-bar__text">{{ hp().label }}</div>
@@ -26,4 +69,26 @@
     <div class="hud-bar__fill" [style.width.%]="stamina().pct"></div>
     <div class="hud-bar__text">{{ stamina().label }}</div>
   </div>
+
+  <!-- H1.3 — Status-Effects-Reihe (unter den Bars) -->
+  @if (statusEffects().length > 0) {
+    <div class="hud-effects" role="list" aria-label="Aktive Status-Effekte">
+      @for (e of statusEffects(); track trackEffect($index, e)) {
+        <div class="hud-effect" role="listitem"
+             [attr.title]="e.label + (e.remainingLabel ? ' (' + e.remainingLabel + ')' : '')">
+          @if (e.iconUrl) {
+            <img class="hud-effect__icon" [src]="e.iconUrl" [alt]="e.label" />
+          } @else {
+            <span class="hud-effect__fallback">?</span>
+          }
+          @if (e.stacks) {
+            <span class="hud-effect__stacks">×{{ e.stacks }}</span>
+          }
+          @if (e.remainingLabel) {
+            <span class="hud-effect__remaining">{{ e.remainingLabel }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
 }

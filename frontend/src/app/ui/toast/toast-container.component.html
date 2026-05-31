@@ -1,0 +1,14 @@
+@if (visible()) {
+  <div class="toast-stack" role="status" aria-live="polite">
+    @for (t of toasts(); track trackById($index, t)) {
+      <div class="toast" [attr.data-kind]="t.kind" (click)="dismiss(t.id, $event)">
+        @if (iconFor(t.text, t.kind); as ico) {
+          @if (ico) { <span class="toast__icon">{{ ico }}</span> }
+        }
+        <span class="toast__text">{{ t.text }}</span>
+        <button class="toast__close" type="button" (click)="dismiss(t.id, $event)"
+                aria-label="Schließen">×</button>
+      </div>
+    }
+  </div>
+}
