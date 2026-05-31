@@ -34,11 +34,13 @@ import {
   CREATURE_KINDS,
   NPC_FLIP_LR_KINDS,
 } from '../core/data/npc-sprites';
+import { ANIMATED_MONSTER_WALK_SET } from '../core/data/monster-sprites';
 import {
+  STRUCTURE,
   USABLE_STRUCTURE_TYPES,
   isHarvestableStructureType,
 } from '../core/data/structures';
-import { TILE, TILE_BY_ID, TILE_SIZE } from '../core/data/tiles';
+import { NON_WALKABLE_TILES, TILE, TILE_BY_ID, TILE_SIZE } from '../core/data/tiles';
 import type { Chunk, Structure } from '../core/models/chunk.model';
 import type { GroundItem } from '../core/models/item.model';
 import type { NPC } from '../core/models/npc.model';
@@ -53,6 +55,7 @@ import {
 } from './asset-loader.service';
 import type { EffectAnimationsService } from './effect-animations.service';
 import type { WalkAnimationsService } from './walk-animations.service';
+import { BiomeAmbient } from './biome-ambient';
 import { COMBAT_FX } from './combat-fx';
 import { DayNightOverlay } from './day-night-overlay';
 import { DisasterOverlay } from './disaster-overlay';
@@ -158,6 +161,7 @@ export class WorldScene extends Phaser.Scene {
   private sensePulse: SensePulse | null = null;
   /** Welle H3-A: Wetter-Partikel (H3.14). */
   private weatherParticles: WeatherParticles | null = null;
+  private biomeAmbient: BiomeAmbient | null = null;
 
   // ─── Tile-Layer ─────────────────────────────────────────────────────
   private readonly chunkContainers = new Map<string, Phaser.GameObjects.Container>();
@@ -210,10 +214,35 @@ export class WorldScene extends Phaser.Scene {
   private structureLookup: (x: number, y: number) => Structure | null = () => null;
 
   // ─── Kamera-Follow + Local Sprint-State (F4c) ────────────────────────
+  /** Bug 31.05 Smooth-Move: erster Kamera-Frame snapt instant; danach
+   *  lerpt der Update-Tick weich auf die Player-Pos zu. Ohne den Flag
+   *  würde der Spawn-Frame auch lerped → Kamera fliegt anfangs ein. */
+  private cameraInit = false;
   /** Letzte Spieler-Tile-Position für Move-Intent-Deduplication. */
   private lastSentMoveTile: { x: number; y: number } | null = null;
   /** Lokaler Sprint-Zustand — wir senden nur on/off-Edges an den Server. */
   private sprintSent = false;
+
+  // ─── Pixel-Movement (Legacy-Style, 31.05) ────────────────────────────
+  /** Eigene Player-Pixel-Pos (Welt-Koord). Init bei erstem state.player(). */
+  private myPx = 0;
+  private myPy = 0;
+  /** Init-Flag: erst nach erstem player()-Update läuft die Pixel-Sim. */
+  private myPosInit = false;
+  /** Held-State der Richtungstasten — wird vom Input-Modul gefüllt. */
+  private heldKeys: Readonly<{
+    up: boolean; down: boolean; left: boolean; right: boolean; sprint: boolean;
+  }> = { up: false, down: false, left: false, right: false, sprint: false };
+  /** Move-Speed in Pixel/Sekunde (Legacy-Wert). Sprint = ×1.5. */
+  private readonly moveSpeed = 240;
+  private readonly sprintMult = 1.5;
+  /** Kollisions-Hitbox: 4-Ecken-Check mit Halb-Kantenlänge — etwas kleiner
+   *  als ein halber Tile, damit der Spieler durch enge Lücken rutscht
+   *  ("forgiveness"). Legacy 14px bei TILE_SIZE 32 → wir skalieren auf
+   *  ~44% von TILE_SIZE. */
+  private readonly collisionHalf = TILE_SIZE * 0.44;
+  /** Letzte Frame-Zeit für dt-Berechnung. */
+  private lastUpdateTime = 0;
   /** Subscription auf den WS-Message-Stream (für transiente FX). */
   private fxSub: Subscription | null = null;
   /** Build-Mode lebt seit F-extras-3 als Signal in der `GameBridgeService`,
@@ -279,24 +308,24 @@ export class WorldScene extends Phaser.Scene {
     this.groundItemPool = new SpritePool<GroundItem, Phaser.GameObjects.GameObject>({
       keyOf: (g) => g.id,
       create: (g) => this.createGroundItemSprite(g),
-      update: (s, g) => this.updateMovableSprite(s, g.x, g.y),
+      update: (s, g) => {
+        this.updateMovableSprite(s, g.x, g.y);
+        // Fallback→echte Textur swappen, sobald das on-demand-Item-Asset da ist.
+        this.trySwapFallbackTexture(s);
+      },
     });
 
     // ─── Input → Intents ──────────────────────────────────────────────
-    setupInput(this, {
+    // Pixel-Movement (Legacy-Style): setupInput trackt nur held-state, der
+    // update-Tick rechnet Pixel-Delta + Kollisions-Check selbst aus.
+    const inputHandle = setupInput(this, {
       onTileClick: (pos) => this.handleTileClick(pos.x, pos.y),
       onSprintChange: (on) => this.handleSprintChange(on),
       onToggleBuildMode: () => {
         this.bridge.toggleBuildMode();
       },
-      // Bug 31.05 Issue #3 — WASD/Arrow-Bewegung um delta-Tiles relativ
-      // zur aktuellen Spieler-Position. Backend kennt nur absolute (x,y).
-      onMoveStep: (dx, dy) => {
-        const p = this.bridge.state.player();
-        if (!p) return;
-        this.bridge.sendMove(p.x + dx, p.y + dy);
-      },
     });
+    this.heldKeys = inputHandle.keys;
 
     // ─── H3.8 — Mob-Hover-Tooltip ─────────────────────────────────────
     // Einfacher Pointer-Move-Listener auf der Scene. Statt jeden NPC-Sprite
@@ -340,6 +369,7 @@ export class WorldScene extends Phaser.Scene {
     this.moodIcons = new NpcMoodIcons(this);
     this.sensePulse = new SensePulse(this);
     this.weatherParticles = new WeatherParticles(this);
+    this.biomeAmbient = new BiomeAmbient(this);
 
     // ─── Kamera-Setup ─────────────────────────────────────────────────
     // Welt-Bounds erst sobald `init` durch ist und Spawn bekannt; vorerst
@@ -362,6 +392,7 @@ export class WorldScene extends Phaser.Scene {
       this.moodIcons?.destroyAll();
       this.sensePulse?.destroyAll();
       this.weatherParticles?.destroy();
+      this.biomeAmbient?.destroy();
     });
     this.events.once(Phaser.Scenes.Events.DESTROY, () => {
       this.fxSub?.unsubscribe();
@@ -374,6 +405,7 @@ export class WorldScene extends Phaser.Scene {
       this.moodIcons?.destroyAll();
       this.sensePulse?.destroyAll();
       this.weatherParticles?.destroy();
+      this.biomeAmbient?.destroy();
     });
   }
 
@@ -434,15 +466,38 @@ export class WorldScene extends Phaser.Scene {
       this.playIdleIfPossible(sprite, this.playerPresetFor(key));
     }
 
-    // ─── Kamera-Follow auf den eigenen Spieler ─────────────────────────
-    // Wir lesen die kanonische Position aus `state.player()` (nicht den
-    // Pool-Sprite), damit Kamera auch dann folgt, wenn das Sprite (noch)
-    // nicht im Pool ist (Edge-Case: kurz vor erstem `players`-Update).
+    // ─── Pixel-Movement + Kamera (Legacy myPx/myPy) ────────────────────
+    // Der eigene Spieler läuft kontinuierlich in Pixeln. Server bekommt
+    // nur Tile-Updates beim Überqueren der Tile-Grenze. Andere Spieler
+    // bleiben tile-snap (kommen ja nur per WS-Echo rein).
     const me = this.bridge.state.player();
     if (me) {
-      const px = me.x * TILE_SIZE + TILE_SIZE / 2;
-      const py = me.y * TILE_SIZE + TILE_SIZE / 2;
-      this.cameras.main.centerOn(px, py);
+      this.tickPixelMovement(me, time);
+      const cam = this.cameras.main;
+      if (!this.cameraInit) {
+        cam.centerOn(this.myPx, this.myPy);
+        this.cameraInit = true;
+      } else {
+        const curX = cam.scrollX + cam.width / 2;
+        const curY = cam.scrollY + cam.height / 2;
+        const dx = this.myPx - curX;
+        const dy = this.myPy - curY;
+        if (dx * dx + dy * dy > (TILE_SIZE * 4) * (TILE_SIZE * 4)) {
+          cam.centerOn(this.myPx, this.myPy);
+        } else {
+          // 0.25 ist aggressiv genug, damit die Kamera dem schnellen
+          // Sprint noch folgt, ohne zu zittern.
+          cam.centerOn(curX + dx * 0.25, curY + dy * 0.25);
+        }
+      }
+      // Eigenes Sprite im Pool auf Pixel-Pos ziehen — überschreibt das
+      // tile-snap-Setzen aus updatePlayerSprite.
+      const meSprite = this.playerPool.get(String(me.player_id));
+      if (meSprite) {
+        const s = meSprite as Phaser.GameObjects.GameObject & { x: number; y: number };
+        s.x = this.myPx;
+        s.y = this.myPy;
+      }
     }
 
     // ─── Welle H2-A: Overlay-Updates pro Frame ─────────────────────────
@@ -482,6 +537,7 @@ export class WorldScene extends Phaser.Scene {
     }
     if (this.moodIcons) this.moodIcons.syncPositions(npcs);
     if (this.weatherParticles) this.weatherParticles.update(this.bridge.state.weather());
+    this.biomeAmbient?.update(this.currentBiomeTileId());
   }
 
   // ─── Input-Handler (F4c) ──────────────────────────────────────────────
@@ -621,17 +677,10 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    // 4) Move-Intent. Dedup: gleicher Ziel-Tile innerhalb derselben
-    // Click-Sequenz → nicht erneut senden (Spam-Schutz, Legacy-Verhalten).
-    if (
-      this.lastSentMoveTile &&
-      this.lastSentMoveTile.x === tileX &&
-      this.lastSentMoveTile.y === tileY
-    ) {
-      return;
-    }
-    this.lastSentMoveTile = { x: tileX, y: tileY };
-    this.bridge.sendMove(tileX, tileY);
+    // 4) Leeres Tile: KEIN Klick-zum-Bewegen (Design-Entscheidung 2026-05-31).
+    // Bewegung läuft ausschließlich über WASD (Pixel-Movement). Linksklick ist
+    // reine Interaktion/Angriff auf Objekte/NPCs; trifft der Klick nichts,
+    // passiert nichts. (Rechtsklick ist für eine spätere Aktion reserviert.)
   }
 
   /**
@@ -677,6 +726,153 @@ export class WorldScene extends Phaser.Scene {
     if (on === this.sprintSent) return;
     this.sprintSent = on;
     this.bridge.sendSprint(on);
+  }
+
+  // ─── Pixel-Movement (Legacy myPx/myPy, 31.05) ──────────────────────────
+  //
+  // Jeden Frame: lese held-keys, baue Velocity-Vektor, achsen-separater
+  // Kollisions-Check (slide-along-wall), update myPx/myPy. Wenn die
+  // Tile-Pos sich geändert hat, sende `move`-Intent + patche optimistisch
+  // `state.player()` damit andere Logik (Kamera, Walk-Anim, Quest-Marker)
+  // den Move sofort sieht — Backend bestätigt per `player_moved` und
+  // _handlePlayerMoved konvergiert.
+  private tickPixelMovement(
+    me: { readonly player_id: number | string; readonly x: number; readonly y: number },
+    timeMs: number,
+  ): void {
+    // Erster Frame: Pixel-Pos aus Server-Tile initialisieren.
+    if (!this.myPosInit) {
+      this.myPx = me.x * TILE_SIZE + TILE_SIZE / 2;
+      this.myPy = me.y * TILE_SIZE + TILE_SIZE / 2;
+      this.myPosInit = true;
+      this.lastUpdateTime = timeMs;
+      return;
+    }
+    // Server-Reconcile: Wenn das Backend uns sehr weit verschoben hat
+    // (Teleport, Floor-Wechsel, Respawn), folge dem Server statt am
+    // alten Pixel-State festzuhalten.
+    const serverPx = me.x * TILE_SIZE + TILE_SIZE / 2;
+    const serverPy = me.y * TILE_SIZE + TILE_SIZE / 2;
+    const drx = serverPx - this.myPx;
+    const dry = serverPy - this.myPy;
+    if (drx * drx + dry * dry > (TILE_SIZE * 3) * (TILE_SIZE * 3)) {
+      this.myPx = serverPx;
+      this.myPy = serverPy;
+    }
+
+    // dt in Sekunden, gegen Lag-Spikes auf 100ms gecappt.
+    const dt = Math.min(0.1, (timeMs - this.lastUpdateTime) / 1000);
+    this.lastUpdateTime = timeMs;
+    if (dt <= 0) return;
+
+    // Velocity aus held-keys.
+    let vx = 0, vy = 0;
+    if (this.heldKeys.left)  vx -= 1;
+    if (this.heldKeys.right) vx += 1;
+    if (this.heldKeys.up)    vy -= 1;
+    if (this.heldKeys.down)  vy += 1;
+    if (vx === 0 && vy === 0) return;
+    const mag = Math.hypot(vx, vy);
+    if (mag > 1) { vx /= mag; vy /= mag; }
+
+    const speed = this.moveSpeed * (this.heldKeys.sprint ? this.sprintMult : 1);
+    const dpx = vx * speed * dt;
+    const dpy = vy * speed * dt;
+
+    // Achsen-separat: slide along walls.
+    if (dpx !== 0) {
+      const nx = this.myPx + dpx;
+      if (this.canMoveTo(nx, this.myPy)) this.myPx = nx;
+    }
+    if (dpy !== 0) {
+      const ny = this.myPy + dpy;
+      if (this.canMoveTo(this.myPx, ny)) this.myPy = ny;
+    }
+
+    // Tile-Wechsel? → Server informieren + optimistisch state patchen.
+    const newTileX = Math.floor(this.myPx / TILE_SIZE);
+    const newTileY = Math.floor(this.myPy / TILE_SIZE);
+    if (newTileX !== me.x || newTileY !== me.y) {
+      this.bridge.sendMove(newTileX, newTileY);
+      // Optimistic patch — sonst rechnet die nächste tickPixelMovement-
+      // Iteration `me.x` immer noch alt und der Server-Reconcile-Check
+      // schießt zurück. Wir mutieren das Signal direkt (interner Sync;
+      // ein dedizierter setOwnPosition-API-Wrapper wäre overkill).
+      const state = this.bridge.state;
+      const cur = state.player();
+      if (cur) {
+        state.player.set({ ...cur, x: newTileX, y: newTileY });
+      }
+    }
+
+    // ─── Walk-Anim: Direction aus Velocity, nicht aus Tile-Delta ───────
+    // handleWalkAnim greift nur bei Tile-Wechsel; während der Pixel-Sim
+    // bewegt sich der Sprite innerhalb eines Tiles. Wir feuern direkt
+    // gegen den Anim-Pfad mit der aktuellen Richtung aus vx/vy.
+    const meKey = String(me.player_id);
+    const meSprite = this.playerPool.get(meKey);
+    if (meSprite) {
+      const preset = this.playerPresetFor(meKey);
+      if (preset) {
+        const dir = directionFor(vx, vy, 'down');
+        this.playWalkAnim(meSprite, preset, dir);
+      }
+      const track = this.playerTracks.get(meKey);
+      if (track) track.lastMoveFrame = this.game.loop.frame;
+    }
+  }
+
+  /** 4-Ecken-Hitbox prüft die Tile-Walkability auf alle Ecken. Erlaubt
+   *  Slide-along-Wall in Verbindung mit achsen-separater Anwendung. */
+  private canMoveTo(px: number, py: number): boolean {
+    // Escape-Ventil: steckt der Spieler schon in einem blockierenden
+    // Tile (z.B. weil eine Mauer NACH ihm dorthin platziert wurde),
+    // Kollisions-Check aussetzen damit er sich rausbewegen kann.
+    const curTx = Math.floor(this.myPx / TILE_SIZE);
+    const curTy = Math.floor(this.myPy / TILE_SIZE);
+    if (!this.isTileWalkable(curTx, curTy)) return true;
+    const h = this.collisionHalf;
+    const corners: ReadonlyArray<readonly [number, number]> = [
+      [px - h, py - h], [px + h, py - h],
+      [px - h, py + h], [px + h, py + h],
+    ];
+    for (const [cx, cy] of corners) {
+      const tx = Math.floor(cx / TILE_SIZE);
+      const ty = Math.floor(cy / TILE_SIZE);
+      if (!this.isTileWalkable(tx, ty)) return false;
+    }
+    return true;
+  }
+
+  /** Frontend-Walkability-Check: lädt Chunk-Tile + Struktur-Block-Flag.
+   *  Im Dungeon wäre eine andere Quelle nötig — solange die Pixel-Sim
+   *  nur Overworld gilt, ist das OK; dort fällt der collision-check
+   *  zurück auf den Backend-Reject (langsamer, aber funktional). */
+  private isTileWalkable(tx: number, ty: number): boolean {
+    // Dungeon: kein lokaler Walkability-Layer im Frontend verfügbar,
+    // also alles freigeben — Backend rejects landen im Snap-Back.
+    if (this.bridge.state.dungeonFloor()) return true;
+    const chunks = this.bridge.state.chunks();
+    const cx = Math.floor(tx / this.chunkSize);
+    const cy = Math.floor(ty / this.chunkSize);
+    const chunk = chunks.find((c) => c.cx === cx && c.cy === cy);
+    if (!chunk) return false; // noch nicht geladen → vorerst blockieren
+    const localX = tx - cx * this.chunkSize;
+    const localY = ty - cy * this.chunkSize;
+    const row = chunk.tiles[localY];
+    if (!row) return false;
+    const tile = row[localX];
+    if (tile == null) return false;
+    if (NON_WALKABLE_TILES.has(tile)) return false;
+    // Strukturen mit `blocking: true` blockieren ebenfalls.
+    const structures = this.bridge.state.structures();
+    for (const s of structures) {
+      if (s.x !== tx || s.y !== ty) continue;
+      const def = STRUCTURE[s.type];
+      if (def?.blocking) return false;
+      break;
+    }
+    return true;
   }
 
   // ─── Tile-Layer-Rendering ──────────────────────────────────────────────
@@ -830,9 +1026,79 @@ export class WorldScene extends Phaser.Scene {
       img.setDisplaySize(sizePx, sizePx);
       return img;
     }
-    const rect = this.add.rectangle(0, 0, sizePx, sizePx, fallbackColor, 0.85);
-    rect.setStrokeStyle(2, 0x000000, 0.6);
-    return rect;
+    // On-Demand-Loading (Lag-Fix 2026-05-31): das Ziel-Asset ist evtl. noch
+    // im Flug. Statt eines nicht-swappbaren Rectangles geben wir ein `Image`
+    // mit einer generierten Platzhalter-Textur (Fallback-Farbe) zurück. Das
+    // hat `setTexture`, sodass der `update*`-Pfad die echte Textur einsetzen
+    // kann, sobald sie geladen ist. Der Magenta-/Kategorie-Debug-Look bleibt.
+    const placeholderKey = this.fallbackTextureKey(fallbackColor);
+    const img = this.add.image(0, 0, placeholderKey);
+    img.setDisplaySize(sizePx, sizePx);
+    // Merkt sich Ziel-Key + Größe für den Texture-Swap im update*-Pfad.
+    const tagged = img as Phaser.GameObjects.Image & {
+      __pendingTex?: string;
+      __spriteSize?: number;
+    };
+    tagged.__pendingTex = textureKey;
+    tagged.__spriteSize = sizePx;
+    // WICHTIG: Statische Pools (Strukturen, Ground-Items) werden NUR bei
+    // Signal-Reference-Wechsel neu gesynct (siehe update(): `if (structures
+    // !== this.lastStructuresRef)`). Nach dem on-demand-Load ändert sich der
+    // Reference NICHT → `update*` läuft nicht mehr → der Swap dort würde nie
+    // greifen und das Sprite bliebe für immer ein Fallback-Quadrat. Daher
+    // hängen wir uns direkt ans Lade-Ende GENAU dieser Textur und swappen
+    // dann dieses konkrete Sprite. (Bewegliche Entities synct der bewegungs-
+    // getriebene Signal-Wechsel ohnehin; dort ist es redundant, aber billig.)
+    this.load.once(
+      `filecomplete-image-${textureKey}`,
+      () => this.trySwapFallbackTexture(img),
+    );
+    return img;
+  }
+
+  /**
+   * Liefert (und erzeugt bei Bedarf einmalig) eine kleine, einfarbige
+   * Platzhalter-Textur für die gegebene Fallback-Farbe. Wird als swappbares
+   * Image-Fallback genutzt, solange das echte On-Demand-Asset noch lädt.
+   */
+  private fallbackTextureKey(color: number): string {
+    const key = `__fallback_${color.toString(16)}`;
+    if (!this.textures.exists(key)) {
+      const g = this.add.graphics();
+      g.fillStyle(color, 0.85);
+      g.fillRect(0, 0, 8, 8);
+      g.lineStyle(2, 0x000000, 0.6);
+      g.strokeRect(0, 0, 8, 8);
+      g.generateTexture(key, 8, 8);
+      g.destroy();
+    }
+    return key;
+  }
+
+  /**
+   * Swappt die Platzhalter-Textur eines Fallback-Images auf das echte Asset,
+   * sobald `__pendingTex` im TextureManager verfügbar ist. No-op für echte
+   * Image-Sprites (kein `__pendingTex`) und für Sprites ohne `setTexture`.
+   */
+  private trySwapFallbackTexture(obj: Phaser.GameObjects.GameObject): void {
+    const tagged = obj as Phaser.GameObjects.Image & {
+      __pendingTex?: string;
+      __spriteSize?: number;
+      setTexture?: (key: string) => void;
+      setDisplaySize?: (w: number, h: number) => void;
+    };
+    // Sprite könnte bereits zerstört sein (Struktur/Item entfernt, bevor die
+    // on-demand-Textur fertig lud) — der `filecomplete`-Listener feuert dann
+    // trotzdem einmal. Nach destroy() ist `scene` null → kein setTexture.
+    if (!tagged.scene) return;
+    const tex = tagged.__pendingTex;
+    if (!tex) return;
+    if (!this.textures.exists(tex)) return;
+    if (typeof tagged.setTexture !== 'function') return;
+    tagged.setTexture(tex);
+    const size = tagged.__spriteSize ?? TILE_SIZE;
+    tagged.setDisplaySize?.(size, size);
+    tagged.__pendingTex = undefined;
   }
 
   /**
@@ -860,15 +1126,48 @@ export class WorldScene extends Phaser.Scene {
   }
 
   /** Position auf Sprite anwenden — funktioniert für Image, Sprite,
-   *  Rectangle, Container (alle haben `x`/`y`-Setter über Transform). */
+   *  Rectangle, Container (alle haben `x`/`y`-Setter über Transform).
+   *
+   *  `smooth=true` (Player/NPC): Tile-Wechsel werden per Linear-Tween über
+   *  ~THROTTLE-Dauer geglättet, statt tile-snap zu jumpen. Das gibt den
+   *  alten Legacy-Smooth-Look — der Server schickt nur alle ~120ms ein
+   *  neues Tile, dazwischen interpoliert der Client. Großer Sprung
+   *  (Teleport/Dungeon-Floor → >2 Tiles) ignoriert den Tween und snapt
+   *  instant, sonst würde der Spieler über den halben Screen "fliegen".
+   */
   private updateMovableSprite(
     obj: Phaser.GameObjects.GameObject,
     tileX: number,
     tileY: number,
+    smooth = false,
   ): void {
-    const withTransform = obj as Phaser.GameObjects.GameObject & { x: number; y: number };
-    withTransform.x = tileX * TILE_SIZE + TILE_SIZE / 2;
-    withTransform.y = tileY * TILE_SIZE + TILE_SIZE / 2;
+    const t = obj as Phaser.GameObjects.GameObject & {
+      x: number; y: number; __posInit?: boolean;
+    };
+    const targetX = tileX * TILE_SIZE + TILE_SIZE / 2;
+    const targetY = tileY * TILE_SIZE + TILE_SIZE / 2;
+    if (!smooth || !t.__posInit) {
+      t.x = targetX;
+      t.y = targetY;
+      t.__posInit = true;
+      return;
+    }
+    if (t.x === targetX && t.y === targetY) return;
+    const ddx = targetX - t.x;
+    const ddy = targetY - t.y;
+    if (ddx * ddx + ddy * ddy > (TILE_SIZE * 2) * (TILE_SIZE * 2)) {
+      t.x = targetX;
+      t.y = targetY;
+      return;
+    }
+    this.tweens.killTweensOf(obj);
+    this.tweens.add({
+      targets: obj,
+      x: targetX,
+      y: targetY,
+      duration: 140,
+      ease: 'Linear',
+    });
   }
 
   private createPlayerSprite(p: OnlinePlayer): Phaser.GameObjects.GameObject {
@@ -886,7 +1185,16 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private updatePlayerSprite(obj: Phaser.GameObjects.GameObject, p: OnlinePlayer): void {
-    this.updateMovableSprite(obj, p.x, p.y);
+    // Eigener Spieler: Pixel-Sim im update-Tick setzt die Position. Wir
+    // markieren das Sprite nur als initialisiert (sonst snapt der erste
+    // updateMovableSprite-Call die Pos auf das Tile-Center) und lassen
+    // den Tween weg. Andere Spieler bekommen smooth Tile-Interpolation.
+    const meId = this.bridge.state.player()?.player_id;
+    if (meId !== undefined && String(meId) === String(p.player_id)) {
+      (obj as Phaser.GameObjects.GameObject & { __posInit?: boolean }).__posInit = true;
+    } else {
+      this.updateMovableSprite(obj, p.x, p.y, /*smooth*/ true);
+    }
     const preset = this.assetLoader.resolvePlayerPreset(p.preset);
     this.handleWalkAnim(obj, this.playerTracks, String(p.player_id), preset, p.x, p.y);
   }
@@ -902,18 +1210,134 @@ export class WorldScene extends Phaser.Scene {
     // registrierte Walk-Anim hat — sonst der Basis-Kind (bandit). So
     // bekommen Equip-Varianten ihren eigenen Walk-Cycle statt der Generic.
     const animKind = this.npcAnimKind(n);
-    const obj = animKind
-      ? this.animatedSpriteOrFallback(tex, animKind, FALLBACK_COLORS.npc, TILE_SIZE)
-      : this.spriteOrFallback(tex, FALLBACK_COLORS.npc, TILE_SIZE);
+    let obj: Phaser.GameObjects.GameObject;
+    if (animKind) {
+      // (a) Animierter NPC-Walk-Cycle (4-direktional) bleibt EAGER.
+      obj = this.animatedSpriteOrFallback(tex, animKind, FALLBACK_COLORS.npc, TILE_SIZE);
+    } else if (ANIMATED_MONSTER_WALK_SET.has(n.kind)) {
+      // (c) Animiertes Monster (Legacy-33-Walk, 8 Frames, nicht-direktional).
+      // Frames werden on-demand geladen + Anim erst nach `complete` gebaut.
+      obj = this.createMonsterWalkSprite(n.kind);
+    } else {
+      // (b) Nicht-animierter Pfad: Monster-/NPC-Single-Sprite on-demand laden.
+      this.assetLoader.ensureSingle(this, n.kind);
+      if (n.sprite_variant) this.assetLoader.ensureSingle(this, n.sprite_variant);
+      obj = this.spriteOrFallback(tex, FALLBACK_COLORS.npc, TILE_SIZE);
+    }
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.NPCS;
     return obj;
   }
 
   private updateNpcSprite(obj: Phaser.GameObjects.GameObject, n: NPC): void {
-    this.updateMovableSprite(obj, n.x, n.y);
+    this.updateMovableSprite(obj, n.x, n.y, /*smooth*/ true);
     const animKind = this.npcAnimKind(n);
     if (animKind) {
       this.handleWalkAnim(obj, this.npcTracks, n.id, animKind, n.x, n.y);
+    } else if (ANIMATED_MONSTER_WALK_SET.has(n.kind)) {
+      this.handleMonsterWalkAnim(obj, n.id, n.kind, n.x, n.y);
+    } else {
+      // Nicht-animierter Pfad: Fallback-Textur auf das (ggf. nachgeladene)
+      // echte Single-Sprite swappen, sobald verfügbar.
+      this.trySwapFallbackTexture(obj);
+    }
+  }
+
+  /**
+   * (c) Erzeugt das Sprite fuer ein animiertes Legacy-33-Monster. Wir legen es
+   * direkt als `Phaser.GameObjects.Sprite` an (nicht Image), damit die spaeter
+   * gebaute Walk-Anim ohne Re-Texturieren greifen kann. Solange die 8 Frames
+   * noch laden:
+   *   • erstes Walk-Frame vorhanden → als Standbild (idle = walk_01),
+   *   • sonst Single-Sprite (legacy_33 96px) on-demand laden + als Platzhalter,
+   *   • sonst Fallback-Farbtextur.
+   * In allen Faellen greift die Anim, sobald `ensureMonsterWalk` `complete` ist.
+   */
+  private createMonsterWalkSprite(kind: string): Phaser.GameObjects.GameObject {
+    // 8 Walk-Frames on-demand laden + Anim nach `complete` bauen.
+    this.assetLoader.ensureMonsterWalk(this, kind);
+
+    const frame0 = this.assetLoader.monsterWalkTextureKey(kind, 1);
+    let startTex: string;
+    if (this.textures.exists(frame0)) {
+      startTex = frame0;
+    } else {
+      // Single-Sprite als Platzhalter, bis die Walk-Frames da sind.
+      this.assetLoader.ensureSingle(this, kind);
+      const single = this.assetLoader.textureKeyFor(kind) ?? `npc_${kind}`;
+      startTex = this.textures.exists(single)
+        ? single
+        : this.fallbackTextureKey(FALLBACK_COLORS.npc);
+    }
+    const sprite = this.add.sprite(0, 0, startTex);
+    sprite.setDisplaySize(TILE_SIZE, TILE_SIZE);
+    return sprite;
+  }
+
+  /**
+   * (c) Bewegungs-getriebenes Abspielen des Monster-Walk-Loops. Analog zu
+   * `handleWalkAnim`, aber nicht-direktional: bei Tile-Delta ≠ 0 spielt die
+   * Anim, bei Stillstand frieren wir sie auf dem ersten Frame ein (idle =
+   * walk_01). Horizontaler Flip je nach dx-Richtung (Frames schauen fix in
+   * eine Richtung). Idle-Handling liegt bewusst HIER drin (nicht im globalen
+   * update()-Loop), da `npcAnimKind` Monster nicht kennt.
+   */
+  private handleMonsterWalkAnim(
+    obj: Phaser.GameObjects.GameObject,
+    id: string | number,
+    kind: string,
+    x: number,
+    y: number,
+  ): void {
+    const sprite = obj as Phaser.GameObjects.GameObject & {
+      anims?: Phaser.Animations.AnimationState;
+      setFlipX?: (flip: boolean) => void;
+      setTexture?: (key: string) => void;
+      setDisplaySize?: (w: number, h: number) => void;
+      texture?: Phaser.Textures.Texture;
+    };
+    if (!sprite.anims) return; // Fallback-Rect → keine Anim
+
+    const animKey = this.assetLoader.monsterWalkAnimKey(kind);
+    const ready = this.assetLoader.monsterWalkReady(kind) && this.anims.exists(animKey);
+
+    // Bewegung gegen den Tracker bestimmen (eigene Map, gleiche Semantik wie
+    // handleWalkAnim — wird via onRemove mit dem Pool aufgeraeumt).
+    const prev = this.npcTracks.get(id);
+    let moving = false;
+    if (!prev) {
+      this.npcTracks.set(id, { x, y, dir: 'down', lastMoveFrame: this.game.loop.frame });
+    } else {
+      const dx = x - prev.x;
+      const dy = y - prev.y;
+      if (dx !== 0 || dy !== 0) {
+        moving = true;
+        if (dx !== 0) sprite.setFlipX?.(dx < 0); // Frames schauen nach rechts
+        prev.x = x;
+        prev.y = y;
+        prev.lastMoveFrame = this.game.loop.frame;
+      }
+    }
+
+    if (!ready) {
+      // Anim noch nicht fertig: sobald das erste Walk-Frame existiert, als
+      // Standbild zeigen (Platzhalter/Single-Sprite ersetzen) — kein Magenta.
+      const frame0 = this.assetLoader.monsterWalkTextureKey(kind, 1);
+      if (this.textures.exists(frame0) && sprite.texture?.key !== frame0) {
+        sprite.setTexture?.(frame0);
+        sprite.setDisplaySize?.(TILE_SIZE, TILE_SIZE);
+      }
+      return;
+    }
+
+    if (moving) {
+      sprite.anims.play(animKey, true); // ignoreIfPlaying → kein Restart
+    } else {
+      // Stillstand: Anim auf erstem Frame einfrieren (idle = walk_01).
+      if (sprite.anims.isPlaying) {
+        sprite.anims.stop();
+        sprite.setTexture?.(this.assetLoader.monsterWalkTextureKey(kind, 1));
+        sprite.setDisplaySize?.(TILE_SIZE, TILE_SIZE);
+      }
     }
   }
 
@@ -930,6 +1354,8 @@ export class WorldScene extends Phaser.Scene {
 
   private createStructureSprite(s: Structure): Phaser.GameObjects.GameObject {
     const key = this.structureSpriteKeyFor(s);
+    // On-Demand: Struktur-Single-Sprite (inkl. Wall-Variant-Key) laden.
+    this.assetLoader.ensureSingle(this, key);
     const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.structure, TILE_SIZE);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.STRUCTURES;
@@ -945,19 +1371,31 @@ export class WorldScene extends Phaser.Scene {
   private updateStructureSprite(obj: Phaser.GameObjects.GameObject, s: Structure): void {
     this.updateMovableSprite(obj, s.x, s.y);
     const family = familyOf(s.type, s.material ?? null);
-    if (!family) return; // nur Wall/Fence brauchen Re-Tiling
+    if (!family) {
+      // Nicht-Wall: kein Re-Tiling, aber Fallback→echte Textur swappen,
+      // sobald das on-demand geladene Asset da ist.
+      this.trySwapFallbackTexture(obj);
+      return;
+    }
+    // Wall/Fence: Variant-Key kann sich durch Re-Tiling ändern → ggf. neues
+    // Asset on-demand nachladen.
     const key = this.structureSpriteKeyFor(s);
+    this.assetLoader.ensureSingle(this, key);
     const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
-    // Nur echte Image-Sprites haben `setTexture`. Rectangle-Fallbacks
-    // ignorieren wir — das Magenta-Rect bleibt bis das Asset da ist.
     const maybeImage = obj as Phaser.GameObjects.GameObject & {
       setTexture?: (key: string) => void;
       texture?: Phaser.Textures.Texture;
+      __pendingTex?: string;
     };
     if (typeof maybeImage.setTexture === 'function' && this.textures.exists(tex)) {
       if (maybeImage.texture?.key !== tex) {
         maybeImage.setTexture(tex);
+        maybeImage.__pendingTex = undefined;
       }
+    } else if (typeof maybeImage.setTexture === 'function') {
+      // Ziel-Asset noch im Flug: pending-Key aktualisieren, damit der nächste
+      // Sync (oder filecomplete) auf die korrekte Variante swappt.
+      maybeImage.__pendingTex = tex;
     }
   }
 
@@ -967,6 +1405,27 @@ export class WorldScene extends Phaser.Scene {
    * WALL_MASK_TO_VARIANT auf eine Variante gemappt (z. B.
    * `wall_stone_corner_ne`). Fuer alle anderen Typen: einfach `s.type`.
    */
+  /**
+   * Tile-ID des Boden-Tiles unter dem eigenen Spieler — Quelle für das
+   * Biom-Ambient-Overlay. Liefert `null`, wenn kein Spieler / kein geladener
+   * Chunk / Dungeon (dort gibt es keinen Overworld-Biom-Tile). Eigener
+   * Chunk-Lookup (parallel zu `isTileWalkable`, ohne dessen Movement-Pfad
+   * anzufassen).
+   */
+  private currentBiomeTileId(): number | null {
+    if (this.bridge.state.dungeonFloor()) return null;
+    const me = this.bridge.state.player();
+    if (!me) return null;
+    const chunks = this.bridge.state.chunks();
+    const cx = Math.floor(me.x / this.chunkSize);
+    const cy = Math.floor(me.y / this.chunkSize);
+    const chunk = chunks.find((c) => c.cx === cx && c.cy === cy);
+    if (!chunk) return null;
+    const row = chunk.tiles[me.y - cy * this.chunkSize];
+    if (!row) return null;
+    return row[me.x - cx * this.chunkSize] ?? null;
+  }
+
   private structureSpriteKeyFor(s: Structure): string {
     const family: WallFamily | null = familyOf(s.type, s.material ?? null);
     if (!family) return s.type;
@@ -978,6 +1437,8 @@ export class WorldScene extends Phaser.Scene {
     // F-render-foundation: AssetLoader kennt den Item-Key aus ITEM_SPRITES
     // (Subagent B). Pro-Asset-Pipeline (Quality/Cosmetic-Skin) kommt mit
     // dem Inventar-Panel (F7).
+    // On-Demand: Item-Single-Sprite laden, sobald ein GroundItem erscheint.
+    this.assetLoader.ensureSingle(this, g.kind);
     const tex = this.assetLoader.textureKeyFor(g.kind) ?? `item_${g.kind}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.groundItem, TILE_SIZE * 0.5);
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.GROUND_ITEMS;

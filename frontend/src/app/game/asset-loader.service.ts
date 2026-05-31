@@ -20,14 +20,19 @@
 //     `SpritePool`s).
 
 import { Injectable } from '@angular/core';
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 
 import {
   ANIMATED_NPC_KINDS,
   NPC_SPRITE,
   PRESET_WALK_CFG,
 } from '../core/data/npc-sprites';
-import { MONSTER_SPRITES } from '../core/data/monster-sprites';
+import {
+  ANIMATED_MONSTER_WALK_SET,
+  MONSTER_SPRITES,
+  MONSTER_WALK_ASSET_BASE,
+  MONSTER_WALK_FRAME_COUNT,
+} from '../core/data/monster-sprites';
 import { STRUCTURE_SPRITES } from '../core/data/structure-sprites';
 import { ITEM_SPRITES } from '../core/data/item-sprites';
 import {
@@ -63,6 +68,10 @@ export type WalkDirection = (typeof WALK_DIRECTIONS)[number];
 /** Default-Frame-Count für die phase2/3/preset-Packs (2 Frames pro Richtung). */
 const DEFAULT_FRAMES_PER_DIR = 2;
 
+/** Frame-Rate der Legacy-33-Monster-Walk-Loops (8 Frames; ~9 FPS = ruhiger,
+ *  fluessiger Gang ohne zu hektisch zu wirken). */
+const MONSTER_WALK_FRAME_RATE = 9;
+
 /** Default-Player-Preset-Key wenn `player.preset` null/leer. */
 const DEFAULT_PLAYER_PRESET = 'wanderer_cloak';
 
@@ -74,6 +83,28 @@ export class AssetLoaderService {
   /** kind → Texture-Key (gleicher Wert wie der Map-Key in singleSprites,
    *  separat damit `textureKeyFor` schnell ist). */
   private readonly kindToTextureKey = new Map<string, string>();
+
+  /**
+   * On-Demand-Single-Sprites (Monster / Item / Struktur): diese kinds werden
+   * NICHT mehr eager im `preloadAll` geladen, sondern erst wenn ein Entity
+   * dieses Kinds in Sichtweite kommt (`ensureSingle`). Spart ~825 HTTP-
+   * Requests + GPU-Texturen beim Boot (GPU-Constraint RTX 3070 8GB).
+   *
+   * Wert ist das `[textureKey, path]`-Paar, damit `ensureSingle` ohne
+   * weitere Map-Lookups arbeiten kann.
+   */
+  private readonly onDemandSingles = new Map<string, readonly [string, string]>();
+
+  /** Texture-Keys, die per `ensureSingle` bereits in den Loader eingereiht
+   *  wurden — verhindert Doppel-Requests. */
+  private readonly requestedSingles = new Set<string>();
+
+  /** Monster-Walk-Kinds, deren 8 Frames bereits per `ensureMonsterWalk` in
+   *  den Loader eingereiht wurden (idempotent, verhindert Doppel-Requests). */
+  private readonly requestedMonsterWalks = new Set<string>();
+
+  /** Monster-Walk-Kinds, deren Phaser-Walk-Anim bereits gebaut wurde. */
+  private readonly builtMonsterWalks = new Set<string>();
 
   /** Walk-Cycles pro Kind (NPC, Player-Preset). */
   private readonly walkCycles = new Map<string, WalkCycleSpec>();
@@ -100,6 +131,132 @@ export class AssetLoaderService {
    *  statische Registry vorliegt (→ WorldScene fällt auf Magenta-Rect). */
   textureKeyFor(kind: string): string | null {
     return this.kindToTextureKey.get(kind) ?? null;
+  }
+
+  /**
+   * On-Demand-Load eines Single-Sprites (Monster / Item / Struktur). Wird von
+   * den `create*`-Sprite-Factories in `WorldScene` pro neuem Entity gerufen —
+   * muss also idempotent + billig sein.
+   *
+   * Lädt die Textur für `kind` nur dann, wenn:
+   *   • `kind` als On-Demand-Single registriert ist (sonst no-op — Walk-Cycle-
+   *     Kinds & Eager-Core liefen schon durch `preloadAll`),
+   *   • die Textur noch nicht im TextureManager existiert,
+   *   • und noch nicht angefordert wurde (`requestedSingles`-Guard).
+   *
+   * Phaser erlaubt `load.image(...)` + `load.start()` zur Laufzeit; läuft
+   * gerade ein Load, wird der neue Eintrag in dieselbe Queue gehängt.
+   * `WorldScene` swappt die Fallback-Textur via `load.on('filecomplete', …)`
+   * bzw. beim nächsten `update*`-Sync auf das fertige Image.
+   */
+  ensureSingle(scene: Phaser.Scene, kind: string): void {
+    const entry = this.onDemandSingles.get(kind);
+    if (!entry) return;
+    const [key, path] = entry;
+    if (this.requestedSingles.has(key)) return;
+    if (scene.textures.exists(key)) {
+      this.requestedSingles.add(key);
+      return;
+    }
+    this.requestedSingles.add(key);
+    scene.load.image(key, path);
+    // `start()` ist no-op wenn der Loader schon läuft; sonst startet er die
+    // (ggf. wachsende) Queue. Mehrfaches Aufrufen ist von Phaser abgesichert.
+    if (!scene.load.isLoading()) {
+      scene.load.start();
+    }
+  }
+
+  /**
+   * On-Demand-Loader + Anim-Build fuer einen Legacy-33-Monster-Walk-Cycle
+   * (8 nicht-direktionale Frames). Analog zu `BiomeAmbient.ensureFrames`:
+   *
+   *   • NICHTS wird eager beim Boot geladen (32×8 = 256 Frames wuerden den
+   *     Boot-Lag wieder einfuehren, GPU-Constraint RTX 3070 8GB).
+   *   • Erst wenn ein Monster dieses Kinds erscheint, werden die 8 Frames in
+   *     den Loader eingereiht; die Phaser-Anim `monster_walk_<kind>` wird erst
+   *     nach `complete` gebaut (Frames muessen im TextureManager existieren).
+   *
+   * Idempotent: Mehrfach-Aufrufe pro Kind sind ein No-op. Liefert sofort, wenn
+   * `kind` kein animiertes Monster ist.
+   *
+   * Hier in `AssetLoaderService`, weil dieser Service bereits das gesamte
+   * On-Demand-Asset-Lifecycle besitzt (`ensureSingle`) UND die Walk-Cycle-
+   * Anim-Specs haelt — der `WalkAnimationsService` baut dagegen nur EAGER aus
+   * bereits vorgeladenen Texturen und passt fuer den Lazy-Pfad nicht.
+   */
+  ensureMonsterWalk(scene: Phaser.Scene, kind: string): void {
+    if (!ANIMATED_MONSTER_WALK_SET.has(kind)) return;
+    if (this.requestedMonsterWalks.has(kind)) {
+      // Frames evtl. schon da (z. B. aus dem Cache) → Anim ggf. nachbauen.
+      this.buildMonsterWalkAnim(scene, kind);
+      return;
+    }
+    this.requestedMonsterWalks.add(kind);
+
+    let queued = 0;
+    for (let n = 1; n <= MONSTER_WALK_FRAME_COUNT; n++) {
+      const key = this.monsterWalkTextureKey(kind, n);
+      if (scene.textures.exists(key)) continue;
+      scene.load.image(
+        key,
+        `${MONSTER_WALK_ASSET_BASE}/${kind}/walk_${pad2(n)}.png`,
+      );
+      queued++;
+    }
+
+    if (queued === 0) {
+      // Alle Frames bereits im Cache → direkt bauen.
+      this.buildMonsterWalkAnim(scene, kind);
+      return;
+    }
+
+    // Nach Abschluss des aktuellen Load-Batches die Anim bauen (idempotent).
+    scene.load.once(Phaser.Loader.Events.COMPLETE, () =>
+      this.buildMonsterWalkAnim(scene, kind),
+    );
+    if (!scene.load.isLoading()) scene.load.start();
+  }
+
+  /** Texture-Key fuer ein einzelnes Monster-Walk-Frame (1-indexiert). */
+  monsterWalkTextureKey(kind: string, n: number): string {
+    return `__mwalk_${kind}_${pad2(n)}`;
+  }
+
+  /** Anim-Key fuer den Monster-Walk-Loop eines Kinds. */
+  monsterWalkAnimKey(kind: string): string {
+    return `monster_walk_${kind}`;
+  }
+
+  /** True, sobald die Walk-Anim `monster_walk_<kind>` gebaut + abspielbar ist. */
+  monsterWalkReady(kind: string): boolean {
+    return this.builtMonsterWalks.has(kind);
+  }
+
+  /**
+   * Baut die Phaser-Anim `monster_walk_<kind>` (8 Frames, repeat -1), sobald
+   * alle Frame-Texturen geladen sind. Idempotent.
+   */
+  private buildMonsterWalkAnim(scene: Phaser.Scene, kind: string): void {
+    if (this.builtMonsterWalks.has(kind)) return;
+
+    const frames: Phaser.Types.Animations.AnimationFrame[] = [];
+    for (let n = 1; n <= MONSTER_WALK_FRAME_COUNT; n++) {
+      const key = this.monsterWalkTextureKey(kind, n);
+      if (!scene.textures.exists(key)) return; // noch nicht alle da → spaeter
+      frames.push({ key });
+    }
+
+    const animKey = this.monsterWalkAnimKey(kind);
+    if (!scene.anims.exists(animKey)) {
+      scene.anims.create({
+        key: animKey,
+        frames,
+        frameRate: MONSTER_WALK_FRAME_RATE,
+        repeat: -1,
+      });
+    }
+    this.builtMonsterWalks.add(kind);
   }
 
   /** Liefert den Walk-Cycle-Spec für ein Kind. Nutzt der
@@ -159,8 +316,12 @@ export class AssetLoaderService {
    * `scene.textures.exists(key)` und fällt auf das Magenta-Rect zurück.
    */
   preloadAll(loader: Phaser.Loader.LoaderPlugin): void {
-    // 1) Single-Sprites (Monster, Strukturen, Items, Effekte).
+    // 1) Single-Sprites — EAGER-Core: NPC-Idle, Player-Presets, Dungeon-Tiles,
+    //    Effekt-Singles. Monster/Item/Struktur-Singles (`onDemandSingles`)
+    //    werden HIER übersprungen und erst per `ensureSingle()` geladen, sobald
+    //    ein Entity dieses Kinds erscheint — spart ~825 Boot-Requests/Texturen.
     for (const [kind, path] of this.singleSprites) {
+      if (this.onDemandSingles.has(kind)) continue;
       const key = this.kindToTextureKey.get(kind);
       if (!key) continue;
       // Phaser ist tolerant: wenn der Key schon im TextureManager ist,
@@ -194,17 +355,20 @@ export class AssetLoaderService {
    * und nichts wird registriert — das ist OK, der Fallback greift.
    */
   private loadStaticManifests(): void {
-    // Monster: key = kind (NPC_SPRITE.sprite-Konvention)
+    // Monster: key = kind (NPC_SPRITE.sprite-Konvention).
+    // On-Demand: erst laden wenn ein Monster dieses Kinds erscheint.
     for (const [kind, path] of Object.entries(MONSTER_SPRITES)) {
-      this.registerSingle(kind, kind, path);
+      this.registerSingle(kind, kind, path, /*onDemand*/ true);
     }
-    // Strukturen: key = `struct_<type>` (siehe WorldScene.createStructureSprite)
+    // Strukturen: key = `struct_<type>` (siehe WorldScene.createStructureSprite).
+    // On-Demand.
     for (const [type, path] of Object.entries(STRUCTURE_SPRITES)) {
-      this.registerSingle(type, `struct_${type}`, path);
+      this.registerSingle(type, `struct_${type}`, path, /*onDemand*/ true);
     }
-    // Items: key = `item_<kind>` (siehe WorldScene.createGroundItemSprite)
+    // Items: key = `item_<kind>` (siehe WorldScene.createGroundItemSprite).
+    // On-Demand.
     for (const [kind, path] of Object.entries(ITEM_SPRITES)) {
-      this.registerSingle(kind, `item_${kind}`, path);
+      this.registerSingle(kind, `item_${kind}`, path, /*onDemand*/ true);
     }
     // Effekte: key = `effect_<kind>` (Convention, wird in einer späteren
     // Welle vom Effect-Renderer konsumiert).
@@ -314,10 +478,25 @@ export class AssetLoaderService {
 
   // ─── Private: Helpers ───────────────────────────────────────────────
 
-  /** Registriert ein Single-Sprite (PNG → Texture). */
-  private registerSingle(kind: string, textureKey: string, path: string): void {
+  /** Registriert ein Single-Sprite (PNG → Texture).
+   *  `onDemand=true`: NICHT eager in `preloadAll` laden, sondern erst per
+   *  `ensureSingle` wenn ein Entity dieses Kinds erscheint. */
+  private registerSingle(
+    kind: string,
+    textureKey: string,
+    path: string,
+    onDemand = false,
+  ): void {
     this.singleSprites.set(kind, path);
     this.kindToTextureKey.set(kind, textureKey);
+    if (onDemand) {
+      this.onDemandSingles.set(kind, [textureKey, path]);
+    } else {
+      // Eager-Registrierung gewinnt: überschreibt einen früheren on-demand-
+      // Eintrag desselben kinds (z. B. animierte NPC-Kinds, die auch in
+      // MONSTER_SPRITES stehen — deren Idle-Frame bleibt eager geladen).
+      this.onDemandSingles.delete(kind);
+    }
   }
 
   /** Lädt alle Frames einer Effect-Anim (`effect_anim_<kind>_<NN>`). */

@@ -677,10 +677,20 @@ export class GameStateService {
     const id = String(msg['player_id']);
     const x = msg['x'] as number;
     const y = msg['y'] as number;
+    // Bug 31.05: Backend echo't `player_moved` jetzt auch an den Initiator,
+    // damit der eigene Spieler nicht vom Server-State driftet. Wenn die
+    // Nachricht uns selbst betrifft, muss zusätzlich state.player() x/y
+    // patchen — sonst rechnet WASD-Compute (p.x + dx) immer ab der
+    // Spawn-Pos, Kamera bleibt stehen und der Sprite hängt am Init-Tile.
+    const me = this.player();
+    if (me && String(me.player_id) === id) {
+      this._patchPlayer({ x, y });
+    }
     const cur = this.players();
     const existing = cur[id];
-    if (!existing) return;
-    this.players.set({ ...cur, [id]: { ...existing, x, y } });
+    if (existing) {
+      this.players.set({ ...cur, [id]: { ...existing, x, y } });
+    }
   }
 
   private _handlePlayerJoined(msg: GenericMsg): void {

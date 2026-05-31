@@ -305,6 +305,50 @@ export const MONSTER_SPRITES: Readonly<Record<string, string>> = {
   rockshell_colossus:      '/assets/monsters/world_sprites/generated_longlist/sprites_128/creature_stone_elemental_lumbering_world_128.png',
 };
 
+/**
+ * Monster-Kinds mit Legacy-33-Walk-Cycle (8 nicht-direktionale Frames).
+ *
+ * Wired 2026-05-31: genau diese 32 Kinds haben unter
+ * `assets/monsters/world_sprites/legacy_33/animations/<kind>/walk_01..08.png`
+ * vollstaendige 8-Frame-Walks. Es ist die Schnittmenge aus
+ * `ANIMATED_MONSTER_KINDS` (npc-sprites.ts) und den Walk-Asset-Ordnern auf der
+ * Platte. Die 17 uebrigen ANIMATED_MONSTER_KINDS (basilisk, bone_crawler,
+ * chimera, crystal_golem, dragon_whelp, gargoyle, giant_spider, griffin,
+ * harpy, hydra, manticore, minotaur, necromancer, ogre, stone_golem,
+ * thornling, treant) haben KEINE Walk-Assets und bleiben statisch.
+ *
+ * bandit/robber/thief haben zwar legacy_33-Walks, sind aber NPCs (laufen ueber
+ * ANIMATED_NPC_KINDS / characters/) und gehoeren daher NICHT hierher.
+ *
+ * KUNST-STIL-ENTSCHEIDUNG: Diese 32 Monster nutzen die legacy_33-Frames fuer
+ * BEIDES — Walk UND Ruhezustand (idle = eingefrorenes walk_01). Sie sehen im
+ * Ruhezustand also wie legacy_33 aus statt wie das neue 128px-MONSTER_SPRITES-
+ * Art. Bewusste Konsistenz-Entscheidung gegen Kunststil-"Popping" bei
+ * Start/Stopp; umkehrbar, indem man diesen Walk-Pfad fuer einzelne Kinds
+ * deaktiviert.
+ */
+export const ANIMATED_MONSTER_WALK_KINDS: readonly string[] = [
+  'bat', 'bear', 'boar', 'cave_bear', 'cobra',
+  'cougar', 'crocodile', 'crystal_beetle', 'crystal_tick', 'dire_wolf',
+  'ember_newt', 'ember_rat', 'fae_mite', 'fire_imp', 'frost_sprite',
+  'gloom_moth', 'goblin', 'lynx', 'mushroom_imp', 'polar_bear',
+  'rat', 'shadow_bat', 'skeleton', 'slime', 'slimelet',
+  'spider', 'stag', 'thorn_scarab', 'wolf', 'wolf_alpha',
+  'wolverine', 'zombie',
+];
+
+/** O(1)-Lookup-Set fuer ANIMATED_MONSTER_WALK_KINDS. */
+export const ANIMATED_MONSTER_WALK_SET: ReadonlySet<string> = new Set(
+  ANIMATED_MONSTER_WALK_KINDS,
+);
+
+/** Anzahl Walk-Frames pro Monster-Kind (walk_01..walk_NN, zero-padded). */
+export const MONSTER_WALK_FRAME_COUNT = 8;
+
+/** Basis-Pfad fuer die Legacy-33-Monster-Walk-Frames. */
+export const MONSTER_WALK_ASSET_BASE =
+  '/assets/monsters/world_sprites/legacy_33/animations';
+
 /** Monster-Kind -> West-gespiegeltes 128px-Sprite (nur creature_ und overworld_ Praefixe). */
 export const MONSTER_SPRITES_MIRRORED: Readonly<Record<string, string>> = {
   // creature_*

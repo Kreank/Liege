@@ -43,7 +43,25 @@ export function familyOf(type: string, material: string | undefined | null): Wal
 function neighborMatches(neighbor: Structure | null, family: WallFamily): boolean {
   if (!neighbor) return false;
   const nFamily = familyOf(neighbor.type, neighbor.material ?? null);
-  return nFamily === family;
+  if (nFamily === family) return true;
+  // Issue #2 (offene Wände): Türen/Tore sind keine Wall-Family, schließen aber
+  // die Wand-Linie. Ohne diese Bruecke bekommt die Wand neben einer Tuer kein
+  // Verbindungs-Bit in ihrer Richtung → rendert eine offene End-Kante → es
+  // klafft eine Luecke zwischen Mauerwerk und Tuer. Wir zaehlen ein
+  // angrenzendes Tuer-/Tor-Tile daher als Verbindung, damit die Wand bis an
+  // die Tuer heranschliesst.
+  if (isDoorLike(neighbor.type)) return true;
+  return false;
+}
+
+/** Tuer-/Tor-Typen, die eine Wand-/Zaun-Linie schliessen (vgl. isDoorType in
+ *  world-scene.ts — hier dupliziert, um Modul-Kopplung zu vermeiden). */
+function isDoorLike(type: string): boolean {
+  return (
+    type.startsWith('door_') ||
+    type.startsWith('garden_gate_') ||
+    type === 'fence_gate_farm'
+  );
 }
 
 /**

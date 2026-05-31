@@ -38,6 +38,9 @@ export const WORLD_POLISH_ANIMS: readonly WorldPolishAnim[] = [
 ];
 
 // Biome-Ambient-Overlays.
+// Frame-Counts gegen das "professional"-Set verifiziert
+// (assets/animations/professional/biomes/<id>/<id>_NN.png): 12 Frames pro Biom.
+// Der Renderer (biome-ambient.ts) lädt dieses höherwertige Set on-demand.
 export const BIOME_AMBIENT_DEFS: readonly BiomeAmbientDef[] = [
   { id: 'desert_heat_haze',      frames: 12, ms:  75 },
   { id: 'desert_dust',           frames: 12, ms:  80 },
