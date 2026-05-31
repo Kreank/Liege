@@ -88,3 +88,19 @@
   pointer-events: none;
   z-index: 1;
 }
+
+/* H3.3 — Mana-Cost-Indicator. Permanentes Badge unten links pro Spell-Slot
+   (kein Tooltip-Hover-Gate, damit die Info auch beim flüchtigen Blick auf
+   die Hotbar lesbar ist). Bei nicht-ausreichendem Mana rot getintet. */
+.hotbar-slot__mana {
+  position: absolute; bottom: 1px; left: 3px;
+  color: #80c8ff;
+  font-size: 10px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+  pointer-events: none;
+  letter-spacing: -0.5px;
+}
+.hotbar-slot__mana--low {
+  color: #ff7060;
+}

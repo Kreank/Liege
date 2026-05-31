@@ -33,6 +33,13 @@
       @if (slot.cooldownRemaining > 0) {
         <span class="hotbar-slot__cooldown">{{ slot.cooldownLabel }}</span>
       }
+      @if (slot.manaCost !== null) {
+        <span class="hotbar-slot__mana"
+              [class.hotbar-slot__mana--low]="!slot.manaAffordable"
+              [attr.title]="'Mana-Kost: ' + slot.manaCost">
+          {{ slot.manaCost }}M
+        </span>
+      }
     </button>
   }
 </div>

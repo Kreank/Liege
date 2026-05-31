@@ -99,6 +99,11 @@ interface HotbarSlotView {
   readonly cooldownRemaining: number;
   /** Vorformatierte Cooldown-Anzeige (z. B. „2.3"). */
   readonly cooldownLabel: string;
+  /** H3.3 — Mana-Cost-Indicator. `null` wenn der Slot kein Spell zeigt,
+   *  sonst die Kost und das Affordable-Flag. UI zeigt den Wert als kleines
+   *  Badge unten links; bei `!affordable` rot getintet. */
+  readonly manaCost: number | null;
+  readonly manaAffordable: boolean;
 }
 
 @Component({
@@ -180,6 +185,18 @@ export class HotbarComponent {
     void this._cdTick(); // Reactivity-Anker: ticker triggert Re-Compute.
     const now = Date.now();
 
+    // H3.3 — Spell-Catalog für Mana-Cost-Lookup. Map<spell_id, mana_cost>.
+    // Backend liefert `spells.catalog` aus `init.spell_catalog`, das fast
+    // immer wenige Dutzend Einträge hat — die Map ist günstig pro Re-Compute.
+    const spellsState = this.state.spells();
+    const spellManaCosts = new Map<string, number>();
+    for (const sp of spellsState.catalog) {
+      if (typeof sp.mana_cost === 'number') {
+        spellManaCosts.set(sp.id, sp.mana_cost);
+      }
+    }
+    const curMana = this.state.player()?.mana ?? 0;
+
     // Counts pro kind, nur nicht-equipped zählen.
     const counts: Record<string, number> = {};
     for (const it of inv) {
@@ -195,7 +212,15 @@ export class HotbarComponent {
       const equipped = kind ? inv.some((it) => it.kind === kind && !!it.equipped_slot) : false;
       const empty = !kind;
       const missing = !!kind && cnt === 0 && !equipped;
-      const tooltip = def ? `${def.name}${cnt > 0 ? ` (${cnt})` : ''}` : null;
+      // H3.3 — Mana-Cost: nur wenn der Slot kein Item-Def hat (Spells haben
+      // keinen ITEM-Eintrag, sondern leben im Spell-Catalog).
+      const manaCost = kind && !def ? spellManaCosts.get(kind) ?? null : null;
+      const manaAffordable = manaCost == null || curMana >= manaCost;
+      const tooltip = def
+        ? `${def.name}${cnt > 0 ? ` (${cnt})` : ''}`
+        : manaCost != null
+          ? `Mana-Kost: ${manaCost}`
+          : null;
       // Item-Cooldown (lokal) ODER Spell-Cooldown (aus GameState-End-Timestamp).
       let cd = kind ? cooldowns.get(kind) ?? 0 : 0;
       if (kind && cd <= 0) {
@@ -216,6 +241,8 @@ export class HotbarComponent {
         tooltip,
         cooldownRemaining: cd,
         cooldownLabel: cdLabel,
+        manaCost,
+        manaAffordable,
       });
     }
     return views;
