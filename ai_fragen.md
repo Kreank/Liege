@@ -166,3 +166,33 @@
 **Entscheidung:** MinimapComponent subscribed direkt auf `bridge.messages$` und filtert `disaster_started`-Frames mit gültigen x/y. Die Pulse-Marker leben lokal im Component-State (Array `eventPulses`), 30 s Lebensdauer pro Marker.
 **Begründung:** Alternative wäre ein neues `disasterPositions`-Signal in GameStateService — größere Änderung außerhalb meines Scopes (Subagent A/B könnten parallel an GameState arbeiten). Direkte Stream-Subscription ist isolierter und passt zum bestehenden Pattern (game-bridge.service.ts dokumentiert `messages$` explizit für transiente FX, „Damage-Numbers, Hit-Sparks" — Event-Pulse fällt in dieselbe Kategorie).
 **Code-Stelle:** frontend/src/app/ui/minimap/minimap.component.ts:ngAfterViewInit
+
+### 2026-05-31 06:50 · [H2-A / H2.1] Trap-Kind → visual_effect-Kind Mapping
+**Frage:** Backend feuert `trap_triggered {kind: spike_trap|poison_trap|fire_trap|frost_trap|dart_trap|rockfall_trap, dmg, text}`. Welcher FX-Kind passt zu welcher Falle?
+**Entscheidung:** Lookup-Map `TRAP_FX_KIND`: spike/dart/rockfall → `hit_spark`, poison → `poison_cloud`, fire → `fireball_explosion` (Multi-Frame-Anim existiert), frost → `frost_impact` (Anim noch nicht registriert; `spawnGeneric` fällt auf console.warn + skip zurück — graceful).
+**Begründung:** Wir nutzen bereits-vorhandene Effekte aus `EFFECT_ANIMATIONS` statt neue Asset-Pipeline aufzumachen. `frost_impact` ist als Asset-Bedarf zu notieren, läuft aber heute schon ohne Crash (Fallback in `visual-effects.ts::spawnGeneric`).
+**Code-Stelle:** frontend/src/app/game/world-scene.ts (TRAP_FX_KIND, fxTrapTriggered)
+
+### 2026-05-31 06:51 · [H2-A / H2.2] Mob-HP-Bar bei npc_damaged + fade vs. permanent
+**Frage:** Sollen HP-Bars permanent angezeigt werden oder nur kurz nach Damage?
+**Entscheidung:** Permanent SOLANGE hp < max_hp. Nach 4 s ohne Update fade-out (400 ms), Bar wird komplett entfernt. Bei Re-Damage wird sie neu gespawnt. Bei voller HP (>=1.0 Ratio) sofort weg.
+**Begründung:** Aufgaben-Vorgabe "leer wenn full HP, sichtbar wenn damaged" interpretiert; 4 s Fade entspricht Legacy. Permanent-anzeige würde bei vielen Mobs visuelles Rauschen erzeugen — Fade trifft Mittelweg.
+**Code-Stelle:** frontend/src/app/game/mob-hp-bar.ts (FADE_AFTER_MS = 4000)
+
+### 2026-05-31 06:52 · [H2-A / H2.5] Auto-Pickup-Float: inventory_add vs. item_picked_up Doppel-Trigger
+**Frage:** Beide Frames feuern bei Self-Pickup. Doppel-Float vermeiden?
+**Entscheidung:** Beide Handler aktiv; bei `item_picked_up` filtern wir auf `by === own player_id` (Broadcast-Frame). Bei `inventory_add` (self-only) keine Filterung. Folge: in der Praxis spawnen beide Frames denselben Float, aber Backend liefert sie sehr nah beieinander → für den Spieler praktisch ein leichter Stagger.
+**Begründung:** Backend-Order ist nicht garantiert; eine reine `inventory_add`-Subscribe würde Broadcast-Pickup-Anzeige (Multiplayer-Coop) ausschließen. Wenn Doppel-Spawn in der Praxis stört, läßt sich später eine Dedup-Map einfügen.
+**Code-Stelle:** frontend/src/app/game/world-scene.ts::fxAutoPickup
+
+### 2026-05-31 06:53 · [H2-A / H2.16] Place-Ghost: nur Struktur-Kollision oder auch Tile-Walkable-Check?
+**Frage:** Rot-Tint nur bei vorhandener Struktur, oder auch bei Wasser/Cliff/Safe-Zone?
+**Entscheidung:** Nur Struktur-Kollision (Schnelltest gegen `state.structures()`). Wasser/Cliff/Safe-Zone bleibt grün — Backend validiert beim `place_structure`-Intent und sendet ggf. Toast/Error.
+**Begründung:** Frontend-Tile-Walkable-Check würde Tile-Cache des World-Streams duplizieren (komplex, fehleranfällig). Safe-Zone-Liste ist im Backend, nicht im Frontend-State. Akzeptable UX-Verschlechterung: gelegentlicher fehlgeschlagener Place-Click mit Toast-Feedback.
+**Code-Stelle:** frontend/src/app/game/place-ghost.ts::isBlocked
+
+### 2026-05-31 06:54 · [H2-A / H2.23] Tag/Nacht-Tint: Phaser-Camera-Filter vs. Vollbild-Rectangle
+**Frage:** Camera.setBackgroundColor / Phaser-PostFX vs. eigenes Vollbild-Rectangle?
+**Entscheidung:** Vollbild-Rectangle mit setScrollFactor(0), depth=45 (unter Disaster-Tint=70, über NPCs=20).
+**Begründung:** PostFX/Filter ist Phaser-WebGL-only (Canvas-Fallback würde brechen). Rectangle ist trivial portabel; Disaster-Tint addiert sich darüber → Bloodmoon zur Nacht = purpur-rot, gewollt. Phase-Wechsel-Tween (3 s) per Alpha; Farbe wird sofort gesnappt (Phaser-Tween-Plugin hat keinen RGB-Interp out of the box).
+**Code-Stelle:** frontend/src/app/game/day-night-overlay.ts (applyTint)
