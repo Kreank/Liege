@@ -258,15 +258,26 @@ class World:
     def is_walkable_sync(self, x: int, y: int) -> bool:
         return self.tile_at_sync(x, y) in WALKABLE
 
-    async def find_spawn(self, center_x: int = 0, center_y: int = 0) -> dict:
-        """Sicheren Grass-Spawn in einer Settlement-Area nahe (center_x, center_y)."""
+    async def find_spawn(self, center_x: int = 0, center_y: int = 0,
+                          structures=None) -> dict:
+        """Sicheren Grass-Spawn in einer Settlement-Area nahe (center_x, center_y).
+
+        Bug 31.05: `structures` ist optional, sollte aber für Player-Respawn
+        immer mitgegeben werden — sonst landet der Spieler auf einem Grass-
+        Tile, das per Wand/Truhe/Möbel blockiert ist (Respawn in der Wand,
+        HP-Verlust, kein Entkommen). Der Block-Check vermeidet das.
+        """
+        def _blocked(x: int, y: int) -> bool:
+            return structures is not None and structures.blocks(x, y)
         # Bevorzuge Settlement-Area + Grass
         for radius in range(0, 80):
             for dy in range(-radius, radius + 1):
                 for dx in range(-radius, radius + 1):
                     x = center_x + dx
                     y = center_y + dy
-                    if await self.tile_at(x, y) == GRASS and self.is_settlement_area(x, y):
+                    if (await self.tile_at(x, y) == GRASS
+                            and self.is_settlement_area(x, y)
+                            and not _blocked(x, y)):
                         return {"x": x, "y": y}
         # Fallback nur Grass
         for radius in range(0, 80):
@@ -274,7 +285,7 @@ class World:
                 for dx in range(-radius, radius + 1):
                     x = center_x + dx
                     y = center_y + dy
-                    if await self.tile_at(x, y) == GRASS:
+                    if await self.tile_at(x, y) == GRASS and not _blocked(x, y):
                         return {"x": x, "y": y}
         # Fallback: irgendein walkable
         for radius in range(0, 80):
@@ -282,7 +293,7 @@ class World:
                 for dx in range(-radius, radius + 1):
                     x = center_x + dx
                     y = center_y + dy
-                    if await self.is_walkable(x, y):
+                    if await self.is_walkable(x, y) and not _blocked(x, y):
                         return {"x": x, "y": y}
         return {"x": center_x, "y": center_y}
 

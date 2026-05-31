@@ -9,7 +9,13 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, player_id: str, x: int, y: int):
         await websocket.accept()
         self.connections[player_id] = websocket
-        self.players[player_id] = {"x": x, "y": y, "name": player_id[:8]}
+        # Bug 31.05: player_id ins Werte-Dict, damit der Frontend-SpritePool
+        # einen stabilen Key hat (Object.values() verliert sonst die Dict-
+        # Keys → keyOf(p)=String(p.player_id) wurde "undefined" und der
+        # eigene Sprite-Override im Update-Tick lief ins Leere).
+        self.players[player_id] = {
+            "player_id": player_id, "x": x, "y": y, "name": player_id[:8],
+        }
 
     def disconnect(self, player_id: str):
         self.connections.pop(player_id, None)

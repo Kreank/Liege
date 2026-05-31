@@ -65,7 +65,7 @@ async def load_or_create_player(world, structures, name: str) -> dict:
         }
         walkable = await world.is_walkable(spawn["x"], spawn["y"])
         if not walkable or structures.blocks(spawn["x"], spawn["y"]):
-            new_pos = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
+            new_pos = await world.find_spawn(*DEFAULT_SPAWN_CENTER, structures=structures)
             spawn["x"], spawn["y"] = new_pos["x"], new_pos["y"]
             await db.pool().execute(
                 "UPDATE players SET x = $1, y = $2 WHERE name = $3",
@@ -73,7 +73,7 @@ async def load_or_create_player(world, structures, name: str) -> dict:
             )
         return spawn
 
-    pos = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
+    pos = await world.find_spawn(*DEFAULT_SPAWN_CENTER, structures=structures)
     await db.pool().execute(
         "INSERT INTO players (name, x, y) VALUES ($1, $2, $3)",
         name, pos["x"], pos["y"],
@@ -184,10 +184,10 @@ async def do_respawn(manager, world, structures, name: str, in_place: bool = Fal
         if (await world.is_walkable(hx, hy)) and not structures.blocks(hx, hy):
             x, y = hx, hy
         else:
-            spawn = await world.find_spawn(hx, hy)
+            spawn = await world.find_spawn(hx, hy, structures=structures)
             x, y = spawn["x"], spawn["y"]
     else:
-        spawn = await world.find_spawn(*DEFAULT_SPAWN_CENTER)
+        spawn = await world.find_spawn(*DEFAULT_SPAWN_CENTER, structures=structures)
         x, y = spawn["x"], spawn["y"]
     await db.pool().execute(
         "UPDATE players SET hp = max_hp, x = $1, y = $2 WHERE name = $3",

@@ -86,6 +86,15 @@ async def handle_move(ctx: WsContext, data: dict) -> None:
             "WHERE name = $3",
             x, y, player_id,
         )
+        # Bug 31.05: Eigenes Move-Echo (Dungeons sind aktuell solo, daher
+        # kein manager.broadcast; der Frontend braucht den Frame trotzdem,
+        # sonst bleibt state.player() bei der Spawn-Pos der Floor).
+        await websocket.send_json({
+            "type": "player_moved",
+            "player_id": player_id,
+            "x": x,
+            "y": y,
+        })
         # Versteckte Falle? → auslösen (Schaden + aufdecken).
         _trap = await dungeon_instance.trap_at(dungeon_id, floor_idx, x, y)
         if _trap:
@@ -220,12 +229,18 @@ async def handle_move(ctx: WsContext, data: dict) -> None:
             "WHERE name = $3",
             x, y, player_id,
         )
+        # Bug 31.05: exclude=player_id ENTFERNT — der Initiator braucht das
+        # Echo selbst, damit `state.player()` im Frontend mitzieht. Ohne das
+        # driftet die Client-Position (Kamera/Sprite/WASD-Compute lesen alle
+        # state.player().x|y) vom Server-State weg, sobald der Spieler sich
+        # bewegt; HP-Verlust durch Mobs an der echten Pos wirkt dann auf
+        # einen "Geist"-Sprite an der Spawn-Pos.
         await manager.broadcast({
             "type": "player_moved",
             "player_id": player_id,
             "x": x,
             "y": y,
-        }, exclude=player_id)
+        })
         # Auto-Pickup: alle Items am Ziel-Tile aufheben
         items_here = await items.get_at(x, y)
         for it in items_here:
