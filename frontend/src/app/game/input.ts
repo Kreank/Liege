@@ -101,5 +101,62 @@ export function setupInput(
   arrLeft.on('down',  () => moveCheck(-1, 0));
   arrRight.on('down', () => moveCheck(1,  0));
 
-  return { isSprintHeld: () => sprintKey.isDown };
+  // ─── Fallback: Window-Level-Listener ─────────────────────────────────
+  // Phaser-Keyboard hört auf das Canvas (oder dessen Focus-Chain). Wenn
+  // der User vorher in ein <input> (Char-Modal, Chat) geklickt hat, geht
+  // der Focus dorthin → Phaser bekommt keine keydown-Events mehr.
+  // window.addEventListener fängt das überall ab (außer wenn ein <input>
+  // den Default verhindert — der unterdrückt das aber per default nicht
+  // für Tasten wie WASD/Arrows). Wir filtern: nicht senden wenn aktiv ein
+  // <input>, <textarea> oder contenteditable Focus hat.
+  const isTextField = (el: EventTarget | null): boolean => {
+    if (!(el instanceof HTMLElement)) return false;
+    const tag = el.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (el.isContentEditable) return true;
+    return false;
+  };
+  let windowSprint = false;
+  const winKeyHandler = (ev: KeyboardEvent) => {
+    if (isTextField(ev.target)) return;
+    if (ev.repeat) {
+      // Repeat-Events drosseln (Browser-Default 30+/s, wir wollen 8-12)
+      // — Throttle in moveCheck() kümmert sich.
+    }
+    let dx = 0, dy = 0;
+    switch (ev.key.toLowerCase()) {
+      case 'w': case 'arrowup':    dy = -1; break;
+      case 's': case 'arrowdown':  dy =  1; break;
+      case 'a': case 'arrowleft':  dx = -1; break;
+      case 'd': case 'arrowright': dx =  1; break;
+      case 'shift':
+        if (!windowSprint) { windowSprint = true; callbacks.onSprintChange(true); }
+        return;
+      case 'b':
+        callbacks.onToggleBuildMode();
+        ev.preventDefault();
+        return;
+      default: return;
+    }
+    if (dx !== 0 || dy !== 0) {
+      moveCheck(dx, dy);
+      ev.preventDefault();   // verhindert Browser-Scrolling bei Pfeiltasten
+    }
+  };
+  const winKeyUp = (ev: KeyboardEvent) => {
+    if (ev.key === 'Shift' && windowSprint) {
+      windowSprint = false;
+      callbacks.onSprintChange(false);
+    }
+  };
+  window.addEventListener('keydown', winKeyHandler);
+  window.addEventListener('keyup', winKeyUp);
+  // Phaser räumt Scene-Listener selbst auf — die Window-Listener nicht.
+  // SHUTDOWN-Event entkoppelt sie.
+  scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    window.removeEventListener('keydown', winKeyHandler);
+    window.removeEventListener('keyup', winKeyUp);
+  });
+
+  return { isSprintHeld: () => sprintKey.isDown || windowSprint };
 }
