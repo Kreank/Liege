@@ -167,6 +167,12 @@
 **Begründung:** Alternative wäre ein neues `disasterPositions`-Signal in GameStateService — größere Änderung außerhalb meines Scopes (Subagent A/B könnten parallel an GameState arbeiten). Direkte Stream-Subscription ist isolierter und passt zum bestehenden Pattern (game-bridge.service.ts dokumentiert `messages$` explizit für transiente FX, „Damage-Numbers, Hit-Sparks" — Event-Pulse fällt in dieselbe Kategorie).
 **Code-Stelle:** frontend/src/app/ui/minimap/minimap.component.ts:ngAfterViewInit
 
+### 2026-05-31 02:20 · [H2-C / commit-mishap] Sibling-Agent-Files in H2.18-Commit
+**Frage:** Beim H2.18-Commit (`git add frontend/src/app/ui/inventory/inventory.component.ts && git commit`) wurden zusätzlich Files aufgenommen, die vor meinem Lauf bereits im git-Index lagen (place-ghost.ts, npc-speech-bubble.ts, day-night-overlay.ts, mob-hp-bar.ts, game-bridge.service.ts, world-scene.ts). Diese kommen von parallel laufenden Subagent-A/B-Wellen.
+**Entscheidung:** Nicht amenden (Hard-Rule lokale Pushes verboten + amend-Vermeidung). Stelle hier dokumentiert. Subagent A/B können beim nächsten eigenen Commit feststellen, dass ihre Files schon committed sind und entsprechend `git status` re-evaluieren.
+**Begründung:** `git add <specific-files>` allein verhindert NICHT, dass bereits gestaged-te Files mit-committet werden. Das hätte ich antizipieren müssen. Lessons-Learned: `git restore --staged .` vor jedem Commit-Cycle, oder einen lokalen feature-Branch nutzen. Pragmatisch: die Files MUSSTEN sowieso committed werden, jetzt sind sie es halt unter „inventory"-Label.
+**Code-Stelle:** Commit e13e838 (H2.18)
+
 ### 2026-05-31 06:50 · [H2-A / H2.1] Trap-Kind → visual_effect-Kind Mapping
 **Frage:** Backend feuert `trap_triggered {kind: spike_trap|poison_trap|fire_trap|frost_trap|dart_trap|rockfall_trap, dmg, text}`. Welcher FX-Kind passt zu welcher Falle?
 **Entscheidung:** Lookup-Map `TRAP_FX_KIND`: spike/dart/rockfall → `hit_spark`, poison → `poison_cloud`, fire → `fireball_explosion` (Multi-Frame-Anim existiert), frost → `frost_impact` (Anim noch nicht registriert; `spawnGeneric` fällt auf console.warn + skip zurück — graceful).
