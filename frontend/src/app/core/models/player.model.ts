@@ -10,29 +10,31 @@ export interface BodyPart {
 
 /** Attribut-Snapshot — 12 deutsche Slugs (Backend ws/character.py
  *  VALID_ATTRS). Alle optional weil Backend nur die allokierten Slugs
- *  sendet (z.B. {stärke: 3, weisheit: 2}, alle anderen 0). */
+ *  sendet (z.B. {stärke: 3, vitalität: 2}, alle anderen 0).
+ *  Redesign 2026-05-31: Kern-Attribute + (weiterhin verteilbare) abgeleitete. */
 export interface PlayerAttributes {
+  // — Kern-Attribute —
   readonly stärke?: number;
-  readonly ausdauer?: number;
-  readonly energie?: number;
-  readonly intelligenz?: number;
-  readonly weisheit?: number;
-  readonly ausweichen?: number;
   readonly geschick?: number;
-  readonly verteidigung?: number;
+  readonly vitalität?: number;
+  readonly intelligenz?: number;
+  readonly willenskraft?: number;
   readonly charisma?: number;
+  // — Abgeleitete Werte (zusätzlich verteilbar) —
+  readonly verteidigung?: number;
+  readonly ausweichen?: number;
   readonly krit_rate?: number;
   readonly krit_schaden?: number;
-  readonly schleichen?: number;
   /** Punkte, die noch zu verteilen sind. */
   readonly unspent?: number;
 }
 
-/** Alle 12 Attribut-Slugs als Konstante (Reihenfolge = UI-Reihenfolge). */
+/** Alle Attribut-Slugs als Konstante (Reihenfolge = UI-Reihenfolge).
+ *  Kern-Attribute zuerst, dann die (verteilbaren) abgeleiteten Werte.
+ *  Muss synchron zu backend/attributes.py ATTR_LABELS bleiben. */
 export const ATTRIBUTE_KEYS = [
-  'stärke', 'geschick', 'ausdauer', 'energie',
-  'intelligenz', 'weisheit', 'verteidigung', 'ausweichen',
-  'krit_rate', 'krit_schaden', 'charisma', 'schleichen',
+  'stärke', 'geschick', 'vitalität', 'intelligenz', 'willenskraft', 'charisma',
+  'verteidigung', 'ausweichen', 'krit_rate', 'krit_schaden',
 ] as const;
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number];
 

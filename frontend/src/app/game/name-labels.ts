@@ -41,10 +41,19 @@ export class NameLabels {
     this.scene = scene;
   }
 
+  /**
+   * @param resolvePos Optionaler Resolver für die ECHTE Sprite-Pixel-Position
+   *   einer Entität (self läuft per Pixel-Movement, andere interpoliert). Damit
+   *   klebt das Label frame-genau am Sprite statt an der niederfrequenten
+   *   Server-Tile-Position — behebt Nachlaufen + Springen. Liefert er nichts
+   *   (kein Sprite), nutzen wir die Tile-Koordinate als Fallback.
+   */
   sync(
     players: ReadonlyArray<OnlinePlayer>,
     npcs: ReadonlyArray<NPC>,
     selfPlayerId: string | undefined,
+    resolvePos?: (kind: 'player' | 'npc', id: string | number)
+      => { readonly x: number; readonly y: number } | undefined,
   ): void {
     this.seenLastFrame.clear();
 
@@ -54,7 +63,10 @@ export class NameLabels {
       if (!name) continue;
       const key = `p:${p.player_id}`;
       const kind: LabelKind = selfPlayerId === String(p.player_id) ? 'self' : 'player';
-      this.upsert(key, name, p.x, p.y, kind);
+      const pos = resolvePos?.('player', p.player_id);
+      const px = pos ? pos.x : (p.x + 0.5) * TILE_SIZE;
+      const py = (pos ? pos.y : (p.y + 0.5) * TILE_SIZE) + LABEL_OFFSET_Y;
+      this.upsert(key, name, px, py, kind);
       this.seenLastFrame.add(key);
     }
 
@@ -63,7 +75,10 @@ export class NameLabels {
       if (!n.name) continue;
       if (n.kind.startsWith('creature_') || n.kind.startsWith('overworld_')) continue;
       const key = `n:${n.id}`;
-      this.upsert(key, n.name, n.x, n.y, 'npc');
+      const pos = resolvePos?.('npc', n.id);
+      const px = pos ? pos.x : (n.x + 0.5) * TILE_SIZE;
+      const py = (pos ? pos.y : (n.y + 0.5) * TILE_SIZE) + LABEL_OFFSET_Y;
+      this.upsert(key, n.name, px, py, 'npc');
       this.seenLastFrame.add(key);
     }
 
@@ -76,9 +91,7 @@ export class NameLabels {
     }
   }
 
-  private upsert(key: string, text: string, tileX: number, tileY: number, kind: LabelKind): void {
-    const px = (tileX + 0.5) * TILE_SIZE;
-    const py = (tileY + 0.5) * TILE_SIZE + LABEL_OFFSET_Y;
+  private upsert(key: string, text: string, px: number, py: number, kind: LabelKind): void {
     const color = kind === 'self' ? COLOR_SELF : kind === 'player' ? COLOR_OTHER : COLOR_NPC;
     let label = this.byKey.get(key);
     if (!label) {

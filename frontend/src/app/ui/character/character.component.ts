@@ -66,20 +66,21 @@ const BODY_PART_LABEL: Readonly<Record<string, string>> = {
   head: '🧠 Kopf',
 };
 
-// 12 deutsche Backend-Slugs (sync mit character-create.component.ts).
+// Deutsche Backend-Slugs (sync mit attributes.py + character-create.component.ts).
+// Kern-Attribute zuerst, dann die (weiterhin verteilbaren) abgeleiteten Werte.
 const ATTR_META: ReadonlyArray<Omit<AttrRow, 'value'>> = [
-  { key: 'stärke',       label: '💪 Stärke',         desc: 'Physischer Schaden + Roh-Yield' },
-  { key: 'geschick',     label: '🎯 Geschick',       desc: 'Genauigkeit + Crafting-Präzision' },
-  { key: 'ausdauer',     label: '🫁 Ausdauer',       desc: 'Höhere HP-Cap + weniger Erschöpfung' },
-  { key: 'energie',      label: '⚡ Energie',         desc: 'Größerer Mana-Pool + Spell-Regen' },
-  { key: 'intelligenz',  label: '🧠 Intelligenz',    desc: 'Stärkere Spells + Forschungs-Gates' },
-  { key: 'weisheit',     label: '📖 Weisheit',       desc: 'Heilkunst + Status-Resistenz' },
-  { key: 'verteidigung', label: '🛡️ Verteidigung',   desc: 'Schadensreduktion' },
-  { key: 'ausweichen',   label: '💨 Ausweichen',     desc: 'Chance Angriffe zu negieren' },
-  { key: 'krit_rate',    label: '💥 Krit-Rate',      desc: 'Chance auf kritischen Treffer' },
-  { key: 'krit_schaden', label: '✨ Krit-Schaden',    desc: 'Multiplier bei Krits' },
-  { key: 'charisma',     label: '💬 Charisma',       desc: 'Handelspreise + NPC-Mood' },
-  { key: 'schleichen',   label: '👤 Schleichen',     desc: 'Reduzierte Aggro-Reichweite' },
+  // — Kern-Attribute —
+  { key: 'stärke',       label: '💪 Stärke',       desc: 'Physischer Schaden, Abbau-Ertrag, Tragelast' },
+  { key: 'geschick',     label: '🎯 Geschick',     desc: 'Krit-Rate, Ausweichen, Crafting, Heimlichkeit' },
+  { key: 'vitalität',    label: '❤️ Vitalität',    desc: 'Max. Leben, HP-Regeneration, Körper-Widerstand' },
+  { key: 'intelligenz',  label: '🧠 Intelligenz',  desc: 'Max. Mana, Magieschaden, Forschungstempo' },
+  { key: 'willenskraft', label: '🔮 Willenskraft', desc: 'Mana-Regen, Status-Resistenz, Heileffizienz' },
+  { key: 'charisma',     label: '💬 Charisma',     desc: 'Handelspreise, NPC-Stimmung' },
+  // — Abgeleitete Werte —
+  { key: 'verteidigung', label: '🛡️ Verteidigung', desc: 'Schadensreduktion gegen Angriffe' },
+  { key: 'ausweichen',   label: '💨 Ausweichen',   desc: 'Chance, Angriffe zu negieren' },
+  { key: 'krit_rate',    label: '💥 Krit-Rate',    desc: 'Chance auf kritischen Treffer (%)' },
+  { key: 'krit_schaden', label: '✨ Krit-Schaden',  desc: 'Schadensbonus bei Krits (%)' },
 ];
 
 const STAT_META: ReadonlyArray<Omit<StatRow, 'value'>> = [

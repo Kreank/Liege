@@ -1,40 +1,53 @@
 @if (crafting(); as c) {
-  <div class="crafting-overlay">
-    <div class="crafting-box">
+  <div class="crafting-overlay" (click)="close()">
+    <div class="crafting-box" (click)="$event.stopPropagation()">
       <div class="crafting-header">
-        <span>🔨 {{ stationLabel() }}</span>
+        <span class="crafting-title">⚒ {{ stationLabel() }}</span>
         <button type="button" class="crafting-close" (click)="close()">Esc</button>
       </div>
+
       <app-bills></app-bills>
+
       <div class="crafting-recipes">
         @if (c.recipes.length === 0) {
-          <div class="inv-empty">(keine Rezepte verfügbar)</div>
+          <div class="crafting-empty">Hier gibt es nichts zu schmieden.</div>
         }
         @for (group of groupedRecipes(); track group.cat) {
-          <div class="recipe-cat-header">{{ group.label }}</div>
-          @for (r of group.recipes; track r.id) {
-            @let lockText = lockTooltip(r.requires);
-            @let locked = lockText !== '';
-            <div class="recipe-row" [class.locked]="locked"
-                 [attr.title]="locked ? lockText : null">
-              <span class="recipe-out">
-                @if (locked) { <span class="recipe-lock-icon">🔒</span> }
-                {{ recipeName(r) }}
-              </span>
-              <span class="recipe-cost">
-                @for (inp of r.inputs; track $index; let last = $last) {
-                  {{ inp.kind }} ×{{ inp.quantity }}@if (!last) {<span>,&nbsp;</span>}
+          <div class="fz-section-title">{{ group.label }}</div>
+          <div class="fz-grid">
+            @for (r of group.recipes; track r.id) {
+              @let lockText = lockTooltip(r.requires);
+              @let locked = lockText !== '';
+              <div class="fz-card recipe-card" [class.locked]="locked"
+                   [attr.title]="locked ? lockText : null">
+                <div class="recipe-head">
+                  @if (iconPath(r); as icon) {
+                    <img class="recipe-icon" [src]="icon" [alt]="recipeName(r)" loading="lazy" />
+                  }
+                  <span class="fz-card-title">
+                    @if (locked) { <span class="recipe-lock">🔒</span> }
+                    {{ recipeName(r) }}
+                  </span>
+                </div>
+
+                <div class="fz-chips">
+                  @for (inp of r.inputs; track $index) {
+                    <span class="fz-chip">{{ matName(inp.kind) }} ×{{ inp.quantity }}</span>
+                  }
+                </div>
+
+                @if (locked) {
+                  <div class="fz-lock-reason">{{ lockText }}</div>
+                } @else {
+                  <div class="fz-card-actions">
+                    <button type="button" class="fz-btn" (click)="craft(r.id)">Schmieden</button>
+                    <button type="button" class="fz-btn-ghost" title="Auftrag für 5 Stück"
+                            (click)="addBill(r.id, 5)">×5</button>
+                  </div>
                 }
-              </span>
-              @if (locked) {
-                <span class="recipe-lock-reason">{{ lockText }}</span>
-              } @else {
-                <button type="button" (click)="craft(r.id)">Herstellen</button>
-                <button type="button" class="bill-btn" title="Auftrag für 5 Stück"
-                        (click)="addBill(r.id, 5)">×5</button>
-              }
-            </div>
-          }
+              </div>
+            }
+          </div>
         }
       </div>
     </div>

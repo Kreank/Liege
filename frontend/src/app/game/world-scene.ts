@@ -533,7 +533,20 @@ export class WorldScene extends Phaser.Scene {
     if (this.nameLabels) {
       const players = Object.values(this.bridge.state.players());
       const selfId = this.bridge.state.player()?.player_id;
-      this.nameLabels.sync(players, npcs, selfId !== undefined ? String(selfId) : undefined);
+      // Label an die ECHTE Sprite-Pixel-Position binden (self = myPx/myPy via
+      // Pixel-Movement, andere = interpolierte Pool-Sprites) — sonst hinkt das
+      // Label der Server-Tile-Position hinterher und springt.
+      this.nameLabels.sync(
+        players, npcs,
+        selfId !== undefined ? String(selfId) : undefined,
+        (kind, id) => {
+          const sprite = (kind === 'player'
+            ? this.playerPool.get(String(id))
+            : this.npcPool.get(id)) as
+            (Phaser.GameObjects.GameObject & { x: number; y: number }) | undefined;
+          return sprite ? { x: sprite.x, y: sprite.y } : undefined;
+        },
+      );
     }
     // Place-Ghost: Cursor-Tracking + Build-Mode-Sichtbarkeit.
     if (this.placeGhost) {

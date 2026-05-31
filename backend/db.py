@@ -206,6 +206,25 @@ ALTER TABLE players ADD COLUMN IF NOT EXISTS magic_resist     INTEGER NOT NULL D
 ALTER TABLE players ADD COLUMN IF NOT EXISTS allocated_attrs     JSONB NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE players ADD COLUMN IF NOT EXISTS unspent_attr_points INTEGER NOT NULL DEFAULT 0;
 
+-- Attribut-Redesign 2026-05-31: Kern-Attribute umbenannt/zusammengeführt
+-- (ausdauer→vitalität, energie+weisheit→willenskraft, schleichen entfällt).
+-- One-time RESPEC: alle bereits verteilten Punkte als freie Punkte
+-- zurückgeben und allocated leeren. Per Flag-Spalte idempotent — wird nach
+-- erneuter Allokation NICHT noch einmal ausgelöst.
+ALTER TABLE players ADD COLUMN IF NOT EXISTS attr_respec_v2 BOOLEAN NOT NULL DEFAULT FALSE;
+UPDATE players
+   SET unspent_attr_points = unspent_attr_points
+         + COALESCE((
+             SELECT SUM(value::int)
+               FROM jsonb_each_text(
+                 CASE WHEN jsonb_typeof(allocated_attrs) = 'object'
+                      THEN allocated_attrs ELSE '{}'::jsonb END
+               )
+           ), 0),
+       allocated_attrs = '{}'::jsonb,
+       attr_respec_v2  = TRUE
+ WHERE attr_respec_v2 = FALSE;
+
 -- Material (für equipment-Sprite-Resolver: sword_1h_iron.png etc.)
 ALTER TABLE items ADD COLUMN IF NOT EXISTS material TEXT;
 

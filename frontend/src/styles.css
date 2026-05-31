@@ -38,3 +38,239 @@ app-root {
   width: 100%;
   height: 100%;
 }
+
+/* ============================================================================
+   FANTASY-DESIGN-SYSTEM (Liege) — gemeinsame Vorlage für ALLE Panels.
+
+   Aufbau:
+   1. Design-Tokens in :root (Farben, Fonts, Form).
+   2. Globale Theme-Ebene über die Panel-Namenskonvention
+      (*-overlay / *-box / *-header / *-close) — re-skinnt alle Modals
+      auf einen Schlag. Es werden bewusst NUR Appearance-Properties
+      (Hintergrund/Rand/Schrift/Schatten) per !important gesetzt — NIE
+      Layout (Breite/Flex/Padding/Position), damit nichts zerbricht.
+   3. Wiederverwendbare .fz-*-Bausteine (Section-Title, Card, Chip, Button,
+      Qualitätsfarben) für detaillierte Panels (Flaggschiff: Crafting).
+   ============================================================================ */
+
+:root {
+  /* — Schrift — */
+  --fz-font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;   /* Überschriften */
+  --fz-font-body:    'EB Garamond', Georgia, 'Times New Roman', serif;
+  --fz-font-mono:    'Courier New', ui-monospace, monospace;   /* Zahlen/Stats */
+
+  /* — Tinten / Pergament — */
+  --fz-ink:       #ead9b6;
+  --fz-ink-dim:   #b6a47e;
+  --fz-ink-faint: #8a7a5c;
+
+  /* — Gold-Akzente — */
+  --fz-gold:        #e6c374;
+  --fz-gold-bright: #ffe39c;
+  --fz-gold-deep:   #a87b3c;
+
+  /* — Flächen (Leder / Holz) — */
+  --fz-panel-1:   #2b2218;
+  --fz-panel-2:   #19130c;
+  --fz-card:      rgba(56,44,28,0.55);
+  --fz-card-hi:   rgba(80,63,40,0.72);
+  --fz-edge:      #6a5430;
+  --fz-edge-soft: #4a3a22;
+  --fz-divider:   rgba(150,120,70,0.30);
+
+  /* — Qualitäts-/Seltenheitsfarben — */
+  --fz-q-rough:      #9aa0a4;
+  --fz-q-normal:     #74c074;
+  --fz-q-fine:       #5b9be8;
+  --fz-q-masterwork: #e7c44b;
+  --fz-q-legendary:  #f0843a;
+
+  /* — Form — */
+  --fz-radius:    8px;
+  --fz-radius-sm: 5px;
+  --fz-shadow:    0 18px 50px rgba(0,0,0,0.72);
+}
+
+/* ── 2a. Modale Hülle (alle *-overlay) ────────────────────────────────────
+   Nur Backdrop-Blur ergänzen (Components behalten ihre Hintergrund-Deckung). */
+[class$="-overlay"] {
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+}
+
+/* ── 2b. Panel-Korpus (alle *-box) ──────────────────────────────────────── */
+[class$="-box"] {
+  background: linear-gradient(180deg, var(--fz-panel-1), var(--fz-panel-2)) !important;
+  border: 1px solid var(--fz-gold-deep) !important;
+  border-radius: var(--fz-radius) !important;
+  box-shadow:
+    var(--fz-shadow),
+    inset 0 0 0 1px rgba(255, 225, 150, 0.09),
+    inset 0 0 26px rgba(0, 0, 0, 0.55) !important;
+  color: var(--fz-ink) !important;
+  font-family: var(--fz-font-body) !important;
+  font-size: 14px !important;
+  line-height: 1.45;
+}
+
+/* ── 2c. Panel-Kopf (NUR direkter *-header im *-box) ──────────────────────
+   Verschachtelte Sub-Header (age-header, recipe-cat-header …) bleiben außen
+   vor. */
+[class$="-box"] > [class$="-header"] {
+  font-family: var(--fz-font-display) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em;
+  color: var(--fz-gold-bright) !important;
+  background: linear-gradient(180deg, rgba(74, 55, 27, 0.6), rgba(40, 30, 16, 0.25)) !important;
+  border-bottom: 1px solid var(--fz-gold-deep) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* ── 2d. Schließen-Button (alle *-close) ──────────────────────────────────── */
+[class$="-close"] {
+  font-family: var(--fz-font-mono) !important;
+  color: var(--fz-gold) !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid var(--fz-gold-deep) !important;
+  border-radius: var(--fz-radius-sm) !important;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+[class$="-close"]:hover {
+  color: #190f06 !important;
+  background: var(--fz-gold) !important;
+}
+
+/* ── 2e. Generische Buttons in Panels (schont .fz-btn + spezialisierte) ──── */
+[class$="-box"] button:not(.fz-btn):not(.fz-btn-ghost):not([class$="-close"]) {
+  font-family: var(--fz-font-body) !important;
+  border-radius: var(--fz-radius-sm) !important;
+  color: var(--fz-ink);
+  border: 1px solid var(--fz-edge);
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+[class$="-box"] button:not(.fz-btn):not(.fz-btn-ghost):not([class$="-close"]):hover:not(:disabled) {
+  border-color: var(--fz-gold);
+  color: var(--fz-gold-bright);
+}
+
+/* ── 2f. Gold-Scrollbars in Panels ────────────────────────────────────────── */
+[class$="-box"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+[class$="-box"] ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 6px; }
+[class$="-box"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--fz-gold-deep), #5a4424);
+  border-radius: 6px;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+}
+[class$="-box"] ::-webkit-scrollbar-thumb:hover { background: linear-gradient(var(--fz-gold), var(--fz-gold-deep)); }
+
+/* ── 3. Wiederverwendbare Bausteine (.fz-*) ───────────────────────────────── */
+.fz-section-title {
+  font-family: var(--fz-font-display);
+  color: var(--fz-gold-bright);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin: 16px 0 9px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--fz-divider);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.fz-section-title:first-child { margin-top: 2px; }
+
+.fz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 10px;
+}
+
+.fz-card {
+  position: relative;
+  background: linear-gradient(158deg, var(--fz-card-hi), var(--fz-card));
+  border: 1px solid var(--fz-edge-soft);
+  border-radius: var(--fz-radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.14s ease, transform 0.14s ease, box-shadow 0.14s ease;
+}
+.fz-card:hover {
+  border-color: var(--fz-gold);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 225, 150, 0.10);
+}
+.fz-card.locked { opacity: 0.58; filter: grayscale(0.35); }
+.fz-card.locked:hover { transform: none; border-color: var(--fz-edge-soft); box-shadow: none; }
+
+.fz-card-title {
+  font-family: var(--fz-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fz-gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.fz-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.fz-chip {
+  font-family: var(--fz-font-mono);
+  font-size: 11px;
+  color: var(--fz-ink-dim);
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--fz-edge-soft);
+  border-radius: 11px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+.fz-card-actions { display: flex; gap: 6px; margin-top: auto; }
+
+.fz-btn {
+  font-family: var(--fz-font-display);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: #1c130a;
+  background: linear-gradient(180deg, var(--fz-gold-bright), var(--fz-gold-deep));
+  border: 1px solid var(--fz-gold-deep);
+  border-radius: var(--fz-radius-sm);
+  padding: 5px 13px;
+  cursor: pointer;
+  flex: 1;
+  transition: filter 0.12s ease, transform 0.06s ease;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+.fz-btn:hover { filter: brightness(1.12); }
+.fz-btn:active { transform: translateY(1px); box-shadow: none; }
+
+.fz-btn-ghost {
+  font-family: var(--fz-font-body);
+  font-size: 12px;
+  color: var(--fz-gold);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--fz-gold-deep);
+  border-radius: var(--fz-radius-sm);
+  padding: 5px 11px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.fz-btn-ghost:hover { background: rgba(230, 195, 116, 0.18); color: var(--fz-gold-bright); }
+
+.fz-lock-reason {
+  font-family: var(--fz-font-body);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--fz-gold-deep);
+}
+
+/* Qualitäts-/Seltenheitsfarben — überall wiederverwendbar. */
+.q-rough { color: var(--fz-q-rough); }
+.q-normal { color: var(--fz-q-normal); }
+.q-fine { color: var(--fz-q-fine); }
+.q-masterwork { color: var(--fz-q-masterwork); }
+.q-legendary { color: var(--fz-q-legendary); }

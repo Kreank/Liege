@@ -55,6 +55,22 @@ _sprinting: set[str] = set()
 _resting: set[str] = set()
 _stamina_accum: dict[str, float] = {}   # Sub-Integer-Akkumulator pro Spieler
 
+# Attribut-gestützte Regen-Raten pro Spieler (gesetzt von
+# attributes.player_combat_sheet bei Equip/Allocation). HP aus Vitalität,
+# Mana aus Willenskraft. Pro Needs-Tick (HUNGER_TICK_SECONDS) angewendet.
+_hp_regen: dict[str, float] = {}
+_mana_regen: dict[str, float] = {}
+_hp_regen_accum: dict[str, float] = {}
+_mana_regen_accum: dict[str, float] = {}
+HP_REGEN_DEFAULT: float = 1.0
+MANA_REGEN_DEFAULT: float = 2.0
+
+
+def set_regen_rates(player_name: str, hp_rate: float, mana_rate: float) -> None:
+    """Cached die aus Attributen abgeleiteten Regen-Raten (pro Needs-Tick)."""
+    _hp_regen[player_name] = hp_rate
+    _mana_regen[player_name] = mana_rate
+
 
 def set_sprint(player_name: str, on: bool) -> None:
     if on:
@@ -80,6 +96,10 @@ def clear_player_state(player_name: str) -> None:
     _sprinting.discard(player_name)
     _resting.discard(player_name)
     _stamina_accum.pop(player_name, None)
+    _hp_regen.pop(player_name, None)
+    _mana_regen.pop(player_name, None)
+    _hp_regen_accum.pop(player_name, None)
+    _mana_regen_accum.pop(player_name, None)
 
 # Drink-Werte pro Item-Kind (analog FOOD_RESTORE)
 THIRST_RESTORE: dict[str, int] = {
@@ -315,6 +335,40 @@ async def _send_needs(connection_manager, player_name: str, needs: dict) -> None
         log.debug("send_needs an %s fehlgeschlagen", player_name, exc_info=True)
 
 
+async def _regen_tick(connection_manager, player_name: str) -> None:
+    """Attribut-gestützte HP/Mana-Regeneration (pro Needs-Tick). HP-Regen nur
+    bei hp > 0 — der Down-State hat sein eigenes Respawn-System. Fraktionale
+    Raten werden über einen Akkumulator zu ganzen Punkten gesammelt."""
+    hp_acc = _hp_regen_accum.get(player_name, 0.0) + _hp_regen.get(player_name, HP_REGEN_DEFAULT)
+    mana_acc = _mana_regen_accum.get(player_name, 0.0) + _mana_regen.get(player_name, MANA_REGEN_DEFAULT)
+    hp_inc = int(hp_acc)
+    mana_inc = int(mana_acc)
+    _hp_regen_accum[player_name] = hp_acc - hp_inc
+    _mana_regen_accum[player_name] = mana_acc - mana_inc
+    if hp_inc <= 0 and mana_inc <= 0:
+        return
+    row = await db.pool().fetchrow(
+        "UPDATE players SET "
+        "  hp   = CASE WHEN hp > 0 THEN LEAST(max_hp, hp + $2) ELSE hp END, "
+        "  mana = LEAST(max_mana, mana + $3) "
+        "WHERE name = $1 AND (mana < max_mana OR (hp > 0 AND hp < max_hp)) "
+        "RETURNING hp, max_hp, mana, max_mana",
+        player_name, max(0, hp_inc), max(0, mana_inc),
+    )
+    if row is None:
+        return
+    ws = connection_manager.connections.get(player_name)
+    if ws is None:
+        return
+    try:
+        await ws.send_json({"type": "player_healed",
+                            "hp": row["hp"], "max_hp": row["max_hp"]})
+        await ws.send_json({"type": "player_mana",
+                            "mana": row["mana"], "max_mana": row["max_mana"]})
+    except Exception:
+        log.debug("regen-send an %s fehlgeschlagen", player_name, exc_info=True)
+
+
 async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
     """Hintergrund-Loop: tickt Hunger runter und regeneriert Stamina für alle
     aktiv verbundenen Spieler."""
@@ -380,6 +434,12 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
 
                 # 5) WS-Update an diesen Spieler
                 await _send_needs(connection_manager, name, needs)
+
+                # 6) Attribut-gestützte HP/Mana-Regeneration
+                try:
+                    await _regen_tick(connection_manager, name)
+                except Exception:
+                    log.debug("Regen-Tick fehlgeschlagen für %s", name, exc_info=True)
 
             # Gewitter: pro Tick ein Blitzeinschlag bei einem zufälligen Spieler.
             if _storm and player_names:

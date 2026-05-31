@@ -1,65 +1,64 @@
 """Player-Attribute-System (derived stats).
 
-11 Attribute (DE-Namen) werden aus Skills + Equipment + Talenten abgeleitet:
+Saubere Trennung Kern-Attribute ↔ abgeleitete Werte (Redesign 2026-05-31):
 
-    Stärke       — primär combat, woodcutting, mining
-    Ausdauer     — primär stamina + construction
-    Energie      — primär max_mana + magic-Skill
-    Intelligenz  — primär magic, research-Gates
-    Weisheit     — primär medical, social → bessere LLM-Dialog-Reaktion
-    Ausweichen   — boots + dexterity-Talente
-    Geschick     — dagger/throwing_knife + finesse-Bonus
-    Verteidigung — Summe Armor-Defense + Talente
-    Charisma     — social + Mood-Boost beim Dialog
-    Krit-Rate    — combat + weapon crit
-    Krit-Schaden — combat + weapon crit_mult
+  KERN-ATTRIBUTE (definieren den Charakter):
+    Stärke       — physischer Schaden, Abbau-Ertrag (Roh-Yield), Tragelast
+    Geschick     — Krit-Rate, Ausweichen, Crafting-Präzision, Heimlichkeit (passiv)
+    Vitalität    — max. Leben (HP-Cap), HP-Regeneration, Körper-Widerstand
+    Intelligenz  — max. Mana, Magieschaden, Forschungstempo
+    Willenskraft — Mana-Regeneration, Status-Resistenzen, Heileffizienz
+    Charisma     — Handelspreise, NPC-Stimmung
 
-Plus "Stealth/Lockpicking" für Diebe (Recherche-Ergebnis):
-    Schleichen   — Dagger-Class + dexterity-Talent → weniger Aggro-Range
-    Schlossknacken — separater Skill später (jetzt aus Geschick)
+  ABGELEITETE WERTE (zusätzlich direkt verteilbar):
+    Verteidigung — Schadensreduktion (Summe Armor-Defense + Talente + Punkte)
+    Ausweichen   — Negier-Chance (Geschick + boots + Punkte)
+    Krit-Rate    — Krit-Chance (Geschick + weapon crit + Punkte)
+    Krit-Schaden — Krit-Multiplier (combat + weapon crit_mult + Punkte)
+
+Hinweis Migration: „Ausdauer" (Attr) → Vitalität; „Energie"+„Weisheit" →
+Willenskraft; „Schleichen" entfällt (passiv aus Geschick). Die Ressource
+Ausdauer (Stamina) bleibt davon unberührt. Bestehende Punkte werden per
+Respec (db.py) als freie Punkte zurückgegeben.
 """
 import logging
 
 log = logging.getLogger("liege.attributes")
 
 
-# Skill-Beiträge pro Attribut: skill → multiplier
+# Skill-Beiträge pro Attribut: skill → multiplier (ausgewogene Gewichtung).
 SKILL_CONTRIBUTIONS = {
+    # — Kern-Attribute —
     "stärke": {
         "combat": 1.5, "woodcutting": 0.8, "mining": 0.8, "construction": 0.5,
-    },
-    "ausdauer": {
-        "construction": 1.0, "woodcutting": 0.6, "mining": 0.6, "farming": 0.5,
-    },
-    "energie": {
-        "magic": 1.5, "medical": 0.5,
-    },
-    "intelligenz": {
-        "magic": 1.2, "crafting": 0.5, "medical": 0.6,
-    },
-    "weisheit": {
-        "medical": 1.0, "social": 0.6, "magic": 0.4,
-    },
-    "ausweichen": {
-        "combat": 0.4, "gathering": 0.3,
     },
     "geschick": {
         "combat": 0.5, "crafting": 0.8, "gathering": 0.5,
     },
-    "verteidigung": {
-        "combat": 0.8, "construction": 0.4,
+    "vitalität": {
+        "construction": 1.0, "woodcutting": 0.6, "mining": 0.6, "farming": 0.5,
+    },
+    "intelligenz": {
+        "magic": 1.4, "crafting": 0.5, "medical": 0.4,
+    },
+    "willenskraft": {
+        "medical": 1.0, "magic": 0.6, "social": 0.4,
     },
     "charisma": {
         "social": 1.5,
+    },
+    # — Abgeleitete (zusätzlich verteilbar) —
+    "verteidigung": {
+        "combat": 0.8, "construction": 0.4,
+    },
+    "ausweichen": {
+        "combat": 0.4, "gathering": 0.3,
     },
     "krit_rate": {
         "combat": 0.6, "magic": 0.4,
     },
     "krit_schaden": {
         "combat": 0.5,
-    },
-    "schleichen": {
-        "gathering": 0.5, "combat": 0.3,
     },
 }
 
@@ -69,12 +68,12 @@ AFFIX_TO_ATTR = {
     "speed_pct":        ("geschick", 0.3),
     "crit_chance_pct":  ("krit_rate", 1.0),
     "defense_flat":     ("verteidigung", 1.0),
-    "hp_flat":          ("ausdauer", 0.2),
-    "mana_flat":        ("energie", 0.2),
-    "fire_damage":      ("energie", 0.3),
-    "ice_damage":       ("energie", 0.3),
-    "lightning_damage": ("energie", 0.3),
-    "necrotic_damage":  ("weisheit", 0.2),
+    "hp_flat":          ("vitalität", 0.2),
+    "mana_flat":        ("intelligenz", 0.2),
+    "fire_damage":      ("intelligenz", 0.3),
+    "ice_damage":       ("intelligenz", 0.3),
+    "lightning_damage": ("intelligenz", 0.3),
+    "necrotic_damage":  ("willenskraft", 0.2),
     "lifesteal_pct":    ("stärke", 0.4),
     "armor_pen_pct":    ("geschick", 0.3),
 }
@@ -85,31 +84,33 @@ TALENT_TO_ATTR = {
     "combat_ranged_damage": ("geschick", 2),
     "combat_crit_chance":   ("krit_rate", 4),
     "combat_crit_damage":   ("krit_schaden", 4),
-    "combat_lifesteal":     ("weisheit", 2),
+    "combat_lifesteal":     ("willenskraft", 2),
     "magic_spell_damage":   ("intelligenz", 3),
-    "magic_max_mana":       ("energie", 4),
+    "magic_max_mana":       ("intelligenz", 4),
     "magic_mana_reduction": ("intelligenz", 2),
     "social_buy_discount":  ("charisma", 4),
     "social_sell_bonus":    ("charisma", 3),
     "social_mood_boost":    ("charisma", 2),
-    "medical_heal_bonus":   ("weisheit", 3),
+    "medical_heal_bonus":   ("willenskraft", 3),
     "mining_extra_damage":  ("stärke", 2),
     "woodcutting_extra_damage": ("stärke", 2),
-    "construction_save_chance": ("ausdauer", 2),
+    "construction_save_chance": ("vitalität", 2),
     "crafting_quality_bonus":   ("geschick", 3),
 }
 
 
 def calculate_attributes(skills_dict: dict, equipped_items: list[dict],
                          talent_effects: dict, body_parts: dict | None = None) -> dict:
-    """Berechnet alle 12 Attribute aus Skills + Equipment + Talenten.
+    """Berechnet alle 10 Attribute aus Skills + Equipment + Talenten.
 
     Returns {attr_name_de: int} — Werte runden auf int.
     """
     attrs: dict[str, float] = {
-        "stärke": 0, "ausdauer": 0, "energie": 0, "intelligenz": 0,
-        "weisheit": 0, "ausweichen": 0, "geschick": 0, "verteidigung": 0,
-        "charisma": 0, "krit_rate": 0, "krit_schaden": 0, "schleichen": 0,
+        # Kern
+        "stärke": 0, "geschick": 0, "vitalität": 0, "intelligenz": 0,
+        "willenskraft": 0, "charisma": 0,
+        # Abgeleitet (zusätzlich verteilbar)
+        "verteidigung": 0, "ausweichen": 0, "krit_rate": 0, "krit_schaden": 0,
     }
 
     # Skills → Attribute
@@ -159,20 +160,21 @@ def calculate_attributes(skills_dict: dict, equipped_items: list[dict],
     return {k: int(round(v)) for k, v in attrs.items()}
 
 
-# Deutsche Labels für UI
+# Deutsche Labels für UI — Reihenfolge bestimmt die UI-Reihenfolge
+# (ATTR_NAMES = list(ATTR_LABELS.keys())). Kern zuerst, dann Abgeleitete.
 ATTR_LABELS = {
-    "stärke":       ("💪 Stärke",         "Erhöht physischen Schaden und Roh-Yield"),
-    "ausdauer":     ("🫁 Ausdauer",       "Höhere HP-Cap, weniger Erschöpfung"),
-    "energie":      ("⚡ Energie",        "Größerer Mana-Pool, bessere Spell-Regen"),
-    "intelligenz":  ("🧠 Intelligenz",    "Stärkere Spells, Forschungs-Gates"),
-    "weisheit":     ("📖 Weisheit",       "Heilkunst, Status-Resistenz, Lore"),
-    "ausweichen":   ("💨 Ausweichen",     "Chance Angriffe komplett zu negieren"),
-    "geschick":     ("🎯 Geschick",       "Genauigkeit, Speed, Crafting-Präzision"),
+    # — Kern-Attribute —
+    "stärke":       ("💪 Stärke",         "Physischer Schaden, Abbau-Ertrag, Tragelast"),
+    "geschick":     ("🎯 Geschick",       "Krit-Rate, Ausweichen, Crafting, Heimlichkeit"),
+    "vitalität":    ("❤️ Vitalität",      "Max. Leben, HP-Regeneration, Körper-Widerstand"),
+    "intelligenz":  ("🧠 Intelligenz",    "Max. Mana, Magieschaden, Forschungstempo"),
+    "willenskraft": ("🔮 Willenskraft",   "Mana-Regeneration, Status-Resistenz, Heileffizienz"),
+    "charisma":     ("💬 Charisma",       "Handelspreise, NPC-Stimmung"),
+    # — Abgeleitete Werte (zusätzlich verteilbar) —
     "verteidigung": ("🛡️ Verteidigung",   "Schadensreduktion gegen Angriffe"),
-    "charisma":     ("💬 Charisma",       "Handelspreise, NPC-Mood, Diplomatie"),
+    "ausweichen":   ("💨 Ausweichen",     "Chance, Angriffe komplett zu negieren"),
     "krit_rate":    ("💥 Krit-Rate",      "Chance auf kritischen Treffer (%)"),
-    "krit_schaden": ("✨ Krit-Schaden",   "Multiplier bei kritischen Treffern"),
-    "schleichen":   ("👤 Schleichen",     "Reduziert Aggro-Reichweite, Diebe-Skills"),
+    "krit_schaden": ("✨ Krit-Schaden",   "Schadensbonus bei kritischen Treffern (%)"),
 }
 
 
@@ -206,18 +208,64 @@ async def build_stat_sheet(items, player_name: str) -> dict:
     return sheet
 
 
+# ─── Attribut → Ressourcen-Caps & Regeneration (mechanische Verdrahtung) ─────
+# Vitalität hebt das HP-Cap, Intelligenz den Mana-Pool. Regen pro Needs-Tick
+# (30s): HP aus Vitalität, Mana aus Willenskraft. Werte bewusst moderat —
+# leicht justierbar.
+BASE_MAX_HP = 100
+BASE_MAX_MANA = 50
+HP_PER_VITALITAET = 5
+MANA_PER_INTELLIGENZ = 5
+
+
+def effective_max_hp(totals: dict) -> int:
+    return BASE_MAX_HP + int(totals.get("vitalität", 0)) * HP_PER_VITALITAET
+
+
+def effective_max_mana(totals: dict) -> int:
+    return BASE_MAX_MANA + int(totals.get("intelligenz", 0)) * MANA_PER_INTELLIGENZ
+
+
+def hp_regen_per_tick(totals: dict) -> float:
+    return 1.0 + int(totals.get("vitalität", 0)) * 0.25
+
+
+def mana_regen_per_tick(totals: dict) -> float:
+    return 2.0 + int(totals.get("willenskraft", 0)) * 0.4
+
+
 async def player_combat_sheet(items, player_name: str) -> dict:
     """FE-konformer Snapshot fürs Charakter-UI: FLACHE `attributes` (deutsche
     Keys + `unspent`) und FLACHE `stats` (damage/defense/crit/attack_speed).
 
-    Das FE (PlayerAttributes/PlayerStats) erwartet diese flache Form — das
-    rohe `build_stat_sheet` (verschachtelt: attributes/totals/resistances)
-    passt NICHT und ließ das Charakter-Panel leer (Regression Welle 34c)."""
+    Verdrahtet zugleich die Ressourcen-Caps: persistiert effektives
+    max_hp/max_mana (aus Vitalität/Intelligenz), klemmt aktuelles hp/mana
+    darauf und cached die Regen-Raten für den Needs-Loop. Liefert die
+    aktuellen Resource-Werte mit zurück (für init/attrs_update → HUD)."""
     import combat
     import item_stats
+    import db
+    import needs
     import skills as _sk
     sheet = await build_stat_sheet(items, player_name)
     totals = sheet.get("totals", {})
+
+    # — Ressourcen-Caps aus Attributen anwenden (persistieren + klemmen) —
+    max_hp = effective_max_hp(totals)
+    max_mana = effective_max_mana(totals)
+    res = await db.pool().fetchrow(
+        "UPDATE players SET max_hp = $1, max_mana = $2, "
+        "hp = LEAST(hp, $1), mana = LEAST(mana, $2) "
+        "WHERE name = $3 RETURNING hp, mana",
+        max_hp, max_mana, player_name,
+    )
+    cur_hp = res["hp"] if res else max_hp
+    cur_mana = res["mana"] if res else max_mana
+    # Regen-Raten für den Needs-Loop cachen (vermeidet Attribut-Neuberechnung
+    # pro Tick/Spieler).
+    needs.set_regen_rates(
+        player_name, hp_regen_per_tick(totals), mana_regen_per_tick(totals),
+    )
 
     # Angelegte Waffe → Schaden/Tempo (Anzeige analog combat.calc_player_damage:
     # Durchschnitts-Swing OHNE Crit = base + skill_add + PLAYER_BASE_DAMAGE//2).
@@ -248,7 +296,14 @@ async def player_combat_sheet(items, player_name: str) -> dict:
         "attack_speed": round(float(speed), 2),
     }
     attributes = {**totals, "unspent": sheet.get("unspent_points", 0)}
-    return {"attributes": attributes, "stats": stats}
+    return {
+        "attributes": attributes,
+        "stats": stats,
+        "max_hp": max_hp,
+        "max_mana": max_mana,
+        "hp": cur_hp,
+        "mana": cur_mana,
+    }
 
 
 async def send_attrs_update(items, websocket, player_name: str) -> None:
@@ -260,6 +315,10 @@ async def send_attrs_update(items, websocket, player_name: str) -> None:
             "type": "attrs_update",
             "attributes": cs["attributes"],
             "stats": cs["stats"],
+            "max_hp": cs["max_hp"],
+            "max_mana": cs["max_mana"],
+            "hp": cs["hp"],
+            "mana": cs["mana"],
         })
     except Exception:
         logging.exception("attrs_update fehlgeschlagen")

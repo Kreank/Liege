@@ -147,6 +147,10 @@ async def handle_list_attributes(ctx: WsContext, data: dict) -> None:
         "type": "attributes_update",
         "attributes": cs["attributes"],
         "stats": cs["stats"],
+        "max_hp": cs["max_hp"],
+        "max_mana": cs["max_mana"],
+        "hp": cs["hp"],
+        "mana": cs["mana"],
     })
 
 
@@ -208,10 +212,9 @@ async def handle_character_create(ctx: WsContext, data: dict) -> None:
         await websocket.send_json({"type": "toast",
             "text": "Ungültige Charakter-Auswahl"})
         return
-    # Validate allocated: 12 valid attrs, sum <= 20, each <= 5
-    VALID_ATTRS = {"stärke", "ausdauer", "energie", "intelligenz",
-                    "weisheit", "ausweichen", "geschick", "verteidigung",
-                    "charisma", "krit_rate", "krit_schaden", "schleichen"}
+    # Validate allocated: gültige Attribute (aus dem Attribut-System abgeleitet,
+    # bleibt automatisch synchron), sum <= 20, each <= MAX_PER_ATTR.
+    VALID_ATTRS = set(attributes.ATTR_LABELS.keys())
     MAX_PER_ATTR = 10   # Welle 23: erhöht von 5 für mehr Specialization
     MAX_TOTAL = 20
     cleaned: dict[str, int] = {}

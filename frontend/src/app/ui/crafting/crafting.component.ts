@@ -28,6 +28,7 @@ import {
   inject,
 } from '@angular/core';
 
+import { ITEM } from '../../core/data/items';
 import { GameStateService } from '../../core/services/game-state.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 import { BillsComponent } from '../bills/bills.component';
@@ -123,6 +124,16 @@ export class CraftingComponent {
    *  „Holzschwert"), sonst der humanisierte `output`-Slug als Fallback. */
   recipeName(r: CraftRecipe): string {
     return r.name ?? this._humanizeSlug(r.output);
+  }
+
+  /** Icon-Pfad des Output-Items (für die Rezept-Karte). null → kein Icon. */
+  iconPath(r: CraftRecipe): string | null {
+    return ITEM[r.output]?.path ?? null;
+  }
+
+  /** Lesbarer Material-Name für einen Input-Kind (z. B. „Holz" statt „wood"). */
+  matName(kind: string): string {
+    return ITEM[kind]?.name ?? this._humanizeSlug(kind);
   }
 
   constructor() {

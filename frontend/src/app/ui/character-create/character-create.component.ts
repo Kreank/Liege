@@ -65,18 +65,18 @@ const PRESETS: ReadonlyArray<PresetOption> = [
 // 12 deutsche Backend-Slugs (ws/character.py VALID_ATTRS). Reihenfolge =
 // UI-Layout der Liste.
 const ATTR_META: ReadonlyArray<AttrMeta> = [
-  { key: 'stärke',       label: '💪 Stärke',         desc: 'Physischer Schaden + Roh-Yield' },
-  { key: 'geschick',     label: '🎯 Geschick',       desc: 'Genauigkeit + Crafting-Präzision' },
-  { key: 'ausdauer',     label: '🫁 Ausdauer',       desc: 'Höhere HP-Cap + weniger Erschöpfung' },
-  { key: 'energie',      label: '⚡ Energie',         desc: 'Größerer Mana-Pool + Spell-Regen' },
-  { key: 'intelligenz',  label: '🧠 Intelligenz',    desc: 'Stärkere Spells + Forschungs-Gates' },
-  { key: 'weisheit',     label: '📖 Weisheit',       desc: 'Heilkunst + Status-Resistenz' },
-  { key: 'verteidigung', label: '🛡️ Verteidigung',   desc: 'Schadensreduktion' },
-  { key: 'ausweichen',   label: '💨 Ausweichen',     desc: 'Chance Angriffe zu negieren' },
-  { key: 'krit_rate',    label: '💥 Krit-Rate',      desc: 'Chance auf kritischen Treffer' },
-  { key: 'krit_schaden', label: '✨ Krit-Schaden',    desc: 'Multiplier bei kritischen Treffern' },
-  { key: 'charisma',     label: '💬 Charisma',       desc: 'Handelspreise + NPC-Mood' },
-  { key: 'schleichen',   label: '👤 Schleichen',     desc: 'Reduzierte Aggro-Reichweite' },
+  // — Kern-Attribute —
+  { key: 'stärke',       label: '💪 Stärke',       desc: 'Physischer Schaden, Abbau-Ertrag, Tragelast' },
+  { key: 'geschick',     label: '🎯 Geschick',     desc: 'Krit-Rate, Ausweichen, Crafting, Heimlichkeit' },
+  { key: 'vitalität',    label: '❤️ Vitalität',    desc: 'Max. Leben, HP-Regeneration, Körper-Widerstand' },
+  { key: 'intelligenz',  label: '🧠 Intelligenz',  desc: 'Max. Mana, Magieschaden, Forschungstempo' },
+  { key: 'willenskraft', label: '🔮 Willenskraft', desc: 'Mana-Regen, Status-Resistenz, Heileffizienz' },
+  { key: 'charisma',     label: '💬 Charisma',     desc: 'Handelspreise, NPC-Stimmung' },
+  // — Abgeleitete Werte —
+  { key: 'verteidigung', label: '🛡️ Verteidigung', desc: 'Schadensreduktion gegen Angriffe' },
+  { key: 'ausweichen',   label: '💨 Ausweichen',   desc: 'Chance, Angriffe zu negieren' },
+  { key: 'krit_rate',    label: '💥 Krit-Rate',    desc: 'Chance auf kritischen Treffer (%)' },
+  { key: 'krit_schaden', label: '✨ Krit-Schaden',  desc: 'Schadensbonus bei Krits (%)' },
 ];
 
 type NameStatus = 'idle' | 'checking' | 'ok' | 'taken' | 'invalid';

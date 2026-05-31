@@ -834,6 +834,14 @@ export class GameStateService {
       this.stats.set(stats);
       this._patchPlayer({ stats });
     }
+    // Ressourcen-Caps aus Attributen (Vitalität→HP, Intelligenz→Mana) live
+    // ins HUD übernehmen — kommen bei Equip/Allocation mit.
+    this._patchPlayer({
+      ...(typeof msg['max_hp'] === 'number' ? { max_hp: msg['max_hp'] as number } : {}),
+      ...(typeof msg['max_mana'] === 'number' ? { max_mana: msg['max_mana'] as number } : {}),
+      ...(typeof msg['hp'] === 'number' ? { hp: msg['hp'] as number } : {}),
+      ...(typeof msg['mana'] === 'number' ? { mana: msg['mana'] as number } : {}),
+    });
   }
 
   private _handleStatusEffects(msg: GenericMsg): void {
