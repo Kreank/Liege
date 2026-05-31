@@ -72,6 +72,11 @@ export const CATEGORY_DE: Readonly<Record<ItemCategory, string>> = {
   magic:      'Magie',
   tool:       'Werkzeug',
   resource:   'Rohstoff',
+  material:   'Material',
+  lore:       'Lore',
+  trophy:     'Trophäe',
+  quest:      'Quest-Item',
+  ammo:       'Munition',
 };
 
 export const QUALITY_DE: Readonly<Record<ItemQuality, string>> = {
@@ -102,6 +107,7 @@ export const QUALITY_TO_RARITY: Readonly<Record<ItemQuality, string>> = {
 /** Kategorien ohne Qualität (rendern als 'rough'/grau). */
 export const NO_QUALITY_CATEGORIES: ReadonlySet<ItemCategory> = new Set<ItemCategory>([
   'resource', 'food', 'consumable', 'magic',
+  'material', 'lore', 'trophy', 'quest', 'ammo',
 ]);
 
 /** Frontend-Quality-Multiplikatoren (Damage/Defense bei nicht-rolled Stats). */

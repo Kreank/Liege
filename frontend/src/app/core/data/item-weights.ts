@@ -12,6 +12,12 @@ export const ITEM_WEIGHT_BY_CATEGORY: Readonly<Record<ItemCategory, number>> = {
   weapon:     4.0,    // Default für Waffen ohne weight-Override
   armor:      5.0,    // Default für Rüstung ohne weight-Override
   tool:       2.0,
+  // 31.05 — neue Drop-Kategorien
+  material:   0.5,    // wie resource
+  lore:       0.3,    // leichte Schriften/Splitter
+  trophy:     0.6,    // Schädel/Banner/etc.
+  quest:      0.3,    // Karten-Fragmente, Kapseln
+  ammo:       0.05,   // Pfeile/Bolzen sehr leicht (pro Stück)
 };
 
 export const ITEM_WEIGHT_OVERRIDES: Readonly<Record<string, number>> = {
@@ -42,6 +48,12 @@ export const ITEM_GROUND_SCALE_BY_CATEGORY: Readonly<Record<ItemCategory, number
   weapon:     0.85,
   armor:      0.75,
   tool:       0.70,
+  // 31.05 — neue Drop-Kategorien
+  material:   0.55,
+  lore:       0.55,
+  trophy:     0.65,
+  quest:      0.55,
+  ammo:       0.45,
 };
 
 export const ITEM_GROUND_SCALE_OVERRIDES: Readonly<Record<string, number>> = {

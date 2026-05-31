@@ -1,6 +1,9 @@
 // Item-Modelle (Definitionen + Runtime-Instances aus dem Backend).
 
-/** Item-Kategorien — entscheidet über Default-Gewicht & Ground-Scale. */
+/** Item-Kategorien — entscheidet über Default-Gewicht & Ground-Scale.
+ *  31.05: monster_drops bringen 5 neue Kategorien (material, lore, trophy,
+ *  quest, ammo). Material verhält sich wie resource, ammo extra-leicht,
+ *  trophy/lore/quest haben kein Quality-Spektrum (siehe NO_QUALITY_CATEGORIES). */
 export type ItemCategory =
   | 'weapon'
   | 'armor'
@@ -9,7 +12,12 @@ export type ItemCategory =
   | 'food'
   | 'magic'
   | 'tool'
-  | 'resource';
+  | 'resource'
+  | 'material'
+  | 'lore'
+  | 'trophy'
+  | 'quest'
+  | 'ammo';
 
 /** Equipment-Slot-Keys. */
 export type EquipSlot =
