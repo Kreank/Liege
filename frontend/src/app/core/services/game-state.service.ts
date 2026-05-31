@@ -121,6 +121,20 @@ export class GameStateService {
    *  Read-only von außen — gesetzt nur aus `_handleCastFinished`. */
   readonly spellCooldowns = signal<ReadonlyMap<string, number>>(new Map());
 
+  // ─── H2.6 — Container-Action-Target-Mode ────────────────────────────
+  //
+  // Bei Container-Items (Eimer/Gießkanne/Wasserschlauch) muss der Spieler
+  // für `fill_container` (Wasser-Tile / Brunnen) und `water_plant`
+  // (farm_plot) ein Ziel-Tile picken. Das Chest-Panel triggert diesen
+  // Mode mit `beginContainerAction({...})`; das
+  // `<app-container-action-overlay>` (Schwester zu spell-target-overlay)
+  // intercepted den nächsten Click und sendet den passenden Intent.
+  readonly containerAction = signal<{
+    readonly action: 'fill_container' | 'water_plant';
+    readonly item_id: number;
+    readonly item_name: string;
+  } | null>(null);
+
   // ─── H2.3 — Spell-Target-Selection-Mode ──────────────────────────────
   //
   // Wenn der Spieler im Spellbook einen Spell mit `target_kind ∈
@@ -1187,6 +1201,22 @@ export class GameStateService {
    *  erfolgreichem Cast). */
   cancelSpellTarget(): void {
     this.castingSpell.set(null);
+  }
+
+  // ── H2.6 — Container-Action-Target-Mode ──
+
+  /** Vom Chest-Panel aufgerufen für Container-Aktionen, die einen Tile-
+   *  Target brauchen (Auffüllen am Wasser, Gießen auf Acker). */
+  beginContainerAction(args: {
+    readonly action: 'fill_container' | 'water_plant';
+    readonly item_id: number;
+    readonly item_name: string;
+  }): void {
+    this.containerAction.set(args);
+  }
+
+  cancelContainerAction(): void {
+    this.containerAction.set(null);
   }
 
   private _handleSpellLearned(msg: GenericMsg): void {

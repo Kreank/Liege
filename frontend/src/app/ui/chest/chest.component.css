@@ -78,6 +78,25 @@
   font-size: 11px;
 }
 
+/* H2.6 — Container-Sub-Actions: kleine Icon-Buttons direkt neben „→ Truhe". */
+.chest-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.chest-actions .container-btn {
+  background: rgba(60, 80, 110, 0.55);
+  border: 1px solid #6080a0;
+  color: #c0d0e8;
+  padding: 2px 6px;
+  font-size: 13px;
+  line-height: 1;
+}
+.chest-actions .container-btn:hover {
+  background: rgba(90, 120, 170, 0.7);
+  border-color: #a0c0e0;
+}
+
 .inv-empty {
   color: #807060;
   font-size: 11px;

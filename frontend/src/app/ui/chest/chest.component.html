@@ -15,7 +15,20 @@
             @for (it of playerItems(); track it.id) {
               <div class="chest-item-row">
                 <span class="name">{{ it.name }}</span>
-                <button type="button" (click)="transferToChest(it.id)">→ Truhe</button>
+                <div class="chest-actions">
+                  @if (it.isContainer) {
+                    <button type="button" class="container-btn"
+                            title="Aus dem Container trinken"
+                            (click)="drinkContainer(it.id)">💧</button>
+                    <button type="button" class="container-btn"
+                            title="An Wasserquelle auffüllen (Tile-Auswahl)"
+                            (click)="startFillContainer(it)">🪣</button>
+                    <button type="button" class="container-btn"
+                            title="Acker gießen (Tile-Auswahl)"
+                            (click)="startWaterPlant(it)">🌱</button>
+                  }
+                  <button type="button" (click)="transferToChest(it.id)">→ Truhe</button>
+                </div>
               </div>
             }
           </div>

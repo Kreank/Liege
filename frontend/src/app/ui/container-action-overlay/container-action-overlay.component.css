@@ -1,0 +1,56 @@
+/* Container-Action-Overlay (H2.6) — analog spell-target-overlay, aber
+   sanftere Vignette (Alltagsfunktion, kein dramatischer Spell). */
+
+:host { display: contents; }
+
+.cao-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  cursor: crosshair;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 30%,
+    rgba(60, 100, 70, 0.18) 100%
+  );
+}
+
+.cao-range-circle {
+  position: absolute;
+  border: 2px dashed rgba(140, 220, 160, 0.7);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 20px rgba(140, 220, 160, 0.25) inset;
+  animation: cao-range-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes cao-range-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 0.5; }
+}
+
+.cao-hint {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 40, 30, 0.88);
+  border: 1px solid #60a080;
+  border-radius: 4px;
+  padding: 8px 16px;
+  color: #c8ffd8;
+  font-family: monospace;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.cao-hint-text { font-weight: bold; }
+
+.cao-hint-esc {
+  font-size: 10px;
+  color: #80b090;
+}

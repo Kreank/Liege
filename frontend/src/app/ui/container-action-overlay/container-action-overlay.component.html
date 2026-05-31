@@ -1,0 +1,13 @@
+@if (action(); as a) {
+  <div class="cao-layer" (click)="onOverlayClick($event)">
+    <div class="cao-range-circle"
+         [style.left]="rangeCircleStyle().left"
+         [style.top]="rangeCircleStyle().top"
+         [style.width]="rangeCircleStyle().width"
+         [style.height]="rangeCircleStyle().height"></div>
+    <div class="cao-hint">
+      <span class="cao-hint-text">{{ hintLabel() }}</span>
+      <span class="cao-hint-esc">ESC zum Abbrechen</span>
+    </div>
+  </div>
+}
