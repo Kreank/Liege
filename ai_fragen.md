@@ -377,3 +377,9 @@
 **Entscheidung:** Native `title`-Attribut. Mehrzeilig via `\n`. Kein neuer Tooltip-Mode im Service.
 **Begründung:** Item/Mob-Tooltips brauchen positionierten Overlay (Mouse-Follow + Pin-Funktion); Skill-Tooltip ist ein statisches Info-Display über einer Row, die sich nicht bewegt. Native title-Attribut: 0 zusätzlicher Code, akzeptable UX (~500ms-Delay ist hier sogar gewollt — sonst spamt der User Tooltips beim Scroll). Wenn Polish gewünscht: später durch Overlay-Service ersetzbar.
 **Code-Stelle:** frontend/src/app/ui/skills/skills.component.html (title-Binding auf .skill-row)
+
+### 2026-05-31 09:30 · [H3-A / Coordination] Race-Condition: H3-A-Code landete im H3.2-Commit (Subject falsch)
+**Frage:** Wer war der "winning writer"? Während ich die 4 neuen Files + world-scene.ts edits in mein Working-Tree geschrieben habe, hat ein paralleler Subagent (H3-B / H3.2 Body-Parts) `git add .` benutzt und somit auch meine H3-A-Files mitgenommen. Resultat: Commit `04ab63f feat(ui): Body-Parts-Section (H3.2)` enthält ALLE meine 5 neuen Files + die kompletten world-scene-Edits inkl. fxNpcMood/fxDungeonSense/fxStructureRepaired.
+**Entscheidung:** Keine Korrektur am Log. Mein Code IST im HEAD — funktional korrekt. Ein Force-Push-Rewrite des H3.2-Commits ist verboten (Hard Rule: keine destructive Git-Operationen). Ein "Marker"-Commit mit leerem Diff macht wenig Sinn. Dokumentation hier reicht für die Nachverfolgung.
+**Begründung:** Code-Funktionalität > Log-Hygiene. Wer einen Subagent-zentrischen Audit machen will, kann `git log -- frontend/src/app/game/quest-marker-world.ts` nutzen — der findet den richtigen Add-Commit auch ohne H3-A im Subject. Lehre fürs nächste Mal: Subagents sollten `git add <files>` mit expliziten Pfaden nutzen, nie `git add .`.
+**Code-Stelle:** Commit `04ab63f` — eigentlich "feat(game): Polish-Visuals H3-A (H3.5/H3.6/H3.10/H3.12/H3.14)"
