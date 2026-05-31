@@ -28,7 +28,7 @@ import type {
   StatusEffect,
 } from '../models/player.model';
 import type { Bill } from '../models/bill.model';
-import type { FactionReputation, Quest } from '../models/quest.model';
+import type { FactionReputation, Quest, QuestObjective } from '../models/quest.model';
 import type {
   ResearchAge,
   ResearchBranch,
@@ -110,6 +110,32 @@ export class GameStateService {
     readonly started_at_ms: number;
     readonly duration_ms: number;
   } | null>(null);
+
+  /** Spell-Cooldowns (H2.4) — Map `spell_id` → absolute Endzeit (`Date.now()`-
+   *  Basis). Befüllt aus `cast_finished {spell_id, cooldown_ms}`. Konsumenten
+   *  (Hotbar) lesen lazy: `(endMs - Date.now()) / 1000`, ignorieren Einträge
+   *  mit Rest ≤ 0. Kein eigener Cleanup-Tick — Map bleibt klein (max ~10
+   *  Spells), abgelaufene Einträge werden beim nächsten `cast_finished` für
+   *  denselben Spell überschrieben.
+   *
+   *  Read-only von außen — gesetzt nur aus `_handleCastFinished`. */
+  readonly spellCooldowns = signal<ReadonlyMap<string, number>>(new Map());
+
+  // ─── H2.3 — Spell-Target-Selection-Mode ──────────────────────────────
+  //
+  // Wenn der Spieler im Spellbook einen Spell mit `target_kind ∈
+  // {single, aoe, ground, group, downed}` cassen möchte, geht das nicht
+  // direkt — der Cast braucht ein konkretes Ziel (`target_npc_id` oder
+  // `target_x`/`target_y`). Wir gehen dann in den Target-Selection-Mode:
+  //   • `castingSpell` zeigt den Spell-Catalog-Eintrag, auf den gewartet
+  //     wird (für Range-Indicator + Cursor-Hint).
+  //   • Das `<app-spell-target-overlay>` intercepted den nächsten Click,
+  //     rechnet Bildschirm → Tile-Koord um, sendet den `cast_spell`-Intent
+  //     und resettet das Signal.
+  //   • ESC cancelt → `cancelSpellTarget()`.
+  //  `target_kind='self'` fällt direkt im Spellbook durch (kein Target
+  //  nötig, sendet sofort).
+  readonly castingSpell = signal<SpellEntry | null>(null);
 
   // ─── Welt-Zustand (für Renderer in F4) ───────────────────────────────
   readonly time = signal<TimeSnapshot | null>(null);
@@ -412,7 +438,7 @@ export class GameStateService {
       case 'group_chat':           this._handleGroupChat(msg); break;
       case 'group_error':          this._toastError(msg, 'Gruppen-Aktion fehlgeschlagen'); break;
       case 'raid_error':           this._toastError(msg, 'Raid-Aktion fehlgeschlagen'); break;
-      case 'raid_started':         /* Visual-Event */ break;
+      case 'raid_started':         this._handleRaidStarted(msg); break;
       case 'loot_roll_started':    this._handleLootRollStarted(msg); break;
       case 'loot_roll_resolved':   this.activeLootRoll.set(null); break;
       case 'loot_roll_voted':
@@ -425,7 +451,7 @@ export class GameStateService {
       // ─── Quests + Factions ──────────────────────────────────────────
       case 'quests_update':        this._handleQuestsUpdate(msg); break;
       case 'quest_new':            this._handleQuestNew(msg); this._toastQuestNew(msg); break;
-      case 'quest_progress':       this._handleQuestProgress(msg); break;
+      case 'quest_progress':       this._handleQuestProgress(msg); this._toastQuestProgress(msg); break;
       case 'quest_closed':         this._handleQuestClosed(msg); this._toastQuestClosed(msg); break;
       case 'factions_update':      this._handleFactionsUpdate(msg); break;
       case 'quest_board_open':     this._handleQuestBoardOpen(msg); break;
@@ -435,8 +461,8 @@ export class GameStateService {
       case 'talent_learned':       this._handleTalentLearned(msg); this._toastTalentLearned(msg); break;
       case 'spell_learned':        this._handleSpellLearned(msg); this._toastSpellLearned(msg); break;
       case 'cast_started':         this._handleCastStarted(msg); break;
-      case 'cast_interrupted':
-      case 'cast_finished':        this.activeCast.set(null); break;
+      case 'cast_interrupted':     this.activeCast.set(null); break;
+      case 'cast_finished':        this._handleCastFinished(msg); break;
 
       // ─── Crafting / Trade / Bills / Research ────────────────────────
       case 'crafting_open':        this._handleCraftingOpen(msg); break;
@@ -899,15 +925,24 @@ export class GameStateService {
     if (nextEvents.length > 50) nextEvents.splice(0, nextEvents.length - 50);
     this.events.set(nextEvents);
 
-    // Toast-Trigger: explizite Severity (`high`/`major`/`critical`) ODER
-    // Disaster-/Raid-Heuristik wenn kein Severity-Feld da ist.
+    // H2.22 — Toast-Trigger: Severity >= medium ODER Disaster-/Raid-
+    // Heuristik (wenn Backend KEIN severity mitschickt). Schwellwert
+    // `medium` weil die Spec sagt „high severity" — wir interpretieren
+    // großzügig (medium-or-higher), damit selten benutzte Backend-Strings
+    // wie `medium`/`major`/`warning`/`critical` alle einen Toast triggern.
     if (!text) return;
-    const isHighSeverity =
-      severity === 'high' || severity === 'major' || severity === 'critical';
+    const sev = severity?.toLowerCase();
+    const toastSeverities = new Set([
+      'medium', 'high', 'major', 'critical', 'severe', 'warning',
+    ]);
+    const isHighSeverity = sev != null && toastSeverities.has(sev);
     const isImportantKind =
       /disaster|raid|invasion|bloodmoon|wildfire|earthquake|collapse|dungeon_spawned/i.test(kind);
     if (isHighSeverity || isImportantKind) {
-      this.toast.show(text, 'warn', 6000);
+      // Kind-Bezogene Toast-Farbe: critical → error, sonst warn.
+      const kindLevel: 'error' | 'warn' =
+        sev === 'critical' || sev === 'severe' ? 'error' : 'warn';
+      this.toast.show(text, kindLevel, 6000);
     }
   }
 
@@ -1021,6 +1056,46 @@ export class GameStateService {
     this.party.set({ ...cur, kind });
   }
 
+  /**
+   * H2.13 — `raid_started` Welt-Event + Toast. Backend (raid_director +
+   * `raid_trigger_manual`-Handler) broadcastet `{type:'raid_started', tier,
+   * wave?, by?, x?, y?}` an alle Spieler im Umfeld. Wir spiegeln das in den
+   * `events`-Stream (für die Chronik-Komponente, H1.15) und zeigen
+   * zusätzlich einen Warn-Toast — der Spieler MUSS das mitkriegen, sonst
+   * stehen plötzlich Tier-5-Mobs auf dem Hof.
+   */
+  private _handleRaidStarted(msg: GenericMsg): void {
+    const tier = msg['tier'] as number | undefined;
+    const wave = msg['wave'] as number | undefined;
+    const by = msg['by'] as string | undefined;
+    const x = msg['x'] as number | undefined;
+    const y = msg['y'] as number | undefined;
+
+    // Toast-Text: kompakt, aber alle relevanten Infos.
+    const parts: string[] = ['⚔️ Raid startet'];
+    if (tier != null) parts.push(`T${tier}`);
+    if (wave != null) parts.push(`Welle ${wave}`);
+    if (by) parts.push(`(${by})`);
+    const text = parts.join(' ');
+    this.toast.show(text, 'warn', 8000);
+
+    // Chronik-Eintrag — analog `_handleWorldEvent`-Form, damit das Panel
+    // einheitlich rendert. ID + ISO-Timestamp lokal, weil Backend kein
+    // `event`-Wrapper-Frame nachschickt.
+    const ev: WorldEvent = {
+      id: `raid_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      kind: 'raid_started',
+      title: text,
+      description: text,
+      ts: new Date().toISOString(),
+      x,
+      y,
+    };
+    const nextEvents = [...this.events(), ev];
+    if (nextEvents.length > 50) nextEvents.splice(0, nextEvents.length - 50);
+    this.events.set(nextEvents);
+  }
+
   // ── Quests + Factions ──
 
   private _handleQuestsUpdate(msg: GenericMsg): void {
@@ -1083,6 +1158,35 @@ export class GameStateService {
       duration_ms: duration ?? 0,
       started_at_ms: Date.now(),
     });
+  }
+
+  /** H2.4 — `cast_finished {spell_id?, cooldown_ms?}`. Räumt den aktiven
+   *  Cast ab UND schreibt den Cooldown in `spellCooldowns`, falls Backend
+   *  einen Wert mitschickt. Hotbar liest den Rest lazy per `Date.now()`. */
+  private _handleCastFinished(msg: GenericMsg): void {
+    this.activeCast.set(null);
+    const spellId = msg['spell_id'] as string | undefined;
+    const cooldownMs = msg['cooldown_ms'] as number | undefined;
+    if (!spellId || !cooldownMs || cooldownMs <= 0) return;
+    const next = new Map(this.spellCooldowns());
+    next.set(spellId, Date.now() + cooldownMs);
+    this.spellCooldowns.set(next);
+  }
+
+  // ── H2.3 — Spell-Target-Selection-Mode ──
+
+  /** Vom Spellbook (bzw. Hotbar in F-final) aufgerufen, wenn ein Spell
+   *  mit `target_kind ∈ {single, aoe, ground, group, downed}` gecastet
+   *  werden soll. Setzt das Signal — das `<app-spell-target-overlay>`
+   *  pickt es auf und rendert seinen Click-Intercept-Layer. */
+  beginSpellTargeting(spell: SpellEntry): void {
+    this.castingSpell.set(spell);
+  }
+
+  /** Cancelt einen offenen Target-Pick (ESC oder programmatisch nach
+   *  erfolgreichem Cast). */
+  cancelSpellTarget(): void {
+    this.castingSpell.set(null);
   }
 
   private _handleSpellLearned(msg: GenericMsg): void {
@@ -1482,13 +1586,28 @@ export class GameStateService {
   }
 
   private _handleDungeonCollapsed(msg: GenericMsg): void {
-    // Backend hat den Spieler bereits zur Overworld zurückgebeamt; wir
-    // räumen lokal den Dungeon-State auf. Toast-Service informiert.
+    // H2.15 — Dungeon-Collapsed-Notification. Backend hat den Spieler
+    // bereits zur Overworld zurückgebeamt (dungeon_director cleanup); wir
+    // räumen lokal den Dungeon-State auf und informieren über Toast UND
+    // Chronik. Die Toast-Duration ist 8s — sonst wundert sich der Spieler,
+    // warum er plötzlich im Wald steht, weil er es vielleicht verpasst hat.
     this.dungeonFloor.set(null);
     this.inDungeon.set(false);
     this.dungeonChests.set([]);
     const name = (msg['name'] as string | undefined) ?? 'Dungeon';
-    this.toast.show(`💥 ${name} eingestürzt — du wurdest hinausgeworfen`, 'warn');
+    const text = `💥 Dungeon „${name}" eingestürzt — du wurdest hinausgeworfen`;
+    this.toast.show(text, 'warn', 8000);
+    // Auch in die Chronik, damit der Spieler es nachschlagen kann.
+    const ev: WorldEvent = {
+      id: `dc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      kind: 'dungeon_collapsed',
+      title: text,
+      description: text,
+      ts: new Date().toISOString(),
+    };
+    const nextEvents = [...this.events(), ev];
+    if (nextEvents.length > 50) nextEvents.splice(0, nextEvents.length - 50);
+    this.events.set(nextEvents);
   }
 
   private _handleDungeonSense(msg: GenericMsg): void {
@@ -1639,7 +1758,66 @@ export class GameStateService {
   private _toastQuestNew(msg: GenericMsg): void {
     const q = msg['quest'] as { readonly title?: string } | undefined;
     const title = q?.title ?? (msg['title'] as string | undefined);
-    this.toast.show(title ? `Neue Quest: ${title}` : 'Neue Quest erhalten.', 'success');
+    this.toast.show(title ? `📜 Neue Quest: ${title}` : '📜 Neue Quest erhalten.', 'success');
+  }
+
+  /**
+   * H2.9 — Quest-Progress-Toast. Backend sendet `quest_progress` bei JEDEM
+   * Objektiv-Tick (1/5, 2/5, …) — wir filtern auf Milestones:
+   *   • Bei 25/50/75 % einer Objective
+   *   • Bei Objective-Completion (done == true)
+   *   • Bei 100 % der Quest (alle Objectives done) — falls Backend kein
+   *     separates `quest_closed` schickt
+   * Sonst kein Toast (vermeidet Spam bei „Töte 50 Wölfe").
+   *
+   * Wir ermitteln das „aktuell relevante" Objektiv heuristisch: das letzte
+   * nicht-fertige plus den frischen Progress-Wert. Backend liefert manchmal
+   * eine flache Form (`progress`, `required`, `objective`), manchmal das
+   * volle Quest-Objekt — wir handeln defensiv beide.
+   */
+  private _toastQuestProgress(msg: GenericMsg): void {
+    const q = msg['quest'] as
+      | { readonly title?: string; readonly objectives?: readonly QuestObjective[] }
+      | undefined;
+    const title = q?.title ?? (msg['title'] as string | undefined);
+    if (!title) return;
+
+    // Flache Form bevorzugen, wenn vorhanden — sie zeigt die FRISCH
+    // veränderte Objective an, die im Quest-Objekt nicht eindeutig wäre.
+    const flatProgress = msg['progress'] as number | undefined;
+    const flatRequired = msg['required'] as number | undefined;
+    const flatDone = msg['done'] as boolean | undefined;
+    const flatObjective = msg['objective'] as string | undefined;
+
+    let progress: number | undefined = flatProgress;
+    let required: number | undefined = flatRequired;
+    let done: boolean | undefined = flatDone;
+    let objectiveLabel: string | undefined = flatObjective;
+
+    // Fallback: aus Quest-Objekt das letzte aktive Objective herauslesen.
+    if (progress == null || required == null) {
+      const objs = q?.objectives ?? [];
+      // „aktuell relevant" = erstes nicht-fertiges, sonst letztes.
+      const obj = objs.find((o) => !o.done) ?? objs[objs.length - 1];
+      if (obj) {
+        progress = obj.progress;
+        required = obj.required;
+        done = obj.done;
+        objectiveLabel = obj.target ?? obj.kind;
+      }
+    }
+    if (progress == null || required == null || required <= 0) return;
+
+    // Milestone-Check: nur 25/50/75 % oder Objective-Done.
+    const pct = Math.floor((progress / required) * 100);
+    const isMilestone = pct === 25 || pct === 50 || pct === 75;
+    const isComplete = done === true || progress >= required;
+    if (!isMilestone && !isComplete) return;
+
+    const label = objectiveLabel ? ` (${objectiveLabel})` : '';
+    const text = `📋 ${title}${label}: ${progress}/${required}`;
+    // Complete → success, sonst info (kurze Anzeige, niedrige Aufmerksamkeit).
+    this.toast.show(text, isComplete ? 'success' : 'info', 3000);
   }
 
   /** Quest-Closed-Toast. */
