@@ -82,7 +82,7 @@ import ws.trade        # noqa: F401 — registriert open_trade/buy_item/sell_ite
 import ws.loot         # noqa: F401 — registriert loot_vote/set_loot_rule
 import ws.raid         # noqa: F401 — registriert raid_trigger_manual/dev_*/force_respawn
 import ws.crafting     # noqa: F401 — registriert open_hand_crafting/craft
-import ws.character    # noqa: F401 — registriert wake/allocate_attr/learn_*/cast_learned/list_*/character_*
+import ws.character    # noqa: F401 — registriert wake/allocate_attr/learn_*/list_*/character_*
 import ws.inventory    # noqa: F401 — registriert split/merge/equip/unequip/use_item/pick/drop/chest_*
 import ws.quests       # noqa: F401 — registriert list_quests/query_npc_quests/accept_quest_*/quest_turn_in/claim_quest_reward
 import ws.social       # noqa: F401 — registriert chat + group_*
@@ -334,6 +334,9 @@ async def websocket_endpoint(websocket: WebSocket):
     await spells.sync_learned_for_player(player_id)
     learned_spells = await spells.list_learned_for_player(player_id)
 
+    # Flache attributes + stats fürs Charakter-UI (PlayerAttributes/PlayerStats).
+    _combat_sheet = await __import__("attributes").player_combat_sheet(items, player_id)
+
     await websocket.send_json({
         "type": "init",
         "player_id": player_id,
@@ -367,9 +370,9 @@ async def websocket_endpoint(websocket: WebSocket):
         "time":     time_system.snapshot(),
         "quests":   await quests.list_for_player(player_id),
         "factions":     await factions.list_all_reputations(player_id),
-        "attributes":   await __import__("attributes").compute_attributes(items, player_id),
+        "attributes":   _combat_sheet["attributes"],
         "active_disasters": await disaster_state.list_active(),
-        "stats":        await __import__("attributes").build_stat_sheet(items, player_id),
+        "stats":        _combat_sheet["stats"],
         "power_tier":   await power_budget.player_power_tier(player_id),
         "spell_catalog": spells.SPELLS,
         "learned_spells": learned_spells,

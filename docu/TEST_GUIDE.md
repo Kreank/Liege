@@ -311,6 +311,16 @@ docker exec liege-postgres psql -U liege -d liege -c "DELETE FROM npcs WHERE nam
 
 Klick auf Palette-Button im Build-Mode wählt die Struktur. Hotkeys 1–0 sind Shortcuts.
 
+### Durst / Wasser
+
+| Aktion | Effekt |
+|--------|--------|
+| Linksklick auf angrenzendes Wasser-Tile (See/Fluss, ≤1 Feld) | Trinkt direkt: +Durst, Toast „💧 Aus dem See getrunken" |
+| Eimer/Behälter füllen → trinken | Weiterhin möglich (Chest-Panel: 🪣 füllen, 💧 trinken) |
+
+Hinweis: Der Wasser-Klick feuert nur, wenn das Ziel-Tile tatsächlich Wasser ist
+und kein NPC/Item/Struktur darauf liegt — sonst gilt die normale Klick-Logik.
+
 ### Heilung
 
 | Quelle | Effekt |

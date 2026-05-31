@@ -206,11 +206,60 @@ async def build_stat_sheet(items, player_name: str) -> dict:
     return sheet
 
 
+async def player_combat_sheet(items, player_name: str) -> dict:
+    """FE-konformer Snapshot fürs Charakter-UI: FLACHE `attributes` (deutsche
+    Keys + `unspent`) und FLACHE `stats` (damage/defense/crit/attack_speed).
+
+    Das FE (PlayerAttributes/PlayerStats) erwartet diese flache Form — das
+    rohe `build_stat_sheet` (verschachtelt: attributes/totals/resistances)
+    passt NICHT und ließ das Charakter-Panel leer (Regression Welle 34c)."""
+    import combat
+    import item_stats
+    import skills as _sk
+    sheet = await build_stat_sheet(items, player_name)
+    totals = sheet.get("totals", {})
+
+    # Angelegte Waffe → Schaden/Tempo (Anzeige analog combat.calc_player_damage:
+    # Durchschnitts-Swing OHNE Crit = base + skill_add + PLAYER_BASE_DAMAGE//2).
+    inv = await items.get_inventory(player_name)
+    weapon = next(
+        (it for it in inv
+         if it.get("equipped_slot")
+         and (it.get("category") == "weapon" or it.get("kind") in item_stats.WEAPON_STATS)),
+        None,
+    )
+    combat_lvl = await _sk.get_skill_level(player_name, "combat")
+    skill_add = combat_lvl // 4
+    wkind = weapon.get("kind") if weapon else None
+    rolled = (weapon.get("rolled_stats") if weapon else None) or {}
+    if "damage_min" in rolled and "damage_max" in rolled:
+        base = (rolled["damage_min"] + rolled["damage_max"]) / 2.0
+        speed = rolled.get("speed") or item_stats.weapon_attack_speed(wkind)
+    else:
+        base = item_stats.weapon_base_damage(wkind)
+        speed = item_stats.weapon_attack_speed(wkind)
+    avg_damage = int(round(base + skill_add + combat.PLAYER_BASE_DAMAGE // 2))
+
+    stats = {
+        "damage":       avg_damage,
+        "defense":      totals.get("verteidigung", 0),
+        "crit_chance":  totals.get("krit_rate", 0),
+        "crit_damage":  totals.get("krit_schaden", 0),
+        "attack_speed": round(float(speed), 2),
+    }
+    attributes = {**totals, "unspent": sheet.get("unspent_points", 0)}
+    return {"attributes": attributes, "stats": stats}
+
+
 async def send_attrs_update(items, websocket, player_name: str) -> None:
-    """Schickt einen frischen Stat-Sheet-Snapshot. Bei jedem Equip/Allocation."""
+    """Schickt einen frischen Stat-Snapshot. Bei jedem Equip/Allocation."""
     import logging
     try:
-        sheet = await build_stat_sheet(items, player_name)
-        await websocket.send_json({"type": "attrs_update", "stats": sheet})
+        cs = await player_combat_sheet(items, player_name)
+        await websocket.send_json({
+            "type": "attrs_update",
+            "attributes": cs["attributes"],
+            "stats": cs["stats"],
+        })
     except Exception:
         logging.exception("attrs_update fehlgeschlagen")

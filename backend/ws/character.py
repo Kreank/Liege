@@ -1,5 +1,5 @@
 """Character/Progression-Handler (Phase B11): allocate_attr, learn_talent,
-learn_spell, cast_learned, list_attributes, character_check_name,
+learn_spell, list_attributes, character_check_name,
 character_create, list_talents, wake.
 
 Behält 1:1 das Verhalten aus den Legacy-Blocks in main.py:
@@ -7,8 +7,8 @@ Behält 1:1 das Verhalten aus den Legacy-Blocks in main.py:
 - allocate_attr: player_stats.allocate_point + attrs_update.
 - learn_talent: talents.learn_talent → talent_learned + Tree-Refresh.
 - learn_spell: Item-Verbrauch + INSERT learned_spells + skill_xp magic.
-- cast_learned: Mana-Check, Mana-Abzug, Self-Effect, status_effects.apply.
-- list_attributes: attributes.compute_attributes → attributes_update.
+  (Gecastet wird ausschließlich über cast_spell → spell_caster, siehe ws/combat.py.)
+- list_attributes: attributes.player_combat_sheet → attributes_update (flach: attributes+stats).
 - character_check_name: display_name-Validierung + DB-Check.
 - character_create: Preset+Allocation+display_name persistieren.
 - list_talents: talents.tree_for_ui + talents_update.
@@ -23,10 +23,7 @@ import db
 import needs
 import skills
 import spells
-import status_effects
 import talents
-
-from services.player_state import heal_player as heal_player_svc
 
 from .context import WsContext
 from .dispatcher import register
@@ -140,64 +137,17 @@ async def handle_learn_spell(ctx: WsContext, data: dict) -> None:
     await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
 
 
-async def handle_cast_learned(ctx: WsContext, data: dict) -> None:
-    websocket = ctx.websocket
-    player_id = ctx.player_id
-    manager = ctx.manager
-    # Cast eines bereits gelernten Zaubers (ohne Item-Verbrauch)
-    spell_kind = data.get("spell_kind", "")
-    spell = combat.SPELLS.get(spell_kind)
-    if not spell:
-        return
-    # Prüfen ob gelernt
-    exists = await db.pool().fetchrow(
-        "SELECT 1 FROM learned_spells WHERE player_name = $1 AND spell_kind = $2",
-        player_id, spell_kind,
-    )
-    if not exists:
-        await websocket.send_json({"type": "toast",
-            "text": "Diesen Zauber hast du nicht gelernt."})
-        return
-    # Mana-Check
-    pstate = await db.pool().fetchrow(
-        "SELECT mana, max_mana FROM players WHERE name = $1", player_id,
-    )
-    if not pstate or pstate["mana"] < spell["mana"]:
-        await websocket.send_json({"type": "toast", "text": "Zu wenig Mana"})
-        return
-    # Mana abziehen
-    new_mana = pstate["mana"] - spell["mana"]
-    await db.pool().execute(
-        "UPDATE players SET mana = $1 WHERE name = $2", new_mana, player_id,
-    )
-    await websocket.send_json({
-        "type": "player_mana", "mana": new_mana, "max_mana": pstate["max_mana"],
-    })
-    # Self-Effekt + Heal anwenden
-    if spell.get("heal_self", 0) > 0:
-        await heal_player_svc(manager, player_id, spell["heal_self"])
-    self_eff = spell.get("self_effect")
-    if self_eff:
-        try:
-            await status_effects.apply("player", player_id,
-                self_eff["effect"], self_eff["magnitude"], self_eff["duration"])
-            effs = await status_effects.list_for_target("player", player_id)
-            await websocket.send_json({"type": "status_effects", "effects": effs})
-        except Exception:
-            pass
-    await websocket.send_json({"type": "toast",
-        "text": f"✨ {spell.get('name', spell_kind)} gewirkt"})
-    xp = await skills.gain_xp(player_id, "magic", 5 + spell["mana"] // 3)
-    if xp:
-        await websocket.send_json({"type": "skill_xp", **xp})
-
-
 async def handle_list_attributes(ctx: WsContext, data: dict) -> None:
     websocket = ctx.websocket
     player_id = ctx.player_id
     items = ctx.items
-    attrs = await attributes.compute_attributes(items, player_id)
-    await websocket.send_json({"type": "attributes_update", **attrs})
+    # FE-konforme flache Form (attributes + stats), identisch zu init/attrs_update.
+    cs = await attributes.player_combat_sheet(items, player_id)
+    await websocket.send_json({
+        "type": "attributes_update",
+        "attributes": cs["attributes"],
+        "stats": cs["stats"],
+    })
 
 
 async def handle_character_check_name(ctx: WsContext, data: dict) -> None:
@@ -328,7 +278,6 @@ register("wake", handle_wake)
 register("allocate_attr", handle_allocate_attr)
 register("learn_talent", handle_learn_talent)
 register("learn_spell", handle_learn_spell)
-register("cast_learned", handle_cast_learned)
 register("list_attributes", handle_list_attributes)
 register("character_check_name", handle_character_check_name)
 register("character_create", handle_character_create)

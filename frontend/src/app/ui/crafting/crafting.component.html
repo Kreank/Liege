@@ -10,28 +10,31 @@
         @if (c.recipes.length === 0) {
           <div class="inv-empty">(keine Rezepte verfügbar)</div>
         }
-        @for (r of c.recipes; track r.output) {
-          @let lockText = lockTooltip(r.requires);
-          @let locked = lockText !== '';
-          <div class="recipe-row" [class.locked]="locked"
-               [attr.title]="locked ? lockText : null">
-            <span class="recipe-out">
-              @if (locked) { <span class="recipe-lock-icon">🔒</span> }
-              {{ r.output }}
-            </span>
-            <span class="recipe-cost">
-              @for (inp of r.inputs; track inp.kind; let last = $last) {
-                {{ inp.kind }} ×{{ inp.quantity }}@if (!last) {<span>,&nbsp;</span>}
+        @for (group of groupedRecipes(); track group.cat) {
+          <div class="recipe-cat-header">{{ group.label }}</div>
+          @for (r of group.recipes; track r.id) {
+            @let lockText = lockTooltip(r.requires);
+            @let locked = lockText !== '';
+            <div class="recipe-row" [class.locked]="locked"
+                 [attr.title]="locked ? lockText : null">
+              <span class="recipe-out">
+                @if (locked) { <span class="recipe-lock-icon">🔒</span> }
+                {{ recipeName(r) }}
+              </span>
+              <span class="recipe-cost">
+                @for (inp of r.inputs; track $index; let last = $last) {
+                  {{ inp.kind }} ×{{ inp.quantity }}@if (!last) {<span>,&nbsp;</span>}
+                }
+              </span>
+              @if (locked) {
+                <span class="recipe-lock-reason">{{ lockText }}</span>
+              } @else {
+                <button type="button" (click)="craft(r.id)">Herstellen</button>
+                <button type="button" class="bill-btn" title="Auftrag für 5 Stück"
+                        (click)="addBill(r.id, 5)">×5</button>
               }
-            </span>
-            @if (locked) {
-              <span class="recipe-lock-reason">{{ lockText }}</span>
-            } @else {
-              <button type="button" (click)="craft(r.output)">Herstellen</button>
-              <button type="button" class="bill-btn" title="Auftrag für 5 Stück"
-                      (click)="addBill(r.output, 5)">×5</button>
-            }
-          </div>
+            </div>
+          }
         }
       </div>
     </div>

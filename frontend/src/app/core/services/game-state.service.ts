@@ -21,6 +21,7 @@ import type { Group, GroupInvite } from '../models/group.model';
 import type { GroundItem, InventoryItem } from '../models/item.model';
 import type { NPC } from '../models/npc.model';
 import type {
+  BodyPart,
   OnlinePlayer,
   PlayerAttributes,
   PlayerSnapshot,
@@ -35,7 +36,7 @@ import type {
   ResearchBranch,
   ResearchNode,
 } from '../models/research.model';
-import type { SpellEntry, SpellState, TalentTree } from '../models/talent.model';
+import type { SpellEntry, SpellState, TalentNode, TalentTree } from '../models/talent.model';
 import type { TimeSnapshot, WeatherSnapshot } from '../models/time.model';
 import type {
   InitMessage,
@@ -53,6 +54,54 @@ import { WebSocketService } from './websocket.service';
  * `unknown`-Signatur statt `never`.
  */
 type GenericMsg = UnknownServerMessage;
+
+/** Backend `body_parts` ist ein Dict `{legs: N, arms: N, torso: N}` (siehe
+ *  `backend/body_parts.py::get_body_parts`); MAX_PART_HP ist implizit 100.
+ *  Frontend-UI iteriert über `BodyPart[]` — wir normalisieren am Service-
+ *  Boundary, damit Components nicht über die Shape nachdenken müssen. Wenn
+ *  das Backend in Zukunft schon Array schickt, lassen wir es durch. */
+const _BODY_PART_MAX_HP = 100;
+function _normalizeBodyParts(raw: unknown): readonly BodyPart[] | undefined {
+  if (raw == null) return undefined;
+  if (Array.isArray(raw)) return raw as readonly BodyPart[];
+  if (typeof raw !== 'object') return undefined;
+  return Object.entries(raw as Record<string, unknown>).map(([name, val]) => {
+    const hp = typeof val === 'number' ? val : 0;
+    return { name, hp, max_hp: _BODY_PART_MAX_HP, damaged: hp < _BODY_PART_MAX_HP };
+  });
+}
+
+/** Backend `talents.tree` ist ein Dict `{skill: [items]}` mit Items im
+ *  Shape `{id, name, desc, tier, skill_min, prereq, status, …}` (siehe
+ *  `backend/talents.py::tree_for_ui`). Frontend erwartet `TalentNode[]`
+ *  mit `description`/`requires`/`cost`. Wir flatten + map'pen die Felder. */
+function _normalizeTalents(raw: unknown): TalentTree | undefined {
+  if (raw == null || typeof raw !== 'object') return undefined;
+  const r = raw as Record<string, unknown>;
+  const learned = Array.isArray(r['learned']) ? (r['learned'] as readonly string[]) : [];
+  const points = typeof r['points'] === 'number' ? (r['points'] as number) : 0;
+  const treeRaw = r['tree'];
+  let nodes: TalentNode[] = [];
+  if (Array.isArray(treeRaw)) {
+    nodes = treeRaw as TalentNode[];
+  } else if (treeRaw && typeof treeRaw === 'object') {
+    for (const items of Object.values(treeRaw as Record<string, unknown>)) {
+      if (!Array.isArray(items)) continue;
+      for (const it of items as readonly Record<string, unknown>[]) {
+        const prereq = it['prereq'];
+        nodes.push({
+          id:          String(it['id'] ?? ''),
+          name:        String(it['name'] ?? it['id'] ?? ''),
+          description: typeof it['desc'] === 'string' ? (it['desc'] as string) : undefined,
+          tier:        typeof it['tier'] === 'number' ? (it['tier'] as number) : 0,
+          cost:        typeof it['cost'] === 'number' ? (it['cost'] as number) : 1,
+          requires:    typeof prereq === 'string' ? [prereq] : (Array.isArray(prereq) ? prereq as string[] : undefined),
+        });
+      }
+    }
+  }
+  return { learned, points, tree: nodes };
+}
 
 /** Helper-Lookup für `inventory_update`-Format-A (Slot-Move löscht alte Slot-
  *  Markierung am vorherigen Item). */
@@ -115,6 +164,13 @@ export class GameStateService {
   // ─── Quests + Factions ───────────────────────────────────────────────
   readonly quests = signal<readonly Quest[]>([]);
   readonly factions = signal<readonly FactionReputation[]>([]);
+
+  /** Sprint-Erschöpfungs-Counter. Wird vom Backend-Event
+   *  `sprint_state {on:false, reason:'exhausted'}` hochgezählt. WorldScene
+   *  liest die Edge → blockt Re-Sprint lokal, bis der Spieler Shift los-
+   *  und wieder gedrückt hat. Ohne diesen Block würde der Pixel-Tick mit
+   *  jedem Frame Stamina>0 wieder in den Sprint kippen → Flicker-Loop. */
+  readonly sprintExhaustEpoch = signal<number>(0);
 
   // ─── Talents + Spells ────────────────────────────────────────────────
   readonly talents = signal<TalentTree | null>(null);
@@ -223,6 +279,8 @@ export class GameStateService {
   readonly activeCrafting = signal<{
     readonly station: string;
     readonly recipes: readonly {
+      readonly id: string;
+      readonly name?: string;
       readonly output: string;
       readonly category?: string;
       readonly requires?: string | null;
@@ -420,7 +478,14 @@ export class GameStateService {
         // Visualisierung in F4 — State-Service ignoriert.
         break;
       case 'body_part_damaged':    this._handleBodyPartDamaged(msg); break;
-      case 'sprint_state':         this._patchPlayer({ is_sprinting: msg['on'] === true }); break;
+      case 'sprint_state': {
+        const on = msg['on'] === true;
+        this._patchPlayer({ is_sprinting: on });
+        if (!on && msg['reason'] === 'exhausted') {
+          this.sprintExhaustEpoch.update((n) => n + 1);
+        }
+        break;
+      }
       case 'rest_start':           this._patchPlayer({ is_resting: true }); break;
       case 'rest_end':             this._patchPlayer({ is_resting: false }); break;
       case 'attributes_update':
@@ -599,7 +664,7 @@ export class GameStateService {
       x: msg.spawn.x,
       y: msg.spawn.y,
       power_tier: msg.power_tier,
-      body_parts: msg.body_parts,
+      body_parts: _normalizeBodyParts(msg.body_parts),
       attributes: msg.attributes,
       stats: msg.stats,
       skills: msg.skills,
@@ -621,7 +686,8 @@ export class GameStateService {
     if (msg.time) this.time.set(msg.time);
     if (msg.quests) this.quests.set(msg.quests);
     if (msg.factions) this.factions.set(msg.factions);
-    if (msg.talents) this.talents.set(msg.talents);
+    const initTalents = _normalizeTalents(msg.talents);
+    if (initTalents) this.talents.set(initTalents);
     // Backend sendet `spell_catalog` als dict (kind → def). Wir bauen daraus
     // einen Array mit `id`-Feld, damit UI über ein einheitliches Format
     // iterieren kann.
@@ -974,9 +1040,11 @@ export class GameStateService {
   private _handleStructureReplaced(msg: GenericMsg): void {
     const s = msg['structure'] as Structure | undefined;
     if (!s) return;
-    const next = this.structures().filter(
-      (cur) => !(cur.x === s.x && cur.y === s.y),
-    );
+    // Per ID ersetzen, NICHT per Position: an einem Tile können mehrere
+    // Strukturen liegen (z.B. Boden + Tür). Beim Tür-Toggle behält das Backend
+    // dieselbe id — würde man per Position filtern, flöge der Boden am selben
+    // Tile mit raus (Bug: Boden unter der Tür verschwindet beim Öffnen/Schließen).
+    const next = this.structures().filter((cur) => cur.id !== s.id);
     next.push(s);
     this.structures.set(next);
   }
@@ -1326,12 +1394,12 @@ export class GameStateService {
   // ── Talents + Spells ──
 
   private _handleTalentsUpdate(msg: GenericMsg): void {
-    const tree = msg['talents'] as TalentTree | undefined;
+    const tree = _normalizeTalents(msg['talents']);
     if (tree) this.talents.set(tree);
   }
 
   private _handleTalentLearned(msg: GenericMsg): void {
-    const tree = msg['talents'] as TalentTree | undefined;
+    const tree = _normalizeTalents(msg['talents']);
     if (tree) {
       this.talents.set(tree);
       return;
@@ -1549,14 +1617,27 @@ export class GameStateService {
 
   private _handleCraftingOpen(msg: GenericMsg): void {
     const station = msg['station'] as string | undefined;
-    const recipes = msg['recipes'] as readonly {
+    // Backend liefert `inputs` als Tupel-Liste (`[("wood", 3)]` → JSON
+    // `[["wood", 3]]`). Wir normalisieren defensiv auf `{kind, quantity}`
+    // (Objekt-Form wird unverändert durchgereicht).
+    const raw = (msg['recipes'] ?? []) as readonly {
+      readonly id: string;
+      readonly name?: string;
       readonly output: string;
       readonly category?: string;
       readonly requires?: string | null;
-      readonly inputs: readonly { readonly kind: string; readonly quantity: number }[];
-    }[] | undefined;
+      readonly inputs?: readonly unknown[];
+    }[];
     if (!station) return;
-    this.activeCrafting.set({ station, recipes: recipes ?? [] });
+    const recipes = raw.map((r) => ({
+      ...r,
+      inputs: (r.inputs ?? []).map((inp) =>
+        Array.isArray(inp)
+          ? { kind: String(inp[0]), quantity: Number(inp[1]) }
+          : (inp as { kind: string; quantity: number }),
+      ),
+    }));
+    this.activeCrafting.set({ station, recipes });
   }
 
   private _handleTradeOpen(msg: GenericMsg): void {

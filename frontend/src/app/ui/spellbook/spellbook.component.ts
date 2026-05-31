@@ -6,10 +6,10 @@
 //                 (Z. ~4167-4222).
 //   • Styles:  `style.css` Z. 325-377.
 //
-// Read-only — keine Intents. (Cast erfolgt aus der Hotbar via `cast_learned`,
-// das in F6 bereits zugängliche Bindung läuft.) Drag-Drop von Spells in die
-// Hotbar bleibt vorerst eine F-final-Sache; das Spellbook zeigt nur Status
-// + Detail-Beschreibung.
+// Cast läuft über `castTile()` → `cast_spell {spell_id}` (Self/Group direkt;
+// zielende Zauber öffnen das `<app-spell-target-overlay>`). Drag-Drop von
+// Spells in die Hotbar bleibt vorerst eine F-final-Sache; das Spellbook zeigt
+// Status + Detail-Beschreibung und löst den Cast aus.
 //
 // Tastatur: `P` toggelt, `Esc` schließt (siehe Legacy Z. 3286 + 3327).
 

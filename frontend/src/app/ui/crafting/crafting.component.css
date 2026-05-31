@@ -50,6 +50,21 @@
   max-height: 50vh;
 }
 
+.recipe-cat-header {
+  margin: 12px 0 4px;
+  padding: 4px 6px;
+  color: #e8d870;
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #6a5d3a;
+  background: rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+}
+.recipe-cat-header:first-child { margin-top: 0; }
+
 .recipe-row {
   display: flex;
   align-items: center;

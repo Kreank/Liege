@@ -13,5 +13,22 @@
     @if (categoryLabel()) {
       <div class="tt-quality">Kategorie: {{ categoryLabel() }}</div>
     }
+    @if (statLines().length) {
+      <div class="tt-stats">
+        @for (s of statLines(); track s.label) {
+          <div class="tt-stat-row">
+            <span class="tt-stat-label">{{ s.label }}</span>
+            <span class="tt-stat-value">{{ s.value }}</span>
+          </div>
+        }
+      </div>
+    }
+    @if (affixLines().length) {
+      <div class="tt-affixes">
+        @for (a of affixLines(); track $index) {
+          <div class="tt-affix-row">{{ a.label }} {{ a.value }}</div>
+        }
+      </div>
+    }
   </div>
 }

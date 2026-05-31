@@ -21,7 +21,36 @@ import {
 } from '@angular/core';
 
 import { ITEM } from '../../core/data/items';
+import { WEAPON_STATS, WEAPON_RANGE } from '../../core/data/weapons';
+import { ARMOR_STATS } from '../../core/data/armor';
 import { TooltipService } from '../../core/services/tooltip.service';
+
+/** Eine Stat-Zeile im Tooltip (z. B. „Schaden: 12–18"). */
+export interface StatLine {
+  readonly label: string;
+  readonly value: string;
+}
+
+/** Klartext-Labels für gängige Affix-Stat-Keys (Backend-Slugs). Fallback ist
+ *  der humanisierte Slug. `pct` markiert Prozent-Werte. */
+const AFFIX_LABEL: Readonly<Record<string, { label: string; pct?: boolean }>> = {
+  damage_pct:       { label: 'Schaden',          pct: true },
+  speed_pct:        { label: 'Angriffstempo',    pct: true },
+  crit_chance_pct:  { label: 'Krit-Chance',      pct: true },
+  defense_flat:     { label: 'Verteidigung' },
+  hp_flat:          { label: 'Leben' },
+  mana_flat:        { label: 'Mana' },
+  fire_damage:      { label: 'Feuerschaden' },
+  ice_damage:       { label: 'Eisschaden' },
+  lightning_damage: { label: 'Blitzschaden' },
+  necrotic_damage:  { label: 'Nekrotischer Schaden' },
+  lifesteal_pct:    { label: 'Lebensraub',       pct: true },
+  armor_pen_pct:    { label: 'Rüstungsdurchschlag', pct: true },
+  fire_resist:      { label: 'Feuerresistenz',   pct: true },
+  ice_resist:       { label: 'Eisresistenz',     pct: true },
+  lightning_resist: { label: 'Blitzresistenz',   pct: true },
+  magic_resist:     { label: 'Magieresistenz',   pct: true },
+};
 
 const QUALITY_COLOR: Readonly<Record<string, string>> = {
   rough:      '#888e91',
@@ -81,6 +110,74 @@ export class ItemTooltipComponent {
     const c = this.payload()?.item.category;
     return c ? CATEGORY_DE[c] ?? c : null;
   });
+
+  /** Waffen-/Rüstungs-Stats. Bevorzugt die per-Instanz `rolled_stats` (Welle 23),
+   *  fällt sonst auf die Basis-Werte aus WEAPON_STATS/ARMOR_STATS (per `kind`)
+   *  zurück. Leer für Items ohne Kampf-Stats (Rohstoffe, Speisen …). */
+  readonly statLines = computed<readonly StatLine[]>(() => {
+    const it = this.payload()?.item;
+    if (!it) return [];
+    const rs = it.rolled_stats;
+    const lines: StatLine[] = [];
+    const pct = (v: number): string => `${Math.round(v * 100)} %`;
+
+    const w = WEAPON_STATS[it.kind];
+    if (w || (rs && rs.damage_max != null)) {
+      const dmgMin = rs?.damage_min;
+      const dmgMax = rs?.damage_max;
+      if (dmgMin != null && dmgMax != null) {
+        lines.push({ label: '⚔️ Schaden', value: `${dmgMin}–${dmgMax}` });
+      } else if (w) {
+        lines.push({ label: '⚔️ Schaden', value: `${w.dmg}` });
+      }
+      const speed = rs?.speed ?? w?.speed;
+      if (speed != null) lines.push({ label: 'Tempo', value: `${speed.toFixed(2)}/s` });
+      const crit = rs?.crit ?? w?.crit;
+      if (crit != null) lines.push({ label: 'Krit-Chance', value: pct(crit) });
+      if (w?.crit_mult != null) lines.push({ label: 'Krit-Schaden', value: `×${w.crit_mult}` });
+      const ap = rs?.armor_pen ?? w?.armor_pen;
+      if (ap) lines.push({ label: 'Rüstungsdurchschlag', value: pct(ap) });
+      const range = rs?.range ?? w?.range ?? WEAPON_RANGE[it.kind];
+      if (range != null) lines.push({ label: 'Reichweite', value: `${range}` });
+      if (rs?.cleave ?? w?.cleave) lines.push({ label: 'Spaltschlag', value: 'ja' });
+    }
+
+    const a = ARMOR_STATS[it.kind];
+    if (a || (rs && rs.defense != null)) {
+      const def = rs?.defense ?? a?.defense;
+      if (def != null) lines.push({ label: '🛡 Verteidigung', value: `${def}` });
+      const block = rs?.block_chance ?? a?.block_chance;
+      if (block) lines.push({ label: 'Block-Chance', value: pct(block) });
+      const sb = rs?.speed_bonus ?? a?.speed_bonus;
+      if (sb) lines.push({ label: 'Tempo-Bonus', value: pct(sb) });
+      const ccb = rs?.crit_chance_bonus ?? a?.crit_chance_bonus;
+      if (ccb) lines.push({ label: 'Krit-Bonus', value: pct(ccb) });
+      if (rs?.weight ?? a?.weight) {
+        lines.push({ label: 'Gewicht', value: `${rs?.weight ?? a?.weight}` });
+      }
+    }
+    return lines;
+  });
+
+  /** Affix-Boni (Prefix/Suffix) als lesbare Zeilen — z. B. „+15 % Schaden". */
+  readonly affixLines = computed<readonly StatLine[]>(() => {
+    const affixes = this.payload()?.item.affixes;
+    if (!affixes?.length) return [];
+    const lines: StatLine[] = [];
+    for (const af of affixes) {
+      for (const [key, val] of Object.entries(af.stats ?? {})) {
+        const meta = AFFIX_LABEL[key];
+        const label = meta?.label ?? this._humanize(key);
+        const value = meta?.pct ? `+${val} %` : `+${val}`;
+        lines.push({ label, value });
+      }
+    }
+    return lines;
+  });
+
+  private _humanize(slug: string): string {
+    return slug.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
 
   readonly positionStyle = computed<{ left: string; top: string }>(() => {
     const p = this.payload();

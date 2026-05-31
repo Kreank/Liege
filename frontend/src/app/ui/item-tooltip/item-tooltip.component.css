@@ -44,3 +44,30 @@
   cursor: pointer;
   font-size: 14px;
 }
+
+.tt-stats {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid #4a3d22;
+}
+
+.tt-stat-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.5;
+}
+
+.tt-stat-label { color: #aaa088; }
+.tt-stat-value { color: #e8d870; font-weight: bold; }
+
+.tt-affixes {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid #4a3d22;
+}
+
+.tt-affix-row {
+  color: #6fa8dc;
+  line-height: 1.5;
+}

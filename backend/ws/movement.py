@@ -58,9 +58,12 @@ async def handle_move(ctx: WsContext, data: dict) -> None:
     if is_downed(player_id):
         return
     # Bewegung weckt aus dem Bett-Schlaf (Safety, falls Client doch
-    # einen move sendet während noch 'resting').
+    # einen move sendet während noch 'resting'). Das Frontend hält ein
+    # `is_resting`-Flag und braucht den Gegen-Frame, sonst bleibt der
+    # Schlaf-Zustand clientseitig hängen (rest_start ohne rest_end).
     if needs.is_resting(player_id):
         needs.set_resting(player_id, False)
+        await websocket.send_json({"type": "rest_end", "reason": "moved"})
     # Welle 25: Bewegung bricht aktiven Cast ab.
     if spell_caster.is_casting(player_id):
         spell_caster.interrupt(player_id, "movement")

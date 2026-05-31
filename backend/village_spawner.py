@@ -335,33 +335,37 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
     door_kind = _door_kind_for(house_type, material)
     floor_mat = _floor_material(material)
 
-    # 2-4) Wände + Tür + Boden
+    # 2-4) Boden auf die GANZE Grundfläche + Wände/Tür DARÜBER.
+    # Boden (floor-Layer) und Wand/Tür/Möbel (object-Layer) koexistieren auf
+    # demselben Tile — `place()` prüft je Layer getrennt. Dadurch ist der
+    # Boden durchgängig und auch unter Wänden/Türen/Möbeln sichtbar (das
+    # Frontend rendert den floor-Layer unter dem object-Layer).
     for ly in range(height):
         for lx in range(width):
             x = origin_x + lx
             y = origin_y + ly
+            if not world.is_walkable_sync(x, y):
+                continue
             is_edge = (lx == 0 or lx == width - 1 or ly == 0 or ly == height - 1)
             is_door = (x == door_x and y == door_y)
-            if is_door:
-                # Tür: door_<material>-Struct statt floor
-                if await _can_place(structure_manager, world, x, y):
-                    s = await structure_manager.place(x, y, door_kind, "system",
-                                                       material=material, durability=15)
-                    if s: placed.append(s)
-                continue
-            if is_edge:
-                # Wand
-                if not await _can_place(structure_manager, world, x, y):
-                    continue
-                s = await structure_manager.place(x, y, "wall", "system",
-                                                   material=material, durability=25)
-                if s: placed.append(s)
-            else:
-                # Innen-Tile → Boden
-                if not await _can_place(structure_manager, world, x, y):
-                    continue
+            # Boden auf die GANZE Grundfläche (auch unter Wänden/Türen/Möbeln).
+            # Die Wände werden im Frontend an die AUSSENKANTE ihres Tiles
+            # versetzt, sodass der Boden bündig bis zur Wand reicht — kein
+            # Überstand nach außen UND keine Gras-Lücke innen.
+            if structure_manager.floor_at(x, y) is None:
                 s = await structure_manager.place(x, y, "floor", "system",
                                                    material=floor_mat, durability=12)
+                if s: placed.append(s)
+            # Object-Layer (Wand/Tür) darüber — nur wenn dort noch kein Objekt.
+            if structure_manager.object_at(x, y) is not None:
+                continue
+            if is_door:
+                s = await structure_manager.place(x, y, door_kind, "system",
+                                                   material=material, durability=15)
+                if s: placed.append(s)
+            elif is_edge:
+                s = await structure_manager.place(x, y, "wall", "system",
+                                                   material=material, durability=25)
                 if s: placed.append(s)
 
     # Inneneinrichtung — pro Haus-Typ
@@ -386,21 +390,12 @@ async def _place_house(world, structure_manager, npc_manager, connection_manager
             return None
         if not (0 <= rx < inner_w and 0 <= ry < inner_h):
             return None
-        # Floor existiert schon → nur eigenes Möbel drauf
-        # structure_manager.at gibt jetzt floor zurück; wir überschreiben es?
-        # Floor blockiert nicht. Aber `place` verhindert Doppel-Place auf gleicher Koord.
-        # Pragmatic: floor entfernen + möbel platzieren ist zu aufwendig — Möbel direkt
-        # platzieren würde fehlschlagen. Lösung: floor da lassen, Möbel als zweites
-        # struct an gleicher Position geht nicht. → Möbel direkt setzen, floor weg.
-        # Aber Welle 8 hat das so gemacht: place floor an den Stellen. Lass mich
-        # einfach Floor vorher nicht platzieren wo Möbel hinkommen.
         occupied.add((x, y))
-        # Bestehendes floor entfernen (vorher gesetzt)
-        existing = structure_manager.at(x, y)
-        if existing is not None:
-            # Nur entfernen wenn floor
-            if existing["type"] == "floor":
-                await structure_manager.remove(x, y)
+        # Boden bleibt UNTER dem Möbel liegen — Möbel geht ins object-Layer,
+        # der floor-Layer koexistiert (place() prüft je Layer getrennt). Kein
+        # Floor-Entfernen mehr (alte Annahme „Doppel-Place geht nicht" war falsch).
+        if structure_manager.object_at(x, y) is not None:
+            return None
         s = await structure_manager.place(x, y, kind, "system",
                                            material=material, durability=dur)
         return s

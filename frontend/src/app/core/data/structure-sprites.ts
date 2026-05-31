@@ -77,6 +77,12 @@ export const STRUCTURE_SPRITES: Readonly<Record<string, string>> = {
   fishing_net:              '/assets/props/water/fishing_net.png',
   fishmonger_sign:          '/assets/props/settlement/signs/trade/fishmonger_sign.png',
   floor:                    '/assets/structures/floor.png',
+  // Nahtlose, material-spezifische Boden-Tiles (füllen das ganze Tile ohne
+  // transparenten Rand — anders als structures/floor.png, das Lücken ließ).
+  // Der Renderer wählt per `floor_<material>` (structureSpriteKeyFor).
+  floor_wood:               '/assets/building/wood/floor.png',
+  floor_stone:              '/assets/building/stone/floor.png',
+  floor_straw:              '/assets/building/straw/floor.png',
   flowers:                  '/assets/props/nature/flowers.png',
   furnace:                  '/assets/structures/furnace.png',
   garden_gate_ew_closed:    '/assets/props/settlement/garden_gate_ew_closed.png',

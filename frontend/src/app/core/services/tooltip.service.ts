@@ -30,6 +30,7 @@ import type { NPC } from '../models/npc.model';
 export type TooltipItem = Pick<
   InventoryItem,
   'kind' | 'name' | 'quality' | 'category' | 'quantity' | 'unique_name'
+  | 'rolled_stats' | 'affixes'
 > & {
   readonly id?: number;
   readonly equipped_slot?: InventoryItem['equipped_slot'];

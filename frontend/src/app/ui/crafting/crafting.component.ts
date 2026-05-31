@@ -8,7 +8,9 @@
 // Backend:
 //   • `crafting_open { station, recipes }` öffnet das Modal.
 //   • Hand-Crafting öffnet der Spieler aktiv per `open_hand_crafting`.
-//   • `craft { output, station }` produziert ein Item / Bill.
+//   • `craft { recipe_id, station }` produziert ein Item (recipe_id = Rezept-`id`,
+//     z. B. `wooden_sword` — NICHT der `output`, da mehrere Rezepte denselben
+//     Output liefern).
 //
 // Scope: Wir migrieren das Grundgerüst (Station-Label, Recipe-Grid,
 // Klick-Action). Das volle Category-Tab-System + Research-Gate (Welle 22)
@@ -37,6 +39,39 @@ const STATION_LABEL: Readonly<Record<string, string>> = {
   hand:      '🛠 Handwerken',
 };
 
+/** Anzeige-Labels + Reihenfolge der Rezept-Kategorien (Backend-Slugs aus
+ *  recipes.py). Reihenfolge bestimmt die Sektions-Abfolge im Grid. */
+const CATEGORY_LABEL: Readonly<Record<string, string>> = {
+  weapon:     '⚔️ Waffen',
+  armor:      '🛡 Rüstung',
+  tool:       '🔧 Werkzeuge',
+  jewelry:    '💍 Schmuck',
+  consumable: '🧪 Verbrauchbares',
+  food:       '🍖 Nahrung',
+  material:   '🧱 Material',
+  magic:      '✨ Magie',
+};
+const CATEGORY_ORDER: readonly string[] = [
+  'weapon', 'armor', 'tool', 'jewelry', 'consumable', 'food', 'material', 'magic',
+];
+
+/** Ein einzelnes Rezept, wie es das Backend (`crafting_open`) liefert. */
+interface CraftRecipe {
+  readonly id: string;
+  readonly name?: string;
+  readonly output: string;
+  readonly category?: string;
+  readonly requires?: string | null;
+  readonly inputs: readonly { readonly kind: string; readonly quantity: number }[];
+}
+
+/** Eine Kategorie-Sektion fürs gruppierte Grid. */
+interface RecipeGroup {
+  readonly cat: string;
+  readonly label: string;
+  readonly recipes: readonly CraftRecipe[];
+}
+
 @Component({
   selector: 'app-crafting',
   standalone: true,
@@ -57,6 +92,38 @@ export class CraftingComponent {
     if (!c) return '';
     return STATION_LABEL[c.station] ?? c.station;
   });
+
+  /** Rezepte nach Kategorie gruppiert — fürs kategorisierte Grid (Vorbild:
+   *  Forschungs-Panel). Bekannte Kategorien folgen CATEGORY_ORDER, unbekannte
+   *  landen alphabetisch dahinter. */
+  readonly groupedRecipes = computed<readonly RecipeGroup[]>(() => {
+    const c = this.crafting();
+    if (!c) return [];
+    const groups = new Map<string, CraftRecipe[]>();
+    for (const r of c.recipes as readonly CraftRecipe[]) {
+      const cat = r.category ?? 'other';
+      const arr = groups.get(cat);
+      if (arr) arr.push(r);
+      else groups.set(cat, [r]);
+    }
+    const rank = (cat: string): number => {
+      const i = CATEGORY_ORDER.indexOf(cat);
+      return i === -1 ? CATEGORY_ORDER.length : i;
+    };
+    return [...groups.entries()]
+      .sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]))
+      .map(([cat, recipes]) => ({
+        cat,
+        label: CATEGORY_LABEL[cat] ?? this._humanizeSlug(cat),
+        recipes,
+      }));
+  });
+
+  /** Anzeige-Name eines Rezepts: bevorzugt den Backend-`name` (z. B.
+   *  „Holzschwert"), sonst der humanisierte `output`-Slug als Fallback. */
+  recipeName(r: CraftRecipe): string {
+    return r.name ?? this._humanizeSlug(r.output);
+  }
 
   constructor() {
     // Beim Öffnen einer Crafting-Station fragen wir frische Bills an
@@ -132,20 +199,22 @@ export class CraftingComponent {
 
   close(): void { this.state.closeCrafting(); }
 
-  craft(output: string): void {
+  craft(recipeId: string): void {
     const c = this.crafting();
     if (!c) return;
-    this.ws.send({ type: 'craft', output, station: c.station });
+    // Backend (handle_craft) matcht auf die Rezept-`id` (z.B. `wooden_sword`),
+    // NICHT auf `output` — mehrere Rezepte teilen sich denselben Output (sword).
+    this.ws.send({ type: 'craft', recipe_id: recipeId, station: c.station });
   }
 
   /** ×5-Auftrag erzeugen (Legacy „bill-btn"). */
-  addBill(output: string, count: number): void {
+  addBill(recipeId: string, count: number): void {
     const c = this.crafting();
     if (!c) return;
     this.ws.send({
       type: 'add_bill',
       station_type: c.station,
-      recipe_id: output,
+      recipe_id: recipeId,
       count,
     });
   }

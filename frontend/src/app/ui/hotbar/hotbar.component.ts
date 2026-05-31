@@ -27,7 +27,7 @@
 //
 // Spell-Slot-Hook (Welle 25 / F13):
 //   `slot.kind` kann später auch eine Spell-ID sein. Der Use-Handler muss
-//   dann `cast_learned {spell_id: slot.kind}` statt `use_item` senden.
+//   dann `cast_spell {spell_id: slot.kind}` statt `use_item` senden.
 //   Der Resolver würde Spells über `state.spells().learned` finden statt
 //   über `state.inventory()`. Aktuell nicht implementiert — siehe
 //   `_resolveSpellOrItem` für die Stelle, an der das später ansetzt.
@@ -274,7 +274,7 @@ export class HotbarComponent {
 
     // Spell-Slot-Hook (F13): falls `kind` keine Item-Definition hat, könnte
     // es eine gelernte Spell-ID sein. Dann statt `use_item` einen Cast
-    // schicken: `this.bridge.sendIntent({ type: 'cast_learned', spell_id: kind })`.
+    // schicken: `this.bridge.sendIntent({ type: 'cast_spell', spell_id: kind })`.
     // Resolver würde `state.spells().learned.some(s => s.kind === kind)` prüfen.
     const def = ITEM[kind] ?? null;
     if (!def) {

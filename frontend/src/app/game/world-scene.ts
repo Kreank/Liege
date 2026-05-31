@@ -95,12 +95,27 @@ export interface WorldSceneInitData {
 /** Render-Tiefen (Z-Order). */
 const DEPTH = {
   TILES: 0,
+  /** Gebäude-Boden (floor-Layer): über dem Welt-Tile, aber UNTER Objekten,
+   *  Items, NPCs — damit Wände/Möbel/Items auf dem Boden stehen statt
+   *  dahinter. */
+  FLOOR: 2,
   GROUND_ITEMS: 5,
   STRUCTURES: 10,
   NPCS: 20,
   PLAYERS: 30,
   ME: 40,
 } as const;
+
+/** Versatz (Anteil von TILE_SIZE), um den Wand-/Tür-Sprites zur Gebäude-
+ *  Außenseite geschoben werden, damit der zentrierte Wand-Streifen an der
+ *  Außenkante seines Tiles sitzt. ~0.28 rückt den Streifenrand etwa auf die
+ *  Tile-Kante. Bei Bedarf feinjustieren. */
+const WALL_EDGE_SHIFT = 0.28;
+
+/** Render-Skalierung für Wände/Türen (Vielfaches von TILE_SIZE). >1 lässt die
+ *  zentrierten Streifen-Sprites überlappen, damit Ecken/Nähte nach dem
+ *  Außen-Versatz schließen (Assets sind sonst „zu kurz"). Feinjustierbar. */
+const WALL_RENDER_SCALE = 1.32;
 
 /** Fallback-Farben pro Sprite-Familie wenn das Texture nicht geladen ist. */
 const FALLBACK_COLORS = {
@@ -222,6 +237,14 @@ export class WorldScene extends Phaser.Scene {
   private lastSentMoveTile: { x: number; y: number } | null = null;
   /** Lokaler Sprint-Zustand — wir senden nur on/off-Edges an den Server. */
   private sprintSent = false;
+  /** True, sobald das Backend uns wegen Erschöpfung gestoppt hat. Bleibt
+   *  gesetzt, bis der Spieler Shift los- und neu drückt — sonst würde der
+   *  Pixel-Tick mit dem ersten regenerierten Stamina-Punkt sofort wieder
+   *  sprinten (Flicker). */
+  private sprintBlocked = false;
+  /** Letzter beobachteter Wert von `state.sprintExhaustEpoch()` — Edge-
+   *  Detection für `sprintBlocked = true`. */
+  private lastSprintExhaustEpoch = 0;
 
   // ─── Pixel-Movement (Legacy-Style, 31.05) ────────────────────────────
   /** Eigene Player-Pixel-Pos (Welt-Koord). Init bei erstem state.player(). */
@@ -236,11 +259,12 @@ export class WorldScene extends Phaser.Scene {
   /** Move-Speed in Pixel/Sekunde (Legacy-Wert). Sprint = ×1.5. */
   private readonly moveSpeed = 240;
   private readonly sprintMult = 1.5;
-  /** Kollisions-Hitbox: 4-Ecken-Check mit Halb-Kantenlänge — etwas kleiner
-   *  als ein halber Tile, damit der Spieler durch enge Lücken rutscht
-   *  ("forgiveness"). Legacy 14px bei TILE_SIZE 32 → wir skalieren auf
-   *  ~44% von TILE_SIZE. */
-  private readonly collisionHalf = TILE_SIZE * 0.44;
+  /** Kollisions-Hitbox: 4-Ecken-Check mit Halb-Kantenlänge. Deutlich kleiner
+   *  als ein halber Tile, damit sich Bewegung nicht "verklemmt" anfühlt und
+   *  der Spieler durch enge Lücken rutscht ("forgiveness"). 0.44 war zu groß
+   *  (≈28px-Box, fast volle Kachel) → fühlte sich nach unsichtbaren Wänden an;
+   *  0.30 ≈ 19px-Box. */
+  private readonly collisionHalf = TILE_SIZE * 0.30;
   /** Letzte Frame-Zeit für dt-Berechnung. */
   private lastUpdateTime = 0;
   /** Subscription auf den WS-Message-Stream (für transiente FX). */
@@ -586,7 +610,11 @@ export class WorldScene extends Phaser.Scene {
     // bestehende Strukturen abreißen/benutzen).
     if (this.bridge.buildMode()) {
       const structures = this.bridge.state.structures();
-      const blocked = structures.some((s) => s.x === tileX && s.y === tileY);
+      // `floor` lebt im floor-Layer (siehe village_spawner) und blockiert
+      // Object-Layer-Placements NICHT — nur object-Layer-Strukturen zählen.
+      const blocked = structures.some(
+        (s) => s.x === tileX && s.y === tileY && s.type !== 'floor',
+      );
       if (!blocked) {
         const structType = this.bridge.selectedStructure();
         if (!structType) {
@@ -662,7 +690,14 @@ export class WorldScene extends Phaser.Scene {
     // 3) Struktur? Harvest-bar (Tree/Stone/Ore/Wall/Crop) → attack,
     //    Tür → toggle_door (H1.12), sonst use (Bett/Brunnen/Schild/Truhe/…).
     const structures = this.bridge.state.structures();
-    const structHere = structures.find((s) => s.x === tileX && s.y === tileY);
+    // Object-Layer bevorzugen: `floor` ist ein passives Boden-Tile (liegt
+    // oft UNTER Türen/Wänden/Möbeln, siehe village_spawner._place_house).
+    // Ohne Filter würde `find` häufig den Boden zurückgeben und der Klick
+    // ginge als `use_structure` auf den Floor — Tür-Toggle/Wall-Attack
+    // würden nie ausgelöst.
+    const structsHere = structures.filter((s) => s.x === tileX && s.y === tileY);
+    const structHere =
+      structsHere.find((s) => s.type !== 'floor') ?? structsHere[0];
     if (structHere) {
       if (isDoorType(structHere.type)) {
         // H1.12 — Tür-Toggle via separates Intent. Backend antwortet mit
@@ -677,7 +712,20 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    // 4) Leeres Tile: KEIN Klick-zum-Bewegen (Design-Entscheidung 2026-05-31).
+    // 4) Angrenzendes Wasser-Tile? → direkt aus dem See trinken.
+    //    Linksklick auf ein Wasser-Tile im Umkreis von 1 Feld sendet
+    //    `drink_water_tile {x, y}` (Backend prüft Distanz + Tile-Typ erneut
+    //    und stillt den Durst). Spart den Umweg „Eimer füllen → trinken",
+    //    wenn man nur schnell den Durst stillen will.
+    const myTx = Math.floor(this.myPx / TILE_SIZE);
+    const myTy = Math.floor(this.myPy / TILE_SIZE);
+    const cheb = Math.max(Math.abs(tileX - myTx), Math.abs(tileY - myTy));
+    if (cheb <= 1 && this.tileIdAt(tileX, tileY) === TILE.WATER.id) {
+      this.bridge.sendIntent({ type: 'drink_water_tile', x: tileX, y: tileY });
+      return;
+    }
+
+    // 5) Leeres Tile: KEIN Klick-zum-Bewegen (Design-Entscheidung 2026-05-31).
     // Bewegung läuft ausschließlich über WASD (Pixel-Movement). Linksklick ist
     // reine Interaktion/Angriff auf Objekte/NPCs; trifft der Klick nichts,
     // passiert nichts. (Rechtsklick ist für eine spätere Aktion reserviert.)
@@ -722,10 +770,15 @@ export class WorldScene extends Phaser.Scene {
     return isHarvestableStructureType(type);
   }
 
-  private handleSprintChange(on: boolean): void {
-    if (on === this.sprintSent) return;
-    this.sprintSent = on;
-    this.bridge.sendSprint(on);
+  private handleSprintChange(shiftHeld: boolean): void {
+    // Wir senden nicht direkt — der Pixel-Tick gated `effectiveSprint`
+    // an Stamina/Block und schickt den Intent dann selbst. Hier nur
+    // den Erschöpfungs-Block aufheben, wenn der Spieler Shift loslässt
+    // (Edge: Backend hat per `sprint_state {exhausted}` blockiert, neuer
+    // Druck soll wieder funktionieren sobald Stamina da ist).
+    if (!shiftHeld) {
+      this.sprintBlocked = false;
+    }
   }
 
   // ─── Pixel-Movement (Legacy myPx/myPy, 31.05) ──────────────────────────
@@ -737,7 +790,12 @@ export class WorldScene extends Phaser.Scene {
   // den Move sofort sieht — Backend bestätigt per `player_moved` und
   // _handlePlayerMoved konvergiert.
   private tickPixelMovement(
-    me: { readonly player_id: number | string; readonly x: number; readonly y: number },
+    me: {
+      readonly player_id: number | string;
+      readonly x: number;
+      readonly y: number;
+      readonly stamina?: number;
+    },
     timeMs: number,
   ): void {
     // Erster Frame: Pixel-Pos aus Server-Tile initialisieren.
@@ -775,7 +833,21 @@ export class WorldScene extends Phaser.Scene {
     const mag = Math.hypot(vx, vy);
     if (mag > 1) { vx /= mag; vy /= mag; }
 
-    const speed = this.moveSpeed * (this.heldKeys.sprint ? this.sprintMult : 1);
+    // Sprint-Gate: Backend-Erschöpfung → Block (bis Shift losgelassen);
+    // ohne Stamina → kein Sprint. Edge-Detect über Exhaust-Epoch.
+    const exhaustEpoch = this.bridge.state.sprintExhaustEpoch();
+    if (exhaustEpoch !== this.lastSprintExhaustEpoch) {
+      this.lastSprintExhaustEpoch = exhaustEpoch;
+      this.sprintBlocked = true;
+    }
+    const stamina = me.stamina ?? 0;
+    const effectiveSprint =
+      this.heldKeys.sprint && !this.sprintBlocked && stamina > 0;
+    if (effectiveSprint !== this.sprintSent) {
+      this.sprintSent = effectiveSprint;
+      this.bridge.sendSprint(effectiveSprint);
+    }
+    const speed = this.moveSpeed * (effectiveSprint ? this.sprintMult : 1);
     const dpx = vx * speed * dt;
     const dpy = vy * speed * dt;
 
@@ -865,14 +937,34 @@ export class WorldScene extends Phaser.Scene {
     if (tile == null) return false;
     if (NON_WALKABLE_TILES.has(tile)) return false;
     // Strukturen mit `blocking: true` blockieren ebenfalls.
+    // WICHTIG: KEIN `break` nach der ersten Struktur — seit Boden unter den
+    // Wänden liegt, hat ein Wand-Tile ZWEI Strukturen (floor + wall). Der
+    // Boden blockt nicht; bräche die Schleife beim Boden ab, liefe man durch
+    // die Wand. Wir prüfen daher ALLE Strukturen am Tile.
     const structures = this.bridge.state.structures();
     for (const s of structures) {
       if (s.x !== tx || s.y !== ty) continue;
       const def = STRUCTURE[s.type];
       if (def?.blocking) return false;
-      break;
     }
     return true;
+  }
+
+  /** Liefert die Terrain-Tile-ID an einer Welt-Tile-Koordinate — oder `null`,
+   *  wenn der Chunk noch nicht geladen ist oder wir im Dungeon sind (dort gibt
+   *  es keinen lokalen Tile-Layer). Mirror des Chunk-Lookups aus
+   *  `isTileWalkable`; wird fürs Wasser-Trinken (`drink_water_tile`) genutzt. */
+  private tileIdAt(tx: number, ty: number): number | null {
+    if (this.bridge.state.dungeonFloor()) return null;
+    const chunks = this.bridge.state.chunks();
+    const cx = Math.floor(tx / this.chunkSize);
+    const cy = Math.floor(ty / this.chunkSize);
+    const chunk = chunks.find((c) => c.cx === cx && c.cy === cy);
+    if (!chunk) return null;
+    const row = chunk.tiles[ty - cy * this.chunkSize];
+    if (!row) return null;
+    const tile = row[tx - cx * this.chunkSize];
+    return tile == null ? null : tile;
   }
 
   // ─── Tile-Layer-Rendering ──────────────────────────────────────────────
@@ -1358,7 +1450,9 @@ export class WorldScene extends Phaser.Scene {
     this.assetLoader.ensureSingle(this, key);
     const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.structure, TILE_SIZE);
-    (obj as Phaser.GameObjects.GameObject & { depth: number }).depth = DEPTH.STRUCTURES;
+    // floor-Layer rendert UNTER dem object-Layer (Wände/Möbel/Items darüber).
+    (obj as Phaser.GameObjects.GameObject & { depth: number }).depth =
+      s.type === 'floor' ? DEPTH.FLOOR : DEPTH.STRUCTURES;
     return obj;
   }
 
@@ -1370,32 +1464,98 @@ export class WorldScene extends Phaser.Scene {
    */
   private updateStructureSprite(obj: Phaser.GameObjects.GameObject, s: Structure): void {
     this.updateMovableSprite(obj, s.x, s.y);
-    const family = familyOf(s.type, s.material ?? null);
-    if (!family) {
-      // Nicht-Wall: kein Re-Tiling, aber Fallback→echte Textur swappen,
-      // sobald das on-demand geladene Asset da ist.
-      this.trySwapFallbackTexture(obj);
-      return;
-    }
-    // Wall/Fence: Variant-Key kann sich durch Re-Tiling ändern → ggf. neues
-    // Asset on-demand nachladen.
+    // Wände/Türen an die AUSSENKANTE ihres Tiles versetzen (siehe Helper).
+    this.applyWallEdgeOffset(obj, s);
+    // Textur für den AKTUELLEN Typ/Variante neu auflösen. Deckt zwei Fälle ab:
+    //   • Tür-Toggle (door_wood → door_wood_open): `structure_replaced` ersetzt
+    //     die Struktur bei gleicher id → Pool ruft update() → hier muss der
+    //     Sprite auf das neue Sprite wechseln (sonst bleibt die Tür optisch zu).
+    //   • Wall/Fence-Re-Tiling: Variant-Key ändert sich, wenn nebenan platziert
+    //     wird (structureSpriteKeyFor berechnet die Bitmask).
     const key = this.structureSpriteKeyFor(s);
+    this.swapStructureTexture(obj, key);
+    // Wände/Türen etwas größer rendern, damit die zentrierten Streifen an
+    // Ecken/Nähten überlappen und keine Lücken bleiben (nach swapStructureTexture,
+    // da setTexture die DisplaySize zurücksetzt).
+    if (s.type === 'wall' || isDoorType(s.type)) {
+      const sz = TILE_SIZE * WALL_RENDER_SCALE;
+      const o = obj as Phaser.GameObjects.GameObject & {
+        setDisplaySize?: (w: number, h: number) => void;
+        setAngle?: (deg: number) => void;
+      };
+      o.setDisplaySize?.(sz, sz);
+      // Tür-Orientierung: Tür-Assets sind für horizontale Wände (N/S) gezeichnet.
+      // In einer VERTIKALEN Wand (E/W) muss die Tür um 90° gedreht werden. Eine
+      // vertikale Wand erkennt man daran, dass die Gebäude-Außenseite LINKS oder
+      // RECHTS liegt (dort fehlt eine Struktur → null), die Wand-Linie also oben/
+      // unten weiterläuft.
+      if (isDoorType(s.type)) {
+        const lk = this.structureLookup;
+        const verticalWall = !lk(s.x - 1, s.y) || !lk(s.x + 1, s.y);
+        o.setAngle?.(verticalWall ? 90 : 0);
+      }
+    }
+  }
+
+  /**
+   * Verschiebt Wand-/Tür-Sprites um einen festen Betrag zur GEBÄUDE-AUSSENSEITE,
+   * sodass der zentrierte Wand-Streifen an der Außenkante seines Tiles sitzt.
+   * Damit deckt die Wand den äußeren Teil des Boden-Tiles ab (kein Boden-Überstand
+   * nach außen) und schließt innen bündig an den Boden an (keine Gras-Lücke).
+   *
+   * Außenseite = orthogonaler Nachbar OHNE Struktur (außerhalb des Gebäude-
+   * Footprints; Innenseite hat Boden/Objekt). Ecken → diagonaler Versatz.
+   */
+  private applyWallEdgeOffset(obj: Phaser.GameObjects.GameObject, s: Structure): void {
+    if (s.type !== 'wall' && !isDoorType(s.type)) return;
+    const lk = this.structureLookup;
+    const SH = TILE_SIZE * WALL_EDGE_SHIFT;
+    let ox = 0;
+    let oy = 0;
+    if (!lk(s.x - 1, s.y)) ox -= SH; // außen links  → nach links
+    if (!lk(s.x + 1, s.y)) ox += SH; // außen rechts → nach rechts
+    if (!lk(s.x, s.y - 1)) oy -= SH; // außen oben   → nach oben
+    if (!lk(s.x, s.y + 1)) oy += SH; // außen unten  → nach unten
+    if (ox === 0 && oy === 0) return;
+    const t = obj as Phaser.GameObjects.GameObject & { x: number; y: number };
+    t.x += ox;
+    t.y += oy;
+  }
+
+  /**
+   * Setzt die Struktur-Textur auf den zu `key` gehörenden Sprite. Lädt das
+   * Asset bei Bedarf on-demand und swappt entweder sofort (schon im Cache)
+   * oder beim Lade-Ende. Der `filecomplete`-Listener wird nur EINMAL pro
+   * Ziel-Textur registriert (sonst sammelt sich pro Sync-Frame ein Listener).
+   */
+  private swapStructureTexture(obj: Phaser.GameObjects.GameObject, key: string): void {
     this.assetLoader.ensureSingle(this, key);
     const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
-    const maybeImage = obj as Phaser.GameObjects.GameObject & {
+    const img = obj as Phaser.GameObjects.GameObject & {
       setTexture?: (key: string) => void;
+      setDisplaySize?: (w: number, h: number) => void;
       texture?: Phaser.Textures.Texture;
       __pendingTex?: string;
+      __spriteSize?: number;
     };
-    if (typeof maybeImage.setTexture === 'function' && this.textures.exists(tex)) {
-      if (maybeImage.texture?.key !== tex) {
-        maybeImage.setTexture(tex);
-        maybeImage.__pendingTex = undefined;
+    if (typeof img.setTexture !== 'function') return; // (sollte nie: Fallback ist Image)
+    if (this.textures.exists(tex)) {
+      if (img.texture?.key !== tex) {
+        img.setTexture(tex);
+        const size = img.__spriteSize ?? TILE_SIZE;
+        img.setDisplaySize?.(size, size);
       }
-    } else if (typeof maybeImage.setTexture === 'function') {
-      // Ziel-Asset noch im Flug: pending-Key aktualisieren, damit der nächste
-      // Sync (oder filecomplete) auf die korrekte Variante swappt.
-      maybeImage.__pendingTex = tex;
+      img.__pendingTex = undefined;
+      return;
+    }
+    // Ziel-Asset noch im Flug: beim Lade-Ende swappen. Nur registrieren, wenn
+    // sich das Ziel geändert hat (verhindert Listener-Akkumulation pro Frame).
+    if (img.__pendingTex !== tex) {
+      img.__pendingTex = tex;
+      this.load.once(
+        `filecomplete-image-${tex}`,
+        () => this.trySwapFallbackTexture(obj),
+      );
     }
   }
 
@@ -1427,6 +1587,16 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private structureSpriteKeyFor(s: Structure): string {
+    // Boden: material-spezifisches, NAHTLOSES Tile (floor_wood/stone/straw)
+    // statt structures/floor.png (das hatte einen transparenten Rand → Lücken).
+    if (s.type === 'floor') {
+      const mat = s.material ?? 'wood';
+      const key = `floor_${mat}`;
+      // Defensiv: nur bekannte Materialien; sonst Holz als Default.
+      return key === 'floor_wood' || key === 'floor_stone' || key === 'floor_straw'
+        ? key
+        : 'floor_wood';
+    }
     const family: WallFamily | null = familyOf(s.type, s.material ?? null);
     if (!family) return s.type;
     const mask = wallMaskFor(s.x, s.y, this.structureLookup, family);
