@@ -87,6 +87,15 @@ export class PartyFrameComponent {
     return `${g.members.length}/${max}`;
   });
 
+  /** H2.7 — Loot-Rule der Gruppe als kurzes Label im Header. Reagiert
+   *  auf `loot_rule_changed`-Frames, die GameState in den Group-Snapshot
+   *  patcht. */
+  readonly lootRuleLabel = computed<string>(() => {
+    const g = this.group();
+    if (!g) return '';
+    return _lootRuleLabel(g.loot_rule);
+  });
+
   readonly isLeader = computed<boolean>(() => {
     const g = this.group();
     if (!g) return false;
@@ -150,5 +159,17 @@ export class PartyFrameComponent {
     // Wir casten defensiv über String() — vergleichbar mit dem Legacy
     // `MY_ID`-Vergleich.
     return String(p.player_id);
+  }
+}
+
+/** Backend-Vertrag → Deutsche UI-Bezeichnung (gespiegelt zum Loot-Roll-
+ *  Component-Helper, damit beide Stellen denselben Wortlaut zeigen). */
+function _lootRuleLabel(rule: string): string {
+  switch (rule) {
+    case 'free_for_all':      return 'FFA';
+    case 'need_before_greed': return 'Need/Greed';
+    case 'leader_decides':    return 'Master-Loot';
+    case 'round_robin':       return 'Round-Robin';
+    default:                  return rule;
   }
 }

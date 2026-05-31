@@ -60,6 +60,42 @@
 .lr-greed { border-color: #c8a050; color: #f0d090; }
 .lr-pass  { border-color: #888; }
 
+.lr-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.lr-btn.my-vote {
+  opacity: 1;
+  box-shadow: 0 0 6px currentColor;
+  font-weight: bold;
+}
+
+/* H2.7 — Loot-Rule-Label + Live-Vote-Counts. */
+.loot-roll-rule {
+  font-size: 11px;
+  color: #b09060;
+  margin-left: 6px;
+  font-weight: normal;
+}
+
+.loot-roll-votes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.lrv {
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid #555;
+}
+.lrv-need  { color: #f0a090; border-color: #804040; }
+.lrv-greed { color: #f0d090; border-color: #806040; }
+.lrv-pass  { color: #aaa; }
+
 .loot-roll-timer {
   font-size: 11px;
   color: #888;

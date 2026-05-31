@@ -96,6 +96,21 @@ export class GameStateService {
     readonly started_at_ms: number;
   } | null>(null);
 
+  /** H2.7 — Live-Vote-Counts pro Loot-Roll. Backend sendet
+   *  `loot_roll_voted {roll_id, voter, vote, votes_cast}` für jeden Vote.
+   *  Wir tracken pro Kategorie need/greed/pass die Anzahl. `total` ist die
+   *  Zahl der Teilnehmer (aus `votes_cast` ableitbar — Backend sendet die
+   *  totale erwartete Vote-Zahl als Summen-Hinweis; fallback auf
+   *  Gruppen-Member-Count). Wird beim `loot_roll_started` zurückgesetzt
+   *  und beim `loot_roll_resolved` geleert. */
+  readonly lootRollVoteCounts = signal<{
+    readonly need: number;
+    readonly greed: number;
+    readonly pass: number;
+    /** Erwartete Vote-Zahl (Gruppen-Member-Count zum Zeitpunkt des Rolls). */
+    readonly total: number;
+  } | null>(null);
+
   // ─── Quests + Factions ───────────────────────────────────────────────
   readonly quests = signal<readonly Quest[]>([]);
   readonly factions = signal<readonly FactionReputation[]>([]);
@@ -454,12 +469,9 @@ export class GameStateService {
       case 'raid_error':           this._toastError(msg, 'Raid-Aktion fehlgeschlagen'); break;
       case 'raid_started':         this._handleRaidStarted(msg); break;
       case 'loot_roll_started':    this._handleLootRollStarted(msg); break;
-      case 'loot_roll_resolved':   this.activeLootRoll.set(null); break;
-      case 'loot_roll_voted':
-      case 'loot_rule_changed':
-        // loot_voted: nur Live-Vote-Count, der Overlay zeigt das nicht; das
-        // Lootrule-Update wird vom späteren Party-Settings-Panel konsumiert.
-        break;
+      case 'loot_roll_resolved':   this._handleLootRollResolved(); break;
+      case 'loot_roll_voted':      this._handleLootRollVoted(msg); break;
+      case 'loot_rule_changed':    this._handleLootRuleChanged(msg); break;
       case 'loot_vote_error':      this._toastError(msg, 'Loot-Vote ungültig'); break;
 
       // ─── Quests + Factions ──────────────────────────────────────────
@@ -1039,10 +1051,61 @@ export class GameStateService {
       expires_in_s: (msg['expires_in_s'] as number | undefined) ?? 20,
       started_at_ms: Date.now(),
     });
+    // H2.7 — Vote-Counts zurücksetzen. `total` aus Backend bzw. aus der
+    // aktuellen Gruppen-Member-Count (Online-Member).
+    const total =
+      (msg['total'] as number | undefined) ??
+      (msg['participants'] as number | undefined) ??
+      this.party()?.members.filter((m) => m.online).length ??
+      0;
+    this.lootRollVoteCounts.set({ need: 0, greed: 0, pass: 0, total });
+  }
+
+  private _handleLootRollResolved(): void {
+    this.activeLootRoll.set(null);
+    this.lootRollVoteCounts.set(null);
+  }
+
+  /** H2.7 — `loot_roll_voted {roll_id, voter, vote, votes_cast}`. Backend
+   *  zählt selbst mit; wir spiegeln den Stand pro Vote-Kategorie. */
+  private _handleLootRollVoted(msg: GenericMsg): void {
+    const rollId = msg['roll_id'] as number | undefined;
+    const cur = this.activeLootRoll();
+    if (!cur || cur.roll_id !== rollId) return; // anderer (stale) Roll
+    const vote = (msg['vote'] as string | undefined)?.toLowerCase();
+    if (vote !== 'need' && vote !== 'greed' && vote !== 'pass') return;
+    const counts = this.lootRollVoteCounts() ?? {
+      need: 0,
+      greed: 0,
+      pass: 0,
+      total: 0,
+    };
+    // Backend liefert `votes_cast` als kumulativen Gesamt-Counter (alle
+    // Stimmen bisher) — primär informativ. Wir inkrementieren die
+    // spezifische Kategorie um 1; bei einem Total-Sprung gleichen wir
+    // den Counter auf die obere Schranke an, damit Race-Conditions
+    // (Doppel-Vote, Refresh) nicht zu negativen UI-Anzeigen führen.
+    const next = {
+      need:  counts.need  + (vote === 'need'  ? 1 : 0),
+      greed: counts.greed + (vote === 'greed' ? 1 : 0),
+      pass:  counts.pass  + (vote === 'pass'  ? 1 : 0),
+      total: counts.total,
+    };
+    this.lootRollVoteCounts.set(next);
+  }
+
+  /** H2.7 — `loot_rule_changed {rule}`. Spiegelt die neue Regel in die
+   *  Gruppe; Party-Frame rendert sie als Subtext. */
+  private _handleLootRuleChanged(msg: GenericMsg): void {
+    const rule = msg['rule'] as Group['loot_rule'] | undefined;
+    const cur = this.party();
+    if (!cur || !rule) return;
+    this.party.set({ ...cur, loot_rule: rule });
   }
 
   clearLootRoll(): void {
     this.activeLootRoll.set(null);
+    this.lootRollVoteCounts.set(null);
   }
 
   private _handleGroupMemberStatus(msg: GenericMsg): void {

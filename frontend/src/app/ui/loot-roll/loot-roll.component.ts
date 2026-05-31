@@ -50,6 +50,19 @@ export class LootRollComponent implements OnInit {
   readonly roll = computed(() => this.state.activeLootRoll());
   readonly visible = computed<boolean>(() => this.roll() !== null);
 
+  /** H2.7 — Live-Vote-Counts (Need/Greed/Pass). Null bevor der erste Vote
+   *  reinkommt → Template rendert dann „Warte auf Stimmen…". */
+  readonly voteCounts = computed(() => this.state.lootRollVoteCounts());
+
+  /** Loot-Rule der eigenen Gruppe — wird im Overlay-Header als Kontext-
+   *  Hinweis angezeigt (Spieler weiß, warum er gerade Need/Greed wählen
+   *  darf). */
+  readonly lootRuleLabel = computed<string>(() => {
+    const g = this.state.party();
+    if (!g) return '';
+    return _lootRuleLabel(g.loot_rule);
+  });
+
   readonly itemLabel = computed<string>(() => {
     const r = this.roll();
     if (!r) return '';
@@ -71,9 +84,12 @@ export class LootRollComponent implements OnInit {
 
   constructor() {
     // Auto-Tick-Effect — startet/stoppt das Intervall je Roll-Status.
+    // Bei neuem Roll: eigene Stimme zurücksetzen, damit Vote-Buttons
+    // wieder enabled sind.
     effect(() => {
       const r = this.state.activeLootRoll();
       if (r) {
+        this._myVote.set(null);
         this._startTimer();
       } else {
         this._stopTimer();
@@ -98,8 +114,23 @@ export class LootRollComponent implements OnInit {
       vote: kind,
     };
     this.ws.send(intent);
-    this.state.clearLootRoll();
+    // H2.7 — NICHT mehr lokal `clearLootRoll` triggern: das Overlay soll
+    // bis zum `loot_roll_resolved` sichtbar bleiben, damit der Spieler
+    // den Vote-Verlauf der Gruppe live sehen kann. Wir schalten lokal
+    // die Aktions-Buttons aus, indem wir den eigenen Stimm-Status
+    // halten (siehe `myVote`).
+    this._myVote.set(kind);
   }
+
+  /** Tracking der eigenen Stimme — damit Buttons nach Vote disabled
+   *  werden. Backend lehnt einen 2. Vote ohnehin per `loot_vote_error`
+   *  ab, aber das UI signalisiert es schon vorher. */
+  private readonly _myVote = signal<Vote | null>(null);
+  readonly myVote = computed<Vote | null>(() => {
+    const r = this.roll();
+    if (!r) return null;
+    return this._myVote();
+  });
 
   private _startTimer(): void {
     if (this._timerId !== null) return;
@@ -116,5 +147,16 @@ export class LootRollComponent implements OnInit {
       window.clearInterval(this._timerId);
       this._timerId = null;
     }
+  }
+}
+
+/** Backend-Vertrag → Deutsche UI-Bezeichnung. */
+function _lootRuleLabel(rule: string): string {
+  switch (rule) {
+    case 'free_for_all':      return 'FFA';
+    case 'need_before_greed': return 'Need/Greed';
+    case 'leader_decides':    return 'Master-Loot';
+    case 'round_robin':       return 'Round-Robin';
+    default:                  return rule;
   }
 }

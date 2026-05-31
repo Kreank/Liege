@@ -4,6 +4,11 @@
       <span class="pf-title">{{ title() }}</span>
       <span class="pf-count">{{ countLabel() }}</span>
     </div>
+    @if (lootRuleLabel()) {
+      <div class="pf-loot-rule" [attr.title]="'Loot-Regel: ' + lootRuleLabel()">
+        🎲 {{ lootRuleLabel() }}
+      </div>
+    }
     <div class="pf-members">
       @for (sec of sections(); track sec.subParty) {
         @if (sec.showHeader) {

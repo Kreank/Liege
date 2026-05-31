@@ -26,6 +26,16 @@
   margin-bottom: 4px;
 }
 
+/* H2.7 — Loot-Rule-Label im Party-Frame-Header-Bereich. */
+.pf-loot-rule {
+  font-size: 10px;
+  color: #b09060;
+  padding: 1px 4px 4px;
+  text-align: right;
+  border-bottom: 1px dashed #444;
+  margin-bottom: 4px;
+}
+
 .pf-member {
   display: flex;
   align-items: center;

@@ -1,15 +1,36 @@
 @if (visible()) {
   <div class="loot-roll-overlay">
     <div class="loot-roll-box">
-      <div class="loot-roll-title">🎲 Loot-Roll</div>
+      <div class="loot-roll-title">
+        🎲 Loot-Roll
+        @if (lootRuleLabel()) {
+          <span class="loot-roll-rule">· {{ lootRuleLabel() }}</span>
+        }
+      </div>
       <div class="loot-roll-body">
         <b>{{ itemLabel() }}</b><br>
         <span class="loot-roll-hint">Need wenn du es brauchst, Greed sonst</span>
       </div>
+      @if (voteCounts(); as vc) {
+        <div class="loot-roll-votes">
+          <span class="lrv lrv-need">⚔️ {{ vc.need }}/{{ vc.total }}</span>
+          <span class="lrv lrv-greed">💰 {{ vc.greed }}/{{ vc.total }}</span>
+          <span class="lrv lrv-pass">✗ {{ vc.pass }}/{{ vc.total }}</span>
+        </div>
+      }
       <div class="loot-roll-actions">
-        <button type="button" class="lr-btn lr-need"  (click)="vote('need')">⚔️ Need</button>
-        <button type="button" class="lr-btn lr-greed" (click)="vote('greed')">💰 Greed</button>
-        <button type="button" class="lr-btn lr-pass"  (click)="vote('pass')">✗ Pass</button>
+        <button type="button" class="lr-btn lr-need"
+                [disabled]="myVote() !== null"
+                [class.my-vote]="myVote() === 'need'"
+                (click)="vote('need')">⚔️ Need</button>
+        <button type="button" class="lr-btn lr-greed"
+                [disabled]="myVote() !== null"
+                [class.my-vote]="myVote() === 'greed'"
+                (click)="vote('greed')">💰 Greed</button>
+        <button type="button" class="lr-btn lr-pass"
+                [disabled]="myVote() !== null"
+                [class.my-vote]="myVote() === 'pass'"
+                (click)="vote('pass')">✗ Pass</button>
       </div>
       <div class="loot-roll-timer">{{ remainingS() }} s</div>
     </div>
