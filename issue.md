@@ -1,0 +1,2 @@
+Problem: npc questgeber stehen in gruppen mitten in der wildnis.
+Wunsch: npc questgeber nur in dörfern/städten/königreich. vereinzelnt questgeber vor z.B: Dungeoneingängen mit quests die in dem Dungeon zu erfüllen sind. Händler der unterwegs getroffen wird und hilfe bruacht.

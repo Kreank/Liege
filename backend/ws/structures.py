@@ -306,6 +306,14 @@ async def handle_attack_structure(ctx: WsContext, data: dict) -> None:
         return
     from structures import is_combat_structure as _is_cs
     if not _is_cs(s["type"]):
+        # Harvestables (Bäume/Pflanzen/Felsen — z. B. carrot_plant, wheat_grown,
+        # tall_grass) sind KEINE Combat-Strukturen: sie werden GEERNTET, nicht
+        # bekämpft. Das Frontend routet Harvest-Klicks (Sichel auf Getreide/
+        # Karotten) als attack_structure hierher — wir delegieren an den
+        # Ernte-Pfad in use_structure (Tool-Check, Yield, Durability, Quests).
+        if harvest.is_harvestable(s["type"]):
+            await handle_use_structure(ctx, data)
+            return
         await websocket.send_json({
             "type": "toast", "text": "Diese Struktur kann nicht angegriffen werden.",
         })
@@ -649,15 +657,26 @@ async def handle_use_structure(ctx: WsContext, data: dict) -> None:
             if (talent_effects_h.get("gathering_crystal_chance", 0) > 0
                     and _r.random() < talent_effects_h["gathering_crystal_chance"]):
                 drops.append("crystal")
-        for drop_kind in drops:
-            created = await items.create_for_player(drop_kind, player_id)
+        from collections import Counter as _Cnt
+        drop_counts = _Cnt(drops)
+        # Pro Item-Art EINE aggregierte inventory_add senden, mit `added` =
+        # in DIESEM Schlag gewonnene Menge. `item.quantity` ist die Stack-
+        # GESAMTmenge — die als Float „+102 Stein" anzuzeigen ist irreführend;
+        # die Float nutzt daher `added` (z. B. „+2 Stein", passend zum Toast).
+        for kind, cnt in drop_counts.items():
+            created = None
+            for _ in range(cnt):
+                c = await items.create_for_player(kind, player_id)
+                if c is not None:
+                    created = c
             if created is not None:
-                await websocket.send_json({"type": "inventory_add", "item": created})
+                await websocket.send_json({
+                    "type": "inventory_add", "item": created, "added": cnt,
+                })
         # Quest-Hook: gesammelte Drops
         if drops:
             try:
-                from collections import Counter as _Cnt
-                for kind, cnt in _Cnt(drops).items():
+                for kind, cnt in drop_counts.items():
                     updated_q = await quests.on_item_collected(player_id, kind, cnt)
                     for q in updated_q:
                         await websocket.send_json({"type": "quest_progress", "quest": q})

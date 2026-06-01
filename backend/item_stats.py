@@ -160,6 +160,30 @@ WEAPON_STATS = {
         "damage": 9, "speed": 1.25, "crit": 0.14, "crit_mult": 1.9,
         "range": 1, "class": "finesse", "two_handed": False,
     },
+    # ── Welle 51: Monster-Drop-Waffen (waren ohne Stats → nur Faust-Schaden).
+    # Archetyp-basiert mit Tier-Flavor (rusty/worn schwächer, demon stärker). ──
+    "rusty_sword":        {"damage": 8,  "speed": 1.0,  "crit": 0.05, "crit_mult": 1.4,
+                           "range": 1, "class": "physical", "two_handed": False},
+    "iron_sword":         {"damage": 13, "speed": 1.0,  "crit": 0.06, "crit_mult": 1.5,
+                           "range": 1, "class": "physical", "two_handed": False},
+    "iron_spear":         {"damage": 15, "speed": 1.0,  "crit": 0.07, "crit_mult": 1.6,
+                           "range": 2, "class": "physical", "two_handed": True},
+    "bone_dagger":        {"damage": 6,  "speed": 1.7,  "crit": 0.20, "crit_mult": 2.3,
+                           "range": 1, "class": "finesse", "two_handed": False},
+    "bone_spear":         {"damage": 12, "speed": 1.0,  "crit": 0.07, "crit_mult": 1.6,
+                           "range": 2, "class": "physical", "two_handed": True},
+    "bone_staff":         {"damage": 9,  "speed": 1.0,  "crit": 0.07, "crit_mult": 1.5,
+                           "range": 4, "class": "magic", "two_handed": True},
+    "bone_warhammer":     {"damage": 17, "speed": 0.70, "crit": 0.04, "crit_mult": 1.7,
+                           "range": 1, "class": "physical", "two_handed": True, "armor_pen": 0.30},
+    "shaman_stick":       {"damage": 8,  "speed": 1.2,  "crit": 0.08, "crit_mult": 1.5,
+                           "range": 4, "class": "magic", "two_handed": False},
+    "worn_bow":           {"damage": 8,  "speed": 0.90, "crit": 0.08, "crit_mult": 1.5,
+                           "range": 5, "class": "ranged", "two_handed": True},
+    "living_wood_bow":    {"damage": 13, "speed": 1.0,  "crit": 0.12, "crit_mult": 1.7,
+                           "range": 5, "class": "ranged", "two_handed": True},
+    "demon_forge_hammer": {"damage": 22, "speed": 0.60, "crit": 0.05, "crit_mult": 1.9,
+                           "range": 1, "class": "physical", "two_handed": True, "armor_pen": 0.35},
 }
 
 # Rüstung: Defense pro Slot (Welle 19 — höhere Werte für meaningful protection).

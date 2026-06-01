@@ -35,8 +35,12 @@ const COLOR_FOR_KIND: Readonly<Record<FloatingNumberKind, string>> = {
   phys: '#ffffff',
   dot:  '#d33', // rot für DOT/Gift/Fire
   heal: '#5e5',
-  crit: '#fc3',
+  crit: '#ffe23a', // kräftiges Gelb für Krit-Treffer
 };
+
+/** Basis-Schriftgröße der Floating-Numbers (px). Krits sind eine Stufe größer. */
+const BASE_FONT_PX = 20;
+const CRIT_FONT_PX = 26;
 
 /** Render-Depth für Combat-FX. Höher als alles andere (Player = 40). */
 const DEPTH_FX = 60;
@@ -61,12 +65,14 @@ export const COMBAT_FX = {
     },
   ): void {
     const color = COLOR_FOR_KIND[args.kind];
+    const isCrit = args.kind === 'crit';
     const text = scene.add.text(args.x, args.y - 8, args.text, {
       fontFamily: 'Arial, sans-serif',
-      fontSize: '20px',
+      fontSize: `${isCrit ? CRIT_FONT_PX : BASE_FONT_PX}px`,
+      fontStyle: isCrit ? 'bold' : 'normal',
       color,
       stroke: '#000000',
-      strokeThickness: 3,
+      strokeThickness: isCrit ? 4 : 3,
     });
     text.setOrigin(0.5, 0.5);
     text.setDepth(DEPTH_FX);

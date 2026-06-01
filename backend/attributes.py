@@ -286,7 +286,15 @@ async def player_combat_sheet(items, player_name: str) -> dict:
     else:
         base = item_stats.weapon_base_damage(wkind)
         speed = item_stats.weapon_attack_speed(wkind)
-    avg_damage = int(round(base + skill_add + combat.PLAYER_BASE_DAMAGE // 2))
+    # Stärke skaliert den physischen Schaden (Welle 51) — denselben Multiplikator
+    # cachen wir für den Combat-Pfad (combat.attack_npc), damit angezeigter und
+    # tatsächlicher Schaden konsistent sind und Stats mit dem Grundangriff
+    # kumulieren. Stärke enthält bereits Equipment-Affixe (damage_pct→stärke).
+    str_total = int(totals.get("stärke", 0))
+    dmg_mult = 1.0 + str_total * combat.STR_DMG_PER_POINT
+    combat.set_player_damage_mult(player_name, dmg_mult)
+    avg_damage = int(round(
+        (base + skill_add + combat.PLAYER_BASE_DAMAGE // 2) * dmg_mult))
 
     stats = {
         "damage":       avg_damage,

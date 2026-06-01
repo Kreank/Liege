@@ -139,6 +139,23 @@ NPC_HP_BY_KIND = {
 # Default-Schaden eines Spielers ohne Waffe (Faust)
 PLAYER_BASE_DAMAGE = 4
 
+# Attribut→Schaden: jeder Punkt Stärke gibt +2 % physischen Schaden. Stärke
+# aggregiert Skills + Equipment-Affixe (damage_pct → stärke) + Talente, daher
+# fließen darüber auch Waffen-Affixe in den Angriff ein. Der effektive Mult
+# wird pro Spieler gecached (gesetzt von attributes.player_combat_sheet bei
+# Login/Equip/Allocation) — damit attack_npc nicht pro Hit alle Attribute neu
+# berechnen muss.
+STR_DMG_PER_POINT = 0.02
+_player_dmg_mult: dict[str, float] = {}
+
+
+def set_player_damage_mult(player_name: str, mult: float) -> None:
+    _player_dmg_mult[player_name] = mult
+
+
+def player_damage_mult(player_name: str) -> float:
+    return _player_dmg_mult.get(player_name, 1.0)
+
 # Legacy-Konstante (Backwards-Compat). Bevorzugt item_stats.weapon_base_damage nutzen.
 WEAPON_DAMAGE = {
     "sword": 10, "axe": 14, "bow": 8, "staff": 7,

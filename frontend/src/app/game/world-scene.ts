@@ -524,6 +524,13 @@ export class WorldScene extends Phaser.Scene {
       }
     }
 
+    // ─── Perf: Chunk-Culling ───────────────────────────────────────────
+    // Phaser cullt Container-Kinder NICHT automatisch — ohne das hier würden
+    // ALLE geladenen Chunks (radius 3 = bis 49 × 32² ≈ 50k Tile-Images) jeden
+    // Frame gerendert. Wir blenden Chunks außerhalb des Kamera-Sichtfelds aus;
+    // unsichtbare Container überspringt Phaser komplett (CPU + Draw-Calls).
+    this.cullChunks();
+
     // ─── Welle H2-A: Overlay-Updates pro Frame ─────────────────────────
     // HP-Bars und Sprech-Bubbles ans aktuelle NPC-Snapshot anhängen
     // (Bewegung folgt dem Sprite).
@@ -675,19 +682,26 @@ export class WorldScene extends Phaser.Scene {
     if (npcHere) {
       if (this.isHostileNpc(npcHere)) {
         this.bridge.sendAttackNpc(npcHere.id);
-      } else if (this.isMerchantNpc(npcHere)) {
-        // Händler: direkt Handels-Modal öffnen (Subagent C / H1.13 bauen
-        // das Trade-Panel-Sell-Tab). Backend antwortet mit `trade_open`.
-        this.bridge.sendIntent({ type: 'open_trade', npc_id: npcHere.id });
       } else {
-        // Friendly → Dialog lokal öffnen. Kein WS-Frame nötig — der Server
-        // bekommt erst beim ersten Send (Enter im Input) Bescheid.
-        this.bridge.state.openDialog({
-          npc_id: npcHere.id,
-          npc_name: npcHere.name ?? npcHere.kind,
-          npc_kind: npcHere.kind,
-          backstory: '',
-        });
+        // Nicht-feindlicher Klick öffnet ein Panel (Trade/Dialog) ÜBER dem
+        // Canvas. Bei stillstehender Maus feuert danach kein pointermove/
+        // pointerout mehr → der Mob-Hover-Tooltip bliebe stehen und würde das
+        // Panel verdecken. Daher hier sofort ausblenden.
+        this.tooltip?.hide();
+        if (this.isMerchantNpc(npcHere)) {
+          // Händler: direkt Handels-Modal öffnen. Backend antwortet mit
+          // `trade_open`.
+          this.bridge.sendIntent({ type: 'open_trade', npc_id: npcHere.id });
+        } else {
+          // Friendly/Questgeber → Dialog lokal öffnen. Kein WS-Frame nötig —
+          // der Server bekommt erst beim ersten Send (Enter im Input) Bescheid.
+          this.bridge.state.openDialog({
+            npc_id: npcHere.id,
+            npc_name: npcHere.name ?? npcHere.kind,
+            npc_kind: npcHere.kind,
+            backstory: '',
+          });
+        }
       }
       return;
     }
@@ -1086,6 +1100,35 @@ export class WorldScene extends Phaser.Scene {
     }
     this.structurePool.setAllVisible(visible);
     this.groundItemPool.setAllVisible(visible);
+  }
+
+  /** Blendet Chunk-Container außerhalb des Kamera-Sichtfelds aus. Läuft pro
+   *  Frame über die geladenen Chunks (~49 — billig). Unsichtbare Container
+   *  überspringt Phaser komplett (keine Kind-Iteration, keine Draw-Calls),
+   *  was die effektiv gerenderten Tiles von ~50k auf die ~4–9 sichtbaren
+   *  Chunks senkt. Respektiert `overworldTilesVisible` (Dungeon → alles aus). */
+  private cullChunks(): void {
+    const view = this.cameras.main.worldView;
+    const chunkPx = this.chunkSize * TILE_SIZE;
+    const margin = TILE_SIZE * 3;
+    const left = view.x - margin;
+    const right = view.right + margin;
+    const top = view.y - margin;
+    const bottom = view.bottom + margin;
+    for (const [key, container] of this.chunkContainers) {
+      if (!this.overworldTilesVisible) {
+        container.setVisible(false);
+        continue;
+      }
+      const comma = key.indexOf(',');
+      const cx = Number(key.slice(0, comma));
+      const cy = Number(key.slice(comma + 1));
+      const x = cx * chunkPx;
+      const y = cy * chunkPx;
+      const onScreen =
+        x + chunkPx >= left && x <= right && y + chunkPx >= top && y <= bottom;
+      container.setVisible(onScreen);
+    }
   }
 
   private renderChunk(chunk: Chunk): void {
@@ -1828,11 +1871,13 @@ export class WorldScene extends Phaser.Scene {
     const center = COMBAT_FX.tileCenter(npc.x, npc.y);
     COMBAT_FX.spawnHitSpark(this, center.x, center.y);
     if (dmg != null && dmg > 0) {
+      // Krit-Treffer (Backend `npc_damaged.crit`) → gelb/fett/größer.
+      const isCrit = msg['crit'] === true;
       COMBAT_FX.spawnFloatingNumber(this, {
         x: center.x,
         y: center.y,
-        text: `-${dmg}`,
-        kind: 'phys',
+        text: isCrit ? `-${dmg}!` : `-${dmg}`,
+        kind: isCrit ? 'crit' : 'phys',
       });
     }
     // H2.2 — HP-Bar: Backend-Frame trägt frische `hp`/`max_hp`-Werte.
@@ -2018,7 +2063,12 @@ export class WorldScene extends Phaser.Scene {
     let qty = 1;
     if (item) {
       label = item.name ?? item.kind ?? 'Item';
-      qty = item.quantity ?? 1;
+      // `added` = in DIESEM Event gewonnene Menge (Backend, z. B. Ernte).
+      // `item.quantity` ist die Stack-GESAMTmenge und wäre als „+N" falsch
+      // (z. B. „+102 Stein" statt „+2"). Fallback auf quantity, wenn kein
+      // `added` mitkommt (z. B. einzelnes Boden-Item).
+      const added = msg['added'] as number | undefined;
+      qty = added ?? item.quantity ?? 1;
     } else {
       // `item_picked_up` ohne `item`-Feld? Backend sendet `kind` separat
       // (Welle 25 Audit hat das beobachtet). Defensiv fallen wir auf

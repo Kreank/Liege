@@ -128,6 +128,10 @@ async def handle_attack_npc(ctx: WsContext, data: dict) -> None:
         dmg = int(dmg * (1 + talent_effects.get("combat_ranged_damage", 0)))
     else:
         dmg = int(dmg * (1 + talent_effects.get("combat_melee_damage", 0)))
+    # Welle 51: Attribut-Schaden — Stärke skaliert den Angriff (gecachter Mult,
+    # enthält Equipment-Affixe via damage_pct→stärke). Schließt die Lücke
+    # „Stats kumulieren nicht mit dem Grundangriff".
+    dmg = int(round(dmg * combat_mod.player_damage_mult(player_id)))
     # Crit-Damage-Boost
     if is_crit and talent_effects.get("combat_crit_damage", 0) > 0:
         dmg = int(dmg * (1 + talent_effects["combat_crit_damage"]))
