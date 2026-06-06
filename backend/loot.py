@@ -519,7 +519,7 @@ async def drop_loot_for_npc(manager, items, killer_id: str, npc: dict,
         drops = roll_dungeon_loot(npc_kind, tier, role, theme_data)
         for kind, quality in drops:
             if currency.is_currency(kind):
-                coins_copper += currency.coin_to_copper(kind)
+                coins_copper += currency.coin_drop_copper(kind)
                 continue
             d = await items.spawn_on_ground(kind, drop_x, drop_y,
                                              quality_kind=quality)
@@ -531,7 +531,7 @@ async def drop_loot_for_npc(manager, items, killer_id: str, npc: dict,
         # Overworld: bisherige Logik
         for drop_kind in roll_loot(npc_kind):
             if currency.is_currency(drop_kind):
-                coins_copper += currency.coin_to_copper(drop_kind)
+                coins_copper += currency.coin_drop_copper(drop_kind)
                 continue
             d = await items.spawn_on_ground(drop_kind, drop_x, drop_y)
             if d is not None:

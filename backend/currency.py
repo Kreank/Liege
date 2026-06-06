@@ -13,6 +13,7 @@ als Items, sondern fließen direkt in den Geldbeutel.
 """
 
 import logging
+import random
 
 import db
 
@@ -35,6 +36,25 @@ def is_currency(kind: str) -> bool:
 
 def coin_to_copper(kind: str, count: int = 1) -> int:
     return COIN_VALUES.get(kind, 0) * int(count)
+
+
+# Welle 53 — Warenwert-Balancing: Münz-DROPS aus Loot geben einen RANDOMISIERTEN
+# Kupfer-Betrag in der Größenordnung des Item-Marktes (Schwert ~80, Brustpanzer
+# ~100 Kupfer), NICHT den vollen Münz-Nennwert. Vorher war ein gold_coin-Drop
+# = 10.000 Kupfer = ~250 Schwert-Verkäufe → Münz-Drops dominierten die ganze
+# Wirtschaft, Sammeln/Handeln war Rauschen. Die Tier-Staffelung (Gold > Silber >
+# Kupfer) bleibt erhalten, nur in vernünftiger Höhe.
+COIN_DROP_RANGES = {
+    "copper_coin": (3, 12),
+    "silver_coin": (20, 70),
+    "gold_coin":   (150, 450),
+}
+
+
+def coin_drop_copper(kind: str) -> int:
+    """Kupfer-Betrag für EINEN Münz-Drop aus Loot (randomisiert, tier-gestaffelt)."""
+    lo, hi = COIN_DROP_RANGES.get(kind, (1, 5))
+    return random.randint(lo, hi)
 
 
 def split(copper: int) -> tuple[int, int, int]:

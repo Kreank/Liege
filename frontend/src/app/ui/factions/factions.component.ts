@@ -86,7 +86,7 @@ export class FactionsComponent {
     const clamped = Math.max(-100, Math.min(100, f.goodwill));
     return {
       faction_id: f.faction_id,
-      displayName: this._displayName(f.faction_id),
+      displayName: f.name?.trim() ? f.name : this._displayName(f.faction_id),
       goodwill: f.goodwill,
       tier,
       tierLabel: TIER_LABEL[tier],
@@ -111,7 +111,10 @@ export class FactionsComponent {
    *  ersetzen `_` durch Leerzeichen und kapitalisieren — primitives
    *  Display, das in F-final durch ein vom Backend geliefertes `name`
    *  ersetzt wird. */
-  private _displayName(id: string): string {
+  private _displayName(id: string | undefined | null): string {
+    // Defensiv: fehlende/leere ID darf NICHT werfen (sonst crasht das
+    // `rows`-computed und reißt die Change-Detection mit → UI friert ein).
+    if (!id) return 'Unbekannt';
     return id
       .split('_')
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))

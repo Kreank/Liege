@@ -167,6 +167,9 @@ export class HudComponent {
 
   readonly visible = computed(() => this.state.player() !== null);
 
+  /** True während Bett-Schlaf (gespiegelt aus `rest_start`/`rest_end`). */
+  readonly isResting = computed<boolean>(() => this.state.player()?.is_resting === true);
+
   readonly hp = computed<BarView>(() => this._bar(
     this.state.player()?.hp, this.state.player()?.max_hp,
   ));
@@ -286,6 +289,13 @@ export class HudComponent {
     if (h >= 8 && h < 18)  return 'day';
     if (h >= 18 && h < 21) return 'dusk';
     return 'night';
+  }
+
+  /** Aktives Aufwachen ohne Schritt — beendet den Bett-Schlaf serverseitig.
+   *  Backend antwortet mit `rest_end` (reason 'woke'), das `is_resting`
+   *  zurücksetzt und den Button wieder ausblendet. */
+  wake(): void {
+    this.ws.send({ type: 'wake' });
   }
 
   trackEffect(_idx: number, e: StatusEffectView): string { return e.id; }

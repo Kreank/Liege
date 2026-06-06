@@ -25,6 +25,15 @@ export interface Structure {
   readonly owner_id?: number | null;
   /** True wenn das Frontend die Tür offen rendern soll. */
   readonly open?: boolean;
+  /** Layer-Zugehörigkeit: 'floor' rendert unter 'object'. Backend liefert es
+   *  in jedem structure-Objekt; nötig für layer-genaues Entfernen (sonst löscht
+   *  das Entfernen eines Objects fälschlich auch den Floor darunter). */
+  readonly layer?: 'floor' | 'object';
+  /** Multi-Tile-Footprint (Welle 25). Backend trackt jedes abgedeckte Tile;
+   *  das Frontend braucht width/height, damit die Kollision den GANZEN
+   *  Footprint blockiert (sonst läuft man in 2×2-Ställe/4×4-Gilden hinein). */
+  readonly width?: number;
+  readonly height?: number;
 }
 
 /** Welt-Event-Eintrag (Chronik). */

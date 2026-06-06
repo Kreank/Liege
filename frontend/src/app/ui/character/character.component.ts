@@ -22,6 +22,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -107,6 +108,22 @@ export class CharacterComponent {
   private readonly bridge = inject(GameBridgeService);
 
   readonly visible = signal<boolean>(false);
+
+  /** Voriger `visible`-Wert, um die false→true-Flanke im effect zu erkennen
+   *  (kein Re-Fire beim Schliessen). */
+  private wasVisible = false;
+
+  constructor() {
+    // Auto-Refresh: bei jedem Oeffnen (false→true) ein frisches Stat-Sheet
+    // anfordern, statt auf veralteten init/equip-Daten zu basieren.
+    effect(() => {
+      const open = this.visible();
+      if (open && !this.wasVisible) {
+        this.bridge.sendIntent({ type: 'list_attributes' });
+      }
+      this.wasVisible = open;
+    });
+  }
 
   readonly attrs = computed<readonly AttrRow[]>(() => {
     const a: PlayerAttributes | null = this.state.attributes() ?? this.state.player()?.attributes ?? null;

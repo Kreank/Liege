@@ -156,6 +156,72 @@ def set_player_damage_mult(player_name: str, mult: float) -> None:
 def player_damage_mult(player_name: str) -> float:
     return _player_dmg_mult.get(player_name, 1.0)
 
+
+# ─── Welle 52: Verdrahtung der vier „toten" Kampfwerte ───────────────────────
+# verteidigung / krit_rate / krit_schaden / ausweichen wurden im Charakter-UI
+# angezeigt + aus Attributen (Skills/Talente/Affixe/verteilte Punkte) berechnet,
+# aber im echten Combat IGNORIERT. Hier liegen die Per-Spieler-Caches, analog zu
+# _player_dmg_mult: gesetzt von attributes.player_combat_sheet() bei
+# Login/Equip/Allocation, gelesen im Attack-Handler bzw. damage_player — so muss
+# pro Hit NICHT das ganze Attribut-Sheet neu berechnet werden.
+#
+# Einheiten (verifiziert gegen attributes.py / player_stats totals):
+#   defense_total      : FLAT defense-Wert (gleiche Skala wie Rüstungs-Defense),
+#                        fließt zusätzlich in combat.damage_reduction ein.
+#   crit_chance_total  : PROZENT 0-100 (krit_rate). Als Bruchteil (/100) auf den
+#                        Crit-Roll addiert.
+#   crit_damage_total  : ADDITIVER %-BONUS auf den Crit-Schaden (krit_schaden,
+#                        z.B. 50 = +50% obendrauf, ON TOP des Waffen-crit_mult).
+#   dodge_total        : PROZENT 0-100 (ausweichen). Chance den Treffer komplett
+#                        zu negieren, als Bruchteil (/100), gedeckelt.
+_player_defense: dict[str, float] = {}
+_player_crit_chance: dict[str, float] = {}
+_player_crit_damage: dict[str, float] = {}
+_player_dodge: dict[str, float] = {}
+
+# Cap der Ausweichen-Chance (Design: fordernd/lebensecht — kein Dauer-Dodge).
+PLAYER_DODGE_CAP = 0.5
+
+
+def set_player_defense(player_name: str, value: float) -> None:
+    """Flat-Defense-Total (Talente/Affixe/verteilte Punkte) cachen."""
+    _player_defense[player_name] = value
+
+
+def player_defense(player_name: str) -> float:
+    return _player_defense.get(player_name, 0.0)
+
+
+def set_player_crit_chance(player_name: str, pct: float) -> None:
+    """Krit-Rate-Total in PROZENT (0-100) cachen."""
+    _player_crit_chance[player_name] = pct
+
+
+def player_crit_chance(player_name: str) -> float:
+    """Krit-Rate als BRUCHTEIL (0..1). Default 0.0 (kein Sheet gebaut)."""
+    return _player_crit_chance.get(player_name, 0.0) / 100.0
+
+
+def set_player_crit_damage(player_name: str, pct: float) -> None:
+    """Krit-Schaden-Total als additiven %-Bonus (z.B. 50 = +50%) cachen."""
+    _player_crit_damage[player_name] = pct
+
+
+def player_crit_damage_mult(player_name: str) -> float:
+    """Multiplikator für den Crit-Schaden: (1 + krit_schaden/100). Default 1.0."""
+    return 1.0 + _player_crit_damage.get(player_name, 0.0) / 100.0
+
+
+def set_player_dodge(player_name: str, pct: float) -> None:
+    """Ausweichen-Total in PROZENT (0-100) cachen."""
+    _player_dodge[player_name] = pct
+
+
+def player_dodge_chance(player_name: str) -> float:
+    """Ausweichen als BRUCHTEIL (0..1), gedeckelt auf PLAYER_DODGE_CAP.
+    Default 0.0 (kein Sheet gebaut → kein Dodge)."""
+    return min(PLAYER_DODGE_CAP, max(0.0, _player_dodge.get(player_name, 0.0) / 100.0))
+
 # Legacy-Konstante (Backwards-Compat). Bevorzugt item_stats.weapon_base_damage nutzen.
 WEAPON_DAMAGE = {
     "sword": 10, "axe": 14, "bow": 8, "staff": 7,

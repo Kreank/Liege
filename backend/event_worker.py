@@ -24,6 +24,20 @@ log = logging.getLogger("liege.event_worker")
 # Wie oft der Dispatcher prüft ob Tiers fällig sind
 TICK_SECONDS = int(os.environ.get("EVENT_TICK_SECONDS", "60"))
 
+# Welle 53: Cap für event-gespawnte wandernde Händler/Karawanen. Ohne Limit
+# feuerten spawn_merchant/spawn_caravan über Tage hunderte Händler+Wagen in die
+# Welt ("Haufenweise NPC-Händler", "Karren aus dem Nichts"). Übersteigt die
+# LIVE-Zahl wandernder Händler diesen Wert, werden weitere Merchant-Events
+# übersprungen (Dorf-Händler aus dem village_spawner zählen NICHT mit).
+MAX_WANDERING_MERCHANTS = int(os.environ.get("MAX_WANDERING_MERCHANTS", "6"))
+
+
+def _wandering_merchant_count(npc_manager) -> int:
+    """Aktuelle Anzahl Merchant/Karren-NPCs (Indikator für wandernde Händler)."""
+    return sum(1 for n in npc_manager.all()
+               if n["kind"] in ("merchant", "merchant_female")
+               or n["kind"] in npc_worker.CART_KINDS)
+
 # System-Prompts pro Tier (LLM-Färbung)
 TIER_SYSTEM_PROMPTS = {
     "atmosphere": (
@@ -204,6 +218,11 @@ async def _apply_event_effect(tmpl: dict, ev_meta: dict, world, npc_manager,
                                  color="#ff6020", ttl_s=1500)
 
         elif effect == "spawn_merchant":
+            # Welle 53: Cap — nicht noch mehr Händler wenn die Welt schon voll ist.
+            if _wandering_merchant_count(npc_manager) >= MAX_WANDERING_MERCHANTS:
+                log.info("spawn_merchant übersprungen — Händler-Cap erreicht (%d)",
+                         MAX_WANDERING_MERCHANTS)
+                return
             # Merchant ist friendly — spawnt direkt nahe Spieler (8-15 Tiles)
             spawned = await npc_worker.spawn_one(world, npc_manager,
                                                   connection_manager, kind="merchant")

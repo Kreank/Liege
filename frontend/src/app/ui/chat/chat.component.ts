@@ -157,13 +157,26 @@ export class ChatComponent {
         this.ws.send({ type: 'raid_trigger_manual', tier });
         return true;
       }
+      case '/repopulate':
+      case '/repop':
+        // Admin-only Dev-Werkzeug; Server gated und antwortet bei Nicht-Admins
+        // mit '⛔ Admin only'-Toast. Kein Payload nötig (Handler ignoriert data).
+        this.ws.send({ type: 'dev_world_repopulate' });
+        return true;
+      case '/event': {
+        // Admin-only Dev-Werkzeug; Server gated. Erwartet data.effect (string).
+        if (!arg) { this._localError('/event NAME — Dev-Event auslösen'); return true; }
+        this.ws.send({ type: 'dev_trigger_event', effect: arg });
+        return true;
+      }
       case '/help':
         this.state.appendChat({
           kind: 'system',
           text:
             '/invite Name · /leave · /kick Name · /promote Name · /lead Name · /disband · ' +
             '/party · /raid (→20) · /raid40 · /p TEXT (Gruppen-Chat) · ' +
-            '/raidstart 1..5 (manuelle Raid-Welle) · /lootrule ffa|need_greed',
+            '/raidstart 1..5 (manuelle Raid-Welle) · /lootrule ffa|need_greed · ' +
+            '/repop (Admin: leere Chunks zurücksetzen) · /event NAME (Admin: Dev-Event auslösen)',
         });
         return true;
     }

@@ -24,6 +24,7 @@ import {
   NgZone,
   OnDestroy,
   ViewChild,
+  effect,
   inject,
 } from '@angular/core';
 import Phaser from 'phaser';
@@ -31,6 +32,7 @@ import Phaser from 'phaser';
 import { GameBridgeService } from '../core/services/game-bridge.service';
 import { TooltipService } from '../core/services/tooltip.service';
 import { WebSocketService } from '../core/services/websocket.service';
+import type { ConnectionStatus } from '../core/models/ws-message.model';
 import { AssetLoaderService } from './asset-loader.service';
 import { EffectAnimationsService } from './effect-animations.service';
 import { MobHoverController } from './mob-hover';
@@ -69,6 +71,29 @@ export class PhaserGameComponent implements AfterViewInit, OnDestroy {
   private readonly tooltip = inject(TooltipService);
 
   private game: Phaser.Game | null = null;
+
+  /**
+   * Letzter beobachteter WS-Status. Dient als Flanken-Detektor, damit der
+   * Gruppen-Resync (`group_refresh`) nur beim ÜBERGANG nach `'open'` feuert
+   * und nicht bei jedem Re-Read des Signals. So gibt es nach Login UND nach
+   * jedem Reconnect (Exponential-Backoff) genau EIN `group_refresh`.
+   */
+  private lastWsStatus: ConnectionStatus = 'closed';
+
+  constructor() {
+    // Auto-Resync der Gruppe: Sobald die WS-Verbindung (neu) offen ist,
+    // einmalig `group_refresh` senden. Das Backend antwortet mit genau einem
+    // `group_state`-Frame (Snapshot | null), den GameStateService bereits in
+    // `this.party` schreibt — so steht das permanent sichtbare PartyFrame
+    // nach einem Reconnect nicht mit veraltetem/leerem Stand da.
+    effect(() => {
+      const status = this.ws.status();
+      if (status === 'open' && this.lastWsStatus !== 'open') {
+        this.ws.send({ type: 'group_refresh' });
+      }
+      this.lastWsStatus = status;
+    });
+  }
 
   ngAfterViewInit(): void {
     this.ngZone.runOutsideAngular(() => {

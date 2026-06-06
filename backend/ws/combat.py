@@ -91,8 +91,12 @@ async def handle_attack_npc(ctx: WsContext, data: dict) -> None:
             })
     # Talent-Effekte für Combat anwenden
     talent_effects = await talents.aggregate_effects(player_id)
-    # Crit-Chance-Boost durch Talent
-    crit_roll = _r.random() - talent_effects.get("combat_crit_chance", 0)
+    # Crit-Chance-Boost durch Talent + Welle 52: Attribut-Krit-Rate (krit_rate-
+    # Total als Bruchteil, gecached). Der Roll vergleicht später rng_roll <
+    # crit_chance — beide Boni senken den Roll, erhöhen also die Crit-Wahrsch.
+    crit_roll = (_r.random()
+                 - talent_effects.get("combat_crit_chance", 0)
+                 - combat_mod.player_crit_chance(player_id))
     dmg, is_crit = combat_mod.calc_player_damage(
         weapon_kind=weapon,
         weapon_quality=weapon_quality,
@@ -133,8 +137,14 @@ async def handle_attack_npc(ctx: WsContext, data: dict) -> None:
     # „Stats kumulieren nicht mit dem Grundangriff".
     dmg = int(round(dmg * combat_mod.player_damage_mult(player_id)))
     # Crit-Damage-Boost
-    if is_crit and talent_effects.get("combat_crit_damage", 0) > 0:
-        dmg = int(dmg * (1 + talent_effects["combat_crit_damage"]))
+    if is_crit:
+        # Welle 52: Attribut-Krit-Schaden (krit_schaden-Total als additiver
+        # %-Bonus, z.B. 50 → ×1.5) ON TOP des Waffen-crit_mult, der bereits in
+        # calc_player_damage angewendet wurde. Mult ist 1.0 wenn kein Sheet
+        # gebaut (neutraler Default).
+        dmg = int(round(dmg * combat_mod.player_crit_damage_mult(player_id)))
+        if talent_effects.get("combat_crit_damage", 0) > 0:
+            dmg = int(dmg * (1 + talent_effects["combat_crit_damage"]))
     # Berserker: unter 30% HP
     prow = await db.pool().fetchrow(
         "SELECT hp, max_hp FROM players WHERE name = $1", player_id,

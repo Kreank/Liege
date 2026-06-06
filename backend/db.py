@@ -656,8 +656,14 @@ async def _apply_schema_with_retry(conn, schema: str) -> None:
 
 async def init_db() -> asyncpg.Pool:
     global _pool
+    # Welle 53: Pool von 10 → 24. Hot-Path-Handler (move/attack) UND viele
+    # Hintergrund-Worker (needs, stamina, npc_worker, respawn, raid, weather …)
+    # teilen sich den Pool; unter Last mit mehreren Spielern war 10 ein
+    # Flaschenhals/Wartepunkt. Konfigurierbar via DB_POOL_MAX.
     _pool = await asyncpg.create_pool(
-        DATABASE_URL, min_size=1, max_size=10, init=_init_conn
+        DATABASE_URL, min_size=2,
+        max_size=int(os.environ.get("DB_POOL_MAX", "24")),
+        init=_init_conn,
     )
     async with _pool.acquire() as conn:
         await _apply_schema_with_retry(conn, SCHEMA)

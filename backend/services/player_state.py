@@ -90,6 +90,12 @@ async def load_or_create_player(world, structures, name: str) -> dict:
 async def heal_player(manager, name: str, amount: int) -> None:
     """Heilt einen Spieler bis max_hp. Broadcastet player_healed.
     Bei voller Heilung werden auch Body-Parts wiederhergestellt."""
+    # Welle 53: Ein „downed" Spieler (hp=0, 30s-Respawn-Timer läuft) darf NICHT
+    # hochgeheilt werden — sonst hat er hp>0, bleibt aber bewegungsblockiert
+    # downed → Soft-Lock (z.B. Bett-Schlaf-Heal-Tick auf einen schlafenden, dann
+    # downed Spieler). Respawn setzt hp separat nach dem Pop des Downed-States.
+    if is_downed(name):
+        return
     row = await db.pool().fetchrow("SELECT hp, max_hp, x, y FROM players WHERE name = $1", name)
     if row is None:
         return
@@ -130,6 +136,19 @@ async def _enter_downed_state(manager, name: str) -> None:
         return
     px, py = row["x"], row["y"]
     await db.pool().execute("UPDATE players SET hp = 0 WHERE name = $1", name)
+    # Welle 53: Resting beenden — wird ein schlafender Spieler downed, bliebe
+    # sonst _resting=True und der Bett-Heal-Tick (run_stamina) würde ihn
+    # hochheilen → Soft-Lock (hp>0 aber downed). Auch der Client braucht das
+    # rest_end (sonst hängt sein is_resting-Flag).
+    try:
+        import needs
+        if needs.is_resting(name):
+            needs.set_resting(name, False)
+            _ws = manager.connections.get(name)
+            if _ws is not None:
+                await _ws.send_json({"type": "rest_end", "reason": "downed"})
+    except Exception:
+        pass
     # Aktiven Cast cleanen
     spell_caster.cleanup_player(name)
     # 30s-Timer
@@ -243,6 +262,20 @@ async def damage_player(manager, name: str, dmg: int, source_npc_id: int | None 
     # Welle 25: Downed-Spieler nehmen keinen Schaden mehr.
     if is_downed(name):
         return
+    # Welle 52 — FIX 4: Ausweichen. Vor jeder Schadensberechnung ein Dodge-Roll
+    # mit der gecachten Ausweichen-Chance (ausweichen-Total/100, gecappt auf
+    # combat.PLAYER_DODGE_CAP = 0.5). Bei Erfolg wird der Treffer komplett
+    # negiert (0 Schaden) und ein "player_dodged"-Signal ans Frontend geschickt.
+    # Default 0.0 wenn noch kein combat_sheet gebaut → kein Dodge.
+    import random as _rnd
+    if _rnd.random() < combat.player_dodge_chance(name):
+        ws_dodge = manager.connections.get(name)
+        if ws_dodge is not None:
+            await ws_dodge.send_json({
+                "type": "player_dodged",
+                "by":   source_npc_id,
+            })
+        return
     # Welle 25: Damage unterbricht aktiven Cast (Standard-RPG-Verhalten).
     if spell_caster.is_casting(name):
         spell_caster.interrupt(name, "damage_taken")
@@ -255,6 +288,11 @@ async def damage_player(manager, name: str, dmg: int, source_npc_id: int | None 
             name,
         )
         total_def = sum(_is.armor_defense(r["kind"], r["quality"]) for r in rows)
+        # Welle 52 — FIX 1: Verteidigung. Zusätzlich zum Rüstungs-Defense fließt
+        # das gecachte verteidigung-Total (Talente/Affixe/verteilte Punkte) ein.
+        # Gleiche FLAT-Skala wie Rüstungs-Defense (beide via def/(def+100)-DR).
+        # Default 0 wenn kein combat_sheet gebaut → neutraler Effekt.
+        total_def += int(combat.player_defense(name))
         dr_pct = _is.damage_reduction(total_def)
         dmg = max(1, int(round(dmg * (1.0 - dr_pct))))
     else:

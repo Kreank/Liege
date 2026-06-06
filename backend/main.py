@@ -45,6 +45,7 @@ import quests
 import raid_director
 import recipes
 import research
+import quest_worker
 import respawn_worker
 import skills
 import spell_caster
@@ -219,7 +220,10 @@ async def lifespan(app: FastAPI):
     mood_task = asyncio.create_task(npc_mood.run(npcs, manager))
     raid_task = asyncio.create_task(raid_director.run(world, npcs, manager, events))
     time_task = asyncio.create_task(time_system.run(manager))
-    weather_task = asyncio.create_task(weather_worker.weather_loop(manager))
+    weather_task = asyncio.create_task(weather_worker.weather_loop(manager, world))
+    # Welle 53: Tick-Worker für defend/escort-Quests (Zeit/Position/Distanz).
+    quest_tick_task = asyncio.create_task(
+        quest_worker.run(manager, npcs, world, structures))
     status_task = asyncio.create_task(
         status_effects.run(manager, damage_player, heal_player)
     )
@@ -250,7 +254,7 @@ async def lifespan(app: FastAPI):
     tasks = (event_task, wander_task, item_task, spawn_task, respawn_task,
              farm_task, world_respawn_task, needs_task, bill_task, mood_task,
              raid_task, time_task, status_task, groups_reaper_task,
-             dungeon_reaper_task, dungeon_spawn_task)
+             dungeon_reaper_task, dungeon_spawn_task, quest_tick_task)
     for t in tasks:
         t.cancel()
     for t in tasks:
@@ -429,6 +433,13 @@ async def websocket_endpoint(websocket: WebSocket):
             await ws_dispatch(ctx, data)
 
     except WebSocketDisconnect:
+        pass   # normaler Verbindungsabbruch — Cleanup läuft im finally
+    except Exception:
+        # Welle 53: unerwarteter Fehler in der Receive-Loop (z.B. defektes
+        # JSON-Frame). Nicht still verschlucken, aber die Verbindung sauber
+        # über das finally räumen statt den Cleanup zu überspringen.
+        logging.exception("WS-Receive-Loop für %s abgebrochen", player_id)
+    finally:
         # Welle 25: aktiven Cast + Cooldowns räumen, Down-Timer canceln
         spell_caster.cleanup_player(player_id)
         needs.clear_player_state(player_id)   # Sprint/Ruhe/Akkumulator räumen

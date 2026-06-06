@@ -9,6 +9,16 @@
                   (click)="pickTier(t.tier)">{{ t.label }}</button>
         }
       </div>
+      @if (isAdmin()) {
+        <div class="raid-selector-title">🧪 Dev-Event auslösen</div>
+        <div class="raid-selector-body">Admin-only: löst sofort einen Effekt in der Welt aus.</div>
+        <div class="raid-selector-tiers">
+          @for (eff of devEffects; track eff) {
+            <button type="button" class="raid-tier-btn"
+                    (click)="triggerEvent(eff)">{{ eff }}</button>
+          }
+        </div>
+      }
       <div class="raid-selector-actions">
         <button type="button" class="raid-cancel-btn" (click)="close.emit()">Abbrechen</button>
       </div>

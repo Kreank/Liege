@@ -167,3 +167,24 @@
   text-shadow: 1px 1px 2px #000;
   white-space: nowrap;
 }
+
+/* Aufwachen-Button — erscheint nur während Bett-Schlaf, im HUD-Stack
+   zwischen Wallet und den Bars. */
+.hud-wake-btn {
+  align-self: flex-start;
+  margin: 4px 0 2px;
+  padding: 4px 10px;
+  background: #2a2038;
+  color: #e8e0f0;
+  border: 1px solid #5a4a7a;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  pointer-events: auto;
+  text-shadow: 1px 1px 2px #000;
+  transition: background 0.12s ease;
+}
+.hud-wake-btn:hover {
+  background: #3a2e50;
+  border-color: #7a6aaa;
+}

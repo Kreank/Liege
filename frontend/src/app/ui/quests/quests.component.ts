@@ -26,6 +26,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -55,6 +56,24 @@ export class QuestsComponent {
   readonly visible = signal<boolean>(false);
   /** Welche Quest gerade expanded ist (Detail-Ansicht). */
   readonly expandedId = signal<number | null>(null);
+
+  /** Voriger `visible`-Wert, um die false→true-Flanke im effect zu erkennen. */
+  private wasVisible = false;
+
+  constructor() {
+    // Auto-Refresh: bei jedem Oeffnen (false→true) die Quest-Liste neu
+    // anfordern (Snapshot kann nach Reconnect/verpassten Pushes veralten).
+    // Tolerant gegenueber ausbleibender Antwort: der Backend-all_reputation
+    // kann fehlschlagen — das blockiert die UI nicht, wir zeigen weiter den
+    // letzten Stand.
+    effect(() => {
+      const open = this.visible();
+      if (open && !this.wasVisible) {
+        this.bridge.sendIntent({ type: 'list_quests' });
+      }
+      this.wasVisible = open;
+    });
+  }
 
   readonly quests = computed<readonly Quest[]>(() => {
     const q = this.state.quests().slice();

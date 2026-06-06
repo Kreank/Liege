@@ -8,7 +8,13 @@
 
 .hotbar {
   position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
-  z-index: 50; display: flex; gap: 4px;
+  /* Welle 53: z-index 155 statt 50 — die Hotbar MUSS über dem Inventar-
+     Backdrop (.inv-overlay, z-index 150) liegen, damit Bag-Items per Drag&Drop
+     auf einen Slot gezogen werden können. Bei z-index 50 fing das Vollbild-
+     Overlay den Drop ab (Hit-Test traf den Backdrop, nicht den Slot) → Items
+     ließen sich gar nicht zuweisen. 155 bleibt unter allen echten Modals
+     (Truhe/Crafting 160, Downed 220, Settings 250, …). */
+  z-index: 155; display: flex; gap: 4px;
   padding: 4px;
   background: rgba(0,0,0,0.55);
   border: 1px solid #806040;

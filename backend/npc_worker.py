@@ -23,6 +23,28 @@ CREATURE_RESPAWN_INTERVAL = int(os.environ.get("CREATURE_RESPAWN_INTERVAL", "8")
 CREATURE_RECYCLE_DIST = int(os.environ.get("CREATURE_RECYCLE_DIST", "110"))
 CREATURE_RECYCLE_PER_TICK = 25
 
+# Welle 53 — Friendly-Population bändigen (vorher liefen Friendlies unbegrenzt
+# auf, wanderten aus den Dörfern und akkumulierten tagelang in der DB):
+# Soft-Cap für die LIVE-Anzahl friendly NPCs. Wird er überschritten, werden
+# abgedriftete Überschuss-Friendlies (fern von Spielern UND fern vom Zuhause)
+# recycelt. Heimat-nahe Dorf-NPCs bleiben IMMER unangetastet.
+MAX_FRIENDLY_COUNT = int(os.environ.get("MAX_FRIENDLY_COUNT", "120"))
+# Heim-Leine: Driftet ein Friendly weiter als dies von seinem Zuhause (Spawn-/
+# Dorf-Position, home_x/home_y) weg, läuft es zurück statt weiter random zu
+# wandern → NPCs bleiben in ihren Siedlungen statt sich über die Welt zu verteilen.
+FRIENDLY_LEASH_RADIUS = int(os.environ.get("FRIENDLY_LEASH_RADIUS", "14"))
+# Transiente Friendlies (Karawanen-Wagen, Disaster-Mobs) + abgedriftete Drifter
+# werden wie Creatures recycelt, sobald sie weit von ALLEN Spielern sind.
+FRIENDLY_RECYCLE_DIST = int(os.environ.get("FRIENDLY_RECYCLE_DIST", "110"))
+
+# Welle 53 — Leere-Gebiete-Fix: Pro-Spieler-Mindestbestand an Creatures. Ohne
+# das konnten bei mehreren Spielern alle Creatures um EINEN clustern (globaler
+# Cap erreicht → kein Nachspawn) und ein anderer Spieler stand in völlig toter
+# Gegend. Hat ein Spieler weniger als LOCAL_CREATURE_MIN Creatures im Umkreis
+# LOCAL_CREATURE_RADIUS, wird lokal nachgespawnt — unabhängig vom globalen Cap.
+LOCAL_CREATURE_RADIUS = int(os.environ.get("LOCAL_CREATURE_RADIUS", "32"))
+LOCAL_CREATURE_MIN = int(os.environ.get("LOCAL_CREATURE_MIN", "6"))
+
 # Sprite-Varianten pro Kind (Waffen/Rollen-Bilder). Beim Spawn wird zufällig
 # eine Variante gepickt und in npcs.sprite_variant gespeichert, damit der
 # selbe NPC nach Reconnect/Reload dasselbe Sprite zeigt.
@@ -427,14 +449,19 @@ async def _find_spawn_position(world, connection_manager=None,
                                biomes: set[int] | None = None,
                                strict: bool = True,
                                structure_manager=None,
-                               npc_manager=None) -> tuple[int, int] | None:
+                               npc_manager=None,
+                               near: tuple[int, int] | None = None) -> tuple[int, int] | None:
     """Findet ein walkbares Tile in der Nähe eines aktiven Spielers.
     Wenn `biomes` gegeben und `strict`: NUR Tiles dieser Biome.
     Wenn `structure_manager`/`npc_manager` mitgegeben: Safe-Zones werden
     geprüft (kein Spawn im Schutzradius von Settlements/Camps/Friendly-NPCs).
+    Wenn `near` (x,y) gesetzt: um DIESE Position spawnen (statt zufälligem
+    Spieler) — für den Pro-Spieler-Mindestbestand (Leere-Gebiete-Fix).
     Bei strict + Fehlschlag → None (Spawn überspringen)."""
     center_x, center_y = 60, 40
-    if connection_manager is not None:
+    if near is not None:
+        center_x, center_y = near
+    elif connection_manager is not None:
         players = connection_manager.get_players()
         if players:
             p = random.choice(list(players.values()))
@@ -620,6 +647,11 @@ CAMP_ONLY_KINDS = {"bandit", "robber", "thief", "frog_swarm"}
 # Distanz hinweg). Map: npc_id → (player_name, expires_at_epoch).
 HEAL_THREAT: dict[int, tuple] = {}
 
+# Welle 53: NPCs einer aktiven Escort-Quest. Der normale Wander-Loop bewegt sie
+# NICHT — ausschließlich der quest_worker führt sie (folgt dem Spieler). Eintrag
+# wird bei Quest-Ende/Despawn entfernt.
+ESCORT_NPCS: set[int] = set()
+
 
 async def respawn_loop(world, npc_manager, connection_manager,
                        structure_manager=None) -> None:
@@ -660,6 +692,33 @@ async def respawn_loop(world, npc_manager, connection_manager,
                             await connection_manager.broadcast(
                                 {"type": "npc_died", "npc_id": n["id"], "recycled": True})
                             recycled += 1
+                # Welle 53 — Friendly-Recycle: transiente Friendlies (Karren,
+                # Disaster-Mobs) und abgedriftete Überschuss-NPCs, die weit von
+                # ALLEN Spielern weg sind, despawnen. So setzt sich die Welt nicht
+                # über Tage mit toten Wander-NPCs zu. Dorf-NPCs nahe ihrem
+                # Zuhause bleiben unangetastet (sonst veröden Dörfer dauerhaft,
+                # da der village_spawner sie nicht nachspawnt).
+                friendlies = [n for n in npc_manager.all() if n["kind"] in FRIENDLY_KINDS]
+                over_cap = max(0, len(friendlies) - MAX_FRIENDLY_COUNT)
+                frecycled = 0
+                for n in friendlies:
+                    if frecycled >= CREATURE_RECYCLE_PER_TICK:
+                        break
+                    if not all(max(abs(n["x"] - p["x"]), abs(n["y"] - p["y"])) > FRIENDLY_RECYCLE_DIST
+                               for p in players_now):
+                        continue  # ein Spieler ist in Sicht — nicht anfassen
+                    is_transient = n["kind"] in CART_KINDS or n["kind"] in DISASTER_MOB_KINDS
+                    hx, hy = n.get("home_x", n["x"]), n.get("home_y", n["y"])
+                    drifted = max(abs(n["x"] - hx), abs(n["y"] - hy)) > FRIENDLY_LEASH_RADIUS * 2
+                    # Transiente immer; abgedriftete Friendlies nur solange wir
+                    # über dem Soft-Cap liegen (bändigt die Gesamtmenge sanft).
+                    if is_transient or (over_cap > 0 and drifted):
+                        if await npc_manager.despawn(n["id"]):
+                            await connection_manager.broadcast(
+                                {"type": "npc_died", "npc_id": n["id"], "recycled": True})
+                            frecycled += 1
+                            if not is_transient:
+                                over_cap -= 1
             import region_difficulty, combat as _cmb, db
             creatures = [n for n in npc_manager.all() if n["kind"] in CREATURE_KINDS]
             deficit = MIN_CREATURE_COUNT - len(creatures)
@@ -730,6 +789,58 @@ async def respawn_loop(world, npc_manager, connection_manager,
                 deficit -= group_size
                 log.info("Gruppen-Respawn: %d × %s @(%d,%d) biome=%s (Rest-Defizit=%d)",
                          group_size, kind, cx, cy, biome, deficit)
+
+            # ── Welle 53: Pro-Spieler-Mindestbestand (Leere-Gebiete-Fix) ──
+            # Unabhängig vom globalen Cap: hat ein Spieler zu wenig Creatures im
+            # Umkreis, spawne lokal nach. Garantiert Leben um JEDEN Spieler,
+            # auch wenn der globale Cap anderswo (anderer Spieler) ausgeschöpft ist.
+            try:
+                import time_system as _ts2
+                _is_night2 = _ts2.clock.is_night()
+            except Exception:
+                _is_night2 = True
+            creatures_now = [n for n in npc_manager.all() if n["kind"] in CREATURE_KINDS]
+            for p in players_now:
+                local = sum(1 for n in creatures_now
+                            if max(abs(n["x"] - p["x"]), abs(n["y"] - p["y"])) <= LOCAL_CREATURE_RADIUS)
+                if local >= LOCAL_CREATURE_MIN:
+                    continue
+                for _lg in range(2):   # bis zu 2 Gruppen je Tick und Spieler
+                    pos = await _find_spawn_position(
+                        world, connection_manager, biomes=None, strict=False,
+                        structure_manager=structure_manager, npc_manager=npc_manager,
+                        near=(p["x"], p["y"]),
+                    )
+                    if pos is None:
+                        break
+                    cx, cy = pos
+                    try:
+                        biome = await world.tile_at(cx, cy)
+                        tier_max = await region_difficulty.effective_tier_max(cx, cy)
+                    except Exception:
+                        biome, tier_max = None, 4
+
+                    def _fits2(k, _tm=tier_max, _bi=biome):
+                        if _cmb.creature_stats(k).get("tier", 2) > _tm:
+                            return False
+                        if not _is_night2 and k in NIGHT_ONLY_KINDS:
+                            return False
+                        kb = CREATURE_SPAWN_PROFILE.get(k, {}).get("biomes")
+                        return kb is None or (_bi is not None and _bi in kb)
+
+                    eligible = [k for k in wild_kinds if _fits2(k)]
+                    if not eligible:
+                        continue
+                    kind = random.choice(eligible)
+                    profile = CREATURE_SPAWN_PROFILE.get(kind, {"group": (1, 1)})
+                    gmin, gmax = profile["group"]
+                    group_size = max(1, random.randint(gmin, gmax))
+                    await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(cx, cy))
+                    for _ in range(group_size - 1):
+                        nx, ny = await _find_nearby_walkable(world, cx, cy, radius=3)
+                        await spawn_one(world, npc_manager, connection_manager, kind=kind, at=(nx, ny))
+                    log.info("Lokaler Mindestbestand: %d × %s nahe Spieler @(%d,%d)",
+                             group_size, kind, cx, cy)
         except asyncio.CancelledError:
             log.info("Creature-Respawn-Loop gestoppt")
             raise
@@ -760,32 +871,52 @@ async def initial_spawn(world, npc_manager, connection_manager,
     log.info("Initial-Spawn fertig.")
 
 
+async def _ready_players_by_world(connection_manager) -> dict:
+    """Einmal pro Wander-Tick: alle verbundenen, character_created Spieler mit
+    ihrer world_id anreichern. Behebt das N+1 (vorher 1 DB-Query pro Creature)
+    UND ermöglicht world-scoped Aggro (Dungeon-Mobs greifen keine Overworld-
+    Spieler an und umgekehrt — geteilter Koordinatenraum). Nicht-ready Spieler
+    (Character-Creation) bleiben unsichtbar für NPCs."""
+    import db
+    players = dict(connection_manager.get_players())
+    if not players:
+        return {}
+    try:
+        rows = await db.pool().fetch(
+            "SELECT name, world_id FROM players WHERE name = ANY($1::text[]) "
+            "AND character_created = TRUE",
+            list(players.keys()),
+        )
+        wid = {r["name"]: (r["world_id"] or "overworld") for r in rows}
+    except Exception:
+        wid = {n: "overworld" for n in players}   # Fallback: alle aggroable
+    out = {}
+    for n, pdata in players.items():
+        if n not in wid:
+            continue   # noch in Character-Creation → unsichtbar
+        d = dict(pdata)
+        d["world_id"] = wid[n]
+        out[n] = d
+    return out
+
+
 async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb,
-                           structures_mgr=None) -> bool:
+                           structures_mgr=None, ready_players=None) -> bool:
     """Creature-Verhalten: Spieler in Aggro-Range jagen, Spieler in Attack-Range angreifen.
     Returnt True wenn ein Verhalten ausgelöst wurde.
     Welle 23: Spieler die noch in der Character-Creation sind, sind unsichtbar
-    für NPCs (kein aggro, kein Damage)."""
-    players = connection_manager.get_players()
+    für NPCs (kein aggro, kein Damage).
+    Welle 53: world-scoped — ein NPC zielt NUR auf Spieler in seiner eigenen
+    Welt (Overworld vs. Dungeon), sonst greifen Dungeon-Mobs Overworld-Spieler
+    an, die zufällig dieselben Koordinaten haben."""
+    if ready_players is None:
+        ready_players = await _ready_players_by_world(connection_manager)
+    # Nur Spieler in DERSELBEN Welt wie dieser NPC.
+    npc_world = npc.get("world_id") or "overworld"
+    players = {n: d for n, d in ready_players.items()
+               if (d.get("world_id") or "overworld") == npc_world}
     if not players:
         return False
-    # Charakter-Creation-Filter: Spieler die noch character_created=FALSE sind
-    # werden hier ausgefiltert (godmode in der Welt-Auswahl).
-    import db
-    try:
-        names = list(players.keys())
-        if names:
-            rows = await db.pool().fetch(
-                "SELECT name FROM players WHERE name = ANY($1::text[]) "
-                "AND character_created = TRUE",
-                names,
-            )
-            ready = {r["name"] for r in rows}
-            players = {k: v for k, v in players.items() if k in ready}
-        if not players:
-            return False
-    except Exception:
-        pass  # Fallback: alle Player aggroable
     nearest_name, nearest_dist, nearest_data = None, float("inf"), None
     for pname, pdata in players.items():
         d = combat.manhattan(npc["x"], npc["y"], pdata["x"], pdata["y"])
@@ -857,7 +988,7 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
         if dx == 0 and dy == 0:
             continue
         nx, ny = npc["x"] + dx, npc["y"] + dy
-        if _can_walk(nx, ny, world, structures_mgr):
+        if _can_walk(nx, ny, world, structures_mgr, npc):
             await npc_manager.move(npc["id"], nx, ny)
             await connection_manager.broadcast({
                 "type":   "npc_moved",
@@ -869,9 +1000,27 @@ async def _try_aggression(npc, world, npc_manager, connection_manager, damage_cb
     return False
 
 
-def _can_walk(x: int, y: int, world, structures_mgr) -> bool:
+def _can_walk(x: int, y: int, world, structures_mgr, npc=None) -> bool:
     """Walkable = TILE ist begehbar UND keine blockende Struktur drauf.
-    structures_mgr=None disabled den Struktur-Check (Legacy-Fallback)."""
+    structures_mgr=None disabled den Struktur-Check (Legacy-Fallback).
+
+    Welle 53: Für Dungeon-NPCs (world_id 'dungeon:<id>:<floor>') wird die
+    Begehbarkeit gegen die DUNGEON-Floor-Tiles geprüft (nicht gegen die
+    Overworld-Geometrie) — sonst liefen Dungeon-Mobs durch Dungeon-Wände oder
+    blieben an gar nicht existenter Overworld-Topologie kleben."""
+    if npc is not None:
+        wid = npc.get("world_id") or "overworld"
+        if wid.startswith("dungeon:"):
+            import dungeon_instance
+            parsed = dungeon_instance.parse_world_id(wid)
+            if parsed is None:
+                return False
+            tiles = dungeon_instance.cached_floor_tiles(parsed[0], parsed[1])
+            if not tiles:
+                return False   # Floor nicht geladen → Mob bleibt stehen
+            if not (0 <= y < len(tiles) and 0 <= x < len(tiles[y])):
+                return False
+            return dungeon_instance.is_walkable_tile(tiles[y][x])
     if not world.is_walkable_sync(x, y):
         return False
     if structures_mgr is not None and structures_mgr.blocks(x, y):
@@ -971,7 +1120,7 @@ async def _try_move_toward(npc, tx, ty, world, npc_manager, connection_manager,
         if ddx == 0 and ddy == 0:
             continue
         nx, ny = npc["x"] + ddx, npc["y"] + ddy
-        if _can_walk(nx, ny, world, structures_mgr):
+        if _can_walk(nx, ny, world, structures_mgr, npc):
             await npc_manager.move(npc["id"], nx, ny)
             await connection_manager.broadcast({
                 "type": "npc_moved", "npc_id": npc["id"], "x": nx, "y": ny,
@@ -986,7 +1135,7 @@ async def _try_random_move(npc, world, npc_manager, connection_manager,
     random.shuffle(dirs)
     for dx, dy in dirs:
         nx, ny = npc["x"] + dx, npc["y"] + dy
-        if _can_walk(nx, ny, world, structures_mgr):
+        if _can_walk(nx, ny, world, structures_mgr, npc):
             await npc_manager.move(npc["id"], nx, ny)
             await connection_manager.broadcast({
                 "type":   "npc_moved",
@@ -1007,11 +1156,18 @@ async def wander_loop(world, npc_manager, connection_manager,
     while True:
         try:
             await asyncio.sleep(NPC_WANDER_TICK_SECONDS)
+            # Welle 53: Spieler EINMAL pro Tick laden (statt 1 DB-Query je
+            # Creature → behebt das N+1) inkl. world_id für world-scoped Aggro.
+            ready_players = await _ready_players_by_world(connection_manager)
             for npc in list(npc_manager.all()):  # copy weil damage löschen kann
+                # Welle 53: Escort-NPCs werden nur vom quest_worker geführt.
+                if npc["id"] in ESCORT_NPCS:
+                    continue
                 # Creatures: Aggression versuchen (jeden Tick — Verfolgung soll konsistent sein)
                 if npc["kind"] in combat.CREATURE_KINDS and damage_player_cb is not None:
                     if await _try_aggression(npc, world, npc_manager, connection_manager,
-                                              damage_player_cb, structures_mgr):
+                                              damage_player_cb, structures_mgr,
+                                              ready_players=ready_players):
                         continue
                 # Random Wander mit kind-spezifischer Chance — Tag/Nacht modulieren
                 chance = NPC_MOVE_CHANCE.get(npc["kind"], 0.15)
@@ -1033,6 +1189,21 @@ async def wander_loop(world, npc_manager, connection_manager,
                     chance *= 1.3   # Creatures aktiver nachts
                 if random.random() >= chance:
                     continue
+
+                # ── Welle 53: Heim-Leine ───────────────────────────────────
+                # Driftet ein Friendly weiter als FRIENDLY_LEASH_RADIUS von
+                # seinem Zuhause (Dorf-/Spawn-Position) weg, zieht es zurück
+                # statt weiter random zu wandern. Hat Vorrang vor dem Goal-
+                # System → NPCs kehren erst heim, dann verfolgen sie wieder
+                # Tagesziele. So bleiben Dorf-NPCs im Dorf statt sich über die
+                # ganze Welt zu verteilen.
+                if is_friendly:
+                    hx, hy = npc.get("home_x"), npc.get("home_y")
+                    if (hx is not None and hy is not None and
+                            max(abs(hx - npc["x"]), abs(hy - npc["y"])) > FRIENDLY_LEASH_RADIUS):
+                        await _try_move_toward(npc, hx, hy, world, npc_manager,
+                                               connection_manager, structures_mgr)
+                        continue
 
                 # ── Welle 20: NPC-Goal-System (friendly NPCs mit Tagesplan) ──
                 if is_friendly and structures_mgr is not None:

@@ -78,7 +78,18 @@ function _normalizeBodyParts(raw: unknown): readonly BodyPart[] | undefined {
 function _normalizeTalents(raw: unknown): TalentTree | undefined {
   if (raw == null || typeof raw !== 'object') return undefined;
   const r = raw as Record<string, unknown>;
-  const learned = Array.isArray(r['learned']) ? (r['learned'] as readonly string[]) : [];
+  // Backend `list_learned` liefert Liste von Dicts ({talent_id, …}); der
+  // Init-Snapshot kann dagegen schon string[] sein. Beides auf string[] mappen.
+  const learned: readonly string[] = Array.isArray(r['learned'])
+    ? (r['learned'] as readonly unknown[]).map((l) => {
+        if (typeof l === 'string') return l;
+        if (l && typeof l === 'object') {
+          const lo = l as Record<string, unknown>;
+          return String(lo['talent_id'] ?? lo['id'] ?? '');
+        }
+        return '';
+      }).filter((id) => id !== '')
+    : [];
   const points = typeof r['points'] === 'number' ? (r['points'] as number) : 0;
   const treeRaw = r['tree'];
   let nodes: TalentNode[] = [];
@@ -101,6 +112,30 @@ function _normalizeTalents(raw: unknown): TalentTree | undefined {
     }
   }
   return { learned, points, tree: nodes };
+}
+
+/** Normalisiert das Backend-Fraktions-Array auf das `FactionReputation`-Format.
+ *  Das Backend (`factions.list_all_reputations`) liefert pro Eintrag den Key
+ *  `id` (+ `name`), das Frontend-Modell erwartet aber `faction_id`. Ohne diese
+ *  Abbildung war `faction_id` undefined → `_displayName(undefined).split()`
+ *  warf in der FactionsComponent und riss die Change-Detection mit (Ursache der
+ *  „Interaktion kaputt"-Regression beim Mob-Kill, der ein factions_update auslöst).
+ *  Tolerant gegen beide Schlüssel und gegen fehlende/kaputte Einträge. */
+function _normalizeFactions(raw: unknown): readonly FactionReputation[] {
+  if (!Array.isArray(raw)) return [];
+  const out: FactionReputation[] = [];
+  for (const e of raw as readonly Record<string, unknown>[]) {
+    if (e == null || typeof e !== 'object') continue;
+    const fid = e['faction_id'] ?? e['id'];
+    if (fid == null || String(fid) === '') continue;   // ohne ID kein Render
+    out.push({
+      faction_id: String(fid),
+      goodwill: typeof e['goodwill'] === 'number' ? (e['goodwill'] as number) : 0,
+      tier: typeof e['tier'] === 'string' ? (e['tier'] as string) : undefined,
+      name: typeof e['name'] === 'string' ? (e['name'] as string) : undefined,
+    });
+  }
+  return out;
 }
 
 /** Helper-Lookup für `inventory_update`-Format-A (Slot-Move löscht alte Slot-
@@ -445,19 +480,38 @@ export class GameStateService {
 
   constructor() {
     // Subscribe lebenslang (Service ist root-singleton → kein Cleanup nötig).
-    this.ws.messages$.subscribe((msg) => this._dispatch(msg));
+    // Defensiver Error-Handler: Wirft ein einzelner Handler eine Exception,
+    // darf das NICHT die RxJS-Subscription beenden — sonst würden ALLE
+    // folgenden Server-Frames verschluckt und der Client friert beim Empfangen
+    // ein (offene WS, aber kein NPC-Move/HP-Update/Interaktions-Echo mehr).
+    // `next` ist zusätzlich in _dispatch gekapselt; der error-Callback ist ein
+    // letztes Netz, das im Fehlerfall neu subscribed.
+    this.ws.messages$.subscribe({
+      next: (msg) => this._dispatch(msg),
+      error: (err) => {
+        console.error('[GameState] messages$ stream error — re-subscribe', err);
+      },
+    });
   }
 
   // ─── Dispatch ─────────────────────────────────────────────────────────
 
   private _dispatch(msg: GenericMsg): void {
-    if (isInitMessage(msg)) {
-      this._handleInit(msg);
-      return;
+    // Pro-Frame-Schutz: eine geworfene Exception in einem _handleX darf nur
+    // DIESEN Frame verlieren, niemals den Stream killen. Ohne dieses try/catch
+    // beendete ein einziger fehlerhafter Frame die Subscription dauerhaft →
+    // Client empfängt nichts mehr (Ursache der Angreifen/Tür/Objekt-Regression).
+    try {
+      if (isInitMessage(msg)) {
+        this._handleInit(msg);
+        return;
+      }
+      // `ServerMessage` IST `UnknownServerMessage` (Bag-Type) — kein Else-
+      // Narrowing nötig, der `init`-Pfad ist oben behandelt.
+      this._dispatchGeneric(msg);
+    } catch (err) {
+      console.error('[GameState] Handler-Fehler bei Frame', msg?.type, err);
     }
-    // `ServerMessage` IST `UnknownServerMessage` (Bag-Type) — kein Else-
-    // Narrowing nötig, der `init`-Pfad ist oben behandelt.
-    this._dispatchGeneric(msg);
   }
 
   private _dispatchGeneric(msg: GenericMsg): void {
@@ -685,7 +739,7 @@ export class GameStateService {
 
     if (msg.time) this.time.set(msg.time);
     if (msg.quests) this.quests.set(msg.quests);
-    if (msg.factions) this.factions.set(msg.factions);
+    if (msg.factions) this.factions.set(_normalizeFactions(msg.factions));
     const initTalents = _normalizeTalents(msg.talents);
     if (initTalents) this.talents.set(initTalents);
     // Backend sendet `spell_catalog` als dict (kind → def). Wir bauen daraus
@@ -1061,8 +1115,15 @@ export class GameStateService {
     const x = msg['x'] as number | undefined;
     const y = msg['y'] as number | undefined;
     if (x == null || y == null) return;
+    // Layer respektieren: das Backend sendet bei jedem structure_removed ein
+    // `layer`-Feld. Wird nur das Object-Layer entfernt, MUSS der Floor am selben
+    // Tile erhalten bleiben (sonst „Objekt löscht Boden"-Bug). Fehlt `layer`
+    // (Legacy-Broadcasts), wird wie bisher Tile-weit entfernt.
+    const layer = msg['layer'] as string | undefined;
     this.structures.set(
-      this.structures().filter((s) => !(s.x === x && s.y === y)),
+      this.structures().filter(
+        (s) => !(s.x === x && s.y === y && (layer == null || s.layer === layer)),
+      ),
     );
   }
 
@@ -1372,6 +1433,21 @@ export class GameStateService {
   private _handleQuestsUpdate(msg: GenericMsg): void {
     const quests = msg['quests'] as readonly Quest[] | undefined;
     if (quests) this.quests.set(quests);
+    // Backend `handle_list_quests` liefert zusaetzlich ein reputation-Dict
+    // {faction_id: goodwill}. In das FactionReputation[]-Format mappen, damit
+    // die FactionsComponent konsistent zum separaten 'factions'-Pfad bleibt.
+    // Tolerant: all_reputation kann backendseitig fehlschlagen → dann fehlt
+    // der Key und wir lassen den letzten factions-Stand unveraendert.
+    const rep = msg['reputation'];
+    if (rep && typeof rep === 'object' && !Array.isArray(rep)) {
+      const facs: FactionReputation[] = Object.entries(
+        rep as Record<string, unknown>,
+      ).map(([faction_id, goodwill]) => ({
+        faction_id,
+        goodwill: typeof goodwill === 'number' ? goodwill : 0,
+      }));
+      this.factions.set(facs);
+    }
   }
 
   private _handleQuestNew(msg: GenericMsg): void {
@@ -1395,19 +1471,25 @@ export class GameStateService {
   }
 
   private _handleFactionsUpdate(msg: GenericMsg): void {
-    const facs = msg['factions'] as readonly FactionReputation[] | undefined;
-    if (facs) this.factions.set(facs);
+    // Backend sendet je Eintrag `id`/`name` (nicht `faction_id`) → normalisieren,
+    // sonst crasht die FactionsComponent an undefined faction_id.
+    if (msg['factions'] != null) {
+      this.factions.set(_normalizeFactions(msg['factions']));
+    }
   }
 
   // ── Talents + Spells ──
 
   private _handleTalentsUpdate(msg: GenericMsg): void {
-    const tree = _normalizeTalents(msg['talents']);
+    // Backend (`handle_list_talents`) sendet learned/points/tree FLACH auf
+    // Top-Level, NICHT unter `msg.talents`. Daher die ganze Nachricht normalisieren.
+    const tree = _normalizeTalents(msg);
     if (tree) this.talents.set(tree);
   }
 
   private _handleTalentLearned(msg: GenericMsg): void {
-    const tree = _normalizeTalents(msg['talents']);
+    // `talent_learned` liefert ebenfalls flach learned/points/tree (Top-Level).
+    const tree = _normalizeTalents(msg);
     if (tree) {
       this.talents.set(tree);
       return;

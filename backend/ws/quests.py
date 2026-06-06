@@ -10,6 +10,7 @@ list_quests nicht mehr.
 """
 from __future__ import annotations
 
+import json
 import logging
 
 import combat
@@ -97,6 +98,25 @@ async def handle_accept_quest_template(ctx: WsContext, data: dict) -> None:
     await websocket.send_json({
         "type": "toast", "text": f"📜 {new_q['title']}",
     })
+    # Welle 53: Escort-Quest → folgenden Schützling (merchant) am Spieler spawnen.
+    # Er wird ausschließlich vom quest_worker geführt (ESCORT_NPCS-Skip im Wander-
+    # Loop); seine id + Annahme-Anker landen in der Quest-progress.
+    if new_q["quest_type"] == "escort":
+        try:
+            player = manager.get_players().get(player_id, {})
+            ex, ey = player.get("x", 60), player.get("y", 40)
+            escort = await npc_worker.spawn_one(world, npcs, manager,
+                                                kind="merchant", at=(ex, ey))
+            if escort is not None:
+                npc_worker.ESCORT_NPCS.add(escort["id"])
+                prog = dict(new_q.get("progress") or {})
+                prog["escort_npc_id"] = escort["id"]
+                prog["anchor_x"], prog["anchor_y"] = ex, ey
+                await db.pool().execute(
+                    "UPDATE quests SET progress = $2 WHERE id = $1",
+                    new_q["id"], json.dumps(prog))
+        except Exception:
+            logging.exception("Escort-NPC-Spawn fehlgeschlagen")
     # Welle 23: Quest-Spawn-Garantie — bei kill-Quests sicherstellen
     # dass mindestens N target-creatures in erreichbarer Distanz sind.
     if new_q["quest_type"] == "kill":
@@ -181,7 +201,9 @@ async def handle_quest_turn_in(ctx: WsContext, data: dict) -> None:
     # späteren Balancing-Pass ggf. anpassen.
     gold = int(reward.get("gold", 0))
     if gold > 0:
-        await currency.add(player_id, gold * currency.COPPER_PER_SILVER)
+        # Welle 53: Quest-Gold ×10 statt ×100 (war absurd hoch ggü. den balancierten
+        # Münz-Drops — gold:200 wären 20.000 Kupfer gewesen).
+        await currency.add(player_id, gold * 10)
     # Münz-items im Reward sind via create_for_player schon ins Guthaben
     # geflossen → Geldbeutel jetzt an den Client pushen.
     await currency.push_wallet(manager, player_id)
@@ -265,6 +287,16 @@ async def handle_claim_quest_reward(ctx: WsContext, data: dict) -> None:
     target_q = next((q for q in qs if q["id"] == quest_id), None)
     if target_q is None:
         return
+    # Welle 53 — Anti-Doppel-Claim (TOCTOU): Reward NUR gewähren, wenn wir die
+    # Quest atomar von 'completed' → 'closed' überführen können. Zwei parallele
+    # claim-Frames → nur einer gewinnt das UPDATE, der andere bekommt nichts.
+    claimed = await db.pool().fetchval(
+        "UPDATE quests SET status = 'closed' "
+        "WHERE id = $1 AND player_name = $2 AND status = 'completed' RETURNING id",
+        quest_id, player_id,
+    )
+    if claimed is None:
+        return   # bereits eingelöst
     # Reward-Struktur: { items: {kind:count}, gold:N, xp:N, research:N,
     # faction: {fac:delta} }. _row_to_dict hat schon defensiv geparsed.
     reward = target_q.get("reward") or {}
@@ -278,7 +310,9 @@ async def handle_claim_quest_reward(ctx: WsContext, data: dict) -> None:
     # Münz-items oben sind via create_for_player schon ins Guthaben geflossen.
     gold = int(reward.get("gold", 0) or 0)
     if gold > 0:
-        await currency.add(player_id, gold * currency.COPPER_PER_SILVER)
+        # Welle 53: Quest-Gold ×10 statt ×100 (war absurd hoch ggü. den balancierten
+        # Münz-Drops — gold:200 wären 20.000 Kupfer gewesen).
+        await currency.add(player_id, gold * 10)
     await currency.push_wallet(manager, player_id)
     # XP → Combat-Skill (pragmatisch)
     xp = int(reward.get("xp", 0) or 0)
@@ -299,7 +333,7 @@ async def handle_claim_quest_reward(ctx: WsContext, data: dict) -> None:
             await quests.add_reputation(player_id, fac, int(delta))
         except Exception:
             logging.exception("quest faction-reward failed")
-    await quests.mark_closed(quest_id)
+    # (Status wurde oben bereits atomar auf 'closed' gesetzt.)
     await websocket.send_json({"type": "quest_closed", "quest_id": quest_id})
     await websocket.send_json({"type": "toast", "text": "✅ Quest abgegeben!"})
 

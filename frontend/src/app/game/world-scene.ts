@@ -106,16 +106,12 @@ const DEPTH = {
   ME: 40,
 } as const;
 
-/** Versatz (Anteil von TILE_SIZE), um den Wand-/Tür-Sprites zur Gebäude-
- *  Außenseite geschoben werden, damit der zentrierte Wand-Streifen an der
- *  Außenkante seines Tiles sitzt. ~0.28 rückt den Streifenrand etwa auf die
- *  Tile-Kante. Bei Bedarf feinjustieren. */
-const WALL_EDGE_SHIFT = 0.28;
-
-/** Render-Skalierung für Wände/Türen (Vielfaches von TILE_SIZE). >1 lässt die
- *  zentrierten Streifen-Sprites überlappen, damit Ecken/Nähte nach dem
- *  Außen-Versatz schließen (Assets sind sonst „zu kurz"). Feinjustierbar. */
-const WALL_RENDER_SCALE = 1.32;
+/** Render-Skalierung für Wände/Türen (Vielfaches von TILE_SIZE). 1.0 = exakt
+ *  kachelgroß: die Wand deckt genau ihr Kollisions-Tile ab (kein Überstand
+ *  über die 64px-Kachel mehr → keine „unsichtbaren Wände"). Die Eck-Assets
+ *  (corner_*) sind so gezeichnet, dass sie bis an die Kachelkanten reichen,
+ *  daher kachelt scale 1.0 ohne Lücken. */
+const WALL_RENDER_SCALE = 1.0;
 
 /** Fallback-Farben pro Sprite-Familie wenn das Texture nicht geladen ist. */
 const FALLBACK_COLORS = {
@@ -970,9 +966,15 @@ export class WorldScene extends Phaser.Scene {
     // die Wand. Wir prüfen daher ALLE Strukturen am Tile.
     const structures = this.bridge.state.structures();
     for (const s of structures) {
-      if (s.x !== tx || s.y !== ty) continue;
       const def = STRUCTURE[s.type];
-      if (def?.blocking) return false;
+      if (!def?.blocking) continue;
+      // Welle 53: GANZEN Multi-Tile-Footprint prüfen, nicht nur das Anker-Tile
+      // — sonst läuft man in 2×2-Ställe / 4×4-Gilden / 5×5-Tempel hinein und
+      // driftet, bis der Backend-Snap-Back greift. Ohne width/height (Default 1)
+      // bleibt es 1×1 wie bisher.
+      const w = s.width ?? 1;
+      const h = s.height ?? 1;
+      if (tx >= s.x && tx < s.x + w && ty >= s.y && ty < s.y + h) return false;
     }
     return true;
   }
@@ -1506,6 +1508,12 @@ export class WorldScene extends Phaser.Scene {
     this.assetLoader.ensureSingle(this, key);
     const tex = this.assetLoader.textureKeyFor(key) ?? `struct_${key}`;
     const obj = this.spriteOrFallback(tex, FALLBACK_COLORS.structure, TILE_SIZE);
+    // Origin deterministisch auf Canvas-Mitte pinnen, damit Sprite-Mitte ==
+    // Tile-Mitte für ALLE Varianten (Wände, Ecken, Türen) gilt — unabhängig
+    // von Phaser-Defaults. So sitzt jede Wand exakt zentriert auf ihrem Tile.
+    (obj as Phaser.GameObjects.GameObject & {
+      setOrigin?: (x: number, y: number) => void;
+    }).setOrigin?.(0.5, 0.5);
     // floor-Layer rendert UNTER dem object-Layer (Wände/Möbel/Items darüber).
     (obj as Phaser.GameObjects.GameObject & { depth: number }).depth =
       s.type === 'floor' ? DEPTH.FLOOR : DEPTH.STRUCTURES;
@@ -1520,8 +1528,6 @@ export class WorldScene extends Phaser.Scene {
    */
   private updateStructureSprite(obj: Phaser.GameObjects.GameObject, s: Structure): void {
     this.updateMovableSprite(obj, s.x, s.y);
-    // Wände/Türen an die AUSSENKANTE ihres Tiles versetzen (siehe Helper).
-    this.applyWallEdgeOffset(obj, s);
     // Textur für den AKTUELLEN Typ/Variante neu auflösen. Deckt zwei Fälle ab:
     //   • Tür-Toggle (door_wood → door_wood_open): `structure_replaced` ersetzt
     //     die Struktur bei gleicher id → Pool ruft update() → hier muss der
@@ -1530,9 +1536,10 @@ export class WorldScene extends Phaser.Scene {
     //     wird (structureSpriteKeyFor berechnet die Bitmask).
     const key = this.structureSpriteKeyFor(s);
     this.swapStructureTexture(obj, key);
-    // Wände/Türen etwas größer rendern, damit die zentrierten Streifen an
-    // Ecken/Nähten überlappen und keine Lücken bleiben (nach swapStructureTexture,
-    // da setTexture die DisplaySize zurücksetzt).
+    // Wände/Türen exakt kachelgroß rendern (WALL_RENDER_SCALE = 1.0), damit der
+    // Sprite genau sein blockierendes Tile abdeckt (kein Überstand → keine
+    // „unsichtbaren Wände"). swapStructureTexture setzt die DisplaySize zurück,
+    // daher hier erneut setzen.
     if (s.type === 'wall' || isDoorType(s.type)) {
       const sz = TILE_SIZE * WALL_RENDER_SCALE;
       const o = obj as Phaser.GameObjects.GameObject & {
@@ -1551,31 +1558,6 @@ export class WorldScene extends Phaser.Scene {
         o.setAngle?.(verticalWall ? 90 : 0);
       }
     }
-  }
-
-  /**
-   * Verschiebt Wand-/Tür-Sprites um einen festen Betrag zur GEBÄUDE-AUSSENSEITE,
-   * sodass der zentrierte Wand-Streifen an der Außenkante seines Tiles sitzt.
-   * Damit deckt die Wand den äußeren Teil des Boden-Tiles ab (kein Boden-Überstand
-   * nach außen) und schließt innen bündig an den Boden an (keine Gras-Lücke).
-   *
-   * Außenseite = orthogonaler Nachbar OHNE Struktur (außerhalb des Gebäude-
-   * Footprints; Innenseite hat Boden/Objekt). Ecken → diagonaler Versatz.
-   */
-  private applyWallEdgeOffset(obj: Phaser.GameObjects.GameObject, s: Structure): void {
-    if (s.type !== 'wall' && !isDoorType(s.type)) return;
-    const lk = this.structureLookup;
-    const SH = TILE_SIZE * WALL_EDGE_SHIFT;
-    let ox = 0;
-    let oy = 0;
-    if (!lk(s.x - 1, s.y)) ox -= SH; // außen links  → nach links
-    if (!lk(s.x + 1, s.y)) ox += SH; // außen rechts → nach rechts
-    if (!lk(s.x, s.y - 1)) oy -= SH; // außen oben   → nach oben
-    if (!lk(s.x, s.y + 1)) oy += SH; // außen unten  → nach unten
-    if (ox === 0 && oy === 0) return;
-    const t = obj as Phaser.GameObjects.GameObject & { x: number; y: number };
-    t.x += ox;
-    t.y += oy;
   }
 
   /**

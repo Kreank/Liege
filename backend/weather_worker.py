@@ -42,7 +42,7 @@ def _pick_intensity(phase: str) -> int:
     return random.choices([1, 2, 3, 4], weights=[40, 35, 18, 7], k=1)[0]
 
 
-async def weather_loop(connection_manager) -> None:
+async def weather_loop(connection_manager, world=None) -> None:
     log.info("Wetter-Worker startet (tick=%ds, real effects: rain→water plantings, "
              "storm→lightning strikes)", WEATHER_TICK_SECONDS)
     # Erste Phase nach kurzer Verzögerung
@@ -74,7 +74,7 @@ async def weather_loop(connection_manager) -> None:
                 if current_intensity >= 3 and now - last_lightning_tick >= 90:
                     # Bei storm/downpour: alle 90s 1 Lightning-Strike
                     last_lightning_tick = now
-                    await _lightning_strike(connection_manager)
+                    await _lightning_strike(connection_manager, world)
             await asyncio.sleep(WEATHER_TICK_SECONDS)
         except asyncio.CancelledError:
             log.info("Wetter-Worker gestoppt")
@@ -111,19 +111,34 @@ async def _rain_water_plantings(connection_manager, intensity: int) -> None:
         log.info("Regen wässerte %d plantings (intensity=%d)", total_updated, intensity)
 
 
-async def _lightning_strike(connection_manager) -> None:
-    """Während eines Sturms: 1 Lightning-Strike auf zufälliges Tile im
-    Spieler-Range. Wenn Spieler in der Nähe → 15 lightning-dmg."""
+async def _lightning_strike(connection_manager, world=None) -> None:
+    """Während eines Sturms: 1 Lightning-Strike auf ein Tile im Spieler-Range.
+    Welle 53: Die Position wird gegen den Tile-Typ validiert — ein Blitz schlägt
+    auf LAND ein, nicht sinnlos mitten im Wasser (Berge/Lava ebenfalls gemieden).
+    Bis zu 8 Versuche; findet sich kein Land-Tile, wird der Strike übersprungen."""
+    from world import WATER, MOUNTAIN, LAVA
     players = list(connection_manager.get_players().values())
     if not players:
         return
     p = random.choice(players)
-    # Strike-Position: 6-15 Tiles entfernt
-    dx = random.randint(-15, 15)
-    dy = random.randint(-15, 15)
-    if abs(dx) < 6 and abs(dy) < 6:
-        dx = (15 if dx >= 0 else -15)
-    sx, sy = p["x"] + dx, p["y"] + dy
+    sx = sy = None
+    for _try in range(8):
+        # Strike-Position: 6-15 Tiles entfernt
+        dx = random.randint(-15, 15)
+        dy = random.randint(-15, 15)
+        if abs(dx) < 6 and abs(dy) < 6:
+            dx = (15 if dx >= 0 else -15)
+        cx, cy = p["x"] + dx, p["y"] + dy
+        if world is not None:
+            try:
+                if world.tile_at_sync(cx, cy) in (WATER, MOUNTAIN, LAVA):
+                    continue   # kein Blitz im Wasser/Berg/Lava
+            except Exception:
+                pass
+        sx, sy = cx, cy
+        break
+    if sx is None:
+        return   # kein geeignetes Land-Tile gefunden — Strike auslassen
     await connection_manager.broadcast({
         "type": "lightning_strike", "x": sx, "y": sy,
     })

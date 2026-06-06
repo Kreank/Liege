@@ -30,8 +30,13 @@ from .dispatcher import register
 
 
 async def handle_wake(ctx: WsContext, data: dict) -> None:
-    # Spieler wacht aktiv aus dem Bett-Schlaf auf.
-    needs.set_resting(ctx.player_id, False)
+    # Spieler wacht aktiv aus dem Bett-Schlaf auf (ohne Bewegung).
+    # Wie in movement.py: bei tatsächlichem Resting->False muss ein
+    # 'rest_end' an den Client, sonst bleibt dessen `is_resting`-Flag
+    # hängen (rest_start ohne Gegen-Frame).
+    if needs.is_resting(ctx.player_id):
+        needs.set_resting(ctx.player_id, False)
+        await ctx.websocket.send_json({"type": "rest_end", "reason": "woke"})
 
 
 async def handle_allocate_attr(ctx: WsContext, data: dict) -> None:

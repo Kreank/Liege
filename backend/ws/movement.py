@@ -212,6 +212,19 @@ async def handle_move(ctx: WsContext, data: dict) -> None:
                     })
         return
     walkable = await world.is_walkable(x, y)
+    if not walkable or structures.blocks(x, y):
+        # Welle 53 — Snap-Back: abgelehnter Move → dem Initiator seine
+        # AUTHORITATIVE Server-Position zurückschicken. Vorher nur 'return',
+        # wodurch der optimistisch patchende Client bis zur 3-Tile-Reconcile-
+        # Schwelle wegdriftete (z.B. bei Multi-Tile-Gebäuden, die das Frontend
+        # nicht voll als blockiert kennt).
+        cur = manager.get_players().get(player_id)
+        if cur is not None:
+            await websocket.send_json({
+                "type": "player_moved", "player_id": player_id,
+                "x": cur["x"], "y": cur["y"],
+            })
+        return
     if walkable and not structures.blocks(x, y):
         # Chunk-Wechsel? → neue Chunks senden
         old_cx, old_cy, _, _ = World.world_to_chunk(

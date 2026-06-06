@@ -30,4 +30,7 @@ export interface FactionReputation {
   readonly faction_id: string;
   readonly goodwill: number;
   readonly tier?: string;
+  /** Vom Backend gelieferter Anzeigename (factions.name). Optional — wenn
+   *  vorhanden, nutzt die UI ihn statt den aus faction_id abgeleiteten Namen. */
+  readonly name?: string;
 }

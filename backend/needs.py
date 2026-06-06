@@ -393,10 +393,26 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
                 _storm  = disaster_state.is_active("thunderstorm")
             except Exception:
                 pass
-            hunger_drain = 1 * (2 if _dying else 1)
-            thirst_drain = THIRST_PER_TICK * (2 if (_dying or _scorch) else 1)
+            # Welle 53: Disaster sind OBERFLÄCHEN-Phänomene — Spieler im Dungeon
+            # dürfen weder Giftnebel-DoT, Blitz noch die Dürre-/Hitze-Drain-
+            # Multiplikatoren abbekommen. Dungeon-Spieler einmal pro Tick laden.
+            dungeon_players: set[str] = set()
+            if (_dying or _scorch or _toxic or _storm) and player_names:
+                try:
+                    drows = await db.pool().fetch(
+                        "SELECT name FROM players WHERE name = ANY($1::text[]) "
+                        "AND world_id IS NOT NULL AND world_id <> 'overworld'",
+                        player_names,
+                    )
+                    dungeon_players = {r["name"] for r in drows}
+                except Exception:
+                    pass
 
             for name in player_names:
+                # Disaster-Modifikatoren NUR für Overworld-Spieler.
+                _surface = name not in dungeon_players
+                hunger_drain = 1 * (2 if (_dying and _surface) else 1)
+                thirst_drain = THIRST_PER_TICK * (2 if ((_dying or _scorch) and _surface) else 1)
                 # 1) Hunger -hunger_drain, Durst -thirst_drain
                 #    (Stamina-Regen läuft im separaten run_stamina-Sekunden-Loop)
                 row = await db.pool().fetchrow(
@@ -425,8 +441,9 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
                     except Exception:
                         log.exception("Dehydration-Damage fehlgeschlagen für %s", name)
 
-                # 4) Giftnebel-DoT: zersetzt die Lunge solange aktiv.
-                if _toxic:
+                # 4) Giftnebel-DoT: zersetzt die Lunge solange aktiv — nur an
+                #    der Oberfläche (im Dungeon kein Nebel).
+                if _toxic and _surface:
                     try:
                         await damage_player_cb(name, 6)
                     except Exception:
@@ -441,10 +458,12 @@ async def run(connection_manager, damage_player_cb: DamagePlayerCb) -> None:
                 except Exception:
                     log.debug("Regen-Tick fehlgeschlagen für %s", name, exc_info=True)
 
-            # Gewitter: pro Tick ein Blitzeinschlag bei einem zufälligen Spieler.
-            if _storm and player_names:
+            # Gewitter: pro Tick ein Blitzeinschlag bei einem zufälligen
+            # OBERFLÄCHEN-Spieler (im Dungeon schlägt kein Blitz ein).
+            _surface_names = [n for n in player_names if n not in dungeon_players]
+            if _storm and _surface_names:
                 import random as _rnd
-                _t = _rnd.choice(player_names)
+                _t = _rnd.choice(_surface_names)
                 _p = connection_manager.get_players().get(_t)
                 try:
                     await damage_player_cb(_t, _rnd.randint(14, 22))

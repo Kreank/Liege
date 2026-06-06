@@ -384,6 +384,15 @@ def _layer_for(type_: str) -> str:
     return "floor" if type_ in FLOOR_TYPES else "object"
 
 
+def is_wall_or_door(type_: str) -> bool:
+    """True für Raum-begrenzende Strukturen: feste Wand oder (offene/zu) Tür.
+    Genutzt für die Auto-Floor-Spread-Logik (jede Raumwand bekommt Floor
+    darunter, damit der Weltgrund nicht durch die Naht scheint). Bewusst OHNE
+    Zäune/Gates (fence, *_fence_segment, garden_gate*, fence_gate*) — die stehen
+    typisch outdoor und sollen keinen Holzboden bekommen."""
+    return type_ == "wall" or type_.startswith("door_")
+
+
 class StructureManager:
     def __init__(self):
         # Zwei Layer-Maps: floor (Boden) + object (Wände/Möbel/Deko).
@@ -531,12 +540,20 @@ class StructureManager:
             durability = max_dur
         else:
             max_dur = durability  # harvest-only: max = initial
+        # Welle 53: ON CONFLICT — der In-Memory-Layer-Check oben kann vom DB-
+        # Unique-Index (x, y, layer) abweichen (z.B. Floor-Auto-Spread auf einem
+        # Tile, das in der DB schon einen Floor hat, im RAM aber nicht). Ohne das
+        # warf der INSERT eine UniqueViolationError, die — bis zur Dispatcher-
+        # Härtung — die WS-Verbindung killte. Bei Konflikt: sauber None liefern.
         row = await db.pool().fetchrow(
             "INSERT INTO structures (x, y, type, owner, material, durability, "
             "max_durability, layer, rotation, width, height) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) "
+            "ON CONFLICT (x, y, layer) DO NOTHING RETURNING id",
             x, y, type_, owner, material, durability, max_dur, layer, rotation, w, h,
         )
+        if row is None:
+            return None   # Tile schon belegt (DB-seitig) — kein Doppel-Insert
         struct = {
             "id":             row["id"],
             "x":              x,

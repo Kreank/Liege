@@ -652,6 +652,12 @@ QUEST_TEMPLATES = [
     },
 ]
 
+# Quest-Typen ohne funktionierenden Completion-Hook werden aus allen Angebots-
+# Pools gefiltert (sonst blieben sie als 'active' für immer hängen).
+# Welle 53: defend (Positions-Timer) + escort (folgender NPC) sind jetzt im
+# quest_worker verdrahtet → Set ist wieder leer, beide werden angeboten.
+UNSUPPORTED_QUEST_TYPES: set[str] = set()
+
 
 def templates_for_npc_kind(npc_kind: str, player_level: int = 0) -> list[dict]:
     """Welche Templates kann dieser NPC anbieten, passend zum Player-Level?"""

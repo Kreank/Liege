@@ -105,9 +105,10 @@ RARE_SCATTER = [
     ("crate",         0.0005, "ruin"),
 ]
 
-# Wasser-Adjacent: nur auf SAND-Tiles die an WATER grenzen
+# Wasser-Adjacent: nur auf SAND-Tiles die an WATER grenzen (Strand-Deko).
+# Welle 53: dock_straight HIER ENTFERNT — ein Steg gehört INS Wasser, nicht auf
+# den Strand. Er wird jetzt in _pick_for_water auf Ufer-Wasser-Tiles platziert.
 WATERSIDE_SCATTER = [
-    ("dock_straight", 0.04,  "ruin"),
     ("driftwood",     0.06,  "tree"),
     ("anchor",        0.012, "ruin"),
     ("fishing_net",   0.020, "ruin"),
@@ -220,8 +221,35 @@ def _pick_ambient(world, x: int, y: int, tile_id: int) -> str | None:
     return None
 
 
+def _land_channel(world, x: int, y: int) -> bool:
+    """True wenn dieses WASSER-Tile eine 1-Tile-schmale Rinne ist — Land auf
+    zwei GEGENÜBERLIEGENDEN Seiten. Eine Brücke auf so einem Tile verbindet
+    tatsächlich beide Ufer (statt sinnlos im offenen Wasser zu stehen)."""
+    left  = world.tile_at_sync(x - 1, y) != WATER
+    right = world.tile_at_sync(x + 1, y) != WATER
+    up    = world.tile_at_sync(x, y - 1) != WATER
+    down  = world.tile_at_sync(x, y + 1) != WATER
+    return (left and right) or (up and down)
+
+
+def _shore_water(world, x: int, y: int) -> bool:
+    """True wenn dieses WASSER-Tile an mindestens 1 Land-Tile grenzt (Ufer)."""
+    for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        if world.tile_at_sync(x + dx, y + dy) != WATER:
+            return True
+    return False
+
+
 def _pick_for_water(world, x: int, y: int) -> str | None:
-    """Picks aus WATER_SCATTER (Schiffswrack, Boot, Seerosen)."""
+    """Picks für WASSER-Tiles. Welle 53: Stege/Brücken kommen jetzt korrekt
+    INS Wasser statt auf den Strand."""
+    # Brücke über schmale Wasserrinne (Land beidseitig) — verbindet die Ufer.
+    if _land_channel(world, x, y) and random.random() < 0.35:
+        return "wooden_bridge"
+    # Steg/Pier: auf Ufer-Wasser-Tile (grenzt an Land), ragt vom Ufer ins Wasser.
+    if _shore_water(world, x, y) and random.random() < 0.05:
+        return "dock_straight"
+    # Sonst klassisches Wasser-Scatter (Wrack, Boot, Seerosen).
     for prop_type, chance, density_kind in WATER_SCATTER:
         density = world.resource_density(x, y, density_kind)
         if random.random() < chance * _density_mod(density):

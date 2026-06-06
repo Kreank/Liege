@@ -30,6 +30,10 @@ services:
     environment:
       - OLLAMA_HOST=http://host.docker.internal:11434
       - DATABASE_URL=postgresql://liege:liege@postgres:5432/liege
+      # Welle 53 — World-Reset 2026-06-06: neuer Seed = komplett neue Landkarte.
+      # Charaktere/Accounts/Inventare bleiben; Position wird beim Login via
+      # find_spawn auf ein gültiges Tile gesetzt (load_or_create_player).
+      - WORLD_SEED=20260606
       # SESSION_SECRET muss vom Host gesetzt sein (z.B. .env oder Override).
       # auth.py wirft beim ersten Auth-Call RuntimeError wenn leer.
       - SESSION_SECRET=${SESSION_SECRET}

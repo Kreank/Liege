@@ -201,16 +201,30 @@ async def handle_place_structure(ctx: WsContext, data: dict) -> None:
             # furnace/anvil/well/...). Wenn Nachbar-Tile Floor hat,
             # Floor auch hier drunter setzen. Material vom Nachbar-
             # Floor übernommen für konsistenten Look.
+            #
+            # Naht-Fix: Eine Raum-Wand (oder Tür) bekommt auch dann Floor,
+            # wenn ein orthogonaler Nachbar eine WEITERE Wand-Linie ist (kein
+            # Floor in Reichweite). So erhält die ÄUSSERE/erste Wand eines
+            # Raumes ebenfalls Floor — sonst scheint der Weltgrund durch die
+            # Naht. Freistehende Outdoor-Wände/Zäune OHNE jeglichen Floor-/
+            # Wand-Kontext bleiben bewusst floor-los (kein Holzboden im Wald).
+            from structures import is_wall_or_door as _is_wd
             if structures.floor_at(x, y) is None:
                 adj_floor_mat = None
+                adj_room_wall = False
                 for dx, dy in [(0, -1), (1, 0), (0, 1), (-1, 0)]:
                     fl = structures.floor_at(x + dx, y + dy)
                     if fl is not None:
                         adj_floor_mat = fl.get("material") or "stone"
                         break
-                if adj_floor_mat is not None:
+                    if _is_wd(type_):
+                        nb = structures.object_at(x + dx, y + dy)
+                        if nb is not None and _is_wd(nb["type"]):
+                            adj_room_wall = True
+                if adj_floor_mat is not None or adj_room_wall:
                     auto = await structures.place(
-                        x, y, "floor", player_id, material=adj_floor_mat
+                        x, y, "floor", player_id,
+                        material=adj_floor_mat or material,
                     )
                     if auto is not None:
                         await manager.broadcast({
@@ -569,12 +583,16 @@ async def handle_use_structure(ctx: WsContext, data: dict) -> None:
     if s["type"] == "quest_board":
         import quest_templates as qt
         combat_lvl = await skills.get_skill_level(player_id, "combat")
-        # Quests die Player schon hat
+        # Welle 53 — Quest-Rotation: NICHT mehr alle je abgeschlossenen Templates
+        # für immer sperren (das war die Ursache für "immer dieselben Quests").
+        # Gesperrt sind nur: aktuell AKTIVE Quests + erst kürzlich (< Cooldown)
+        # abgeschlossene. Nach dem Cooldown rotiert ein Template zurück in den Pool.
         taken_rows = await db.pool().fetch(
             "SELECT template_id FROM quests "
-            "WHERE player_name = $1 "
-            "AND status IN ('active','completed','closed') "
-            "AND template_id IS NOT NULL",
+            "WHERE player_name = $1 AND template_id IS NOT NULL "
+            "AND (status = 'active' "
+            "     OR (status IN ('completed','closed') "
+            "         AND created_at > NOW() - INTERVAL '8 hours'))",
             player_id,
         )
         taken = {r["template_id"] for r in taken_rows}
@@ -583,6 +601,7 @@ async def handle_use_structure(ctx: WsContext, data: dict) -> None:
             t for t in qt.QUEST_TEMPLATES
             if t["min_level"] <= combat_lvl <= t["max_level"]
             and t["id"] not in taken
+            and t["type"] not in qt.UNSUPPORTED_QUEST_TYPES
         ]
         import random as _rb
         pool = _rb.sample(pool, min(6, len(pool)))

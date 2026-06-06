@@ -87,6 +87,16 @@ async def get_dungeon(dungeon_id: int) -> dict | None:
     }
 
 
+# Welle 53: In-Memory-Cache der Floor-Tiles (dungeon_id, floor_idx) → tiles[y][x].
+# Wird in get_floor gefüllt und vom synchronen NPC-Bewegungs-Check gelesen.
+_floor_tiles_cache: dict[tuple[int, int], list] = {}
+
+
+def cached_floor_tiles(dungeon_id: int, floor_idx: int):
+    """Synchroner Zugriff auf gecachte Floor-Tiles oder None (nicht geladen)."""
+    return _floor_tiles_cache.get((dungeon_id, floor_idx))
+
+
 async def get_floor(dungeon_id: int, floor_idx: int) -> dict | None:
     """Lädt eine Floor-Row. Generiert sie lazy wenn nicht vorhanden."""
     row = await db.pool().fetchrow(
@@ -99,6 +109,11 @@ async def get_floor(dungeon_id: int, floor_idx: int) -> dict | None:
         tiles = row["tiles"]
         if isinstance(tiles, str):
             tiles = json.loads(tiles)
+        # Welle 53: Floor-Tiles synchron cachen, damit die NPC-Bewegung
+        # (npc_worker._can_walk, synchron + hot) die Dungeon-Begehbarkeit ohne
+        # DB-Roundtrip prüfen kann → Dungeon-Mobs laufen nicht mehr durch
+        # Dungeon-Wände bzw. gegen Overworld-Geometrie.
+        _floor_tiles_cache[(dungeon_id, floor_idx)] = tiles
         return {
             "dungeon_id":   row["dungeon_id"],
             "floor_idx":    row["floor_idx"],

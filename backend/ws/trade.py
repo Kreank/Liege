@@ -52,6 +52,19 @@ async def handle_open_trade(ctx: WsContext, data: dict) -> None:
     })
 
 
+async def _effective_buy_price(player_id: str, kind: str) -> int:
+    """Effektiver Einkaufspreis dieses Spielers (Basis × Social-Rabatt ×
+    Haggler-Talent). Gemeinsam genutzt von Kauf UND Verkauf (Verkauf clampt
+    daran, damit sell < buy gilt → keine Gelddruck-Arbitrage)."""
+    price = trade_mod.buy_price(kind)
+    social_lvl = await skills.get_skill_level(player_id, "social")
+    discount = skills.social_trade_discount(social_lvl)
+    talent_eff = await talents.aggregate_effects(player_id)
+    if talent_eff.get("social_buy_discount", 0) > 0:
+        discount *= (1 - talent_eff["social_buy_discount"])
+    return max(1, int(round(price * discount)))
+
+
 async def handle_buy_item(ctx: WsContext, data: dict) -> None:
     websocket = ctx.websocket
     player_id = ctx.player_id
@@ -62,14 +75,7 @@ async def handle_buy_item(ctx: WsContext, data: dict) -> None:
     from items import ITEM_KINDS
     if kind not in ITEM_KINDS:
         return
-    price = trade_mod.buy_price(kind)
-    # Social-Skill + Haggler-Talent: Rabatt
-    social_lvl = await skills.get_skill_level(player_id, "social")
-    discount = skills.social_trade_discount(social_lvl)
-    talent_eff_t = await talents.aggregate_effects(player_id)
-    if talent_eff_t.get("social_buy_discount", 0) > 0:
-        discount *= (1 - talent_eff_t["social_buy_discount"])
-    price = max(1, int(round(price * discount)))
+    price = await _effective_buy_price(player_id, kind)
     # Welle 33: aus dem Geldbeutel bezahlen (atomar)
     if not await currency.spend(player_id, price):
         await websocket.send_json({"type": "toast", "text": "Nicht genug Geld"})
@@ -86,7 +92,7 @@ async def handle_buy_item(ctx: WsContext, data: dict) -> None:
     await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
     await currency.push_wallet(manager, player_id)
     await websocket.send_json({
-        "type": "trade_coins", "coins": await currency.balance(player_id),
+        "type": "trade_coins", "copper": await currency.balance(player_id),
     })
 
 
@@ -109,18 +115,30 @@ async def handle_sell_item(ctx: WsContext, data: dict) -> None:
     talent_eff_s = await talents.aggregate_effects(player_id)
     sell_mult = 1.0 + talent_eff_s.get("social_sell_bonus", 0)
     price = max(1, int(round(price * sell_mult)))
+    # Welle 53 — Anti-Arbitrage: Verkaufspreis NIE >= eigener Einkaufspreis,
+    # sonst kauft+verkauft man im Kreis Geld (Sell-Bonus-Talent + Buy-Rabatt
+    # konnten sell > buy machen). Clamp auf buy_eff - 1 (mind. 1).
+    buy_eff = await _effective_buy_price(player_id, kind)
+    price = max(1, min(price, buy_eff - 1))
+    # Verkauf muss atomar sein: nur gutschreiben, wenn das Item wirklich
+    # GELÖSCHT wurde (verhindert Doppel-Verkauf bei parallelen sell-Frames).
+    deleted = await db.pool().fetchval(
+        "DELETE FROM items WHERE id = $1 AND owner = $2 RETURNING id",
+        item_id, player_id,
+    )
+    if deleted is None:
+        return   # schon weg / nicht (mehr) im Besitz — kein Erlös
     # Social-XP
     sxp = await skills.gain_xp(player_id, "social", 4)
     if sxp:
         await websocket.send_json({"type": "skill_xp", **sxp})
-    await db.pool().execute("DELETE FROM items WHERE id = $1", item_id)
     # Welle 33: Erlös in den Geldbeutel
     await currency.add(player_id, price)
     inv = await items.get_inventory(player_id)
     await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
     await currency.push_wallet(manager, player_id)
     await websocket.send_json({
-        "type": "trade_coins", "coins": await currency.balance(player_id),
+        "type": "trade_coins", "copper": await currency.balance(player_id),
     })
 
 

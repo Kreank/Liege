@@ -548,12 +548,20 @@ async def handle_chest_transfer_from(ctx: WsContext, data: dict) -> None:
     item_id = int(data.get("item_id", 0))
     # Welle 33: Münzen aus der Truhe → Geldbeutel statt Inventar.
     _krow = await db.pool().fetchrow(
-        "SELECT kind, quantity FROM items WHERE id = $1 AND owner = $2",
+        "SELECT kind FROM items WHERE id = $1 AND owner = $2",
         item_id, f"chest:{chest_id}",
     )
     if _krow and currency.is_currency(_krow["kind"]):
-        _gain = currency.coin_to_copper(_krow["kind"], _krow["quantity"] or 1)
-        await db.pool().execute("DELETE FROM items WHERE id = $1", item_id)
+        # Welle 53 — Anti-Dupe (TOCTOU): vorher SELECT→add→DELETE, wodurch zwei
+        # parallele Transfers beide gutschreiben konnten. Jetzt atomar löschen
+        # mit RETURNING — nur der Frame, der die Row WIRKLICH entfernt, schreibt gut.
+        deleted = await db.pool().fetchrow(
+            "DELETE FROM items WHERE id = $1 AND owner = $2 RETURNING kind, quantity",
+            item_id, f"chest:{chest_id}",
+        )
+        if deleted is None:
+            return   # bereits von einem parallelen Transfer geholt
+        _gain = currency.coin_to_copper(deleted["kind"], deleted["quantity"] or 1)
         await currency.add(player_id, _gain)
         await websocket.send_json({
             "type": "chest_remove", "chest_id": chest_id, "item_id": item_id,

@@ -22,6 +22,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -47,6 +48,21 @@ export class TalentsComponent {
   private readonly bridge = inject(GameBridgeService);
 
   readonly visible = signal<boolean>(false);
+
+  /** Voriger `visible`-Wert, um die false→true-Flanke im effect zu erkennen. */
+  private wasVisible = false;
+
+  constructor() {
+    // Auto-Refresh: bei jedem Oeffnen (false→true) den Talent-Tree neu
+    // anfordern, statt nur den Init-Snapshot zu zeigen.
+    effect(() => {
+      const open = this.visible();
+      if (open && !this.wasVisible) {
+        this.bridge.sendIntent({ type: 'list_talents' });
+      }
+      this.wasVisible = open;
+    });
+  }
 
   readonly points = computed<number>(() => this.state.talents()?.points ?? 0);
 

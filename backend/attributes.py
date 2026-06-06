@@ -293,6 +293,17 @@ async def player_combat_sheet(items, player_name: str) -> dict:
     str_total = int(totals.get("stärke", 0))
     dmg_mult = 1.0 + str_total * combat.STR_DMG_PER_POINT
     combat.set_player_damage_mult(player_name, dmg_mult)
+    # Welle 52: Die vier bisher „toten" Kampfwerte ebenfalls cachen, damit sie im
+    # echten Combat wirken (gleiches Pattern wie dmg_mult — eine Stelle, aktuell
+    # bei Login/Equip/Allocation). Einheiten siehe combat.py-Setter:
+    #   verteidigung → flat defense (combat.damage_reduction in damage_player)
+    #   krit_rate    → % Crit-Chance (auf den crit_roll im Attack-Handler)
+    #   krit_schaden → additiver % Crit-Schaden-Bonus
+    #   ausweichen   → % Dodge-Chance (Roll am Anfang von damage_player, gecappt)
+    combat.set_player_defense(player_name, int(totals.get("verteidigung", 0)))
+    combat.set_player_crit_chance(player_name, float(totals.get("krit_rate", 0)))
+    combat.set_player_crit_damage(player_name, float(totals.get("krit_schaden", 0)))
+    combat.set_player_dodge(player_name, float(totals.get("ausweichen", 0)))
     avg_damage = int(round(
         (base + skill_add + combat.PLAYER_BASE_DAMAGE // 2) * dmg_mult))
 

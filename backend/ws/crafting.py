@@ -59,9 +59,30 @@ async def handle_craft(ctx: WsContext, data: dict) -> None:
             "type": "toast", "text": "Nicht genug Material",
         })
         return
+    # Welle 53 — Anti-Dupe (TOCTOU): consume_one ist je atomar, aber der
+    # Count-Check oben + die Schleife waren es zusammen NICHT — zwei parallele
+    # craft-Frames konnten beide den Check bestehen, beide ein Output erzeugen,
+    # während Material nur einmal abgezogen wurde. Wir prüfen jetzt JEDEN
+    # consume_one-Rückgabewert: scheitert einer (Material per Race weg), geben
+    # wir das bereits Verbrauchte zurück und brechen ab (kein Output).
+    consumed: list[str] = []
+    race_lost = False
     for k, n in recipe["inputs"]:
         for _ in range(n):
-            await items.consume_one(player_id, k)
+            if await items.consume_one(player_id, k):
+                consumed.append(k)
+            else:
+                race_lost = True
+                break
+        if race_lost:
+            break
+    if race_lost:
+        for k in consumed:
+            await items.create_for_player(k, player_id)   # Refund
+        await websocket.send_json({
+            "type": "toast", "text": "Nicht genug Material",
+        })
+        return
     # Quality-Roll basierend auf Crafting-Skill + Talente
     craft_level = await skills.get_skill_level(player_id, "crafting")
     talent_craft = await talents.aggregate_effects(player_id)

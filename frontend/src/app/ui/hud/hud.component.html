@@ -49,6 +49,14 @@
     </span>
   </div>
 
+  <!-- Aufwachen — nur während Bett-Schlaf; aktives Wecken ohne Schritt. -->
+  @if (isResting()) {
+    <button type="button" class="hud-wake-btn" (click)="wake()"
+            title="Aus dem Bett-Schlaf aufwachen">
+      😴 Aufwachen
+    </button>
+  }
+
   <div class="hud-bar hud-bar--hp">
     <div class="hud-bar__fill" [style.width.%]="hp().pct"></div>
     <div class="hud-bar__text">{{ hp().label }}</div>

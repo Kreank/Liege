@@ -242,11 +242,14 @@ async def offers_for_npc(npc: dict, player_name: str,
     candidates = qt.templates_for_npc_kind(npc["kind"], player_level)
     if not candidates:
         return []
-    # Quests die Player schon hat
+    # Welle 53 — Quest-Rotation: aktive Quests dauerhaft gesperrt, abgeschlossene
+    # nur innerhalb des Cooldowns (danach wieder anbietbar → Abwechslung).
     rows = await db.pool().fetch(
         "SELECT template_id FROM quests "
-        "WHERE player_name = $1 AND status IN ('active','completed','closed') "
-        "  AND template_id IS NOT NULL",
+        "WHERE player_name = $1 AND template_id IS NOT NULL "
+        "AND (status = 'active' "
+        "     OR (status IN ('completed','closed') "
+        "         AND created_at > NOW() - INTERVAL '8 hours'))",
         player_name,
     )
     taken = {r["template_id"] for r in rows}
@@ -256,6 +259,8 @@ async def offers_for_npc(npc: dict, player_name: str,
     for t in candidates:
         if t["id"] in taken:
             continue
+        if t["type"] in qt.UNSUPPORTED_QUEST_TYPES:
+            continue   # Welle 53: nicht-abschließbare Typen nicht anbieten
         # Faction-Requirement?
         ok = True
         for fac, min_rep in (t.get("faction_req") or {}).items():
@@ -349,16 +354,20 @@ def _initial_progress(quest_type: str) -> dict:
 async def turn_in(quest_id: int, player_name: str) -> dict | None:
     """Quest abgeben — closed + Reward gewähren. Returns die Quest mit
     `reward_granted` für UI-Feedback, oder None wenn Quest nicht completed."""
+    # Welle 53 — Anti-Doppel-Abgabe (TOCTOU): Status atomar von 'completed' →
+    # 'closed' überführen und die Row zurückgeben. Vorher waren SELECT-Check und
+    # mark_closed getrennt → zwei parallele turn_in-Frames konnten beide den
+    # Reward gewähren. Nur der Frame, dessen UPDATE eine Row liefert, gewinnt.
     row = await db.pool().fetchrow(
-        "SELECT id, player_name, giver_npc_id, target_npc_id, quest_type, "
+        "UPDATE quests SET status = 'closed' "
+        "WHERE id = $1 AND player_name = $2 AND status = 'completed' "
+        "RETURNING id, player_name, giver_npc_id, target_npc_id, quest_type, "
         "title, description, objective, progress, reward, status, created_at, "
-        "template_id, tier "
-        "FROM quests WHERE id = $1 AND player_name = $2",
+        "template_id, tier",
         quest_id, player_name,
     )
-    if not row or row["status"] != "completed":
+    if not row:
         return None
-    await mark_closed(quest_id)
     # reward kann (legacy) doppelt JSON-encoded sein → defensiv parsen,
     # sonst ist es ein str und reward.get(...) crasht (Reward ginge verloren).
     reward = _maybe_parse(row["reward"])

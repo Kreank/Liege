@@ -287,6 +287,50 @@ def _bounding_box(tiles: list[tuple[int, int]]) -> tuple[int, int, int, int]:
     return (min(xs), min(ys), max(xs), max(ys))
 
 
+async def _clear_settlement_ground(structure_manager, connection_manager,
+                                    min_x: int, min_y: int, max_x: int, max_y: int,
+                                    margin: int = 1) -> int:
+    """Welle 53 — Dorf-Rodung: Entfernt ALLE natürlichen System-Props (Bäume,
+    Büsche, Felsen, Stümpfe, Schutt, …) aus der gesamten Siedlungs-Bounding-Box.
+
+    Hintergrund: Die Settlement-Area ist eine unregelmäßige Noise-Blob; das Dorf
+    wird über deren Bounding-Box gelegt, die auch Nicht-Settlement-Tiles (FOREST
+    mit Bäumen aus der Chunk-Populierung) einschließt. Ohne Rodung blieben diese
+    Bäume zwischen den Häusern stehen → „Dorf = Wald". Wir roden die ganze Box,
+    sodass das Dorf in einer Lichtung liegt (umgebende Chunks behalten ihren
+    Wald → natürlicher Übergang).
+
+    Nur `system`-Props werden entfernt (Spielerbauten & Settlement-Strukturen
+    bleiben unangetastet). Broadcastet structure_removed, damit bereits geladene
+    Clients die gerodeten Props verschwinden sehen.
+    """
+    removed = 0
+    has_players = bool(connection_manager.get_players())
+    for x in range(min_x - margin, max_x + margin + 1):
+        for y in range(min_y - margin, max_y + margin + 1):
+            existing = structure_manager.at(x, y)
+            if existing is None:
+                continue
+            if existing["type"] in SETTLEMENT_STRUCT_TYPES:
+                continue
+            owner = existing.get("owner")
+            if owner and owner != "system":
+                continue   # Spielerbau — niemals automatisch roden
+            try:
+                gone = await structure_manager.remove(x, y)
+            except Exception:
+                gone = None
+            if gone is not None:
+                removed += 1
+                if has_players:
+                    await connection_manager.broadcast({
+                        "type": "structure_removed",
+                        "x": x, "y": y,
+                        "layer": gone.get("layer", "object"),
+                    })
+    return removed
+
+
 async def _place_house(world, structure_manager, npc_manager, connection_manager,
                        origin_x: int, origin_y: int, inner_w: int, inner_h: int,
                        house_type: str, material: str) -> tuple[list[dict], list[dict]]:
@@ -634,6 +678,18 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
     if not house_layouts:
         return 0
 
+    # Welle 53 — Dorffläche roden BEVOR Häuser stehen: entfernt Wald-/Fels-Props
+    # aus der ganzen Bounding-Box, damit das Dorf in einer Lichtung liegt statt
+    # zwischen Bäumen zu verschwinden ("Dorf = Wald"-Fix).
+    try:
+        cleared = await _clear_settlement_ground(
+            structure_manager, connection_manager, min_x, min_y, max_x, max_y, margin=1,
+        )
+        if cleared:
+            log.info("Dorf-Rodung @chunk=(%d,%d): %d Natur-Props entfernt", cx, cy, cleared)
+    except Exception:
+        log.exception("Dorf-Rodung fehlgeschlagen @chunk=(%d,%d)", cx, cy)
+
     all_placed: list[dict] = []
     all_npcs: list[dict] = []
 
@@ -794,7 +850,9 @@ async def try_spawn_settlement(world, structure_manager, npc_manager,
         ("dog", 2), ("cat", 2),
     ]
     livestock_kinds = [k for k, w in livestock_pool for _ in range(w)]
-    livestock_count = random.randint(4, 10) if kind != "capital" else random.randint(8, 16)
+    # Welle 53: Vieh-Bestand pro Siedlung gesenkt (vorher 4-10 / 8-16) — trug
+    # spürbar zur NPC-Überfüllung bei; ein Dorf braucht ein paar Tiere, keine Herde.
+    livestock_count = random.randint(2, 5) if kind != "capital" else random.randint(5, 9)
     for _ in range(livestock_count):
         sx = random.randint(min_x, max_x)
         sy = random.randint(min_y, max_y)
