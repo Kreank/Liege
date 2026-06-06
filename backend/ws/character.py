@@ -267,6 +267,44 @@ async def handle_character_create(ctx: WsContext, data: dict) -> None:
         "unspent": remaining_points,
     })
 
+    # Welle 53 — Klassen-Startkit (weiches Klassensystem): das Preset gibt die
+    # Startausrüstung + (für Caster) den ersten Zauber. Wachstum läuft weiter
+    # über die Skills — niemand ist hart eingesperrt. Caster bekommen einen Stab
+    # (Pflicht zum Zaubern) und sind so sofort spielbar.
+    STARTING_KIT = {
+        "ember_mage":     {"weapon": "staff",   "spell": "magic_missile"},
+        "wanderer_cloak": {"weapon": "staff",   "spell": "lesser_heal"},
+        "wild_ranger":    {"weapon": "bow"},
+        "knife_runner":   {"weapon": "dagger"},
+        "shieldbearer":   {"weapon": "sword",   "offhand": "shield"},
+        "iron_delver":    {"weapon": "sword",   "tool": "pickaxe"},
+    }
+    kit = STARTING_KIT.get(preset)
+    if kit:
+        items = ctx.items
+        try:
+            w = await items.create_for_player(kit["weapon"], player_id)
+            if w is not None:
+                await items.equip(w["id"], player_id)   # direkt ausrüsten
+            for extra_slot in ("offhand", "tool"):
+                ek = kit.get(extra_slot)
+                if ek:
+                    e = await items.create_for_player(ek, player_id)
+                    if e is not None:
+                        await items.equip(e["id"], player_id)
+            spell = kit.get("spell")
+            if spell:
+                await db.pool().execute(
+                    "INSERT INTO learned_spells (player_name, spell_kind) "
+                    "VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                    player_id, spell,
+                )
+            inv = await items.get_inventory(player_id)
+            await websocket.send_json({"type": "inventory_full_refresh", "inventory": inv})
+            logging.info("Startkit '%s' an %s vergeben", preset, player_id)
+        except Exception:
+            logging.exception("Startkit-Vergabe fehlgeschlagen (%s)", preset)
+
 
 async def handle_list_talents(ctx: WsContext, data: dict) -> None:
     websocket = ctx.websocket
