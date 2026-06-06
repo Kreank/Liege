@@ -6,10 +6,10 @@
         <button type="button" class="sb-close" (click)="close()">P / Esc</button>
       </div>
       <div class="spellbook-tabs">
-        @for (s of schools; track s.id) {
+        @for (c of categories(); track c.id) {
           <button type="button" class="sb-tab"
-                  [class.active]="school() === s.id"
-                  (click)="selectSchool(s.id)">{{ s.label }}</button>
+                  [class.active]="category() === c.id"
+                  (click)="selectCategory(c.id)">{{ c.label }}</button>
         }
       </div>
       <div class="spellbook-grid">

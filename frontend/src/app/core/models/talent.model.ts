@@ -57,6 +57,9 @@ export interface SpellEntry {
   readonly skill_req?: number;
   readonly icon_path?: string;
   readonly school?: SpellSchool;
+  /** Welle 53: Zauber-Kategorie (grund/flaeche/heilung/schutz/fluch) — das
+   *  Spellbook gruppiert danach statt nach Schule. */
+  readonly category?: string;
   readonly target_kind?: SpellTargetKind;
   /** Maximale Cast-Entfernung in Tiles (Backend `range`). H2.3 Range-Circle. */
   readonly range?: number;

@@ -22,7 +22,7 @@ import {
   signal,
 } from '@angular/core';
 
-import type { SpellEntry, SpellSchool } from '../../core/models/talent.model';
+import type { SpellEntry } from '../../core/models/talent.model';
 import { GameBridgeService } from '../../core/services/game-bridge.service';
 import { GameStateService } from '../../core/services/game-state.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -47,12 +47,15 @@ interface DetailRow {
   readonly tile: SpellTile;
 }
 
-const SCHOOL_LABEL: Readonly<Record<SpellSchool, string>> = {
-  healer: '⚕ Heiler',
-  mage:   '🔥 Magier',
+// Welle 53: Spellbook nach Wirkungs-Kategorie gegliedert (statt Schule).
+const CATEGORY_LABEL: Readonly<Record<string, string>> = {
+  grund:   '✦ Grundzauber',
+  flaeche: '✸ Flächenzauber',
+  heilung: '⚕ Heilzauber',
+  schutz:  '🛡 Schutzzauber',
+  fluch:   '☠ Flüche',
 };
-
-const SCHOOLS: readonly SpellSchool[] = ['healer', 'mage'];
+const CATEGORY_ORDER: readonly string[] = ['grund', 'flaeche', 'heilung', 'schutz', 'fluch'];
 
 @Component({
   selector: 'app-spellbook',
@@ -66,17 +69,24 @@ export class SpellbookComponent {
   private readonly bridge = inject(GameBridgeService);
   private readonly toast = inject(ToastService);
 
-  readonly schools = SCHOOLS.map((s) => ({ id: s, label: SCHOOL_LABEL[s] }));
   readonly visible = signal<boolean>(false);
-  readonly school = signal<SpellSchool>('healer');
+  readonly category = signal<string>('grund');
   readonly selectedDetail = signal<DetailRow | null>(null);
+
+  /** Nur Kategorien mit mindestens einem Zauber im Katalog (in fixer Reihenfolge),
+   *  damit z.B. „Flüche" erst auftaucht, sobald es solche Zauber gibt. */
+  readonly categories = computed(() => {
+    const present = new Set(this.state.spells().catalog.map((s) => s.category ?? 'grund'));
+    return CATEGORY_ORDER.filter((c) => present.has(c))
+      .map((c) => ({ id: c, label: CATEGORY_LABEL[c] ?? c }));
+  });
 
   readonly tiles = computed<readonly SpellTile[]>(() => {
     const spells = this.state.spells();
     const magicLvl = this._magicLevel();
-    const cur = this.school();
+    const cur = this.category();
     return spells.catalog
-      .filter((s) => s.school === cur)
+      .filter((s) => (s.category ?? 'grund') === cur)
       .map((s) => {
         const learned = spells.learned.includes(s.id);
         const meetsReq = magicLvl >= (s.skill_req ?? 0);
@@ -109,8 +119,8 @@ export class SpellbookComponent {
 
   close(): void { this.visible.set(false); }
 
-  selectSchool(s: SpellSchool): void {
-    this.school.set(s);
+  selectCategory(c: string): void {
+    this.category.set(c);
     this.selectedDetail.set(null);
   }
 

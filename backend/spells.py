@@ -197,7 +197,108 @@ SPELLS = {
         ],
         "description":  "Ultimativer Flächenschaden. Lange Cast-Zeit, lange Abklingzeit.",
     },
+
+    # ─── Item-gelernte Zauber (Welle 53) ───────────────────────────────────────
+    # Aus combat.SPELLS (Buch/Schriftrollen) ins moderne System überführt, damit
+    # sie im Spellbook erscheinen + castbar/hotbar-fähig sind. Keys = Item-Kind
+    # (matchen die bereits in learned_spells gespeicherten Einträge). skill_req 0:
+    # per Item gelernt, nicht per Magie-Level gegated.
+    "spell_book": {
+        "name":         "Feuerball",
+        "school":       "mage",
+        "icon_path":    "/assets/animations/professional/combat_magic/fireball_explosion/fireball_explosion_06.png",
+        "fx_anim":      "fireball_explosion",
+        "target_kind":  "aoe", "range": 7, "radius": 1,
+        "cast_time_ms": 1300, "mana_cost": 20, "cooldown_ms": 4000, "skill_req": 0, "threat": 25,
+        "effects": [{"kind": "damage", "amount": 25, "damage_type": "fire"}],
+        "description":  "Explosiver Feuerball (aus einem Zauberbuch gelernt).",
+    },
+    "scroll": {
+        "name":         "Magisches Geschoss",
+        "school":       "mage",
+        "icon_path":    "/assets/animations/professional/combat_magic/magic_circle/magic_circle_04.png",
+        "fx_anim":      "hit_spark",
+        "target_kind":  "single", "range": 8,
+        "cast_time_ms": 800, "mana_cost": 12, "cooldown_ms": 2000, "skill_req": 0, "threat": 15,
+        "effects": [{"kind": "damage", "amount": 30, "damage_type": "magic"}],
+        "description":  "Zielsuchendes Arkangeschoss (aus einer Schriftrolle gelernt).",
+    },
+    "rune_stone": {
+        "name":         "Heilrune",
+        "school":       "healer",
+        "icon_path":    "/assets/animations/professional/combat_magic/heal_pulse/heal_pulse_05.png",
+        "fx_anim":      "heal_glow",
+        "target_kind":  "self",
+        "cast_time_ms": 1000, "mana_cost": 15, "cooldown_ms": 6000, "skill_req": 0, "threat": 10,
+        "effects": [
+            {"kind": "heal", "amount": 30},
+            {"kind": "status", "effect": "blessed", "magnitude": 4, "duration": 20},
+        ],
+        "description":  "Heilt dich und segnet dich kurzzeitig.",
+    },
+    "ice_scroll": {
+        "name":         "Eis-Sturm",
+        "school":       "mage",
+        "icon_path":    "/assets/animations/spells/ice_shard_projectile.png",
+        "fx_anim":      "ice_shard",
+        "target_kind":  "aoe", "range": 6, "radius": 1,
+        "cast_time_ms": 1200, "mana_cost": 18, "cooldown_ms": 5000, "skill_req": 0, "threat": 22,
+        "effects": [
+            {"kind": "damage", "amount": 22, "damage_type": "ice"},
+            {"kind": "status", "effect": "slowed", "magnitude": 40, "duration": 4},
+        ],
+        "description":  "Eisiger Flächenzauber, verlangsamt Getroffene.",
+    },
+    "wind_slash_scroll": {
+        "name":         "Wind-Klinge",
+        "school":       "mage",
+        "icon_path":    "/assets/animations/professional/combat_magic/magic_circle/magic_circle_04.png",
+        "fx_anim":      "hit_spark",
+        "target_kind":  "single", "range": 5,
+        "cast_time_ms": 700, "mana_cost": 14, "cooldown_ms": 2500, "skill_req": 0, "threat": 18,
+        "effects": [{"kind": "damage", "amount": 28, "damage_type": "magic"}],
+        "description":  "Schnelle Wind-Klinge auf ein Ziel.",
+    },
+    "holy_shield_scroll": {
+        "name":         "Heiliger Schild",
+        "school":       "healer",
+        "icon_path":    "/assets/animations/professional/combat_magic/holy_shield_aura/holy_shield_aura_04.png",
+        "fx_anim":      "magic_circle",
+        "target_kind":  "self",
+        "cast_time_ms": 1500, "mana_cost": 25, "cooldown_ms": 20000, "skill_req": 0, "threat": 5,
+        "effects": [{"kind": "status", "effect": "shielded", "magnitude": 15, "duration": 30}],
+        "description":  "Schützender Schild, reduziert Schaden für 30 s.",
+    },
 }
+
+
+# ─── Welle 53: Zauber-Kategorien (Spellbook-Gliederung nach Typ) ──────────────
+# Statt nur healer/mage gruppiert das Spellbook nach Wirkungs-Typ:
+#   grund     — Einzelziel-Schaden
+#   flaeche   — Flächenschaden (aoe/ground)
+#   heilung   — Heilung / Wiederbelebung
+#   schutz    — Schutz-/Stärkungszauber (Buffs auf sich/Gruppe)
+#   fluch     — reine Flüche/Schwächungen auf Gegner (ohne direkten Schaden)
+SPELL_CATEGORIES = ["grund", "flaeche", "heilung", "schutz", "fluch"]
+
+
+def category_for(spell: dict) -> str:
+    effs = spell.get("effects", [])
+    kinds = {e.get("kind") for e in effs}
+    if "revive" in kinds or "heal" in kinds:
+        return "heilung"
+    if "damage" in kinds:
+        return "flaeche" if spell.get("target_kind") in ("aoe", "ground") else "grund"
+    if "status" in kinds:
+        # Buff auf sich/Gruppe = Schutz; Debuff auf Gegner = Fluch.
+        return "schutz" if spell.get("target_kind") in ("self", "group") else "fluch"
+    return "grund"
+
+
+# Kategorie in jeden Spell injizieren (einmalig beim Import) → landet im
+# spell_catalog ans Frontend.
+for _sp in SPELLS.values():
+    _sp.setdefault("category", category_for(_sp))
 
 
 def get(spell_id: str) -> dict | None:
