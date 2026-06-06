@@ -23,6 +23,14 @@
         </button>
       </div>
 
+      <!-- Welle 53: Sortierung gegen „alles wild durcheinander". -->
+      <div class="trade-sort">
+        <span class="trade-sort__label">Sortieren:</span>
+        <button type="button" [class.active]="sortBy() === 'category'" (click)="setSort('category')">Kategorie</button>
+        <button type="button" [class.active]="sortBy() === 'name'" (click)="setSort('name')">Name</button>
+        <button type="button" [class.active]="sortBy() === 'price'" (click)="setSort('price')">Preis</button>
+      </div>
+
       @if (tab() === 'buy') {
         <div class="trade-panel">
           <div class="col-title">Angebot des Händlers</div>
@@ -30,7 +38,7 @@
             @if (t.offerings.length === 0) {
               <div class="inv-empty">(keine Angebote)</div>
             }
-            @for (off of t.offerings; track off.kind) {
+            @for (off of displayOfferings(); track off.kind) {
               <div class="trade-row" [class.unaffordable]="t.coins < off.price">
                 <span class="name">{{ off.name }}</span>
                 <span class="price">{{ off.price }}</span>
@@ -46,7 +54,7 @@
             @if (sellable().length === 0) {
               <div class="inv-empty">(nichts zu verkaufen)</div>
             }
-            @for (it of sellable(); track it.id) {
+            @for (it of displaySellable(); track it.id) {
               <div class="trade-row" [class.needs-confirm]="it.needsConfirm">
                 <span class="name">
                   {{ it.name }}@if (it.quantity > 1) { <span class="qty">× {{ it.quantity }}</span> }

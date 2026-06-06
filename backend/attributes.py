@@ -140,6 +140,19 @@ def calculate_attributes(skills_dict: dict, equipped_items: list[dict],
                 cfg = item_stats.WEAPON_STATS[kind]
                 attrs["krit_rate"] += cfg["crit"] * 100   # in %
                 attrs["krit_schaden"] += (cfg["crit_mult"] - 1.0) * 50
+            elif kind in item_stats.JEWELRY_STATS:
+                # Welle 53: Schmuck (Ring/Amulett) wirkte bisher GAR NICHT — die
+                # JEWELRY_STATS wurden nirgends verdrahtet. Wir mappen sie auf
+                # Kern-Attribute, von denen sich Max-HP/Mana/Regen/Magie ableiten:
+                #   hp_bonus    → vitalität   (+HP, HP-Regen)
+                #   mana_bonus  → intelligenz (+Mana)
+                #   magic_bonus → intelligenz (Magieschaden)
+                #   regen_bonus → willenskraft (Mana-Regen/Resistenz)
+                js = item_stats.JEWELRY_STATS[kind]
+                attrs["vitalität"]    += js.get("hp_bonus", 0) / HP_PER_VITALITAET
+                attrs["intelligenz"]  += js.get("mana_bonus", 0) / MANA_PER_INTELLIGENZ
+                attrs["intelligenz"]  += js.get("magic_bonus", 0.0) * 40
+                attrs["willenskraft"] += js.get("regen_bonus", 0.0) * 40
     except ImportError:
         pass
 

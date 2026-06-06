@@ -131,7 +131,13 @@ export class DisasterOverlay {
       sprite.setDepth(DEPTH_BOLT);
       sprite.setDisplaySize(TILE_SIZE * 2.0, TILE_SIZE * 4.0);
       sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => sprite.destroy());
-      sprite.anims.play(animKey);
+      // Welle 53: Die Disaster-Anim ist global mit repeat:-1 registriert. Ohne
+      // repeat:0-Override loopte der Blitz ewig, ANIMATION_COMPLETE feuerte nie
+      // → der Bolt blieb DAUERHAFT an seinem Tile stehen (auch nach Sturmende).
+      // Einmalig abspielen, dann zerstört der Complete-Handler ihn.
+      sprite.anims.play({ key: animKey, repeat: 0 });
+      // Sicherheitsnetz: falls die Anim doch nicht sauber endet, hart aufräumen.
+      this.scene.time.delayedCall(1200, () => sprite.destroy());
     } else {
       // Fallback: heller Strich als Graphics-Line.
       const g = this.scene.add.graphics({ x: cx, y: cy });

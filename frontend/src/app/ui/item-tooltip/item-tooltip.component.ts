@@ -33,6 +33,14 @@ export interface StatLine {
 
 /** Klartext-Labels für gängige Affix-Stat-Keys (Backend-Slugs). Fallback ist
  *  der humanisierte Slug. `pct` markiert Prozent-Werte. */
+// Welle 53: Schmuck-Basis-Stats (Spiegel von backend item_stats.JEWELRY_STATS).
+const JEWELRY_STATS: Readonly<Record<string, {
+  hp_bonus?: number; mana_bonus?: number; magic_bonus?: number; regen_bonus?: number;
+}>> = {
+  ring:   { mana_bonus: 10, magic_bonus: 0.05 },
+  amulet: { hp_bonus: 15, regen_bonus: 0.05 },
+};
+
 const AFFIX_LABEL: Readonly<Record<string, { label: string; pct?: boolean }>> = {
   damage_pct:       { label: 'Schaden',          pct: true },
   speed_pct:        { label: 'Angriffstempo',    pct: true },
@@ -155,6 +163,16 @@ export class ItemTooltipComponent {
       if (rs?.weight ?? a?.weight) {
         lines.push({ label: 'Gewicht', value: `${rs?.weight ?? a?.weight}` });
       }
+    }
+
+    // Welle 53: Schmuck (Ring/Amulett). Vorher zeigte der Tooltip dafür GAR
+    // nichts. Werte = Basis aus JEWELRY_STATS (Backend wendet sie ebenso an).
+    const j = JEWELRY_STATS[it.kind];
+    if (j) {
+      if (j.hp_bonus)    lines.push({ label: '❤️ Leben', value: `+${j.hp_bonus}` });
+      if (j.mana_bonus)  lines.push({ label: '💧 Mana', value: `+${j.mana_bonus}` });
+      if (j.magic_bonus) lines.push({ label: '✨ Magieschaden', value: `+${pct(j.magic_bonus)}` });
+      if (j.regen_bonus) lines.push({ label: '🔮 Regeneration', value: `+${pct(j.regen_bonus)}` });
     }
     return lines;
   });

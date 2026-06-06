@@ -107,6 +107,11 @@ function _normalizeTalents(raw: unknown): TalentTree | undefined {
           tier:        typeof it['tier'] === 'number' ? (it['tier'] as number) : 0,
           cost:        typeof it['cost'] === 'number' ? (it['cost'] as number) : 1,
           requires:    typeof prereq === 'string' ? [prereq] : (Array.isArray(prereq) ? prereq as string[] : undefined),
+          // Welle 53: skill_min + vorberechneten Backend-Status durchreichen,
+          // damit die UI das Skill-Level-Gate respektiert (kein „Lernen"-Button,
+          // den das Backend mit skill_too_low ablehnt).
+          skill_min:   typeof it['skill_min'] === 'number' ? (it['skill_min'] as number) : undefined,
+          status:      typeof it['status'] === 'string' ? (it['status'] as string) : undefined,
         });
       }
     }

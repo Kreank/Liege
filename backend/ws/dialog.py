@@ -18,9 +18,86 @@ import npc_worker
 import quest_generator
 import quest_stages
 import region_history
+import skills
 
 from .context import WsContext
 from .dispatcher import register
+
+
+# Welle 53 — Tier-Nutzinteraktion (melken / scheren / Eier / streicheln).
+# Produkt-Items existieren bereits in items.ITEM_KINDS.
+ANIMAL_PRODUCTS = {
+    "cow": "milk_bucket", "calf": "milk_bucket", "ox": "milk_bucket", "bull": "milk_bucket",
+    "goat": "milk_jug", "buck_goat": "milk_jug", "kid_goat": "milk_jug",
+    "sheep": "wool_shearing", "ram": "wool_shearing", "lamb": "wool_shearing",
+    "chicken_hen": "egg", "duck": "egg", "goose": "egg",
+    "rooster": "feathers", "drake": "feathers", "gander": "feathers",
+}
+ANIMAL_VERB = {
+    "milk_bucket": "melkst", "milk_jug": "melkst",
+    "wool_shearing": "scherst", "egg": "sammelst ein Ei von",
+    "feathers": "rupfst Federn von",
+}
+PET_FLAVOR = {
+    "cat": "Die Katze schnurrt und reibt sich an deinem Bein. 🐈",
+    "dog": "Der Hund wedelt freudig mit dem Schwanz. 🐕",
+}
+_TEND_COOLDOWN: dict[int, float] = {}   # npc_id → next_ready_epoch
+TEND_COOLDOWN_S = 300                     # 5 min pro Tier
+
+
+async def handle_tend_animal(ctx: WsContext, data: dict) -> None:
+    """Streicheln/Melken/Scheren/Eier-Sammeln. Produzierende Nutztiere geben mit
+    Cooldown ein Produkt ins Inventar; Haustiere + nicht-produzierende geben
+    eine Flavor-Reaktion."""
+    import time as _t
+    websocket = ctx.websocket
+    player_id = ctx.player_id
+    npcs = ctx.npcs
+    items = ctx.items
+    manager = ctx.manager
+    npc_id = int(data.get("npc_id", 0))
+    npc = npcs.get(npc_id)
+    if npc is None:
+        return
+    kind = npc["kind"]
+    name = npc.get("name", "Das Tier")
+    # Reichweite: Spieler muss am Tier stehen (chebyshev <= 2).
+    player = manager.get_players().get(player_id)
+    if player is None or combat.chebyshev(player["x"], player["y"], npc["x"], npc["y"]) > 2:
+        await websocket.send_json({"type": "toast", "text": "Du bist zu weit weg."})
+        return
+    # Haustiere → Flavor.
+    if kind in PET_FLAVOR:
+        await websocket.send_json({"type": "toast", "text": PET_FLAVOR[kind]})
+        return
+    if kind not in npc_worker.LIVESTOCK_KINDS:
+        return
+    now = _t.time()
+    ready = _TEND_COOLDOWN.get(npc_id, 0.0)
+    if now < ready:
+        mins = int((ready - now) / 60) + 1
+        await websocket.send_json({"type": "toast",
+            "text": f"🐾 {name} ist gerade versorgt — in ~{mins} min wieder."})
+        return
+    product = ANIMAL_PRODUCTS.get(kind)
+    if not product:
+        await websocket.send_json({"type": "toast", "text": f"🐾 Du tätschelst {name}."})
+        return
+    created = await items.create_for_player(product, player_id)
+    _TEND_COOLDOWN[npc_id] = now + TEND_COOLDOWN_S
+    if created is not None:
+        from items import ITEM_KINDS as _IK
+        pname = _IK.get(product, {}).get("name", product)
+        verb = ANIMAL_VERB.get(product, "versorgst")
+        await websocket.send_json({"type": "inventory_add", "item": created})
+        await websocket.send_json({"type": "toast", "text": f"🪣 Du {verb} {name}: +1 {pname}"})
+        try:
+            xp = await skills.gain_xp(player_id, "gathering", 4)
+            if xp:
+                await websocket.send_json({"type": "skill_xp", **xp})
+        except Exception:
+            pass
 
 
 async def handle_talk_to_npc(ctx: WsContext, data: dict) -> None:
@@ -147,3 +224,4 @@ async def handle_talk_to_npc(ctx: WsContext, data: dict) -> None:
 
 
 register("talk_to_npc", handle_talk_to_npc)
+register("tend_animal", handle_tend_animal)

@@ -79,7 +79,17 @@ export class TalentsComponent {
     const points = tree.points;
     const nodes = tree.tree ?? [];
     return nodes.map<TalentRow>((node) => {
+      // Bereits gelernt → immer 'learned' (optimistisch, auch vor Tree-Refresh).
       if (learned.has(node.id)) return { node, status: 'learned' };
+      // Welle 53: Backend-Status BEVORZUGEN — er berücksichtigt das
+      // skill_min-Level-Gate (Tier-2-Talente wie „Vampirisch" brauchen Combat-
+      // Level 8). Vorher rechnete die UI nur prereq+Punkte → zeigte „Lernen",
+      // das Backend lehnte mit skill_too_low ab (wirkte wie „kaputt").
+      if (node.status === 'available' || node.status === 'needs_points'
+          || node.status === 'locked' || node.status === 'learned') {
+        return { node, status: node.status };
+      }
+      // Fallback (kein Backend-Status): clientseitig ohne Skill-Gate.
       const reqOk = (node.requires ?? []).every((r) => learned.has(r));
       if (!reqOk) return { node, status: 'locked' };
       if (points < node.cost) return { node, status: 'needs_points' };

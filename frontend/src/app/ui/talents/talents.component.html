@@ -48,7 +48,11 @@
               } @else if (row.status === 'needs_points') {
                 <span class="talent-status needs_points">Punkte fehlen</span>
               } @else {
-                <span class="talent-status locked">Voraussetzungen fehlen</span>
+                @if (row.node.skill_min) {
+                  <span class="talent-status locked">Braucht Skill-Stufe {{ row.node.skill_min }}</span>
+                } @else {
+                  <span class="talent-status locked">Voraussetzungen fehlen</span>
+                }
               }
             </div>
           </div>

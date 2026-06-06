@@ -106,6 +106,16 @@ const DEPTH = {
   ME: 40,
 } as const;
 
+/** Welle 53: Tiere (Nutztiere + Haustiere) — Klick löst `tend_animal` aus.
+ *  Spiegel von backend npc_worker.LIVESTOCK_KINDS + cat/dog. */
+const ANIMAL_KINDS = new Set<string>([
+  'cow', 'bull', 'calf', 'ox', 'sheep', 'ram', 'lamb', 'sheared_sheep',
+  'pig', 'piglet', 'boar_domestic', 'goat', 'buck_goat', 'kid_goat',
+  'horse', 'draft_horse', 'foal', 'donkey', 'mule',
+  'chicken_hen', 'rooster', 'chick', 'duck', 'drake', 'duckling',
+  'goose', 'gander', 'gosling', 'cat', 'dog',
+]);
+
 /** Render-Skalierung für Wände/Türen (Vielfaches von TILE_SIZE). 1.0 = exakt
  *  kachelgroß: die Wand deckt genau ihr Kollisions-Tile ab (kein Überstand
  *  über die 64px-Kachel mehr → keine „unsichtbaren Wände"). Die Eck-Assets
@@ -688,6 +698,10 @@ export class WorldScene extends Phaser.Scene {
           // Händler: direkt Handels-Modal öffnen. Backend antwortet mit
           // `trade_open`.
           this.bridge.sendIntent({ type: 'open_trade', npc_id: npcHere.id });
+        } else if (this.isAnimalNpc(npcHere)) {
+          // Welle 53: Tier → Nutzinteraktion (melken/scheren/Eier/streicheln)
+          // statt eines Dialog-Modals, das das Backend ohnehin ablehnte.
+          this.bridge.sendIntent({ type: 'tend_animal', npc_id: npcHere.id });
         } else {
           // Friendly/Questgeber → Dialog lokal öffnen. Kein WS-Frame nötig —
           // der Server bekommt erst beim ersten Send (Enter im Input) Bescheid.
@@ -780,6 +794,13 @@ export class WorldScene extends Phaser.Scene {
    */
   private isMerchantNpc(n: { readonly kind: string }): boolean {
     return n.kind === 'merchant' || n.kind === 'merchant_female';
+  }
+
+  /** Tier (Nutztier/Haustier) → Klick löst die Nutzinteraktion `tend_animal`
+   *  aus (melken/scheren/Eier/streicheln) statt eines Dialogs. Spiegelt
+   *  backend npc_worker.LIVESTOCK_KINDS + Haustiere cat/dog. */
+  private isAnimalNpc(n: { readonly kind: string }): boolean {
+    return ANIMAL_KINDS.has(n.kind);
   }
 
   /**

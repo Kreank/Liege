@@ -36,6 +36,10 @@
                   }
                 </div>
 
+                @if (outputStats(r); as st) {
+                  <div class="recipe-stats">{{ st }}</div>
+                }
+
                 @if (locked) {
                   <div class="fz-lock-reason">{{ lockText }}</div>
                 } @else {

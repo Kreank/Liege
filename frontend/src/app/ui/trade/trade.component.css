@@ -198,3 +198,15 @@
   padding: 10px;
   text-align: center;
 }
+
+/* Welle 53: Sortier-Leiste */
+.trade-sort {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; font-size: 0.85em;
+}
+.trade-sort__label { opacity: 0.7; }
+.trade-sort button {
+  background: rgba(40,36,28,0.8); border: 1px solid #6a5a3c;
+  color: #d8c89a; border-radius: 4px; padding: 2px 8px; cursor: pointer;
+}
+.trade-sort button.active { background: #6a5a3c; color: #fff; border-color: #c8b88a; }

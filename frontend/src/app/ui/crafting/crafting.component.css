@@ -68,3 +68,9 @@
 }
 
 .recipe-lock { font-size: 12px; }
+
+/* Welle 53: Crafting-Ergebnis-Stats-Vorschau */
+.recipe-stats {
+  font-size: 0.8em; color: #c8b88a; opacity: 0.9;
+  margin: 2px 0 4px; letter-spacing: 0.2px;
+}

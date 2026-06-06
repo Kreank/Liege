@@ -100,6 +100,38 @@ export class TradeComponent {
       }),
   );
 
+  // ─── Welle 53: Sortierung (gegen „alles wild durcheinander") ───────────
+  readonly sortBy = signal<'category' | 'name' | 'price'>('category');
+  setSort(s: 'category' | 'name' | 'price'): void { this.sortBy.set(s); }
+
+  private readonly CAT_ORDER: Readonly<Record<string, number>> = {
+    weapon: 0, armor: 1, magic: 2, consumable: 3, food: 4, resource: 5, ammo: 6,
+  };
+  private catRank(c: string): number { return this.CAT_ORDER[c] ?? 99; }
+  private cmp(s: string, ca: string, na: string, pa: number,
+              cb: string, nb: string, pb: number): number {
+    if (s === 'name') return na.localeCompare(nb);
+    if (s === 'price') return (pa - pb) || na.localeCompare(nb);
+    return (this.catRank(ca) - this.catRank(cb)) || na.localeCompare(nb);
+  }
+
+  /** Kauf-Angebote mit Kategorie angereichert + sortiert. */
+  readonly displayOfferings = computed(() => {
+    const t = this.trade();
+    if (!t) return [];
+    const s = this.sortBy();
+    return t.offerings
+      .map((o) => ({ ...o, category: ITEM[o.kind]?.category ?? '' }))
+      .sort((a, b) => this.cmp(s, a.category, a.name, a.price, b.category, b.name, b.price));
+  });
+
+  /** Verkaufsliste sortiert (Sell-Preis unbekannt → Preis-Sort fällt auf Name). */
+  readonly displaySellable = computed(() => {
+    const s = this.sortBy();
+    return [...this.sellable()]
+      .sort((a, b) => this.cmp(s, a.category, a.name, 0, b.category, b.name, 0));
+  });
+
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.sellConfirm()) { this.sellConfirm.set(null); return; }

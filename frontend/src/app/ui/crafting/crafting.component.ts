@@ -29,6 +29,8 @@ import {
 } from '@angular/core';
 
 import { ITEM } from '../../core/data/items';
+import { WEAPON_STATS } from '../../core/data/weapons';
+import { ARMOR_STATS } from '../../core/data/armor';
 import { GameStateService } from '../../core/services/game-state.service';
 import { WebSocketService } from '../../core/services/websocket.service';
 import { BillsComponent } from '../bills/bills.component';
@@ -124,6 +126,26 @@ export class CraftingComponent {
    *  „Holzschwert"), sonst der humanisierte `output`-Slug als Fallback. */
   recipeName(r: CraftRecipe): string {
     return r.name ?? this._humanizeSlug(r.output);
+  }
+
+  /** Welle 53: Kompakte Stats-Vorschau des Ergebnis-Items (Basis-Werte), damit
+   *  man vor dem Schmieden sieht, was rauskommt. Leer für Items ohne Kampfwerte. */
+  outputStats(r: CraftRecipe): string {
+    const out: string[] = [];
+    const w = WEAPON_STATS[r.output];
+    if (w) {
+      out.push(`⚔️ ${w.dmg}`);
+      if (w.crit != null) out.push(`Krit ${Math.round(w.crit * 100)}%`);
+      if (w.range != null && w.range > 1) out.push(`Reichw. ${w.range}`);
+    }
+    const a = ARMOR_STATS[r.output];
+    if (a) {
+      out.push(`🛡 ${a.defense}`);
+      if (a.block_chance) out.push(`Block ${Math.round(a.block_chance * 100)}%`);
+    }
+    if (r.output === 'ring') out.push('💧 +10', '✨ +5%');
+    if (r.output === 'amulet') out.push('❤️ +15', '🔮 +5%');
+    return out.join(' · ');
   }
 
   /** Icon-Pfad des Output-Items (für die Rezept-Karte). null → kein Icon. */

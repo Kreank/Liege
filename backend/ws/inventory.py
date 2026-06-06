@@ -221,6 +221,15 @@ async def handle_use_item(ctx: WsContext, data: dict) -> None:
     kind = cur["kind"] if cur else None
     category = cur["category"] if cur else None
 
+    # Welle 53 — Magic-Items (Zauberbuch/Schriftrolle/Rune) → Zauber LERNEN.
+    # Das Frontend routet spell_book wegen eines Catalog-Key-Mismatch auf
+    # `use_item` statt `learn_spell`; consume() lehnt magic ab → vorher No-Op.
+    # Wir delegieren hier an den (funktionierenden) Lern-Pfad.
+    if category == "magic":
+        from .character import handle_learn_spell
+        await handle_learn_spell(ctx, data)
+        return
+
     # Welle 35 — Lore / Quest / Trophy: Flavor-Toast, KEIN Verbrauch.
     no_consume_text = _no_consume_toast(kind or "")
     if no_consume_text is not None:

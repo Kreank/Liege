@@ -7,6 +7,12 @@ export interface TalentNode {
   readonly tier: number;
   readonly cost: number;
   readonly requires?: readonly string[];
+  /** Mindest-Skill-Level (Backend `skill_min`). Tier-2-Talente brauchen z.B. 8. */
+  readonly skill_min?: number;
+  /** Vom Backend vorberechneter Status (learned/available/needs_points/locked),
+   *  berücksichtigt skill_min + prereq + Punkte. Die UI nutzt ihn bevorzugt,
+   *  damit kein „Lernen"-Button erscheint, den das Backend ablehnt. */
+  readonly status?: string;
 }
 
 export interface TalentTree {

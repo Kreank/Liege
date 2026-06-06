@@ -213,6 +213,19 @@ async def do_respawn(manager, world, structures, name: str, in_place: bool = Fal
         x, y, name,
     )
     manager.update_player(name, x, y)
+    # Welle 53 — Schwarzer-Bildschirm-Fix: Der Respawn teleportiert den Spieler
+    # (meist weit) zum Heim-/Welt-Spawn, schickte aber NIE die Map-Chunks für die
+    # neue Position. Folge: alle alten Chunks liegen off-screen (gecullt), für die
+    # Spawn-Region gibt es keine Tiles → nur die Kamera-Hintergrundfarbe = schwarz,
+    # bis ein Browser-Reload den Init-Snapshot neu lädt. Wir streamen die Chunks
+    # jetzt aktiv mit (gleiches Muster wie Dungeon-Exit / Chunk-Übertritt).
+    try:
+        from world import World as _World
+        _cx, _cy, _, _ = _World.world_to_chunk(x, y)
+        _chunks = await world.ensure_chunks_around(_cx, _cy, radius=3)  # CHUNK_SEND_RADIUS
+        await send_to_player(manager, name, {"type": "chunks", "chunks": _chunks})
+    except Exception:
+        logging.exception("Respawn-Chunk-Streaming fehlgeschlagen für %s", name)
     await send_to_player(manager, name, {
         "type":   "player_respawned",
         "x":      x, "y": y,

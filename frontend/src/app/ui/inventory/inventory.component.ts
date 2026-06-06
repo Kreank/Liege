@@ -204,17 +204,20 @@ export class InventoryComponent {
     if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
     if (ev.key === 'i' || ev.key === 'I') {
       this.visible.update((v) => !v);
+      // Welle 53: Tooltip beim Schließen ausblenden — Angular zerstört die
+      // Slot-Elemente ohne mouseleave, sonst bleibt die Hover-Info hängen.
+      this.tooltip.hide();
       ev.preventDefault();
     } else if (ev.key === 'Escape') {
       // Dialoge schließen sich zuerst, sonst das Overlay.
       if (this.splitDialog()) { this.splitDialog.set(null); ev.preventDefault(); return; }
       if (this.dropConfirm()) { this.dropConfirm.set(null); ev.preventDefault(); return; }
-      if (this.visible()) { this.visible.set(false); ev.preventDefault(); }
+      if (this.visible()) { this.visible.set(false); this.tooltip.hide(); ev.preventDefault(); }
     }
   }
 
   // ─── Actions ─────────────────────────────────────────────────────────
-  close(): void { this.visible.set(false); }
+  close(): void { this.visible.set(false); this.tooltip.hide(); }
 
   /** Klick auf Inv-Slot — mit Shift öffnet sich der Split-Dialog. */
   onSlotClick(item: InventoryItem, ev: MouseEvent): void {
