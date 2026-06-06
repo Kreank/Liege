@@ -25,6 +25,10 @@ from .player_comms import send_to_player
 
 DEFAULT_SPAWN_CENTER = (60, 40)  # nahe Mitte der Legacy-Welt
 DOWNED_DURATION_S = 30.0
+# Welle 53: Spawn-Unverwundbarkeit nach Respawn (Sekunden) — verhindert das
+# sofortige Re-Down (Respawn-Loop). player_name → grace_until_epoch.
+RESPAWN_GRACE_S = 3.0
+_respawn_grace: dict[str, float] = {}
 
 # Modul-globaler Downed-State, geteilt zwischen den Helfern hier (und vom
 # spell-cast-Code drüben im spells-Modul über apply_spell_effects abgefragt).
@@ -129,6 +133,7 @@ def is_downed(player_name: str) -> bool:
 async def _enter_downed_state(manager, name: str) -> None:
     if is_downed(name):
         return
+    logging.info("Downed: %s (Respawn-Timer %.0fs gestartet)", name, DOWNED_DURATION_S)
     row = await db.pool().fetchrow(
         "SELECT x, y FROM players WHERE name = $1", name,
     )
@@ -208,11 +213,35 @@ async def do_respawn(manager, world, structures, name: str, in_place: bool = Fal
     else:
         spawn = await world.find_spawn(*DEFAULT_SPAWN_CENTER, structures=structures)
         x, y = spawn["x"], spawn["y"]
-    await db.pool().execute(
-        "UPDATE players SET hp = max_hp, x = $1, y = $2 WHERE name = $3",
+    # Welle 53 — Respawn-Loop-Fix: ALLE Vitalwerte wiederherstellen, nicht nur HP.
+    # Nach langer Session sind Hunger/Durst oft 0 → der Spieler respawnte direkt
+    # in den Verhungerungs-/Verdurstungs-Tod (Needs-Worker schlug sofort wieder
+    # zu) → sofort erneut downed → „30s starten von vorne". Voll auffüllen bricht
+    # die Todesspirale.
+    vit = await db.pool().fetchrow(
+        "UPDATE players SET hp = max_hp, mana = max_mana, "
+        "  hunger = max_hunger, thirst = max_thirst, stamina = max_stamina, "
+        "  x = $1, y = $2 WHERE name = $3 "
+        "RETURNING max_mana, hunger, max_hunger, thirst, max_thirst, stamina, max_stamina",
         x, y, name,
     )
     manager.update_player(name, x, y)
+    # Wiederhergestellte Needs + Mana an den Client (sonst zeigt die UI weiter 0).
+    if vit is not None:
+        await send_to_player(manager, name, {
+            "type": "player_needs",
+            "hunger": vit["hunger"], "max_hunger": vit["max_hunger"],
+            "stamina": vit["stamina"], "max_stamina": vit["max_stamina"],
+            "thirst": vit["thirst"], "max_thirst": vit["max_thirst"],
+        })
+        await send_to_player(manager, name, {
+            "type": "player_mana", "mana": vit["max_mana"], "max_mana": vit["max_mana"],
+        })
+    # Spawn-Unverwundbarkeit: kurzes Gnadenfenster, damit man nicht sofort wieder
+    # gedownt wird (z.B. durch einen Needs-Tick oder einen Mob am Spawn).
+    _respawn_grace[name] = time.time() + RESPAWN_GRACE_S
+    logging.info("Respawn: %s @ (%d,%d) — Vitalwerte voll, %.0fs Schutz",
+                 name, x, y, RESPAWN_GRACE_S)
     # Welle 53 — Schwarzer-Bildschirm-Fix: Der Respawn teleportiert den Spieler
     # (meist weit) zum Heim-/Welt-Spawn, schickte aber NIE die Map-Chunks für die
     # neue Position. Folge: alle alten Chunks liegen off-screen (gecullt), für die
@@ -275,6 +304,13 @@ async def damage_player(manager, name: str, dmg: int, source_npc_id: int | None 
     # Welle 25: Downed-Spieler nehmen keinen Schaden mehr.
     if is_downed(name):
         return
+    # Welle 53: Spawn-Unverwundbarkeit — frisch Respawnte sind kurz immun
+    # (bricht den Respawn-Loop: kein sofortiges Re-Down durch Needs-Tick/Mob).
+    _g = _respawn_grace.get(name)
+    if _g is not None:
+        if time.time() < _g:
+            return
+        del _respawn_grace[name]
     # Welle 52 — FIX 4: Ausweichen. Vor jeder Schadensberechnung ein Dodge-Roll
     # mit der gecachten Ausweichen-Chance (ausweichen-Total/100, gecappt auf
     # combat.PLAYER_DODGE_CAP = 0.5). Bei Erfolg wird der Treffer komplett

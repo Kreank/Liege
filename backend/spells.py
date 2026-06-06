@@ -303,6 +303,14 @@ async def apply_spell_effects(manager, npcs, player_id: str, spell_id: str,
     import status_effects
     target_kind = spell.get("target_kind", "self")
 
+    # Welle 53 — Spell-Skalierung: Schaden UND Heilung wachsen mit dem Magie-
+    # Skill des Casters. Vorher waren beide FLAT (Fireball Lvl 1 == Lvl 50),
+    # womit Caster (die ja nur ihre Fähigkeiten haben) nicht spielbar skalierten.
+    # +4% pro Magie-Level → Lvl 25 ≈ ×2. Intelligenz speist weiterhin den Mana-
+    # Pool (mehr Casts); reine Spell-Power hängt am Magie-Skill (Caster-Meisterschaft).
+    _magic_lvl = await skills.get_skill_level(player_id, "magic")
+    power_mult = 1.0 + _magic_lvl * 0.04
+
     # FX-Animation broadcasten — auf Ziel-Position (für AoE/single) oder
     # Caster-Position (für self/group).
     fx_kind = spell.get("fx_anim")
@@ -368,11 +376,11 @@ async def apply_spell_effects(manager, npcs, player_id: str, spell_id: str,
                 if is_downed_fn(pname):
                     await do_respawn_fn(pname, in_place=True)
         elif ekind == "heal":
-            amount = int(eff.get("amount", 0))
+            amount = int(round(int(eff.get("amount", 0)) * power_mult))
             for pname in affected_players:
                 await heal_player_fn(pname, amount)
         elif ekind == "damage":
-            amount = int(eff.get("amount", 0))
+            amount = int(round(int(eff.get("amount", 0)) * power_mult))
             dmg_type = eff.get("damage_type", "magic")
             for n in affected_npcs:
                 final = combat.apply_creature_resists(n["kind"], amount, dmg_type=dmg_type)

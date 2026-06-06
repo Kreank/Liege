@@ -304,6 +304,21 @@ async def handle_cast_spell(ctx: WsContext, data: dict) -> None:
                 "type": "toast", "text": "Du beherrschst diesen Zauber nicht.",
             })
             return
+        # Welle 53 — Stab-Kanalisierung: Zaubern erfordert einen ausgerüsteten
+        # Zauberstab/Stab (item_stats class 'magic'). „Über den Zauberstab
+        # kanalisiert" — mit Schwert/bloßer Hand geht kein Spell.
+        import item_stats as _is
+        wrow = await db.pool().fetchrow(
+            "SELECT kind FROM items WHERE owner = $1 AND equipped_slot = 'weapon'",
+            player_id,
+        )
+        wkind = wrow["kind"] if wrow else None
+        if not wkind or _is.WEAPON_STATS.get(wkind, {}).get("class") != "magic":
+            await websocket.send_json({
+                "type": "toast",
+                "text": "🪄 Du musst einen Zauberstab führen, um zu zaubern.",
+            })
+            return
         # Mana + Skill-Level + Position holen
         pstate = await db.pool().fetchrow(
             "SELECT mana, max_mana FROM players WHERE name = $1", player_id,

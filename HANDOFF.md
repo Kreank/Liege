@@ -83,6 +83,27 @@ Soft-Lock weg (`heal_player` no-op bei downed, `_enter_downed_state` beendet Res
   quest_worker führt ihn via `ESCORT_NPCS`-Skip im Wander-Loop, fail wenn verloren).
   `UNSUPPORTED_QUEST_TYPES` wieder leer → beide werden angeboten.
 
+## 🟢 Welle 53c (2026-06-06, Test-Feedback — live + gepusht, Commit 1ba2b19)
+
+- Schwarzer Bildschirm beim Sterben: `do_respawn` (services/player_state.py)
+  streamt jetzt Chunks um die Respawn-Position.
+- Dauer-Blitz in der Welt: `disaster-overlay.ts` spielte repeat:-1-Anim →
+  jetzt `repeat:0` + delayedCall-Cleanup.
+- Tooltip blieb nach Inventar-Schließen: `tooltip.hide()` in i/Esc/close.
+- Ringe/Amulette: `JEWELRY_STATS` in `attributes.calculate_attributes` verdrahtet
+  + Jewelry-Zweig im item-tooltip.
+- Zauberbücher: `handle_use_item` delegiert magic-Items an `handle_learn_spell`.
+- Talent-UI nutzt jetzt Backend-`status` (skill_min-Gate), zeigt „Braucht Skill-Stufe X".
+- Handels-Sortierung (Kategorie/Name/Preis), Crafting-Stats-Vorschau.
+- Tier-Nutzinteraktion `tend_animal` (melken/scheren/Eier + 5min-Cooldown,
+  Haustiere Flavor) — ws/dialog.py + world-scene isAnimalNpc.
+
+## 🔵 IN ARBEIT: Fähigkeiten-/Zaubersystem (Magier/Heiler)
+User-Wunsch: Magier/Heiler kämpfen über Zauberstab-Fähigkeiten (Cast-Zeit etc.),
+nicht mit Schwert. Bestehendes Gerüst: spells.py (Schulen healer/mage, cast_time/
+mana/cooldown), spell_caster, learned_spells, cast_spell, Spellbook. Aufbauen
+statt neu bauen. (Stand: System wird kartiert, dann Plan + Umsetzung.)
+
 ## 🔴 OFFEN / bewusst aufgeschoben
 
 1. **NPC-Move-Broadcast Proximity-Filter** + Move-Persistenz batchen (Perf —
