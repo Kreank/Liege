@@ -309,7 +309,9 @@ async def apply_spell_effects(manager, npcs, player_id: str, spell_id: str,
     # +4% pro Magie-Level → Lvl 25 ≈ ×2. Intelligenz speist weiterhin den Mana-
     # Pool (mehr Casts); reine Spell-Power hängt am Magie-Skill (Caster-Meisterschaft).
     _magic_lvl = await skills.get_skill_level(player_id, "magic")
-    power_mult = 1.0 + _magic_lvl * 0.04
+    # Skaliert mit Magie-Skill (+4%/Level) UND Intelligenz (gecached via
+    # player_combat_sheet, +2%/Punkt). Beides additiv auf den Multiplikator.
+    power_mult = 1.0 + _magic_lvl * 0.04 + combat.player_spell_power_bonus(player_id)
 
     # FX-Animation broadcasten — auf Ziel-Position (für AoE/single) oder
     # Caster-Position (für self/group).

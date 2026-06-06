@@ -114,6 +114,18 @@ export class SpellbookComponent {
     this.selectedDetail.set(null);
   }
 
+  /** Welle 53: Drag eines gelernten Zaubers in die Hotbar. Schreibt die
+   *  Spell-ID unter dem SPELL_MIME; die Hotbar legt sie in den Slot und castet
+   *  sie bei Aktivierung. Ungelernte Zauber sind nicht draggable. */
+  onSpellDragStart(ev: DragEvent, tile: SpellTile): void {
+    if (!tile.learned || !ev.dataTransfer) {
+      ev.preventDefault();
+      return;
+    }
+    ev.dataTransfer.setData('application/x-liege-spell', tile.entry.id);
+    ev.dataTransfer.effectAllowed = 'copy';
+  }
+
   pickTile(tile: SpellTile): void {
     const e = tile.entry;
     const cast = ((e.cast_time_ms ?? 0) / 1000).toFixed(1);

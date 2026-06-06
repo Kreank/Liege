@@ -16,10 +16,12 @@
         @for (t of tiles(); track t.id) {
           <div class="sb-spell"
                [class.locked]="t.locked"
+               [attr.draggable]="t.learned ? 'true' : null"
+               (dragstart)="onSpellDragStart($event, t)"
                (click)="pickTile(t)"
                (dblclick)="castTile(t)">
             @if (t.icon) {
-              <img [src]="t.icon" [alt]="t.name">
+              <img [src]="t.icon" [alt]="t.name" draggable="false">
             }
             <div class="sb-name">{{ t.name }}</div>
             @if (!t.meetsReq) {

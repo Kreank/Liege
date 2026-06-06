@@ -317,6 +317,9 @@ async def player_combat_sheet(items, player_name: str) -> dict:
     combat.set_player_crit_chance(player_name, float(totals.get("krit_rate", 0)))
     combat.set_player_crit_damage(player_name, float(totals.get("krit_schaden", 0)))
     combat.set_player_dodge(player_name, float(totals.get("ausweichen", 0)))
+    # Welle 53: Spell-Power aus Intelligenz cachen (skaliert Spell-Schaden/Heilung
+    # zusätzlich zum Magie-Level — „Intelligenz → Magieschaden", siehe spells.py).
+    combat.set_player_spell_power(player_name, float(totals.get("intelligenz", 0)))
     avg_damage = int(round(
         (base + skill_add + combat.PLAYER_BASE_DAMAGE // 2) * dmg_mult))
 

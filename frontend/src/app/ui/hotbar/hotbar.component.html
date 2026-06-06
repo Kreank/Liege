@@ -22,8 +22,8 @@
       (mouseleave)="hideTooltip()"
     >
       <span class="hotbar-slot__key">{{ slot.key }}</span>
-      @if (slot.def?.path) {
-        <img class="hotbar-slot__icon" [src]="slot.def?.path" alt="" />
+      @if (slot.iconPath) {
+        <img class="hotbar-slot__icon" [src]="slot.iconPath" alt="" />
       }
       @if (slot.count > 1) {
         <span class="hotbar-slot__count">{{ slot.count }}</span>

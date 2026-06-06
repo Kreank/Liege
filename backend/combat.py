@@ -222,6 +222,22 @@ def player_dodge_chance(player_name: str) -> float:
     Default 0.0 (kein Sheet gebaut → kein Dodge)."""
     return min(PLAYER_DODGE_CAP, max(0.0, _player_dodge.get(player_name, 0.0) / 100.0))
 
+
+# Welle 53: Spell-Power aus Intelligenz (gecached wie die Welle-52-Werte, gesetzt
+# in attributes.player_combat_sheet). Spell-Schaden/Heilung skalieren zusätzlich
+# zum Magie-Level mit Intelligenz. Default 0.0 (kein Sheet gebaut → kein Bonus).
+_player_spell_power: dict[str, float] = {}
+SPELL_POWER_PER_INT = 0.02   # +2% Spell-Output pro Intelligenz-Punkt
+
+
+def set_player_spell_power(player_name: str, intelligenz: float) -> None:
+    _player_spell_power[player_name] = intelligenz
+
+
+def player_spell_power_bonus(player_name: str) -> float:
+    """Zusatz-Multiplikator-Bonus für Spells aus Intelligenz (0.0 default)."""
+    return _player_spell_power.get(player_name, 0.0) * SPELL_POWER_PER_INT
+
 # Legacy-Konstante (Backwards-Compat). Bevorzugt item_stats.weapon_base_damage nutzen.
 WEAPON_DAMAGE = {
     "sword": 10, "axe": 14, "bow": 8, "staff": 7,

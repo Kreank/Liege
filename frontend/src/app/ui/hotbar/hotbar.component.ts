@@ -54,6 +54,7 @@ import {
 
 import { ITEM } from '../../core/data/items';
 import type { InventoryItem, ItemDef } from '../../core/models/item.model';
+import type { SpellEntry } from '../../core/models/talent.model';
 import { GameBridgeService } from '../../core/services/game-bridge.service';
 import { GameStateService } from '../../core/services/game-state.service';
 import { TooltipService } from '../../core/services/tooltip.service';
@@ -65,6 +66,8 @@ const SLOT_COUNT = 9;
 const HOTBAR_MIME = 'application/x-liege-hotbar';
 /** Mime-Type, den das Inventar (`inventory.component.ts`) als Source nutzt. */
 const INVENTORY_MIME = 'application/json';
+/** Welle 53: Mime-Type, den das Spellbook beim Drag eines Zaubers schreibt. */
+const SPELL_MIME = 'application/x-liege-spell';
 
 /** Quality-Order für Tooltip-Sortierung — höhere Qualität priorisieren. */
 const QR: Readonly<Record<string, number>> = {
@@ -87,6 +90,8 @@ interface HotbarSlotView {
   readonly key: string;
   readonly kind: string | null;
   readonly def: ItemDef | null;
+  /** Welle 53: Icon-Pfad — Item-Sprite ODER Spell-Icon (für Spell-Slots). */
+  readonly iconPath: string | null;
   readonly count: number;
   readonly equipped: boolean;
   readonly active: boolean;
@@ -190,7 +195,9 @@ export class HotbarComponent {
     // immer wenige Dutzend Einträge hat — die Map ist günstig pro Re-Compute.
     const spellsState = this.state.spells();
     const spellManaCosts = new Map<string, number>();
+    const spellById = new Map<string, SpellEntry>();
     for (const sp of spellsState.catalog) {
+      spellById.set(sp.id, sp);
       if (typeof sp.mana_cost === 'number') {
         spellManaCosts.set(sp.id, sp.mana_cost);
       }
@@ -208,19 +215,25 @@ export class HotbarComponent {
     for (let i = 0; i < SLOT_COUNT; i++) {
       const kind = slots[i] ?? null;
       const def = kind ? ITEM[kind] ?? null : null;
+      // Welle 53: Spell-Slot (kein Item-Def, aber im Spell-Catalog).
+      const spellEntry = kind && !def ? spellById.get(kind) ?? null : null;
       const cnt = kind ? counts[kind] ?? 0 : 0;
       const equipped = kind ? inv.some((it) => it.kind === kind && !!it.equipped_slot) : false;
       const empty = !kind;
-      const missing = !!kind && cnt === 0 && !equipped;
+      // Spells sind nie „missing" (sie liegen nicht im Inventar).
+      const missing = !!kind && !spellEntry && cnt === 0 && !equipped;
+      const iconPath = def?.path ?? spellEntry?.icon_path ?? null;
       // H3.3 — Mana-Cost: nur wenn der Slot kein Item-Def hat (Spells haben
       // keinen ITEM-Eintrag, sondern leben im Spell-Catalog).
       const manaCost = kind && !def ? spellManaCosts.get(kind) ?? null : null;
       const manaAffordable = manaCost == null || curMana >= manaCost;
       const tooltip = def
         ? `${def.name}${cnt > 0 ? ` (${cnt})` : ''}`
-        : manaCost != null
-          ? `Mana-Kost: ${manaCost}`
-          : null;
+        : spellEntry
+          ? `${spellEntry.name}${manaCost != null ? ` — ${manaCost} Mana` : ''}`
+          : manaCost != null
+            ? `Mana-Kost: ${manaCost}`
+            : null;
       // Item-Cooldown (lokal) ODER Spell-Cooldown (aus GameState-End-Timestamp).
       let cd = kind ? cooldowns.get(kind) ?? 0 : 0;
       if (kind && cd <= 0) {
@@ -233,6 +246,7 @@ export class HotbarComponent {
         key: String(i + 1),
         kind,
         def,
+        iconPath,
         count: cnt,
         equipped,
         active: i === active,
@@ -272,13 +286,23 @@ export class HotbarComponent {
     const kind = this._slots()[idx];
     if (!kind) return; // No-op auf leerem Slot.
 
-    // Spell-Slot-Hook (F13): falls `kind` keine Item-Definition hat, könnte
-    // es eine gelernte Spell-ID sein. Dann statt `use_item` einen Cast
-    // schicken: `this.bridge.sendIntent({ type: 'cast_spell', spell_id: kind })`.
-    // Resolver würde `state.spells().learned.some(s => s.kind === kind)` prüfen.
+    // Welle 53 — Spell-Cast aus der Hotbar: hat `kind` keine Item-Definition,
+    // ist es (potenziell) eine Spell-ID. Wenn gelernt → casten (self/group
+    // direkt, zielende Zauber öffnen das Target-Overlay — wie im Spellbook).
     const def = ITEM[kind] ?? null;
     if (!def) {
-      // Hook-Stelle — aktuell still: weder Item noch Spell-Resolver hier.
+      const sp = this.state.spells();
+      const entry = sp.catalog.find((e) => e.id === kind);
+      if (entry && sp.learned.includes(kind)) {
+        const tk = entry.target_kind;
+        if (tk === 'self' || tk === 'group' || tk === undefined) {
+          this.bridge.sendIntent({ type: 'cast_spell', spell_id: kind });
+        } else {
+          this.state.beginSpellTargeting(entry);
+        }
+      } else if (entry) {
+        this._notifyMissing(entry.name);   // bekannt, aber nicht gelernt
+      }
       return;
     }
 
@@ -357,6 +381,14 @@ export class HotbarComponent {
       if (hp && hp.fromSlotIdx !== idx) {
         this._swapSlots(hp.fromSlotIdx, idx);
       }
+      return;
+    }
+
+    // Welle 53 — Spell aus dem Spellbook zugewiesen: Slot trägt dann die
+    // Spell-ID (activate() castet sie). _assignSlot speichert nur den String.
+    const spellRaw = ev.dataTransfer.getData(SPELL_MIME);
+    if (spellRaw) {
+      this._assignSlot(idx, spellRaw);
       return;
     }
 
