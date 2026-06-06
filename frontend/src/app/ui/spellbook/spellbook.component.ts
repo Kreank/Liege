@@ -133,7 +133,9 @@ export class SpellbookComponent {
       return;
     }
     ev.dataTransfer.setData('application/x-liege-spell', tile.entry.id);
-    ev.dataTransfer.effectAllowed = 'copy';
+    // 'copyMove', damit der von der Hotbar im dragover gesetzte dropEffect
+    // 'move' akzeptiert wird (reines 'copy' würde den Drop verwerfen).
+    ev.dataTransfer.effectAllowed = 'copyMove';
   }
 
   pickTile(tile: SpellTile): void {
