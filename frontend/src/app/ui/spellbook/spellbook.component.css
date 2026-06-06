@@ -5,7 +5,10 @@
 .spellbook-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  /* Welle 53: 150 statt 200 — wie die anderen Panels (Inventar/Skills/Quests)
+     und UNTER der Hotbar (155). Sonst deckt das Vollbild-Overlay die Hotbar ab
+     und fängt den Spell-Drag-Drop ab (gleicher Bug wie früher beim Inventar). */
+  z-index: 150;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
