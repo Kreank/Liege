@@ -98,11 +98,27 @@ Soft-Lock weg (`heal_player` no-op bei downed, `_enter_downed_state` beendet Res
 - Tier-Nutzinteraktion `tend_animal` (melken/scheren/Eier + 5min-Cooldown,
   Haustiere Flavor) — ws/dialog.py + world-scene isAnimalNpc.
 
-## 🔵 IN ARBEIT: Fähigkeiten-/Zaubersystem (Magier/Heiler)
-User-Wunsch: Magier/Heiler kämpfen über Zauberstab-Fähigkeiten (Cast-Zeit etc.),
-nicht mit Schwert. Bestehendes Gerüst: spells.py (Schulen healer/mage, cast_time/
-mana/cooldown), spell_caster, learned_spells, cast_spell, Spellbook. Aufbauen
-statt neu bauen. (Stand: System wird kartiert, dann Plan + Umsetzung.)
+## 🟢 Fähigkeiten-/Zaubersystem (Magier/Heiler) — Welle 53d/53e, live
+Aufgebaut auf dem vorhandenen Gerüst (spell_caster, Schulen healer/mage,
+learned_spells, Spellbook P-Taste, Cast-Bar, Target-Overlay):
+- **Spell-Skalierung** (spells.apply_spell_effects): Schaden+Heilung ×(1+4%/Magie-
+  Level) statt flat → Caster wachsen.
+- **Stab-Kanalisierung** (ws/combat.py handle_cast_spell): Zaubern erfordert
+  ausgerüsteten Stab/Wand (item_stats class 'magic'). Stäbe im Händler-Pool.
+- **Weiches Klassensystem** (ws/character.py Startkit): Preset = Klasse + Startkit.
+  ember_mage→Stab+magic_missile, wanderer_cloak→Stab+lesser_heal, wild_ranger→Bogen,
+  knife_runner→Dolch, shieldbearer→Schwert+Schild, iron_delver→Schwert+Spitzhacke.
+  Startwaffe direkt ausgerüstet. Wachstum weiter über Skills (kein Hard-Lock).
+- Schaden unterbricht Cast war bereits verdrahtet (player_state:293).
+
+**Noch offen (Politur):** Hotbar-Casting (Spells aus Hotbar-Slots wirken +
+Zuweisung Spellbook→Hotbar; aktuell castet man über das Spellbook/P). Doppel-
+SPELLS-Struktur (spells.py-IDs vs combat.py-Item-Kinds) langfristig vereinheitlichen.
+Spell-Skalierung auch an Intelligenz koppeln (aktuell nur Magie-Skill).
+
+## 🟢 Respawn-Loop-Fix (Welle 53d): do_respawn füllt jetzt ALLE Vitalwerte
+(hp/mana/hunger/thirst/stamina), nicht nur HP — sonst respawnte man in den
+Verhungerungstod → 30s-Loop. + 3s Spawn-Unverwundbarkeit, Downed/Respawn-Logging.
 
 ## 🔴 OFFEN / bewusst aufgeschoben
 
